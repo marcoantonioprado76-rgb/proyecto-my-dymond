@@ -32,10 +32,6 @@ const SERVICES = [
   { href: '/dashboard/services/virtual-store', icon: 'fa-solid fa-shop',         label: 'Tienda Virtual', desc: 'Tu escaparate digital',      color: '#38bdf8' },
   { href: '/dashboard/services/marketplace',   icon: 'fa-solid fa-cube',         label: 'Marketplace',   desc: 'Vende tus cursos',            color: '#fb7185' },
   { href: '/dashboard/services/clipping',      icon: 'fa-solid fa-newspaper',    label: 'Clipping',      desc: 'Monitoreo de contenido',      color: '#f472b6' },
-  { href: '/dashboard/courses',                icon: 'fa-solid fa-book-open',    label: 'Academy',       desc: 'Cursos y formación',          color: '#D203DD' },
-  { href: '/dashboard/store',                  icon: 'fa-solid fa-bag-shopping', label: 'Shop',          desc: 'Tienda MY DIAMOND',           color: '#e855f0' },
-  { href: '/dashboard/wallet',                 icon: 'fa-solid fa-wallet',       label: 'Wallet',        desc: 'Saldo y retiros',             color: '#22c55e' },
-  { href: '/dashboard/planes',                 icon: 'fa-solid fa-crown',        label: 'Planes',        desc: 'Gestiona tu membresía',       color: '#fbbf24' },
 ]
 
 export default function DashboardPage() {
