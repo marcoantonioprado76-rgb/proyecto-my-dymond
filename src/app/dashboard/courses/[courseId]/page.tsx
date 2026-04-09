@@ -47,14 +47,15 @@ export default function CourseDetailPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [paymentQrUrl, setPaymentQrUrl] = useState<string | null>(null)
+  const [selectedVideoId, setSelectedVideoId] = useState<string | null>(null)
 
   useEffect(() => {
     fetch('/api/settings').then(r => r.json()).then(d => setPaymentQrUrl(d.settings?.PAYMENT_QR_URL || null)).catch(() => {})
   }, [])
 
   // Vimeo player refs and tracking
-  const iframeRefs = useRef<Record<string, HTMLIFrameElement | null>>({})
-  const vimeoPlayers = useRef<Record<string, any>>({})
+  const iframeRef = useRef<HTMLIFrameElement | null>(null)
+  const vimeoPlayer = useRef<any>(null)
   const reportedRef = useRef<Set<string>>(new Set())
   const [completedVideos, setCompletedVideos] = useState<Set<string>>(new Set())
 
@@ -92,11 +93,15 @@ export default function CourseDetailPage() {
     const data = await res.json()
     if (!res.ok) { setError(data.error ?? 'Error'); setLoading(false); return }
     setCourse(data.course)
-    // Sync completed state from server
     const serverCompleted = new Set<string>(
       (data.course.videos as CourseVideo[]).filter(v => v.completed).map(v => v.id)
     )
     setCompletedVideos(serverCompleted)
+    // Auto-select first unlocked video
+    if (!selectedVideoId) {
+      const firstUnlocked = (data.course.videos as CourseVideo[]).find(v => v.unlocked)
+      if (firstUnlocked) setSelectedVideoId(firstUnlocked.id)
+    }
     setLoading(false)
   }
 
@@ -116,51 +121,50 @@ export default function CourseDetailPage() {
     }
   }, [])
 
-  // Load Vimeo SDK and init players when course is approved and loaded
+  // Init Vimeo player when selected video changes
   useEffect(() => {
-    if (!course || course.enrollment?.status !== 'APPROVED') return
-    if (course.videos.length === 0) return
+    if (!selectedVideoId || !course || course.enrollment?.status !== 'APPROVED') return
 
-    function initPlayers() {
+    function initPlayer() {
       const Vimeo = (window as any).Vimeo
-      if (!Vimeo) return
+      if (!Vimeo || !iframeRef.current) return
 
-      for (const video of course!.videos) {
-        if (!video.unlocked) continue
-        const iframe = iframeRefs.current[video.id]
-        if (!iframe || vimeoPlayers.current[video.id]) continue
-
-        const player = new Vimeo.Player(iframe)
-        vimeoPlayers.current[video.id] = player
-
-        const vid = video // capture for closure
-        player.on('timeupdate', (data: { percent: number }) => {
-          const pct = Math.round(data.percent * 100)
-          if (pct >= 95 && !reportedRef.current.has(vid.id)) {
-            reportedRef.current.add(vid.id)
-            reportProgress(vid.id, pct)
-          }
-        })
+      // Destroy previous player
+      if (vimeoPlayer.current) {
+        try { vimeoPlayer.current.destroy() } catch {}
+        vimeoPlayer.current = null
       }
+
+      const player = new Vimeo.Player(iframeRef.current)
+      vimeoPlayer.current = player
+
+      const vidId = selectedVideoId
+      player.on('timeupdate', (data: { percent: number }) => {
+        const pct = Math.round(data.percent * 100)
+        if (pct >= 95 && !reportedRef.current.has(vidId)) {
+          reportedRef.current.add(vidId)
+          reportProgress(vidId, pct)
+        }
+      })
     }
 
     if ((window as any).Vimeo) {
-      initPlayers()
+      // Small delay to let iframe render
+      const t = setTimeout(initPlayer, 300)
+      return () => clearTimeout(t)
     } else {
-      // Check if script already added
       if (!document.querySelector('script[data-vimeo-sdk]')) {
         const script = document.createElement('script')
         script.src = 'https://player.vimeo.com/api/player.js'
         script.setAttribute('data-vimeo-sdk', '1')
-        script.onload = initPlayers
+        script.onload = () => setTimeout(initPlayer, 300)
         document.head.appendChild(script)
       } else {
-        // Script loading, retry after a moment
-        const timer = setTimeout(initPlayers, 1500)
-        return () => clearTimeout(timer)
+        const t = setTimeout(initPlayer, 1500)
+        return () => clearTimeout(t)
       }
     }
-  }, [course])
+  }, [selectedVideoId, course?.enrollment?.status])
 
   async function reportProgress(videoId: string, percent: number) {
     try {
@@ -171,7 +175,6 @@ export default function CourseDetailPage() {
       })
       if (res.ok) {
         setCompletedVideos(prev => new Set(prev).add(videoId))
-        // Reload to unlock next video
         await loadCourse()
       }
     } catch {}
@@ -195,7 +198,6 @@ export default function CourseDetailPage() {
     loadCourse()
   }
 
-  // Crypto payment submission
   async function handleCryptoPayment(txHash: string): Promise<'approved' | 'pending_verification'> {
     const res = await fetch(`/api/courses/${courseId}/enroll`, {
       method: 'POST',
@@ -207,7 +209,6 @@ export default function CourseDetailPage() {
     return data.status === 'APPROVED' ? 'approved' : 'pending_verification'
   }
 
-  // Free plan enroll
   async function handleFreeEnroll() {
     setSubmitting(true)
     setSubmitError(null)
@@ -253,9 +254,11 @@ export default function CourseDetailPage() {
   const isRejected = enrollment?.status === 'REJECTED'
   const isLocked = course.locked
 
+  const selectedVideo = course.videos.find(v => v.id === selectedVideoId) ?? null
+  const selectedIdx = course.videos.findIndex(v => v.id === selectedVideoId)
+
   return (
-    <div className="px-4 sm:px-6 pt-6 pb-12 max-w-7xl mx-auto"
-      style={{ userSelect: 'none', WebkitUserSelect: 'none' }}>
+    <div className="px-4 sm:px-6 pt-6 pb-12 max-w-7xl mx-auto" style={{ userSelect: 'none', WebkitUserSelect: 'none' }}>
       <Link href="/dashboard/courses" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 13, color: 'rgba(255,255,255,0.4)', textDecoration: 'none', marginBottom: 20 }}>
         ← Volver a cursos
       </Link>
@@ -307,14 +310,12 @@ export default function CourseDetailPage() {
           <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', marginTop: 2 }}>Tu comprobante está siendo verificado. Recibirás acceso una vez aprobado.</p>
         </div>
       )}
-
       {!isLocked && isPendingVerification && (
         <div style={{ padding: '12px 16px', borderRadius: 12, marginBottom: 20, background: 'rgba(245,166,35,0.08)', border: '1px solid rgba(245,166,35,0.25)' }}>
           <p style={{ fontSize: 13, color: '#F5A623', fontWeight: 600 }}>⛓️ Verificando en blockchain...</p>
           <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', marginTop: 2 }}>Tu transacción fue enviada. Estamos confirmando los bloques en la red BSC. Se activará en minutos.</p>
         </div>
       )}
-
       {!isLocked && isRejected && (
         <div style={{ padding: '12px 16px', borderRadius: 12, marginBottom: 20, background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)' }}>
           <p style={{ fontSize: 13, color: '#ef4444', fontWeight: 600 }}>✕ Solicitud rechazada</p>
@@ -328,83 +329,111 @@ export default function CourseDetailPage() {
       {/* CTA buttons */}
       {!isLocked && !enrollment && (
         course.freeForPlan ? (
-          <button
-            onClick={handleFreeEnroll}
-            disabled={submitting}
-            style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '12px 24px', borderRadius: 12, fontWeight: 700, fontSize: 14, background: submitting ? 'rgba(0,255,136,0.3)' : 'linear-gradient(135deg, #00FF88 0%, #D203DD 100%)', color: '#000', border: 'none', cursor: submitting ? 'not-allowed' : 'pointer', marginBottom: 28 }}
-          >
+          <button onClick={handleFreeEnroll} disabled={submitting}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '12px 24px', borderRadius: 12, fontWeight: 700, fontSize: 14, background: submitting ? 'rgba(0,255,136,0.3)' : 'linear-gradient(135deg, #00FF88 0%, #D203DD 100%)', color: '#000', border: 'none', cursor: submitting ? 'not-allowed' : 'pointer', marginBottom: 28 }}>
             {submitting ? 'Activando...' : '✓ Acceder gratis con mi plan'}
           </button>
         ) : (
-          <button
-            onClick={() => setShowModal(true)}
-            style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '12px 24px', borderRadius: 12, fontWeight: 700, fontSize: 14, background: 'linear-gradient(135deg, #F5A623 0%, #f97316 100%)', color: '#000', border: 'none', cursor: 'pointer', marginBottom: 28 }}
-          >
+          <button onClick={() => setShowModal(true)}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '12px 24px', borderRadius: 12, fontWeight: 700, fontSize: 14, background: 'linear-gradient(135deg, #F5A623 0%, #f97316 100%)', color: '#000', border: 'none', cursor: 'pointer', marginBottom: 28 }}>
             ₮ Comprar con USDT — {course.price.toFixed(2)} USDT
           </button>
         )
       )}
       {submitError && !showModal && <p style={{ fontSize: 12, color: '#ef4444', marginBottom: 16 }}>{submitError}</p>}
 
-      {/* Videos */}
+      {/* ── PLAYER + PLAYLIST ── */}
       {isApproved && course.videos.length > 0 && (
-        <div>
-          <h2 style={{ fontSize: 15, fontWeight: 700, color: '#fff', marginBottom: 16, letterSpacing: '0.04em', textTransform: 'uppercase' }}>
-            Contenido del curso
-          </h2>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-            {course.videos.map((video, idx) => {
-              const isUnlocked = video.unlocked
-              const isDone = completedVideos.has(video.id) || video.completed
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
 
-              return (
-                <div key={video.id} style={{ borderRadius: 14, overflow: 'hidden', border: `1px solid ${isUnlocked ? 'rgba(255,255,255,0.07)' : 'rgba(255,255,255,0.03)'}`, opacity: isUnlocked ? 1 : 0.6 }}>
-                  {/* Video header */}
-                  <div style={{ background: isUnlocked ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.2)', padding: '10px 14px', borderBottom: `1px solid ${isUnlocked ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.02)'}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <p style={{ fontSize: 13, fontWeight: 600, color: isUnlocked ? '#fff' : 'rgba(255,255,255,0.4)', margin: 0 }}>
-                      <span style={{ color: 'rgba(255,255,255,0.3)', marginRight: 6 }}>{idx + 1}.</span>
+          {/* Player activo */}
+          {selectedVideo && (
+            <div style={{ borderRadius: 14, overflow: 'hidden', border: '1px solid rgba(210,3,221,0.2)' }}>
+              {/* Título del video activo */}
+              <div style={{ background: 'rgba(210,3,221,0.08)', padding: '10px 16px', display: 'flex', alignItems: 'center', gap: 10 }}>
+                <span style={{ fontSize: 11, fontWeight: 700, color: '#D203DD', background: 'rgba(210,3,221,0.15)', border: '1px solid rgba(210,3,221,0.3)', padding: '2px 8px', borderRadius: 6 }}>
+                  {selectedIdx + 1} / {course.videos.length}
+                </span>
+                <p style={{ fontSize: 13, fontWeight: 700, color: '#fff', margin: 0, flex: 1 }}>{selectedVideo.title}</p>
+                {(completedVideos.has(selectedVideo.id) || selectedVideo.completed) && (
+                  <span style={{ fontSize: 11, fontWeight: 700, color: '#00FF88', background: 'rgba(0,255,136,0.1)', border: '1px solid rgba(0,255,136,0.2)', padding: '2px 8px', borderRadius: 6, whiteSpace: 'nowrap' }}>
+                    ✓ Completado
+                  </span>
+                )}
+              </div>
+              {/* iframe */}
+              <div style={{ position: 'relative', paddingBottom: '56.25%', background: '#000' }}>
+                <iframe
+                  key={selectedVideoId}
+                  ref={el => { iframeRef.current = el }}
+                  src={getVimeoEmbedUrl(selectedVideo.youtubeUrl)}
+                  title={selectedVideo.title}
+                  allow="autoplay; fullscreen; picture-in-picture"
+                  allowFullScreen
+                  style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 'none' }}
+                />
+              </div>
+            </div>
+          )}
+
+          {/* Playlist */}
+          <div style={{ borderRadius: 14, overflow: 'hidden', border: '1px solid rgba(255,255,255,0.07)' }}>
+            <div style={{ background: 'rgba(255,255,255,0.03)', padding: '10px 16px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+              <p style={{ fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.4)', margin: 0, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                Contenido del curso
+              </p>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+              {course.videos.map((video, idx) => {
+                const isUnlocked = video.unlocked
+                const isDone = completedVideos.has(video.id) || video.completed
+                const isActive = video.id === selectedVideoId
+
+                return (
+                  <button
+                    key={video.id}
+                    onClick={() => isUnlocked && setSelectedVideoId(video.id)}
+                    disabled={!isUnlocked}
+                    style={{
+                      display: 'flex', alignItems: 'center', gap: 12,
+                      padding: '12px 16px',
+                      background: isActive ? 'rgba(210,3,221,0.1)' : 'transparent',
+                      borderLeft: isActive ? '3px solid #D203DD' : '3px solid transparent',
+                      borderRight: 'none', borderTop: 'none',
+                      borderBottom: idx < course.videos.length - 1 ? '1px solid rgba(255,255,255,0.04)' : 'none',
+                      cursor: isUnlocked ? 'pointer' : 'default',
+                      textAlign: 'left', width: '100%',
+                      opacity: isUnlocked ? 1 : 0.45,
+                      transition: 'background 0.15s',
+                    }}
+                  >
+                    {/* Número / estado */}
+                    <div style={{
+                      width: 28, height: 28, borderRadius: '50%', flexShrink: 0,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      background: isDone ? 'rgba(0,255,136,0.15)' : isActive ? 'rgba(210,3,221,0.2)' : 'rgba(255,255,255,0.06)',
+                      border: `1px solid ${isDone ? 'rgba(0,255,136,0.3)' : isActive ? 'rgba(210,3,221,0.4)' : 'rgba(255,255,255,0.1)'}`,
+                      fontSize: 11, fontWeight: 700,
+                      color: isDone ? '#00FF88' : isActive ? '#D203DD' : 'rgba(255,255,255,0.4)',
+                    }}>
+                      {isDone ? '✓' : !isUnlocked ? '🔒' : idx + 1}
+                    </div>
+
+                    {/* Título */}
+                    <span style={{ fontSize: 13, fontWeight: isActive ? 700 : 500, color: isActive ? '#fff' : isUnlocked ? 'rgba(255,255,255,0.75)' : 'rgba(255,255,255,0.3)', flex: 1, lineHeight: 1.4 }}>
                       {video.title}
-                    </p>
-                    {isDone && (
-                      <span style={{ fontSize: 11, fontWeight: 700, color: '#00FF88', background: 'rgba(0,255,136,0.1)', border: '1px solid rgba(0,255,136,0.2)', padding: '2px 8px', borderRadius: 6, whiteSpace: 'nowrap', marginLeft: 8 }}>
-                        ✓ Completado
-                      </span>
-                    )}
-                    {!isUnlocked && !isDone && (
-                      <span style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.3)', whiteSpace: 'nowrap', marginLeft: 8 }}>
-                        🔒 Bloqueado
-                      </span>
-                    )}
-                  </div>
+                    </span>
 
-                  {isUnlocked ? (
-                    /* Unlocked: show Vimeo player */
-                    <div style={{ position: 'relative', paddingBottom: '56.25%', background: '#000' }}>
-                      <iframe
-                        ref={el => { iframeRefs.current[video.id] = el }}
-                        src={getVimeoEmbedUrl(video.youtubeUrl)}
-                        title={video.title}
-                        allow="autoplay; fullscreen; picture-in-picture"
-                        allowFullScreen
-                        style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 'none' }}
-                      />
-                    </div>
-                  ) : (
-                    /* Locked: placeholder with message */
-                    <div style={{ position: 'relative', paddingBottom: '56.25%', background: 'rgba(0,0,0,0.4)' }}>
-                      <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 10 }}>
-                        <span style={{ fontSize: 32 }}>🔒</span>
-                        <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.35)', textAlign: 'center', margin: 0, padding: '0 20px', lineHeight: 1.5 }}>
-                          {idx === 0
-                            ? 'Este video está bloqueado'
-                            : `Completa el video ${idx} al 95% para desbloquear`}
-                        </p>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              )
-            })}
+                    {/* Play icon si está activo */}
+                    {isActive && (
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="#D203DD" style={{ flexShrink: 0 }}>
+                        <path d="M8 5v14l11-7z" />
+                      </svg>
+                    )}
+                  </button>
+                )
+              })}
+            </div>
           </div>
         </div>
       )}
@@ -426,45 +455,17 @@ export default function CourseDetailPage() {
               <h3 style={{ fontSize: 16, fontWeight: 700, color: '#fff', margin: 0 }}>Comprar curso</h3>
               <button onClick={closeModal} style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.4)', cursor: 'pointer', fontSize: 18 }}>✕</button>
             </div>
-
-            {/* Tabs */}
             <div style={{ display: 'flex', gap: 8, marginBottom: 20 }}>
-              <button
-                onClick={() => setPayTab('CRYPTO')}
-                style={{
-                  flex: 1, padding: '9px 0', borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: 'pointer',
-                  background: payTab === 'CRYPTO' ? 'rgba(245,166,35,0.15)' : 'rgba(255,255,255,0.04)',
-                  border: `1px solid ${payTab === 'CRYPTO' ? 'rgba(245,166,35,0.4)' : 'rgba(255,255,255,0.08)'}`,
-                  color: payTab === 'CRYPTO' ? '#F5A623' : 'rgba(255,255,255,0.4)',
-                }}
-              >
+              <button onClick={() => setPayTab('CRYPTO')} style={{ flex: 1, padding: '9px 0', borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: 'pointer', background: payTab === 'CRYPTO' ? 'rgba(245,166,35,0.15)' : 'rgba(255,255,255,0.04)', border: `1px solid ${payTab === 'CRYPTO' ? 'rgba(245,166,35,0.4)' : 'rgba(255,255,255,0.08)'}`, color: payTab === 'CRYPTO' ? '#F5A623' : 'rgba(255,255,255,0.4)' }}>
                 ₮ Cripto (USDT)
               </button>
-              <button
-                onClick={() => setPayTab('MANUAL')}
-                style={{
-                  flex: 1, padding: '9px 0', borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: 'pointer',
-                  background: payTab === 'MANUAL' ? 'rgba(210,3,221,0.1)' : 'rgba(255,255,255,0.04)',
-                  border: `1px solid ${payTab === 'MANUAL' ? 'rgba(210,3,221,0.3)' : 'rgba(255,255,255,0.08)'}`,
-                  color: payTab === 'MANUAL' ? '#D203DD' : 'rgba(255,255,255,0.4)',
-                }}
-              >
+              <button onClick={() => setPayTab('MANUAL')} style={{ flex: 1, padding: '9px 0', borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: 'pointer', background: payTab === 'MANUAL' ? 'rgba(210,3,221,0.1)' : 'rgba(255,255,255,0.04)', border: `1px solid ${payTab === 'MANUAL' ? 'rgba(210,3,221,0.3)' : 'rgba(255,255,255,0.08)'}`, color: payTab === 'MANUAL' ? '#D203DD' : 'rgba(255,255,255,0.4)' }}>
                 📎 Comprobante
               </button>
             </div>
-
-            {/* CRYPTO tab */}
             {payTab === 'CRYPTO' && (
-              <PaymentGateway
-                plan={course.title}
-                price={course.price}
-                onSubmitPayment={handleCryptoPayment}
-                onSuccess={() => { closeModal(); loadCourse() }}
-                onCancel={closeModal}
-              />
+              <PaymentGateway plan={course.title} price={course.price} onSubmitPayment={handleCryptoPayment} onSuccess={() => { closeModal(); loadCourse() }} onCancel={closeModal} />
             )}
-
-            {/* MANUAL tab */}
             {payTab === 'MANUAL' && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                 <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', lineHeight: 1.5, margin: 0 }}>
@@ -485,11 +486,8 @@ export default function CourseDetailPage() {
                       <button onClick={() => setProofUrl('')} style={{ position: 'absolute', top: 6, right: 6, background: 'rgba(0,0,0,0.6)', border: 'none', borderRadius: 6, cursor: 'pointer', padding: '4px 6px', color: '#fff', fontSize: 12 }}>✕</button>
                     </div>
                   ) : (
-                    <button
-                      onClick={() => proofInputRef.current?.click()}
-                      disabled={uploading}
-                      style={{ width: '100%', height: 80, borderRadius: 10, border: '1.5px dashed rgba(255,255,255,0.15)', background: 'rgba(255,255,255,0.03)', cursor: uploading ? 'wait' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'rgba(255,255,255,0.4)', fontSize: 13 }}
-                    >
+                    <button onClick={() => proofInputRef.current?.click()} disabled={uploading}
+                      style={{ width: '100%', height: 80, borderRadius: 10, border: '1.5px dashed rgba(255,255,255,0.15)', background: 'rgba(255,255,255,0.03)', cursor: uploading ? 'wait' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'rgba(255,255,255,0.4)', fontSize: 13 }}>
                       {uploading ? '⏳ Subiendo...' : '📎 Seleccionar imagen del comprobante'}
                     </button>
                   )}
@@ -499,11 +497,8 @@ export default function CourseDetailPage() {
                   <button onClick={closeModal} style={{ flex: 1, padding: '10px 0', borderRadius: 10, fontSize: 13, fontWeight: 600, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.6)', cursor: 'pointer' }}>
                     Cancelar
                   </button>
-                  <button
-                    onClick={handleManualEnroll}
-                    disabled={submitting}
-                    style={{ flex: 2, padding: '10px 0', borderRadius: 10, fontSize: 13, fontWeight: 700, background: submitting ? 'rgba(210,3,221,0.3)' : 'linear-gradient(135deg, #D203DD 0%, #00FF88 100%)', border: 'none', color: '#000', cursor: submitting ? 'not-allowed' : 'pointer' }}
-                  >
+                  <button onClick={handleManualEnroll} disabled={submitting}
+                    style={{ flex: 2, padding: '10px 0', borderRadius: 10, fontSize: 13, fontWeight: 700, background: submitting ? 'rgba(210,3,221,0.3)' : 'linear-gradient(135deg, #D203DD 0%, #00FF88 100%)', border: 'none', color: '#000', cursor: submitting ? 'not-allowed' : 'pointer' }}>
                     {submitting ? 'Enviando...' : 'Enviar comprobante'}
                   </button>
                 </div>
