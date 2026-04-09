@@ -37,7 +37,7 @@ export default function SettingsPage() {
       {/* Header */}
       <div className="flex items-center gap-4">
         <div className="w-11 h-11 rounded-xl flex items-center justify-center"
-          style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
+          style={{ background: 'rgba(13,30,121,0.5)', border: '1px solid rgba(210,3,221,0.2)' }}>
           <Settings className="w-5 h-5 text-white animate-spin" style={{ animationDuration: '8s' }} />
         </div>
         <div>
@@ -53,7 +53,7 @@ export default function SettingsPage() {
 
       {/* Secciones */}
       <div className="relative rounded-2xl p-5 sm:p-6 overflow-hidden space-y-6"
-        style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)' }}>
+        style={{ background: 'rgba(13,30,121,0.4)', border: '1px solid rgba(210,3,221,0.2)' }}>
         <div className="absolute top-0 left-0 right-0 h-px"
           style={{ background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent)' }} />
 
@@ -66,14 +66,14 @@ export default function SettingsPage() {
             <div className="space-y-2">
               {section.items.map((item, i) => (
                 <div key={i} className="flex items-center justify-between p-4 rounded-xl transition-all duration-300 cursor-pointer group"
-                  style={{ background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.04)' }}
+                  style={{ background: 'rgba(13,30,121,0.4)', border: '1px solid rgba(210,3,221,0.12)' }}
                   onMouseEnter={e => {
-                    e.currentTarget.style.background = `${item.color}08`
-                    e.currentTarget.style.borderColor = `${item.color}20`
+                    e.currentTarget.style.background = `${item.color}10`
+                    e.currentTarget.style.borderColor = `${item.color}30`
                   }}
                   onMouseLeave={e => {
-                    e.currentTarget.style.background = 'rgba(255,255,255,0.025)'
-                    e.currentTarget.style.borderColor = 'rgba(255,255,255,0.04)'
+                    e.currentTarget.style.background = 'rgba(13,30,121,0.4)'
+                    e.currentTarget.style.borderColor = 'rgba(210,3,221,0.12)'
                   }}>
                   <div className="flex items-center gap-4">
                     <div className="w-9 h-9 rounded-lg flex items-center justify-center"

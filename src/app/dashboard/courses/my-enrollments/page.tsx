@@ -95,7 +95,7 @@ export default function MyEnrollmentsPage() {
             const course = e.course
             return (
               <div key={e.id}
-                style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 14, overflow: 'hidden' }}>
+                style={{ background: 'linear-gradient(145deg, #0D1E79 0%, #1e0068 100%)', border: '1px solid rgba(210,3,221,0.25)', borderRadius: 14, overflow: 'hidden' }}>
 
                 <div style={{ display: 'flex', gap: 14, padding: 16 }}>
                   {/* Cover */}

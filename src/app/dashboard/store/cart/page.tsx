@@ -171,7 +171,7 @@ export default function CartPage() {
     const approved = success.status === 'APPROVED'
     return (
       <div className="px-4 sm:px-6 pt-8 pb-12 max-w-lg mx-auto">
-        <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 20, padding: 32, textAlign: 'center' }}>
+        <div style={{ background: 'linear-gradient(145deg, #0D1E79 0%, #1e0068 100%)', border: '1px solid rgba(210,3,221,0.25)', borderRadius: 20, padding: 32, textAlign: 'center' }}>
           <div style={{ fontSize: 48, marginBottom: 16 }}>{approved ? '✅' : '⏳'}</div>
           <h2 style={{ fontSize: 20, fontWeight: 800, color: approved ? '#00FF88' : '#F5A623', marginBottom: 8 }}>
             {approved ? 'Pago Confirmado' : 'Pago en Revisión'}
@@ -184,7 +184,7 @@ export default function CartPage() {
                 : 'El administrador verificará tu comprobante y aprobará el pedido.'}
           </p>
 
-          <div style={{ background: 'rgba(255,255,255,0.03)', borderRadius: 12, padding: '14px 18px', marginBottom: 20, textAlign: 'left' }}>
+          <div style={{ background: 'rgba(13,30,121,0.5)', borderRadius: 12, padding: '14px 18px', marginBottom: 20, textAlign: 'left' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
               <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)' }}>Nº Pedido</span>
               <span style={{ fontSize: 12, fontWeight: 700, color: '#fff', letterSpacing: '0.05em' }}>#{success.orderId.slice(0, 8).toUpperCase()}</span>
@@ -243,7 +243,7 @@ export default function CartPage() {
       {/* ── SECTION 1: CART ITEMS ── */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 28 }}>
         {cart.map((item, idx) => (
-          <div key={idx} style={{ display: 'flex', gap: 12, padding: 14, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 14, alignItems: 'center' }}>
+          <div key={idx} style={{ display: 'flex', gap: 12, padding: 14, background: 'linear-gradient(145deg, #0D1E79 0%, #1e0068 100%)', border: '1px solid rgba(210,3,221,0.25)', borderRadius: 14, alignItems: 'center' }}>
             <div style={{ width: 56, height: 56, borderRadius: 10, overflow: 'hidden', flexShrink: 0, background: 'rgba(255,255,255,0.05)' }}>
               {item.image ? <img src={item.image} alt={item.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <div style={{ height: '100%' }} />}
             </div>
@@ -265,7 +265,7 @@ export default function CartPage() {
       </div>
 
       {/* ── SECTION 2: DELIVERY DATA ── */}
-      <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 16, padding: '20px 18px', marginBottom: 24 }}>
+      <div style={{ background: 'rgba(13,30,121,0.4)', border: '1px solid rgba(210,3,221,0.2)', borderRadius: 16, padding: '20px 18px', marginBottom: 24 }}>
         <h2 style={{ fontSize: 14, fontWeight: 700, color: '#fff', marginBottom: 16, textTransform: 'uppercase', letterSpacing: '0.08em' }}>📦 Datos de entrega</h2>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
           <div style={{ gridColumn: '1 / -1' }}>
@@ -304,7 +304,7 @@ export default function CartPage() {
       </div>
 
       {/* ── SECTION 3: SUMMARY + PAYMENT ── */}
-      <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 16, padding: '20px 18px' }}>
+      <div style={{ background: 'rgba(13,30,121,0.4)', border: '1px solid rgba(210,3,221,0.2)', borderRadius: 16, padding: '20px 18px' }}>
         {/* Summary */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
           <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.4)' }}>Subtotal ({cart.length} producto{cart.length !== 1 ? 's' : ''})</span>

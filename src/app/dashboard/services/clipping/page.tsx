@@ -276,7 +276,7 @@ function ClippingPageInner() {
 
       {/* Connect Accounts */}
       <div className="rounded-2xl p-6 space-y-4"
-        style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)' }}>
+        style={{ background: 'rgba(13,30,121,0.4)', border: '1px solid rgba(210,3,221,0.2)' }}>
         <h2 className="text-sm font-semibold text-white uppercase tracking-widest">Cuentas conectadas</h2>
 
         {(['YOUTUBE', 'TIKTOK', 'FACEBOOK'] as Platform[]).map(platform => {
@@ -343,7 +343,7 @@ function ClippingPageInner() {
 
       {/* Campaigns + Submit */}
       <div className="rounded-2xl p-6 space-y-4"
-        style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)' }}>
+        style={{ background: 'rgba(13,30,121,0.4)', border: '1px solid rgba(210,3,221,0.2)' }}>
         <h2 className="text-sm font-semibold text-white uppercase tracking-widest">Campañas activas</h2>
 
         {campaigns.length === 0 ? (
@@ -414,7 +414,7 @@ function ClippingPageInner() {
                       {/* Campaign images */}
                       {c.imageUrls && c.imageUrls.length > 0 && (
                         <div className="p-4 space-y-2"
-                          style={{ background: 'rgba(255,255,255,0.02)', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                          style={{ background: 'rgba(13,30,121,0.3)', borderBottom: '1px solid rgba(210,3,221,0.15)' }}>
                           <div className="flex items-center gap-2 mb-2">
                             <Images className="w-3.5 h-3.5" style={{ color: '#D203DD' }} />
                             <p className="text-[11px] font-semibold uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.4)' }}>
@@ -438,7 +438,7 @@ function ClippingPageInner() {
                       )}
 
                     <form onSubmit={handleSubmit} className="p-4 space-y-3"
-                      style={{ background: 'rgba(255,255,255,0.03)' }}>
+                      style={{ background: 'rgba(13,30,121,0.3)' }}>
                       {!hasAccount && (
                         <div className="flex items-center gap-2 text-xs p-3 rounded-lg"
                           style={{ background: 'rgba(255,136,0,0.08)', border: '1px solid rgba(255,136,0,0.2)', color: '#FF8800' }}>
@@ -492,7 +492,7 @@ function ClippingPageInner() {
       {/* My Submissions */}
       {submissions.length > 0 && (
         <div className="rounded-2xl p-6 space-y-4"
-          style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)' }}>
+          style={{ background: 'rgba(13,30,121,0.4)', border: '1px solid rgba(210,3,221,0.2)' }}>
           <h2 className="text-sm font-semibold text-white uppercase tracking-widest">Mis videos enviados</h2>
 
           <div className="space-y-3">
@@ -504,7 +504,7 @@ function ClippingPageInner() {
 
               return (
                 <div key={sub.id} className="p-4 rounded-xl"
-                  style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)' }}>
+                  style={{ background: 'linear-gradient(145deg, #0D1E79 0%, #1e0068 100%)', border: '1px solid rgba(210,3,221,0.2)' }}>
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">

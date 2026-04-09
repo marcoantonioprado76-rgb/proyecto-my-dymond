@@ -104,7 +104,7 @@ export default function StoreItemPage({ params }: { params: { itemId: string } }
       <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 28 }} className="sm:grid-cols-2">
         {/* Images */}
         <div>
-          <div style={{ aspectRatio: '1/1', borderRadius: 16, overflow: 'hidden', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', position: 'relative' }}>
+          <div style={{ aspectRatio: '1/1', borderRadius: 16, overflow: 'hidden', background: 'linear-gradient(145deg, #0D1E79 0%, #1e0068 100%)', border: '1px solid rgba(210,3,221,0.25)', position: 'relative' }}>
             {images.length > 0 ? (
               <img src={images[activeImg]} alt={item.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
             ) : (

@@ -95,7 +95,7 @@ export default function ProfilePage() {
           <p className="text-xs font-light tracking-[0.3em] uppercase mb-5" style={{ color: '#D203DD' }}>@{user.username}</p>
 
           <div className="w-full py-2.5 px-4 rounded-xl"
-            style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
+            style={{ background: 'rgba(13,30,121,0.5)', border: '1px solid rgba(210,3,221,0.2)' }}>
             <p className="text-[9px] font-black uppercase tracking-widest mb-1" style={{ color: 'rgba(255,255,255,0.25)' }}>Estado de Cuenta</p>
             <p className="text-sm font-black uppercase tracking-widest"
               style={{ color: user.isActive ? '#00FF88' : '#ef4444' }}>
@@ -123,9 +123,9 @@ export default function ProfilePage() {
           <div className="grid gap-3">
             {fields.map((field, i) => (
               <div key={i} className="flex items-center gap-4 p-3.5 rounded-xl transition-all duration-300 group"
-                style={{ background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.04)' }}
-                onMouseEnter={e => (e.currentTarget.style.borderColor = `${field.color}30`)}
-                onMouseLeave={e => (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.04)')}>
+                style={{ background: 'rgba(13,30,121,0.4)', border: '1px solid rgba(210,3,221,0.12)' }}
+                onMouseEnter={e => (e.currentTarget.style.borderColor = `${field.color}40`)}
+                onMouseLeave={e => (e.currentTarget.style.borderColor = 'rgba(210,3,221,0.12)')}>
                 <div className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
                   style={{ background: `${field.color}12`, border: `1px solid ${field.color}25` }}>
                   <field.icon className="w-4 h-4" style={{ color: field.color }} />

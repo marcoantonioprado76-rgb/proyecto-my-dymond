@@ -81,7 +81,7 @@ const services = [
 
 function SkeletonCard() {
   return (
-    <div className="rounded-2xl p-6 animate-pulse" style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)' }}>
+    <div className="rounded-2xl p-6 animate-pulse" style={{ background: 'rgba(13,30,121,0.3)', border: '1px solid rgba(210,3,221,0.12)' }}>
       <div className="flex items-start justify-between mb-5">
         <div className="w-11 h-11 rounded-xl bg-white/5" />
         <div className="w-16 h-6 rounded-full bg-white/5" />
@@ -203,7 +203,7 @@ export default function ServicesPage() {
                   style={{
                     background: unlocked
                       ? `linear-gradient(135deg, ${service.from}08, ${service.to}04)`
-                      : 'rgba(255,255,255,0.02)',
+                      : 'rgba(13,30,121,0.25)',
                     border: unlocked
                       ? `1px solid ${service.from}20`
                       : '1px solid rgba(255,255,255,0.07)',

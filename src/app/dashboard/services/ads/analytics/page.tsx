@@ -351,7 +351,7 @@ export default function AnalyticsPage() {
                                         className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold border transition-all"
                                         style={on
                                             ? { background: m.color + '20', borderColor: m.color + '50', color: m.color }
-                                            : { background: 'rgba(255,255,255,0.03)', borderColor: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.3)' }}>
+                                            : { background: 'rgba(13,30,121,0.4)', borderColor: 'rgba(210,3,221,0.15)', color: 'rgba(255,255,255,0.3)' }}>
                                         <span style={{ width: 7, height: 7, borderRadius: '50%', background: on ? m.color : 'rgba(255,255,255,0.2)', display: 'inline-block', flexShrink: 0 }} />
                                         {m.label}
                                     </button>

@@ -231,7 +231,7 @@ export default function BotReportsPage() {
           { label: 'Ventas hoy', value: stats.salesToday, color: '#F5A623' },
           { label: 'Conversión', value: `${stats.conversionRate}%`, color: '#FF2DF7' },
         ].map(s => (
-          <div key={s.label} style={{ borderRadius: 14, padding: '14px 16px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
+          <div key={s.label} style={{ borderRadius: 14, padding: '14px 16px', background: 'linear-gradient(145deg, #0D1E79 0%, #1e0068 100%)', border: '1px solid rgba(210,3,221,0.25)' }}>
             <p style={{ fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 6 }}>{s.label}</p>
             <p style={{ fontSize: 26, fontWeight: 900, color: s.color, lineHeight: 1 }}>{s.value}</p>
           </div>
@@ -239,7 +239,7 @@ export default function BotReportsPage() {
       </div>
 
       {/* Chart section */}
-      <div style={{ borderRadius: 16, padding: '20px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', marginBottom: 24 }}>
+      <div style={{ borderRadius: 16, padding: '20px', background: 'rgba(13,30,121,0.4)', border: '1px solid rgba(210,3,221,0.2)', marginBottom: 24 }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16, flexWrap: 'wrap', gap: 8 }}>
           <p style={{ fontSize: 13, fontWeight: 700, color: '#fff' }}>Últimos 30 días</p>
           <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>

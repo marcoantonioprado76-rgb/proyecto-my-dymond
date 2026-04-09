@@ -201,7 +201,7 @@ function AdsDashboardInner() {
 
                     {/* ── SETUP ───────────────────────────── */}
                     {!allReady && (
-                        <div className="rounded-3xl p-5 md:p-6" style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.07)' }}>
+                        <div className="rounded-3xl p-5 md:p-6" style={{ background: 'rgba(13,30,121,0.4)', border: '1px solid rgba(210,3,221,0.2)' }}>
                             <div className="flex items-center justify-between mb-4">
                                 <div className="flex items-center gap-2.5">
                                     <Rocket size={15} className="text-purple-400" />
@@ -291,8 +291,8 @@ function AdsDashboardInner() {
                                         <div key={platform.id}
                                             className="relative overflow-hidden rounded-2xl flex items-center gap-3 p-3.5"
                                             style={{
-                                                background: platform.comingSoon ? 'rgba(255,255,255,0.01)' : isConnected ? 'rgba(255,255,255,0.03)' : 'rgba(255,255,255,0.015)',
-                                                border: platform.comingSoon ? '1px dashed rgba(255,255,255,0.05)' : isConnected ? '1px solid rgba(255,255,255,0.1)' : '1px dashed rgba(255,255,255,0.07)',
+                                                background: platform.comingSoon ? 'rgba(13,30,121,0.2)' : isConnected ? 'rgba(13,30,121,0.5)' : 'rgba(13,30,121,0.3)',
+                                                border: platform.comingSoon ? '1px dashed rgba(210,3,221,0.1)' : isConnected ? '1px solid rgba(210,3,221,0.3)' : '1px dashed rgba(210,3,221,0.15)',
                                                 opacity: platform.comingSoon ? 0.5 : 1,
                                             }}>
                                             <div className="pointer-events-none absolute -top-6 -right-6 w-20 h-20 rounded-full blur-[40px]"
@@ -327,7 +327,7 @@ function AdsDashboardInner() {
 
                                             {platform.comingSoon
                                                 ? <span className="text-[10px] font-bold py-1.5 px-3 rounded-xl shrink-0 cursor-not-allowed"
-                                                    style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', color: 'rgba(255,255,255,0.2)' }}>
+                                                    style={{ background: 'rgba(13,30,121,0.3)', border: '1px solid rgba(210,3,221,0.12)', color: 'rgba(255,255,255,0.2)' }}>
                                                     Próximamente
                                                   </span>
                                                 : <button onClick={() => handleConnect(platform.id)}
@@ -370,7 +370,7 @@ function AdsDashboardInner() {
                                     {allBriefs.slice(0, 3).map((b: any) => (
                                         <div key={b.id}
                                             className="flex items-center gap-3 rounded-2xl px-3.5 py-3 group"
-                                            style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
+                                            style={{ background: 'linear-gradient(145deg, #0D1E79 0%, #1e0068 100%)', border: '1px solid rgba(210,3,221,0.2)' }}>
                                             <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0"
                                                 style={{ background: 'rgba(139,92,246,0.12)', border: '1px solid rgba(139,92,246,0.2)' }}>
                                                 <FileText size={13} className="text-purple-400" />
@@ -503,7 +503,7 @@ function AdsDashboardInner() {
 
                                 <Link href="/dashboard/services/ads/history"
                                     className="flex items-center justify-center gap-2 py-3 rounded-2xl text-xs text-white/30 font-bold hover:text-white/60 transition-all"
-                                    style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)' }}>
+                                    style={{ background: 'rgba(13,30,121,0.3)', border: '1px solid rgba(210,3,221,0.15)' }}>
                                     Ver todas las campañas <ArrowRight size={11} />
                                 </Link>
                             </div>

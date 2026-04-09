@@ -138,7 +138,7 @@ function CommissionsContent() {
 
       {/* Historial */}
       <div className="relative rounded-2xl overflow-hidden"
-        style={{ border: '1px solid rgba(255,255,255,0.06)', background: 'rgba(255,255,255,0.02)' }}>
+        style={{ border: '1px solid rgba(210,3,221,0.2)', background: 'rgba(13,30,121,0.4)' }}>
         <div className="absolute top-0 left-0 right-0 h-px"
           style={{ background: 'linear-gradient(90deg, transparent, #00FF8840, #D203DD30, transparent)' }} />
 
@@ -151,7 +151,7 @@ function CommissionsContent() {
         {commissions.length === 0 ? (
           <div className="p-12 text-center">
             <div className="w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-4"
-              style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
+              style={{ background: 'rgba(13,30,121,0.5)', border: '1px solid rgba(210,3,221,0.15)' }}>
               <Wallet className="w-7 h-7" style={{ color: 'rgba(255,255,255,0.15)' }} />
             </div>
             <p className="text-sm font-light" style={{ color: 'rgba(255,255,255,0.25)' }}>
@@ -167,8 +167,8 @@ function CommissionsContent() {
               const Icon = isSponsor ? Gift : Users
               return (
                 <div key={c.id} className="p-4 flex items-center justify-between transition-colors"
-                  style={{ borderBottom: '1px solid rgba(255,255,255,0.03)' }}
-                  onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.02)')}
+                  style={{ borderBottom: '1px solid rgba(210,3,221,0.08)' }}
+                  onMouseEnter={e => (e.currentTarget.style.background = 'rgba(210,3,221,0.06)')}
                   onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}>
                   <div className="flex items-center gap-4">
                     <div className="w-10 h-10 rounded-xl flex items-center justify-center"
