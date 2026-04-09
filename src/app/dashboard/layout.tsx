@@ -20,7 +20,7 @@ export default function DashboardLayout({
       <ScreenshotGuard />
       <div className="lg:flex lg:h-screen lg:overflow-hidden">
         <Navbar />
-        <main className="flex-1 min-w-0 relative z-10 lg:overflow-y-auto lg:h-full pb-20 lg:pb-0 pt-[57px] lg:pt-0">
+        <main className="flex-1 min-w-0 relative z-10 lg:overflow-y-auto lg:h-full pb-20 lg:pb-0">
           {children}
         </main>
       </div>
