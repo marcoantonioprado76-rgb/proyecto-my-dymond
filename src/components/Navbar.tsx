@@ -14,20 +14,20 @@ const serviceItems = [
   { href: '/dashboard/services/clipping',      iconClass: 'fa-solid fa-newspaper',    label: 'Clipping' },
 ]
 
-const mainItemsTop = [
-  { href: '/dashboard', iconClass: 'fa-solid fa-house', label: 'Inicio' },
+const academyItems = [
+  { href: '/dashboard/courses',  iconClass: 'fa-solid fa-book-open',  label: 'Cursos' },
+  { href: '/dashboard/podcasts', iconClass: 'fa-solid fa-microphone', label: 'Podcasts' },
 ]
 
 const mainItemsBottom = [
-  { href: '/dashboard/courses', iconClass: 'fa-solid fa-book-open',    label: 'Academy' },
-  { href: '/dashboard/store',   iconClass: 'fa-solid fa-bag-shopping', label: 'Shop' },
-  { href: '/dashboard/wallet',  iconClass: 'fa-solid fa-wallet',       label: 'Wallet' },
+  { href: '/dashboard/store',  iconClass: 'fa-solid fa-bag-shopping', label: 'Shop' },
+  { href: '/dashboard/wallet', iconClass: 'fa-solid fa-wallet',       label: 'Wallet' },
 ]
 
 const mobileNavItems = [
   { href: '/dashboard',         iconClass: 'fa-solid fa-house',        label: 'Inicio' },
   { href: '/dashboard/services',iconClass: 'fa-solid fa-th-large',     label: 'Servicios' },
-  { href: '/dashboard/courses', iconClass: 'fa-solid fa-book-open',    label: 'Academy' },
+  { href: '/dashboard/academy', iconClass: 'fa-solid fa-graduation-cap', label: 'Academy' },
   { href: '/dashboard/store',   iconClass: 'fa-solid fa-bag-shopping', label: 'Shop' },
   { href: '/dashboard/wallet',  iconClass: 'fa-solid fa-wallet',       label: 'Wallet' },
 ]
@@ -40,7 +40,10 @@ async function logout() {
 export default function Navbar() {
   const pathname = usePathname()
   const isInServices = pathname.startsWith('/dashboard/services')
+  const isInAcademy  = pathname.startsWith('/dashboard/courses') || pathname.startsWith('/dashboard/podcasts') || pathname === '/dashboard/academy'
+
   const [servicesOpen, setServicesOpen] = useState(isInServices)
+  const [academyOpen,  setAcademyOpen]  = useState(isInAcademy)
 
   return (
     <>
@@ -60,16 +63,11 @@ export default function Navbar() {
         <nav className="sidebar__nav" aria-label="Menú">
 
           {/* Inicio */}
-          {mainItemsTop.map(item => {
-            const isActive = pathname === item.href
-            return (
-              <Link key={item.href} href={item.href} className={`nav-item ${isActive ? 'nav-item--active' : ''}`}>
-                <span className="nav-item__icon"><i className={item.iconClass}></i></span>
-                <span className="nav-item__label">{item.label}</span>
-                <span className="nav-item__dot"></span>
-              </Link>
-            )
-          })}
+          <Link href="/dashboard" className={`nav-item ${pathname === '/dashboard' ? 'nav-item--active' : ''}`}>
+            <span className="nav-item__icon"><i className="fa-solid fa-house"></i></span>
+            <span className="nav-item__label">Inicio</span>
+            <span className="nav-item__dot"></span>
+          </Link>
 
           {/* Servicios colapsable */}
           <button
@@ -80,15 +78,11 @@ export default function Navbar() {
             <span className="nav-item__icon"><i className="fa-solid fa-th-large"></i></span>
             <span className="nav-item__label">Servicios</span>
             <i className="fa-solid fa-chevron-down" style={{
-              fontSize: '0.65rem',
-              color: 'rgba(255,255,255,0.35)',
-              marginLeft: 'auto',
+              fontSize: '0.65rem', color: 'rgba(255,255,255,0.35)', marginLeft: 'auto',
               transition: 'transform 0.2s ease',
               transform: servicesOpen ? 'rotate(180deg)' : 'rotate(0deg)',
             }}></i>
           </button>
-
-          {/* Lista de servicios */}
           {servicesOpen && (
             <div style={{ paddingLeft: 10 }}>
               {serviceItems.map(item => {
@@ -104,7 +98,36 @@ export default function Navbar() {
             </div>
           )}
 
-          {/* Academy / Shop / Wallet */}
+          {/* Academy colapsable */}
+          <button
+            onClick={() => setAcademyOpen(o => !o)}
+            className={`nav-item ${isInAcademy ? 'nav-item--active' : ''}`}
+            style={{ width: '100%', background: 'none', border: 'none', cursor: 'pointer' }}
+          >
+            <span className="nav-item__icon"><i className="fa-solid fa-graduation-cap"></i></span>
+            <span className="nav-item__label">Academy</span>
+            <i className="fa-solid fa-chevron-down" style={{
+              fontSize: '0.65rem', color: 'rgba(255,255,255,0.35)', marginLeft: 'auto',
+              transition: 'transform 0.2s ease',
+              transform: academyOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+            }}></i>
+          </button>
+          {academyOpen && (
+            <div style={{ paddingLeft: 10 }}>
+              {academyItems.map(item => {
+                const isActive = pathname === item.href || pathname.startsWith(item.href)
+                return (
+                  <Link key={item.href} href={item.href} className={`nav-item ${isActive ? 'nav-item--active' : ''}`} style={{ fontSize: '0.78rem', padding: '8px 10px' }}>
+                    <span className="nav-item__icon" style={{ width: 26, height: 26, fontSize: '0.72rem' }}><i className={item.iconClass}></i></span>
+                    <span className="nav-item__label">{item.label}</span>
+                    <span className="nav-item__dot"></span>
+                  </Link>
+                )
+              })}
+            </div>
+          )}
+
+          {/* Shop / Wallet */}
           {mainItemsBottom.map(item => {
             const isActive = pathname === item.href || pathname.startsWith(item.href)
             return (

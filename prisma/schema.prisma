@@ -1223,6 +1223,20 @@ model AdminOtpCode {
   @@map("admin_otp_codes")
 }
 
+model Podcast {
+  id          String   @id @default(uuid()) @db.Uuid
+  title       String
+  description String?
+  coverUrl    String?  @map("cover_url")
+  embedUrl    String   @map("embed_url")
+  active      Boolean  @default(true)
+  order       Int      @default(0)
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("podcasts")
+}
+
 model DeviceVerifyCode {
   id        String   @id @default(uuid()) @db.Uuid
   userId    String   @map("user_id") @db.Uuid
