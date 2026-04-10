@@ -175,11 +175,11 @@ export default function DashboardPage() {
               <Link key={s.href} href={s.href} style={{ textDecoration: 'none', display: 'block' }}>
                 <div className="group" style={{
                   position: 'relative', borderRadius: 18, overflow: 'hidden', padding: '14px 14px 12px',
-                  background: 'linear-gradient(135deg, rgba(154, 203, 255, 0.85) 0%, rgba(255, 125, 224, 0.85) 50%, rgba(162, 102, 255, 0.85) 100%)',
+                  background: 'linear-gradient(135deg, rgba(154, 203, 255, 0.35) 0%, rgba(255, 125, 224, 0.35) 50%, rgba(162, 102, 255, 0.35) 100%)',
                   backdropFilter: 'blur(16px)',
                   WebkitBackdropFilter: 'blur(16px)',
-                  border: '1px solid rgba(255, 255, 255, 0.4)',
-                  boxShadow: 'inset 0 0 10px rgba(255, 255, 255, 0.3)',
+                  border: '1px solid rgba(255, 255, 255, 0.15)',
+                  boxShadow: 'inset 0 0 10px rgba(255, 255, 255, 0.08)',
                   display: 'flex', flexDirection: 'column', gap: 8,
                   transition: 'transform 0.2s, border-color 0.2s',
                 }}>
@@ -300,11 +300,11 @@ export default function DashboardPage() {
                 <Link key={s.href} href={s.href} style={{ textDecoration: 'none', display: 'block' }}>
                   <div style={{
                     position: 'relative', borderRadius: 20, overflow: 'hidden', padding: '20px 18px 16px',
-                    background: 'linear-gradient(135deg, rgba(154, 203, 255, 0.85) 0%, rgba(255, 125, 224, 0.85) 50%, rgba(162, 102, 255, 0.85) 100%)',
+                    background: 'linear-gradient(135deg, rgba(154, 203, 255, 0.35) 0%, rgba(255, 125, 224, 0.35) 50%, rgba(162, 102, 255, 0.35) 100%)',
                     backdropFilter: 'blur(16px)',
                     WebkitBackdropFilter: 'blur(16px)',
-                    border: '1px solid rgba(255, 255, 255, 0.4)',
-                    boxShadow: 'inset 0 0 12px rgba(255, 255, 255, 0.3), 0 4px 16px rgba(0,0,0,0.1)',
+                    border: '1px solid rgba(255, 255, 255, 0.15)',
+                    boxShadow: 'inset 0 0 12px rgba(255, 255, 255, 0.06), 0 4px 16px rgba(0,0,0,0.2)',
                     display: 'flex', flexDirection: 'column', gap: 10,
                     transition: 'transform 0.25s, border-color 0.25s, box-shadow 0.25s',
                     cursor: 'pointer',
