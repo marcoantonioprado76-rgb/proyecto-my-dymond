@@ -182,19 +182,21 @@ export default function ServicesPage() {
                 <div key={service.id}
                   className={`relative rounded-3xl overflow-hidden transition-all duration-500 group ${unlocked ? 'hover:-translate-y-2' : 'opacity-60'}`}
                   style={{
-                    background: unlocked ? `linear-gradient(135deg, ${service.from}, ${service.to})` : '#2B2644',
-                    border: `1px solid ${unlocked ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.05)'}`,
+                    background: unlocked ? 'linear-gradient(135deg, rgba(154, 203, 255, 0.85) 0%, rgba(255, 125, 224, 0.85) 50%, rgba(162, 102, 255, 0.85) 100%)' : '#2B2644',
+                    backdropFilter: unlocked ? 'blur(16px)' : 'none',
+                    WebkitBackdropFilter: unlocked ? 'blur(16px)' : 'none',
+                    border: `1px solid ${unlocked ? 'rgba(255,255,255,0.4)' : 'rgba(255,255,255,0.05)'}`,
                     boxShadow: unlocked ? `0 8px 32px rgba(0,0,0,0.35), 0 0 0 0 ${service.from}00` : 'none',
                   }}
                   onMouseEnter={e => {
                     if (!unlocked) return
-                    e.currentTarget.style.boxShadow = `0 20px 60px rgba(0,0,0,0.5), 0 0 40px ${service.from}20`
-                    e.currentTarget.style.borderColor = `${service.from}55`
+                    e.currentTarget.style.boxShadow = `inset 0 0 16px rgba(255,255,255,0.5), 0 20px 60px rgba(0,0,0,0.5), 0 0 40px rgba(255, 125, 224, 0.3)`
+                    e.currentTarget.style.borderColor = `rgba(255,255,255,0.7)`
                   }}
                   onMouseLeave={e => {
                     if (!unlocked) return
-                    e.currentTarget.style.boxShadow = `0 8px 32px rgba(0,0,0,0.35)`
-                    e.currentTarget.style.borderColor = `${service.from}35`
+                    e.currentTarget.style.boxShadow = `inset 0 0 10px rgba(255,255,255,0.3), 0 8px 32px rgba(0,0,0,0.35)`
+                    e.currentTarget.style.borderColor = `rgba(255,255,255,0.4)`
                   }}>
 
                   {/* Neon top bar */}

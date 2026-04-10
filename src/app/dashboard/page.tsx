@@ -175,8 +175,11 @@ export default function DashboardPage() {
               <Link key={s.href} href={s.href} style={{ textDecoration: 'none', display: 'block' }}>
                 <div className="group" style={{
                   position: 'relative', borderRadius: 18, overflow: 'hidden', padding: '14px 14px 12px',
-                  background: 'linear-gradient(145deg, #0D1E79 0%, #12004A 100%)',
-                  border: `1px solid ${s.from}30`,
+                  background: 'linear-gradient(135deg, rgba(154, 203, 255, 0.85) 0%, rgba(255, 125, 224, 0.85) 50%, rgba(162, 102, 255, 0.85) 100%)',
+                  backdropFilter: 'blur(16px)',
+                  WebkitBackdropFilter: 'blur(16px)',
+                  border: '1px solid rgba(255, 255, 255, 0.4)',
+                  boxShadow: 'inset 0 0 10px rgba(255, 255, 255, 0.3)',
                   display: 'flex', flexDirection: 'column', gap: 8,
                   transition: 'transform 0.2s, border-color 0.2s',
                 }}>
@@ -185,18 +188,18 @@ export default function DashboardPage() {
                   {/* icon */}
                   <div style={{
                     width: 36, height: 36, borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    background: `linear-gradient(135deg, ${s.from}22, ${s.to}12)`,
-                    border: `1px solid ${s.from}35`,
-                    boxShadow: `0 0 12px ${s.from}18`,
-                    fontSize: 15, color: s.from,
+                    background: `rgba(255,255,255,0.15)`,
+                    border: `1px solid rgba(255,255,255,0.3)`,
+                    boxShadow: `0 0 12px rgba(255,255,255,0.1)`,
+                    fontSize: 15, color: '#fff',
                   }}>
                     <i className={s.icon} />
                   </div>
                   <p style={{ fontSize: 12, fontWeight: 800, color: '#fff', margin: 0, lineHeight: 1.2 }}>{s.label}</p>
-                  <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.35)', margin: 0, lineHeight: 1.4 }}>{s.desc}</p>
+                  <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.9)', margin: 0, lineHeight: 1.4 }}>{s.desc}</p>
                   {/* bottom arrow */}
                   <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 2 }}>
-                    <span style={{ fontSize: 10, fontWeight: 700, color: s.from, opacity: 0.7 }}>Abrir →</span>
+                    <span style={{ fontSize: 10, fontWeight: 700, color: '#fff', opacity: 0.9 }}>Abrir →</span>
                   </div>
                 </div>
               </Link>
@@ -297,8 +300,11 @@ export default function DashboardPage() {
                 <Link key={s.href} href={s.href} style={{ textDecoration: 'none', display: 'block' }}>
                   <div style={{
                     position: 'relative', borderRadius: 20, overflow: 'hidden', padding: '20px 18px 16px',
-                    background: 'linear-gradient(145deg, #0D1E79 0%, #12004A 100%)',
-                    border: `1px solid ${s.from}30`,
+                    background: 'linear-gradient(135deg, rgba(154, 203, 255, 0.85) 0%, rgba(255, 125, 224, 0.85) 50%, rgba(162, 102, 255, 0.85) 100%)',
+                    backdropFilter: 'blur(16px)',
+                    WebkitBackdropFilter: 'blur(16px)',
+                    border: '1px solid rgba(255, 255, 255, 0.4)',
+                    boxShadow: 'inset 0 0 12px rgba(255, 255, 255, 0.3), 0 4px 16px rgba(0,0,0,0.1)',
                     display: 'flex', flexDirection: 'column', gap: 10,
                     transition: 'transform 0.25s, border-color 0.25s, box-shadow 0.25s',
                     cursor: 'pointer',
@@ -306,14 +312,14 @@ export default function DashboardPage() {
                   onMouseEnter={e => {
                     const el = e.currentTarget as HTMLElement
                     el.style.transform = 'translateY(-4px)'
-                    el.style.borderColor = `${s.from}55`
-                    el.style.boxShadow = `0 16px 40px rgba(0,0,0,0.4), 0 0 30px ${s.from}18`
+                    el.style.borderColor = `rgba(255, 255, 255, 0.7)`
+                    el.style.boxShadow = `inset 0 0 16px rgba(255, 255, 255, 0.5), 0 16px 40px rgba(0,0,0,0.4), 0 0 30px rgba(255, 125, 224, 0.4)`
                   }}
                   onMouseLeave={e => {
                     const el = e.currentTarget as HTMLElement
                     el.style.transform = 'translateY(0)'
-                    el.style.borderColor = `${s.from}30`
-                    el.style.boxShadow = 'none'
+                    el.style.borderColor = `rgba(255, 255, 255, 0.4)`
+                    el.style.boxShadow = 'inset 0 0 12px rgba(255, 255, 255, 0.3), 0 4px 16px rgba(0,0,0,0.1)'
                   }}>
                     {/* neon top bar */}
                     <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 2, background: `linear-gradient(90deg, transparent, ${s.from}, ${s.to}, transparent)` }} />
@@ -325,27 +331,28 @@ export default function DashboardPage() {
                     <div style={{ position: 'relative', width: 46, height: 46 }}>
                       <div style={{
                         width: 46, height: 46, borderRadius: 13, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        background: `linear-gradient(135deg, ${s.from}22, ${s.to}12)`,
-                        border: `1.5px solid ${s.from}40`,
-                        boxShadow: `0 0 18px ${s.from}20`,
-                        fontSize: 18, color: s.from,
+                        background: `rgba(255,255,255,0.15)`,
+                        border: `1.5px solid rgba(255,255,255,0.3)`,
+                        boxShadow: `0 0 18px rgba(255,255,255,0.1)`,
+                        fontSize: 18, color: '#fff',
                       }}>
                         <i className={s.icon} />
                       </div>
-                      <span style={{ position: 'absolute', top: -3, right: -3, width: 10, height: 10, borderRadius: '50%', background: s.from, border: '2px solid #0D1E79', boxShadow: `0 0 6px ${s.from}` }} />
+                      <span style={{ position: 'absolute', top: -3, right: -3, width: 10, height: 10, borderRadius: '50%', background: '#fff', border: '2px solid rgba(0,0,0,0.1)', boxShadow: `0 0 6px rgba(255,255,255,0.5)` }} />
                     </div>
                     {/* text */}
                     <div style={{ flex: 1 }}>
                       <p style={{ fontSize: 14, fontWeight: 800, color: '#fff', margin: '0 0 4px', letterSpacing: '0.01em' }}>{s.label}</p>
-                      <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.38)', margin: 0, lineHeight: 1.5 }}>{s.desc}</p>
+                      <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.9)', margin: 0, lineHeight: 1.5 }}>{s.desc}</p>
                     </div>
                     {/* CTA */}
                     <div style={{
                       display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
                       padding: '8px 0', borderRadius: 12, marginTop: 4,
-                      background: `linear-gradient(135deg, ${s.from}, ${s.to})`,
+                      background: `rgba(255,255,255,0.2)`,
+                      border: '1px solid rgba(255,255,255,0.3)',
                       fontSize: 11, fontWeight: 800, color: '#fff',
-                      boxShadow: `0 4px 16px ${s.from}30`,
+                      boxShadow: `0 4px 16px rgba(0,0,0,0.1)`,
                     }}>
                       Abrir <i className="fa-solid fa-arrow-right" style={{ fontSize: 9 }} />
                     </div>
