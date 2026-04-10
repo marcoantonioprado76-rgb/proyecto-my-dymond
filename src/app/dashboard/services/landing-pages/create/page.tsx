@@ -376,42 +376,53 @@ export default function CreateLandingPage() {
 
     if (mode === 'html') return (
         <div className="min-h-screen bg-[#050505] flex flex-col">
-            <nav className="h-16 border-b border-white/5 flex items-center justify-between px-4 sm:px-8 bg-black/50 backdrop-blur-xl fixed top-0 w-full z-50">
-                <div className="flex items-center gap-3">
-                    <button onClick={() => setMode('select')} className="w-9 h-9 rounded-full border border-white/10 flex items-center justify-center hover:bg-white/10 transition-all">
-                        <ArrowLeft size={16} />
-                    </button>
-                    <span className="font-black text-sm uppercase tracking-widest">Pegar HTML</span>
+            {/* Top bar — title + back only (no save button, avoids clash with dashboard Navbar) */}
+            <div className="h-12 border-b border-white/5 flex items-center gap-3 px-4 sm:px-8 bg-[#050505]/90 backdrop-blur-xl sticky top-0 z-40">
+                <button onClick={() => setMode('select')} className="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center hover:bg-white/10 transition-all">
+                    <ArrowLeft size={15} />
+                </button>
+                <span className="font-black text-sm uppercase tracking-widest">Pegar HTML</span>
+            </div>
+
+            {/* Name + slug bar */}
+            <div className="px-4 sm:px-8 py-3 border-b border-white/5 bg-[#050505] flex items-center gap-3">
+                <input
+                    type="text"
+                    value={form.name}
+                    onChange={e => { set('name', e.target.value); set('slug', slug(e.target.value)) }}
+                    placeholder="Nombre de tu landing page"
+                    className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-white/25 focus:outline-none focus:border-[#00FF88]/50 transition-colors"
+                />
+                <span className="text-white/20 text-xs hidden sm:block">{form.slug || 'slug-auto'}</span>
+            </div>
+
+            {error && <p className="text-red-400 text-xs text-center py-2 bg-red-500/10">{error}</p>}
+
+            {/* Code editor */}
+            <textarea
+                value={htmlCode}
+                onChange={e => setHtmlCode(e.target.value)}
+                className="flex-1 bg-[#0A0A0F] text-[#00FF88] font-mono text-sm p-6 outline-none resize-none border-none"
+                placeholder="<!-- Pega aquí tu código HTML completo -->"
+                spellCheck={false}
+                style={{ minHeight: 'calc(100vh - 200px)' }}
+            />
+
+            {/* Bottom save bar — always visible */}
+            <div className="fixed bottom-[65px] left-0 w-full bg-black/90 backdrop-blur-xl border-t border-white/8 px-4 sm:px-8 py-4 flex items-center justify-between z-50 lg:bottom-0 lg:left-[240px]">
+                <div>
+                    <p className="text-xs font-bold text-white/50">Pegar HTML</p>
+                    <p className="text-[10px] text-white/25">{form.name || 'Sin nombre aún'}</p>
                 </div>
                 <button
                     onClick={handleSaveHtml}
-                    disabled={savingHtml}
-                    className="bg-[#00FF88] text-black px-6 py-2 rounded-full font-black text-xs uppercase tracking-widest flex items-center gap-2 disabled:opacity-50"
+                    disabled={savingHtml || !htmlCode.trim()}
+                    className="flex items-center gap-2 px-6 py-2.5 rounded-xl font-black text-sm uppercase tracking-widest text-black transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                    style={{ background: '#00FF88' }}
                 >
-                    {savingHtml ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />}
-                    Crear Landing
+                    {savingHtml ? <Loader2 size={15} className="animate-spin" /> : <Check size={15} />}
+                    {savingHtml ? 'Guardando...' : 'Crear Landing'}
                 </button>
-            </nav>
-            <div className="pt-16 flex flex-col flex-1">
-                {error && <p className="text-red-400 text-xs text-center py-2 bg-red-500/10">{error}</p>}
-                <div className="px-4 sm:px-8 py-3 border-b border-white/5 bg-[#050505] flex items-center gap-3">
-                    <input
-                        type="text"
-                        value={form.name}
-                        onChange={e => { set('name', e.target.value); set('slug', slug(e.target.value)) }}
-                        placeholder="Nombre de tu landing page"
-                        className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-white/25 focus:outline-none focus:border-[#00FF88]/50 transition-colors"
-                    />
-                    <span className="text-white/20 text-xs hidden sm:block">{form.slug || 'slug-auto'}</span>
-                </div>
-                <textarea
-                    value={htmlCode}
-                    onChange={e => setHtmlCode(e.target.value)}
-                    className="flex-1 bg-[#0A0A0F] text-[#00FF88] font-mono text-sm p-6 outline-none resize-none border-none"
-                    placeholder="<!-- Pega aquí tu código HTML completo -->"
-                    spellCheck={false}
-                    style={{ minHeight: 'calc(100vh - 112px)' }}
-                />
             </div>
         </div>
     )
