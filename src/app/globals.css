@@ -48,16 +48,16 @@
 
   /* Efecto Agua / Liquid Glass 2026 */
   .water-glass {
-    @apply bg-white/5 backdrop-blur-[45px] border border-white/20 rounded-[1.5rem] shadow-water-shadow relative overflow-hidden;
-    background: linear-gradient(135deg, rgba(210, 3, 221, 0.08) 0%, rgba(13, 30, 121, 0.06) 100%);
+    @apply backdrop-blur-[16px] border border-white/8 rounded-[1.5rem] relative overflow-hidden;
+    background: linear-gradient(135deg, rgba(154,203,255,0.12) 0%, rgba(255,125,224,0.12) 50%, rgba(162,102,255,0.12) 100%);
   }
 
   /* Brillo líquido superficial (Efecto Mojado) */
   .water-glass::before {
     content: "";
     @apply absolute top-0 left-0 w-full h-[60%] pointer-events-none;
-    background: linear-gradient(180deg, rgba(210, 3, 221, 0.12) 0%, transparent 100%);
-    border-top: 1px solid rgba(210, 3, 221, 0.25);
+    background: linear-gradient(180deg, rgba(255,255,255,0.04) 0%, transparent 100%);
+    border-top: 1px solid rgba(255,255,255,0.1);
     border-radius: 1.5rem 1.5rem 0 0;
     z-index: 1;
   }

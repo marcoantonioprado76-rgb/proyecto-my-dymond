@@ -335,13 +335,13 @@ export default function PlanesPage() {
           return (
             <div
               key={pack.id}
-              className={`relative rounded-3xl border flex flex-col transition-all duration-300 ${pack.accent.border} ${pack.accent.glow} ${
-                pack.locked
-                  ? 'bg-white/[0.015] opacity-60'
-                  : pack.accent.featured
-                  ? 'bg-gradient-to-b from-purple-900/25 to-dark-900/60 md:-mt-4'
-                  : 'bg-dark-900/50 hover:bg-dark-900/70'
-              }`}
+              className={`relative rounded-3xl border flex flex-col transition-all duration-300 ${pack.accent.border} ${pack.accent.glow} ${pack.accent.featured ? 'md:-mt-4' : ''} ${pack.locked ? 'opacity-60' : ''}`}
+              style={{
+                background: pack.locked
+                  ? 'rgba(255,255,255,0.015)'
+                  : 'linear-gradient(135deg, rgba(154,203,255,0.12) 0%, rgba(255,125,224,0.12) 50%, rgba(162,102,255,0.12) 100%)',
+                backdropFilter: 'blur(16px)',
+              }}
             >
               {pack.locked && (
                 <div className="absolute inset-0 rounded-3xl z-10 flex flex-col items-center justify-center gap-2 backdrop-blur-[1px]">
