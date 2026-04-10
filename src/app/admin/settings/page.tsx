@@ -1,13 +1,80 @@
 'use client'
 
 import { useEffect, useState, useRef } from 'react'
-import { Settings, Save, Loader2, Check, QrCode, Upload, ExternalLink, Trash2 } from 'lucide-react'
+import {
+  Settings, Save, Loader2, Check, QrCode, Upload,
+  ExternalLink, Trash2, DollarSign, RefreshCw, ToggleLeft, ToggleRight,
+  Info,
+} from 'lucide-react'
 
-const PACK_KEYS = [
-  { key: 'PRICE_BASIC', label: 'Pack Básico', desc: 'Precio base para el pack de entrada', color: 'text-cyan-400 border-cyan-500/25 bg-cyan-500/5' },
-  { key: 'PRICE_PRO', label: 'Pack Pro', desc: 'Precio para el pack profesional', color: 'text-purple-400 border-purple-500/25 bg-purple-500/5' },
-  { key: 'PRICE_ELITE', label: 'Pack Elite', desc: 'Precio para el pack premium (próximamente)', color: 'text-yellow-400 border-yellow-500/25 bg-yellow-500/5' },
+/* ─── Plan price config ─────────────────────────────────────────── */
+const PLAN_PRICES = [
+  {
+    key: 'PRICE_BASIC',
+    renewalKey: 'PRICE_BASIC_RENEWAL',
+    label: 'Pack Básico',
+    color: 'text-cyan-400',
+    border: 'border-cyan-500/25',
+    bg: 'bg-cyan-500/5',
+    dot: '#22d3ee',
+  },
+  {
+    key: 'PRICE_PRO',
+    renewalKey: 'PRICE_PRO_RENEWAL',
+    label: 'Pack Pro',
+    color: 'text-purple-400',
+    border: 'border-purple-500/25',
+    bg: 'bg-purple-500/5',
+    dot: '#a78bfa',
+  },
+  {
+    key: 'PRICE_ELITE',
+    renewalKey: 'PRICE_ELITE_RENEWAL',
+    label: 'Pack Elite',
+    color: 'text-yellow-400',
+    border: 'border-yellow-500/25',
+    bg: 'bg-yellow-500/5',
+    dot: '#fbbf24',
+  },
 ]
+
+/* ─── Toggle config ─────────────────────────────────────────────── */
+const TOGGLES = [
+  {
+    key: 'STORE_PAYMENT_CRYPTO',
+    label: 'Pago con Cripto (USDT)',
+    desc: 'WalletConnect / USDT-BEP20. Verificación automática en blockchain.',
+  },
+  {
+    key: 'STORE_PAYMENT_MANUAL',
+    label: 'Pago con Comprobante (QR)',
+    desc: 'El usuario sube comprobante. El admin verifica y aprueba manualmente.',
+  },
+  {
+    key: 'STORE_PAYMENT_FASE_GLOBAL',
+    label: 'Recompra Fase Global',
+    desc: 'Comprobante de recompra + código de Fase Global. Activa Pack Básico.',
+  },
+]
+
+function Toggle({ on, onToggle, disabled }: { on: boolean; onToggle: () => void; disabled?: boolean }) {
+  return (
+    <button
+      onClick={onToggle}
+      disabled={disabled}
+      style={{
+        width: 44, height: 24, borderRadius: 99, border: 'none', cursor: disabled ? 'not-allowed' : 'pointer',
+        background: on ? '#00FF88' : 'rgba(255,255,255,0.12)',
+        position: 'relative', transition: 'background 0.2s', flexShrink: 0, opacity: disabled ? 0.6 : 1,
+      }}>
+      <span style={{
+        position: 'absolute', top: 3, left: on ? 23 : 3,
+        width: 18, height: 18, borderRadius: '50%', background: '#fff',
+        transition: 'left 0.2s', boxShadow: '0 1px 3px rgba(0,0,0,0.4)',
+      }} />
+    </button>
+  )
+}
 
 export default function AdminSettingsPage() {
   const [prices, setPrices] = useState<Record<string, string>>({})
@@ -15,12 +82,10 @@ export default function AdminSettingsPage() {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState<string | null>(null)
   const [saved, setSaved] = useState<string | null>(null)
+  const [toggles, setToggles] = useState<Record<string, boolean>>({})
+  const [savingToggle, setSavingToggle] = useState<string | null>(null)
   const [uploadingQr, setUploadingQr] = useState(false)
   const qrInputRef = useRef<HTMLInputElement>(null)
-  const [storePaymentCrypto, setStorePaymentCrypto] = useState(false)
-  const [storePaymentManual, setStorePaymentManual] = useState(false)
-  const [storePaymentFaseGlobal, setStorePaymentFaseGlobal] = useState(false)
-  const [savingToggle, setSavingToggle] = useState<string | null>(null)
 
   useEffect(() => {
     fetch('/api/admin/settings')
@@ -30,70 +95,58 @@ export default function AdminSettingsPage() {
         d.settings?.forEach((s: { key: string; value: string }) => { map[s.key] = s.value })
         setPrices(map)
         setPaymentQr(map['PAYMENT_QR_URL'] ?? '')
-        setStorePaymentCrypto(map['STORE_PAYMENT_CRYPTO'] === 'true')
-        setStorePaymentManual(map['STORE_PAYMENT_MANUAL'] === 'true')
-        setStorePaymentFaseGlobal(map['STORE_PAYMENT_FASE_GLOBAL'] === 'true')
+        setToggles({
+          STORE_PAYMENT_CRYPTO: map['STORE_PAYMENT_CRYPTO'] === 'true',
+          STORE_PAYMENT_MANUAL: map['STORE_PAYMENT_MANUAL'] === 'true',
+          STORE_PAYMENT_FASE_GLOBAL: map['STORE_PAYMENT_FASE_GLOBAL'] === 'true',
+        })
         setLoading(false)
       })
   }, [])
 
-  async function saveToggle(key: string, value: boolean) {
+  async function saveKey(key: string, value?: string) {
+    const val = value ?? prices[key]
+    if (!val || isNaN(Number(val)) || Number(val) <= 0) {
+      alert('Ingresa un precio válido mayor a 0')
+      return
+    }
+    setSaving(key)
+    const res = await fetch('/api/admin/settings', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ key, value: val }),
+    })
+    setSaving(null)
+    if (res.ok) { setSaved(key); setTimeout(() => setSaved(null), 2500) }
+  }
+
+  async function saveToggle(key: string, next: boolean) {
     setSavingToggle(key)
+    setToggles(prev => ({ ...prev, [key]: next }))
     await fetch('/api/admin/settings', {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ key, value: value ? 'true' : 'false' }),
+      body: JSON.stringify({ key, value: next ? 'true' : 'false' }),
     })
     setSavingToggle(null)
     setSaved(key)
     setTimeout(() => setSaved(null), 2000)
   }
 
-  async function savePrice(key: string) {
-    setSaving(key)
-    const value = prices[key]
-    if (!value || isNaN(Number(value)) || Number(value) <= 0) {
-      alert('Precio inválido')
-      setSaving(null)
-      return
-    }
-    const res = await fetch('/api/admin/settings', {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ key, value }),
-    })
-    setSaving(null)
-    if (res.ok) {
-      setSaved(key)
-      setTimeout(() => setSaved(null), 2000)
-    }
-  }
-
   async function uploadQr(file: File) {
     setUploadingQr(true)
     const fd = new FormData()
     fd.append('file', file)
-    const uploadRes = await fetch('/api/upload', { method: 'POST', body: fd })
-    const uploadData = await uploadRes.json()
+    const res = await fetch('/api/upload', { method: 'POST', body: fd })
+    const data = await res.json()
     setUploadingQr(false)
-
-    if (!uploadRes.ok || !uploadData.url) {
-      alert(uploadData.error ?? 'Error al subir la imagen a Supabase Storage. Verifica que el bucket "uploads" exista y sea público.')
-      return
-    }
-
-    setPaymentQr(uploadData.url)
-    const saveRes = await fetch('/api/admin/settings', {
+    if (!res.ok || !data.url) { alert(data.error ?? 'Error al subir la imagen'); return }
+    setPaymentQr(data.url)
+    await fetch('/api/admin/settings', {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ key: 'PAYMENT_QR_URL', value: uploadData.url }),
+      body: JSON.stringify({ key: 'PAYMENT_QR_URL', value: data.url }),
     })
-
-    if (!saveRes.ok) {
-      alert('La imagen se subió pero no se pudo guardar en la configuración. Inténtalo de nuevo.')
-      return
-    }
-
     setSaved('PAYMENT_QR_URL')
     setTimeout(() => setSaved(null), 2000)
   }
@@ -107,14 +160,44 @@ export default function AdminSettingsPage() {
     })
   }
 
+  const PriceInput = ({ settingKey, placeholder = '0' }: { settingKey: string; placeholder?: string }) => (
+    <div className="flex items-center gap-2">
+      <div className="relative">
+        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-white/40 text-sm font-bold">$</span>
+        <input
+          type="number"
+          min="1"
+          step="0.01"
+          placeholder={placeholder}
+          value={prices[settingKey] ?? ''}
+          onChange={e => setPrices(prev => ({ ...prev, [settingKey]: e.target.value }))}
+          className="w-28 bg-black/30 border border-white/15 rounded-xl pl-6 pr-3 py-2 text-sm font-bold text-white outline-none focus:border-white/30 text-right"
+        />
+      </div>
+      <button
+        onClick={() => saveKey(settingKey)}
+        disabled={saving === settingKey}
+        className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white/10 hover:bg-white/15 border border-white/15 text-xs font-bold transition-colors disabled:opacity-50 whitespace-nowrap"
+      >
+        {saving === settingKey
+          ? <Loader2 size={12} className="animate-spin" />
+          : saved === settingKey
+          ? <><Check size={12} className="text-green-400" /> Guardado</>
+          : <><Save size={12} /> Guardar</>
+        }
+      </button>
+    </div>
+  )
+
   return (
-    <div className="space-y-6 max-w-xl">
+    <div className="space-y-8 max-w-2xl">
+
       {/* Header */}
       <div>
         <h1 className="text-xl font-black uppercase tracking-tighter flex items-center gap-2">
           <Settings size={18} className="text-white/50" /> Configuración
         </h1>
-        <p className="text-xs text-white/30 mt-0.5">Gestiona precios y métodos de pago.</p>
+        <p className="text-xs text-white/30 mt-0.5">Precios de planes, renovaciones y métodos de pago.</p>
       </div>
 
       {loading ? (
@@ -123,223 +206,146 @@ export default function AdminSettingsPage() {
         </div>
       ) : (
         <>
-          {/* Payment QR */}
-          <div className="space-y-3">
-            <p className="text-[10px] font-black uppercase tracking-widest text-white/30 flex items-center gap-2">
-              <QrCode size={11} /> QR de Pago Global
-            </p>
+          {/* ── Plan Prices ─────────────────────────────── */}
+          <section className="space-y-3">
+            <div className="flex items-center gap-2 mb-1">
+              <DollarSign size={13} className="text-white/40" />
+              <p className="text-[10px] font-black uppercase tracking-widest text-white/40">Precios de Planes</p>
+            </div>
+
+            <div className="rounded-2xl overflow-hidden border border-white/8">
+              {/* Column headers */}
+              <div className="grid grid-cols-3 px-5 py-2.5 border-b border-white/6"
+                style={{ background: 'rgba(255,255,255,0.03)' }}>
+                <span className="text-[10px] font-bold uppercase tracking-widest text-white/25">Plan</span>
+                <span className="text-[10px] font-bold uppercase tracking-widest text-white/25 flex items-center gap-1">
+                  <DollarSign size={9} /> Precio inicial
+                </span>
+                <span className="text-[10px] font-bold uppercase tracking-widest text-white/25 flex items-center gap-1">
+                  <RefreshCw size={9} /> Renovación
+                </span>
+              </div>
+
+              {PLAN_PRICES.map(plan => (
+                <div key={plan.key}
+                  className="grid grid-cols-3 items-center px-5 py-4 border-b border-white/5 last:border-0"
+                  style={{ background: 'rgba(255,255,255,0.015)' }}>
+
+                  {/* Plan name */}
+                  <div className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full shrink-0" style={{ background: plan.dot }} />
+                    <span className={`text-sm font-black ${plan.color}`}>{plan.label}</span>
+                  </div>
+
+                  {/* Initial price */}
+                  <PriceInput settingKey={plan.key} placeholder="49" />
+
+                  {/* Renewal price */}
+                  <PriceInput settingKey={plan.renewalKey} placeholder="19" />
+                </div>
+              ))}
+            </div>
+
+            <div className="flex items-start gap-2 p-3 rounded-xl bg-white/[0.02] border border-white/6">
+              <Info size={12} className="text-white/25 mt-0.5 shrink-0" />
+              <p className="text-[11px] text-white/30 leading-relaxed">
+                El <strong className="text-white/45">precio inicial</strong> se cobra cuando el usuario activa el plan por primera vez.
+                La <strong className="text-white/45">renovación</strong> se cobra cuando el plan vence y el usuario quiere extenderlo.
+                Si dejas la renovación vacía, se usará el precio inicial.
+              </p>
+            </div>
+          </section>
+
+          {/* ── Payment QR ──────────────────────────────── */}
+          <section className="space-y-3">
+            <div className="flex items-center gap-2 mb-1">
+              <QrCode size={13} className="text-white/40" />
+              <p className="text-[10px] font-black uppercase tracking-widest text-white/40">QR de Pago Global</p>
+            </div>
+
             <div className="bg-white/[0.025] border border-white/8 rounded-2xl p-5">
-              <p className="text-xs text-white/50 mb-4">
-                Este QR se muestra a los usuarios en la página de checkout para que realicen el pago. Sube el QR de tu billetera USDT u otro método de pago.
+              <p className="text-xs text-white/40 mb-4">
+                Este QR se muestra en el checkout para pagos manuales. Sube el QR de tu billetera USDT u otro método.
               </p>
 
               {paymentQr ? (
                 <div className="flex items-start gap-4">
-                  {/* Preview */}
-                  <div className="w-28 h-28 rounded-xl border border-white/10 overflow-hidden bg-white flex items-center justify-center shrink-0">
+                  <div className="w-24 h-24 rounded-xl border border-white/10 overflow-hidden bg-white flex items-center justify-center shrink-0">
                     <img src={paymentQr} alt="QR de pago" className="w-full h-full object-contain" />
                   </div>
                   <div className="flex-1 space-y-2">
-                    <div className="flex items-center gap-1.5">
-                      {saved === 'PAYMENT_QR_URL' && (
-                        <span className="text-[10px] text-green-400 flex items-center gap-1">
-                          <Check size={10} /> Guardado
-                        </span>
-                      )}
-                    </div>
-                    <a
-                      href={paymentQr}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-1.5 text-xs text-cyan-400 hover:text-cyan-300"
-                    >
+                    {saved === 'PAYMENT_QR_URL' && (
+                      <span className="text-[10px] text-green-400 flex items-center gap-1">
+                        <Check size={10} /> Guardado
+                      </span>
+                    )}
+                    <a href={paymentQr} target="_blank" rel="noopener noreferrer"
+                      className="flex items-center gap-1.5 text-xs text-cyan-400 hover:text-cyan-300">
                       <ExternalLink size={11} /> Ver QR completo
                     </a>
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => qrInputRef.current?.click()}
-                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-purple-600/20 border border-purple-500/30 text-purple-400 text-xs font-bold hover:bg-purple-600/30 transition-colors"
-                      >
+                    <div className="flex gap-2 flex-wrap">
+                      <button onClick={() => qrInputRef.current?.click()}
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-purple-600/20 border border-purple-500/30 text-purple-400 text-xs font-bold hover:bg-purple-600/30 transition-colors">
                         <Upload size={11} /> Cambiar QR
                       </button>
-                      <button
-                        onClick={removeQr}
-                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-red-600/15 border border-red-500/25 text-red-400 text-xs font-bold hover:bg-red-600/25 transition-colors"
-                      >
+                      <button onClick={removeQr}
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-red-600/15 border border-red-500/25 text-red-400 text-xs font-bold hover:bg-red-600/25 transition-colors">
                         <Trash2 size={11} /> Quitar
                       </button>
                     </div>
                   </div>
                 </div>
               ) : (
-                <button
-                  onClick={() => qrInputRef.current?.click()}
-                  disabled={uploadingQr}
-                  className="w-full flex flex-col items-center justify-center gap-2 py-8 border-2 border-dashed border-white/10 rounded-xl text-white/30 hover:border-purple-500/40 hover:text-purple-400 transition-colors"
-                >
-                  {uploadingQr ? (
-                    <Loader2 size={20} className="animate-spin" />
-                  ) : (
-                    <>
-                      <QrCode size={24} className="text-white/20" />
-                      <span className="text-xs font-bold">Subir imagen del QR de pago</span>
-                      <span className="text-[10px] text-white/20">PNG, JPG · USDT, Binance Pay, etc.</span>
-                    </>
-                  )}
+                <button onClick={() => qrInputRef.current?.click()} disabled={uploadingQr}
+                  className="w-full flex flex-col items-center justify-center gap-2 py-8 border-2 border-dashed border-white/10 rounded-xl text-white/30 hover:border-purple-500/40 hover:text-purple-400 transition-colors">
+                  {uploadingQr
+                    ? <Loader2 size={20} className="animate-spin" />
+                    : <>
+                        <QrCode size={24} className="text-white/20" />
+                        <span className="text-xs font-bold">Subir imagen del QR de pago</span>
+                        <span className="text-[10px] text-white/20">PNG, JPG · USDT, Binance Pay, etc.</span>
+                      </>
+                  }
                 </button>
               )}
 
-              <input
-                ref={qrInputRef}
-                type="file"
-                accept="image/*"
-                className="hidden"
-                onChange={e => {
-                  const file = e.target.files?.[0]
-                  if (file) uploadQr(file)
-                }}
-              />
+              <input ref={qrInputRef} type="file" accept="image/*" className="hidden"
+                onChange={e => { const f = e.target.files?.[0]; if (f) uploadQr(f) }} />
             </div>
-          </div>
+          </section>
 
-          {/* Pack prices */}
-          <div className="space-y-3">
-            <p className="text-[10px] font-black uppercase tracking-widest text-white/30">Precios de Packs</p>
-            {PACK_KEYS.map(({ key, label, desc, color }) => (
-              <div key={key} className={`rounded-2xl border p-4 ${color}`}>
-                <div className="flex items-center justify-between gap-4">
+          {/* ── Payment Methods (Store) ──────────────────── */}
+          <section className="space-y-3">
+            <div className="flex items-center gap-2 mb-1">
+              <ToggleLeft size={13} className="text-white/40" />
+              <p className="text-[10px] font-black uppercase tracking-widest text-white/40">Métodos de Pago — Tienda</p>
+            </div>
+
+            <div className="bg-white/[0.025] border border-white/8 rounded-2xl divide-y divide-white/6 overflow-hidden">
+              {TOGGLES.map(t => (
+                <div key={t.key} className="flex items-center justify-between gap-4 px-5 py-4">
                   <div>
-                    <p className="text-sm font-black">{label}</p>
-                    <p className="text-[10px] text-white/30 mt-0.5">{desc}</p>
+                    <p className="text-sm font-bold text-white">{t.label}</p>
+                    <p className="text-[11px] text-white/35 mt-0.5">{t.desc}</p>
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
-                    <div className="relative">
-                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-white/40 text-sm font-bold">$</span>
-                      <input
-                        type="number"
-                        min="1"
-                        step="1"
-                        value={prices[key] ?? ''}
-                        onChange={e => setPrices(prev => ({ ...prev, [key]: e.target.value }))}
-                        className="w-24 bg-black/30 border border-white/15 rounded-xl pl-6 pr-3 py-2 text-sm font-bold text-white outline-none focus:border-white/30 text-right"
-                      />
-                    </div>
-                    <button
-                      onClick={() => savePrice(key)}
-                      disabled={saving === key}
-                      className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white/10 hover:bg-white/15 border border-white/15 text-xs font-bold transition-colors disabled:opacity-50"
-                    >
-                      {saving === key ? (
-                        <Loader2 size={12} className="animate-spin" />
-                      ) : saved === key ? (
-                        <><Check size={12} className="text-green-400" /> Guardado</>
-                      ) : (
-                        <><Save size={12} /> Guardar</>
-                      )}
-                    </button>
+                    {saved === t.key && <Check size={11} className="text-green-400" />}
+                    {savingToggle === t.key && <Loader2 size={11} className="text-white/40 animate-spin" />}
+                    <Toggle
+                      on={toggles[t.key] ?? false}
+                      onToggle={() => saveToggle(t.key, !toggles[t.key])}
+                      disabled={savingToggle === t.key}
+                    />
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Tienda — métodos de pago */}
-          <div className="space-y-3">
-            <p className="text-[10px] font-black uppercase tracking-widest text-white/30">Tienda — Métodos de Pago</p>
-            <div className="bg-white/[0.025] border border-white/8 rounded-2xl p-4 space-y-4">
-              <p className="text-xs text-white/40">Activa los métodos de pago disponibles en el carrito de la tienda. El QR que se muestra es el mismo configurado arriba.</p>
-
-              {/* Crypto toggle */}
-              <div className="flex items-center justify-between gap-4">
-                <div>
-                  <p className="text-sm font-bold text-white">Pago con Cripto (USDT)</p>
-                  <p className="text-[11px] text-white/35 mt-0.5">WalletConnect / USDT-BEP20. Verificación automática en blockchain.</p>
-                </div>
-                <button
-                  onClick={async () => {
-                    const next = !storePaymentCrypto
-                    setStorePaymentCrypto(next)
-                    await saveToggle('STORE_PAYMENT_CRYPTO', next)
-                  }}
-                  disabled={savingToggle === 'STORE_PAYMENT_CRYPTO'}
-                  style={{
-                    width: 44, height: 24, borderRadius: 99, border: 'none', cursor: 'pointer',
-                    background: storePaymentCrypto ? '#00FF88' : 'rgba(255,255,255,0.12)',
-                    position: 'relative', transition: 'background 0.2s', flexShrink: 0
-                  }}
-                >
-                  <span style={{
-                    position: 'absolute', top: 3, left: storePaymentCrypto ? 23 : 3,
-                    width: 18, height: 18, borderRadius: '50%', background: '#fff',
-                    transition: 'left 0.2s', boxShadow: '0 1px 3px rgba(0,0,0,0.4)'
-                  }} />
-                </button>
-              </div>
-
-              {/* Manual toggle */}
-              <div className="flex items-center justify-between gap-4">
-                <div>
-                  <p className="text-sm font-bold text-white">Pago con Comprobante (QR)</p>
-                  <p className="text-[11px] text-white/35 mt-0.5">El usuario sube URL del comprobante. El admin verifica y aprueba manualmente.</p>
-                </div>
-                <button
-                  onClick={async () => {
-                    const next = !storePaymentManual
-                    setStorePaymentManual(next)
-                    await saveToggle('STORE_PAYMENT_MANUAL', next)
-                  }}
-                  disabled={savingToggle === 'STORE_PAYMENT_MANUAL'}
-                  style={{
-                    width: 44, height: 24, borderRadius: 99, border: 'none', cursor: 'pointer',
-                    background: storePaymentManual ? '#00FF88' : 'rgba(255,255,255,0.12)',
-                    position: 'relative', transition: 'background 0.2s', flexShrink: 0
-                  }}
-                >
-                  <span style={{
-                    position: 'absolute', top: 3, left: storePaymentManual ? 23 : 3,
-                    width: 18, height: 18, borderRadius: '50%', background: '#fff',
-                    transition: 'left 0.2s', boxShadow: '0 1px 3px rgba(0,0,0,0.4)'
-                  }} />
-                </button>
-              </div>
-
-              {/* Fase Global toggle */}
-              <div className="flex items-center justify-between gap-4">
-                <div>
-                  <p className="text-sm font-bold text-white">Recompra Fase Global</p>
-                  <p className="text-[11px] text-white/35 mt-0.5">El usuario sube comprobante de recompra + código de Fase Global. Siempre activa Pack Básico.</p>
-                </div>
-                <button
-                  onClick={async () => {
-                    const next = !storePaymentFaseGlobal
-                    setStorePaymentFaseGlobal(next)
-                    await saveToggle('STORE_PAYMENT_FASE_GLOBAL', next)
-                  }}
-                  disabled={savingToggle === 'STORE_PAYMENT_FASE_GLOBAL'}
-                  style={{
-                    width: 44, height: 24, borderRadius: 99, border: 'none', cursor: 'pointer',
-                    background: storePaymentFaseGlobal ? '#00FF88' : 'rgba(255,255,255,0.12)',
-                    position: 'relative', transition: 'background 0.2s', flexShrink: 0
-                  }}
-                >
-                  <span style={{
-                    position: 'absolute', top: 3, left: storePaymentFaseGlobal ? 23 : 3,
-                    width: 18, height: 18, borderRadius: '50%', background: '#fff',
-                    transition: 'left 0.2s', boxShadow: '0 1px 3px rgba(0,0,0,0.4)'
-                  }} />
-                </button>
-              </div>
-
-              {saved === 'STORE_PAYMENT_CRYPTO' || saved === 'STORE_PAYMENT_MANUAL' || saved === 'STORE_PAYMENT_FASE_GLOBAL' ? (
-                <p className="text-[11px] text-green-400 flex items-center gap-1"><Check size={10} /> Guardado</p>
-              ) : null}
+              ))}
             </div>
-          </div>
+          </section>
 
-          {/* Info */}
+          {/* Flow info */}
           <div className="bg-white/[0.02] border border-white/6 rounded-2xl p-4">
             <p className="text-[11px] text-white/30 leading-relaxed">
-              <strong className="text-white/50">Flujo de compra:</strong> El usuario selecciona un pack → ve el QR de pago y los detalles → realiza el pago → sube su comprobante → tú revisas el comprobante y apruebas manualmente desde la sección <em>Compras</em>.
+              <strong className="text-white/50">Flujo de compra:</strong> El usuario selecciona un plan → ve el precio y QR de pago → realiza el pago → sube su comprobante → tú revisas y apruebas desde <em>Compras</em>.
             </p>
           </div>
         </>

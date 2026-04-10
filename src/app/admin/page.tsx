@@ -18,6 +18,7 @@ interface Stats {
   activeUsers: number
   pendingPurchases: number
   pendingWithdrawals: number
+  totalRevenue: number
   totalCommissions: number
 }
 
@@ -102,7 +103,14 @@ export default function AdminOverviewPage() {
       alert: (stats?.pendingWithdrawals ?? 0) > 0,
     },
     {
-      label: 'Total Comisiones',
+      label: 'Ingresos Aprobados',
+      value: `$${(stats?.totalRevenue ?? 0).toFixed(2)}`,
+      icon: DollarSign,
+      color: 'text-green-400',
+      bg: 'bg-green-500/8 border-green-500/20',
+    },
+    {
+      label: 'Comisiones Pagadas',
       value: `$${(stats?.totalCommissions ?? 0).toFixed(2)}`,
       icon: DollarSign,
       color: 'text-yellow-400',
@@ -119,7 +127,7 @@ export default function AdminOverviewPage() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
         {statCards.map((s, i) => {
           const Icon = s.icon
           const card = (

@@ -14,6 +14,8 @@ export async function GET() {
     pendingWithdrawals,
     recentPurchases,
     recentWithdrawals,
+    totalRevenueRaw,
+    totalCommissionsRaw,
   ] = await Promise.all([
     prisma.user.count(),
     prisma.user.count({ where: { isActive: true } }),
@@ -31,6 +33,15 @@ export async function GET() {
       orderBy: { createdAt: 'desc' },
       take: 5,
     }),
+    // Total revenue: sum of all approved pack purchases
+    prisma.packPurchaseRequest.aggregate({
+      _sum: { price: true },
+      where: { status: 'APPROVED' },
+    }),
+    // Total commissions: sum of all clipping payouts issued
+    prisma.clippingPayout.aggregate({
+      _sum: { amountUSD: true },
+    }),
   ])
 
   return NextResponse.json({
@@ -39,6 +50,8 @@ export async function GET() {
       activeUsers,
       pendingPurchases,
       pendingWithdrawals,
+      totalRevenue: Number(totalRevenueRaw._sum.price ?? 0),
+      totalCommissions: Number(totalCommissionsRaw._sum.amountUSD ?? 0),
     },
     recentPurchases: recentPurchases.map(r => ({ ...r, price: Number(r.price) })),
     recentWithdrawals: recentWithdrawals.map(r => ({ ...r, amount: Number(r.amount) })),

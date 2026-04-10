@@ -143,9 +143,16 @@ export async function POST(request: NextRequest) {
 
     let effectivePrice: number
     if (isRenewal) {
-      // Renovación: siempre $19 fijo (configurable vía AppSetting PRICE_RENEWAL)
-      const renewalSetting = await prisma.appSetting.findUnique({ where: { key: 'PRICE_RENEWAL' } })
-      effectivePrice = renewalSetting ? parseFloat(renewalSetting.value) : 19
+      // Renovación: usa precio de renovación por plan (PRICE_X_RENEWAL), si no existe usa precio base
+      const renewalKey = `PRICE_${plan}_RENEWAL`
+      const renewalSetting = await prisma.appSetting.findUnique({ where: { key: renewalKey } })
+      if (renewalSetting) {
+        effectivePrice = parseFloat(renewalSetting.value)
+      } else {
+        // fallback: precio base del plan
+        const baseSetting = await prisma.appSetting.findUnique({ where: { key: `PRICE_${plan}` } })
+        effectivePrice = baseSetting ? parseFloat(baseSetting.value) : DEFAULT_PRICES[plan] ?? 19
+      }
     } else {
       // Nueva activación o upgrade: precio diferencial
       let currentPrice = 0
