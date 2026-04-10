@@ -151,7 +151,6 @@ const SectionTitle = ({ icon: Icon, title, color = '#00FF88' }: any) => (
             <Icon size={16} />
         </div>
         <h3 className="text-base font-black uppercase tracking-tight text-white">{title}</h3>
-        <div className="flex-1 h-px bg-white/5" />
     </div>
 )
 
