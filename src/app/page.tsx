@@ -60,144 +60,179 @@ function Counter({ target, suffix, visible }: { target:number; suffix:string; vi
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// LIVE CHAT SIMULATION
+// LIVE CHAT SIMULATION  (bot respondiendo a 3 contactos individualmente)
 // ─────────────────────────────────────────────────────────────────────────────
-// 3 personas en el grupo
-const PEOPLE = {
-  ana:   { name: 'Ana García',    avatar: 'AG', color: '#25D366', time: '10:42' },
-  luis:  { name: 'Luis Torres',   avatar: 'LT', color: '#D203DD', time: '10:43' },
-  sofia: { name: 'Sofía Reyes',   avatar: 'SR', color: '#00BFFF', time: '10:44' },
-}
+const CONTACTS = [
+  { name: 'Carlos M.',  avatar: 'CM', color: '#25D366' },
+  { name: 'María T.',   avatar: 'MT', color: '#D203DD' },
+  { name: 'Luis R.',    avatar: 'LR', color: '#00BFFF' },
+]
 
-type Person = keyof typeof PEOPLE
+type ChatMsg = { from: 'contact' | 'bot'; text: string; time: string }
 
-const CHAT_SCRIPT: { from: Person; text: string; time: string }[] = [
-  { from:'ana',   text:'Chicos acabo de recibir mi primer pago 🎉 $340 esta semana solo con el bot', time:'10:41' },
-  { from:'luis',  text:'¡Serio! 😱 y cuánto tiempo llevas con MY DIAMOND?', time:'10:42' },
-  { from:'ana',   text:'Solo 3 semanas jaja, el bot vende solo mientras yo duermo 🤖💸', time:'10:42' },
-  { from:'sofia', text:'Yo llevo 2 meses y ya recuperé la inversión. Las campañas de Meta con IA son 🔥', time:'10:43' },
-  { from:'luis',  text:'Oigan y cómo arrancaron? yo recién me registro hoy', time:'10:43' },
-  { from:'sofia', text:'Fácil! Activa el bot primero, ponle tus productos y listo. En 1 día ya está vendiendo 💪', time:'10:44' },
-  { from:'ana',   text:'Y no se te olvide conectar la tienda virtual. Mis clientes pagan directo desde ahí 🛒', time:'10:44' },
-  { from:'luis',  text:'Wow gracias! esto es exactamente lo que necesitaba 🙌🙌', time:'10:45' },
+const CONVS: ChatMsg[][] = [
+  [
+    { from: 'contact', text: 'Hola! me interesa el plan básico 🙌', time: '10:41' },
+    { from: 'bot',     text: 'Hola Carlos! 👋 El Pack Básico es $49 USD: bot IA de ventas, tienda virtual y landing page.', time: '10:41' },
+    { from: 'contact', text: 'El bot responde solo sin que yo esté?', time: '10:42' },
+    { from: 'bot',     text: '¡Exacto! Responde y cierra ventas 24/7 automáticamente 🤖 ¿Te lo activo hoy?', time: '10:42' },
+    { from: 'contact', text: 'Dale! Cómo pago?', time: '10:43' },
+    { from: 'bot',     text: 'Puedes pagar con USDT o transferencia 💳 Te envío el link ahora mismo 👇', time: '10:43' },
+  ],
+  [
+    { from: 'contact', text: 'Vi tu anuncio 👀 qué incluye el plan pro?', time: '11:15' },
+    { from: 'bot',     text: 'Hola María! 😊 Pack Pro: 2 bots IA, 2 tiendas, 3 landings + campañas con IA en Meta y TikTok.', time: '11:15' },
+    { from: 'contact', text: 'Y cuánto tarda en estar listo?', time: '11:16' },
+    { from: 'bot',     text: 'Menos de 24h y ya tienes todo activo y vendiendo 🚀 ¿Empezamos?', time: '11:16' },
+    { from: 'contact', text: 'Me convenciste! quiero el pro 💎', time: '11:17' },
+    { from: 'bot',     text: 'Perfecto! Pack Pro a $99 USD. Te mando el checkout ahora ✅', time: '11:17' },
+  ],
+  [
+    { from: 'contact', text: 'Tengo tienda física y quiero vender online', time: '14:30' },
+    { from: 'bot',     text: 'Hola Luis! 💪 Te armamos tienda online + bot IA que atiende y cierra ventas por WhatsApp.', time: '14:30' },
+    { from: 'contact', text: 'Y los anuncios los crea la plataforma sola?', time: '14:31' },
+    { from: 'bot',     text: '¡Sí! La IA crea y optimiza tus anuncios en Meta, TikTok y Google 🔥', time: '14:31' },
+    { from: 'contact', text: 'Eso es exactamente lo que necesito 🙌', time: '14:32' },
+    { from: 'bot',     text: 'Actívate hoy, en 24h tienes todo funcionando 💎', time: '14:32' },
+  ],
 ]
 
 function LiveChatSim() {
-  const [messages, setMessages] = useState<typeof CHAT_SCRIPT>([])
-  const [typingPerson, setTypingPerson] = useState<Person | null>(null)
-  const [step, setStep] = useState(0)
-  const chatBodyRef = useRef<HTMLDivElement>(null)
+  const [ci, setCi]           = useState(0)   // contact index
+  const [msgs, setMsgs]       = useState<ChatMsg[]>([])
+  const [step, setStep]       = useState(0)
+  const [typing, setTyping]   = useState<'contact'|'bot'|null>(null)
+  const [fading, setFading]   = useState(false)
+  const bodyRef = useRef<HTMLDivElement>(null)
 
+  // scroll interno del chat
   useEffect(() => {
-    if (step >= CHAT_SCRIPT.length) {
-      const t = setTimeout(() => { setMessages([]); setStep(0) }, 4000)
+    const el = bodyRef.current
+    if (el) el.scrollTop = el.scrollHeight
+  }, [msgs, typing])
+
+  // avance de mensajes
+  useEffect(() => {
+    const conv = CONVS[ci]
+    if (step >= conv.length) {
+      // conversación terminada → pausa, fade, siguiente contacto
+      const t = setTimeout(() => {
+        setFading(true)
+        setTimeout(() => {
+          setCi(c => (c + 1) % CONVS.length)
+          setMsgs([])
+          setStep(0)
+          setTyping(null)
+          setFading(false)
+        }, 400)
+      }, 2800)
       return () => clearTimeout(t)
     }
-    const msg = CHAT_SCRIPT[step]
-    const delay = step === 0 ? 600 : 1600
-
+    const msg = conv[step]
+    const delay = step === 0 ? 700 : 1400
     const t1 = setTimeout(() => {
-      setTypingPerson(msg.from)
+      setTyping(msg.from)
       const t2 = setTimeout(() => {
-        setTypingPerson(null)
-        setMessages(prev => [...prev, msg])
+        setTyping(null)
+        setMsgs(prev => [...prev, msg])
         setStep(s => s + 1)
-      }, 1300)
+      }, 1100)
       return () => clearTimeout(t2)
     }, delay)
     return () => clearTimeout(t1)
-  }, [step])
+  }, [step, ci])
 
-  useEffect(() => {
-    const el = chatBodyRef.current
-    if (el) el.scrollTop = el.scrollHeight
-  }, [messages, typingPerson])
-
-  const p = PEOPLE
+  const contact = CONTACTS[ci]
 
   return (
-    <div style={{ width: '100%', maxWidth: 340, borderRadius: 16, overflow: 'hidden', boxShadow: '0 32px 80px rgba(0,0,0,0.6)', fontFamily: 'system-ui, sans-serif' }}>
+    <div style={{ width: '100%', maxWidth: 340, borderRadius: 16, overflow: 'hidden', boxShadow: '0 32px 80px rgba(0,0,0,0.6)', fontFamily: 'system-ui, sans-serif', opacity: fading ? 0 : 1, transition: 'opacity 0.4s ease' }}>
 
-      {/* WhatsApp header */}
+      {/* Header — muestra el contacto actual */}
       <div style={{ background: '#1F2C34', padding: '10px 14px', display: 'flex', alignItems: 'center', gap: 10 }}>
         <div style={{ position: 'relative', flexShrink: 0 }}>
-          <div style={{ width: 40, height: 40, borderRadius: '50%', background: 'linear-gradient(135deg, #25D366, #128C7E)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <span style={{ fontSize: 11, fontWeight: 800, color: '#fff' }}>MD</span>
+          <div style={{ width: 40, height: 40, borderRadius: '50%', background: contact.color + '25', border: `2px solid ${contact.color}`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <span style={{ fontSize: 12, fontWeight: 800, color: contact.color }}>{contact.avatar}</span>
           </div>
           <div style={{ position: 'absolute', bottom: 1, right: 1, width: 10, height: 10, borderRadius: '50%', background: '#25D366', border: '2px solid #1F2C34' }} />
         </div>
         <div style={{ flex: 1 }}>
-          <p style={{ fontSize: 14, fontWeight: 700, color: '#E9EDEF', margin: 0 }}>MY DIAMOND 💎</p>
+          <p style={{ fontSize: 14, fontWeight: 700, color: '#E9EDEF', margin: 0 }}>{contact.name}</p>
           <p style={{ fontSize: 11, color: '#8696A0', margin: 0 }}>
-            {typingPerson ? <span style={{ color: '#25D366' }}>{p[typingPerson].name} está escribiendo...</span> : 'Ana, Luis, Sofía · 3 participantes'}
+            {typing === 'bot' ? <span style={{ color: '#25D366' }}>Bot MY DIAMOND escribiendo...</span>
+             : typing === 'contact' ? <span style={{ color: contact.color }}>{contact.name} escribiendo...</span>
+             : 'en línea'}
           </p>
         </div>
-        <div style={{ display: 'flex', gap: 16 }}>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8696A0" strokeWidth="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8696A0" strokeWidth="2"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+        {/* Dots indicadores de contacto */}
+        <div style={{ display: 'flex', gap: 5 }}>
+          {CONTACTS.map((_, idx) => (
+            <div key={idx} style={{ width: 6, height: 6, borderRadius: '50%', background: idx === ci ? contact.color : 'rgba(255,255,255,0.15)', transition: 'background 0.3s' }} />
+          ))}
         </div>
       </div>
 
-      {/* Chat background */}
-      <div ref={chatBodyRef} style={{ height: 310, overflowY: 'auto', background: '#0B141A', backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.015'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E\")", padding: '12px 10px', display: 'flex', flexDirection: 'column', gap: 4, scrollbarWidth: 'none' }}>
+      {/* Área de chat */}
+      <div ref={bodyRef} style={{ height: 310, overflowY: 'auto', background: '#0B141A', backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.015'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E\")", padding: '12px 10px', display: 'flex', flexDirection: 'column', gap: 3, scrollbarWidth: 'none' }}>
 
-        {/* Date badge */}
         <div style={{ textAlign: 'center', margin: '4px 0 10px' }}>
           <span style={{ fontSize: 11, color: '#8696A0', background: 'rgba(0,0,0,0.4)', padding: '3px 10px', borderRadius: 8 }}>HOY</span>
         </div>
 
-        {messages.map((m, i) => {
-          const person = p[m.from]
-          const prevFrom = i > 0 ? messages[i-1].from : null
-          const showAvatar = prevFrom !== m.from
+        {msgs.map((m, i) => {
+          const isBot = m.from === 'bot'
           return (
-            <div key={i} style={{ display: 'flex', alignItems: 'flex-end', gap: 6, marginBottom: showAvatar && i > 0 ? 6 : 2 }}>
-              {/* Avatar */}
-              <div style={{ width: 28, flexShrink: 0, display: 'flex', alignItems: 'flex-end' }}>
-                {showAvatar && (
-                  <div style={{ width: 28, height: 28, borderRadius: '50%', background: person.color + '30', border: `1.5px solid ${person.color}`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <span style={{ fontSize: 8, fontWeight: 800, color: person.color }}>{person.avatar}</span>
-                  </div>
-                )}
-              </div>
-              {/* Bubble */}
-              <div style={{ maxWidth: '75%' }}>
-                {showAvatar && (
-                  <p style={{ fontSize: 11, fontWeight: 700, color: person.color, margin: '0 0 2px 10px' }}>{person.name}</p>
-                )}
-                <div style={{ background: '#202C33', borderRadius: showAvatar ? '0px 10px 10px 10px' : '10px 10px 10px 4px', padding: '7px 10px 6px', position: 'relative' }}>
-                  {showAvatar && <div style={{ position: 'absolute', left: -6, top: 0, width: 0, height: 0, borderTop: '6px solid #202C33', borderLeft: '6px solid transparent' }} />}
-                  <p style={{ fontSize: 12.5, color: '#E9EDEF', margin: 0, lineHeight: 1.45 }}>{m.text}</p>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 4, marginTop: 3 }}>
-                    <span style={{ fontSize: 10, color: '#8696A0' }}>{m.time}</span>
-                    <svg width="14" height="10" viewBox="0 0 16 11" fill="none"><path d="M1 6l4 4L15 1" stroke="#53BDEB" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/><path d="M5 6l4 4" stroke="#53BDEB" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" opacity="0.5"/></svg>
-                  </div>
+            <div key={i} style={{ display: 'flex', justifyContent: isBot ? 'flex-end' : 'flex-start', marginBottom: 3 }}>
+              {/* Avatar contacto (izquierda) */}
+              {!isBot && (
+                <div style={{ width: 28, height: 28, borderRadius: '50%', background: contact.color + '25', border: `1.5px solid ${contact.color}`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginRight: 6, alignSelf: 'flex-end' }}>
+                  <span style={{ fontSize: 8, fontWeight: 800, color: contact.color }}>{contact.avatar}</span>
+                </div>
+              )}
+              {/* Burbuja */}
+              <div style={{ maxWidth: '72%', background: isBot ? '#005C4B' : '#202C33', borderRadius: isBot ? '10px 2px 10px 10px' : '2px 10px 10px 10px', padding: '7px 10px 5px', position: 'relative' }}>
+                {isBot && <div style={{ position: 'absolute', right: -5, top: 0, width: 0, height: 0, borderTop: '6px solid #005C4B', borderRight: '6px solid transparent' }} />}
+                {!isBot && <div style={{ position: 'absolute', left: -5, top: 0, width: 0, height: 0, borderTop: '6px solid #202C33', borderLeft: '6px solid transparent' }} />}
+                <p style={{ fontSize: 12.5, color: '#E9EDEF', margin: 0, lineHeight: 1.45 }}>{m.text}</p>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 3, marginTop: 2 }}>
+                  <span style={{ fontSize: 10, color: 'rgba(233,237,239,0.45)' }}>{m.time}</span>
+                  {isBot && <svg width="14" height="10" viewBox="0 0 16 11" fill="none"><path d="M1 6l4 4L15 1" stroke="#53BDEB" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/><path d="M5 6l4 4" stroke="#53BDEB" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" opacity="0.6"/></svg>}
                 </div>
               </div>
+              {/* Avatar bot (derecha) */}
+              {isBot && (
+                <div style={{ width: 28, height: 28, borderRadius: '50%', background: 'linear-gradient(135deg,#25D366,#128C7E)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginLeft: 6, alignSelf: 'flex-end' }}>
+                  <span style={{ fontSize: 8, fontWeight: 800, color: '#fff' }}>MD</span>
+                </div>
+              )}
             </div>
           )
         })}
 
-        {/* Typing indicator */}
-        {typingPerson && (
-          <div style={{ display: 'flex', alignItems: 'flex-end', gap: 6, marginTop: 4 }}>
-            <div style={{ width: 28, height: 28, borderRadius: '50%', background: p[typingPerson].color + '30', border: `1.5px solid ${p[typingPerson].color}`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-              <span style={{ fontSize: 8, fontWeight: 800, color: p[typingPerson].color }}>{p[typingPerson].avatar}</span>
-            </div>
-            <div style={{ background: '#202C33', borderRadius: '0 10px 10px 10px', padding: '10px 14px', display: 'flex', gap: 4, alignItems: 'center' }}>
+        {/* Indicador de escritura */}
+        {typing && (
+          <div style={{ display: 'flex', justifyContent: typing === 'bot' ? 'flex-end' : 'flex-start', marginTop: 2 }}>
+            {typing === 'contact' && (
+              <div style={{ width: 28, height: 28, borderRadius: '50%', background: contact.color + '25', border: `1.5px solid ${contact.color}`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginRight: 6 }}>
+                <span style={{ fontSize: 8, fontWeight: 800, color: contact.color }}>{contact.avatar}</span>
+              </div>
+            )}
+            <div style={{ background: typing === 'bot' ? '#005C4B' : '#202C33', borderRadius: 20, padding: '10px 14px', display: 'flex', gap: 4, alignItems: 'center' }}>
               {[0,1,2].map(i => (
                 <div key={i} style={{ width: 6, height: 6, borderRadius: '50%', background: '#8696A0', animation: `typing-dot 1.2s ${i*0.2}s ease-in-out infinite` }} />
               ))}
             </div>
+            {typing === 'bot' && (
+              <div style={{ width: 28, height: 28, borderRadius: '50%', background: 'linear-gradient(135deg,#25D366,#128C7E)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginLeft: 6 }}>
+                <span style={{ fontSize: 8, fontWeight: 800, color: '#fff' }}>MD</span>
+              </div>
+            )}
           </div>
         )}
       </div>
 
-      {/* WhatsApp input bar */}
+      {/* Input bar */}
       <div style={{ background: '#1F2C34', padding: '8px 10px', display: 'flex', alignItems: 'center', gap: 8 }}>
-        <div style={{ flex: 1, background: '#2A3942', borderRadius: 24, padding: '9px 14px', fontSize: 12, color: '#8696A0' }}>
-          Mensaje
-        </div>
+        <div style={{ flex: 1, background: '#2A3942', borderRadius: 24, padding: '9px 14px', fontSize: 12, color: '#8696A0' }}>Mensaje</div>
         <div style={{ width: 40, height: 40, borderRadius: '50%', background: '#25D366', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M2 21l21-9L2 3v7l15 2-15 2v7z"/></svg>
         </div>
