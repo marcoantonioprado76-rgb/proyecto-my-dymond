@@ -245,6 +245,7 @@ export default function PlanesPage() {
   const [planExpiresAt, setPlanExpiresAt] = useState<string | null>(null)
   const [pendingPlan, setPendingPlan] = useState<string | null>(null)
   const [isFaseGlobal, setIsFaseGlobal] = useState(false)
+  const [enabledPlans, setEnabledPlans] = useState<Record<string, boolean> | null>(null)
   const countdown = useCountdown(planExpiresAt)
 
   useEffect(() => {
@@ -263,7 +264,25 @@ export default function PlanesPage() {
         if (pending) setPendingPlan(pending.plan)
       })
       .catch(() => {})
-  }, [])
+    // Cargar disponibilidad de planes
+    fetch('/api/settings')
+      .then(r => r.json())
+      .then(d => {
+        const s = d.settings ?? {}
+        const map = {
+          BASIC: s['PLAN_BASIC_ENABLED'] !== 'false',
+          PRO:   s['PLAN_PRO_ENABLED']   !== 'false',
+          ELITE: s['PLAN_ELITE_ENABLED'] !== 'false',
+        }
+        // Si todos están desactivados → redirigir a checkout con Fase Global
+        if (!map.BASIC && !map.PRO && !map.ELITE) {
+          router.replace('/dashboard/store/checkout?plan=BASIC&faseGlobalOnly=true')
+          return
+        }
+        setEnabledPlans(map)
+      })
+      .catch(() => setEnabledPlans({ BASIC: true, PRO: true, ELITE: true }))
+  }, [router])
 
   return (
     <div className="px-4 md:px-6 pt-6 max-w-screen-xl mx-auto pb-24 text-white">
@@ -329,8 +348,13 @@ export default function PlanesPage() {
       )}
 
       {/* Cards */}
+      {enabledPlans === null ? (
+        <div className="flex items-center justify-center py-24">
+          <div className="w-6 h-6 border-2 border-t-transparent rounded-full animate-spin" style={{ borderColor: '#D203DD', borderTopColor: 'transparent' }} />
+        </div>
+      ) : (
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
-        {PACKS.map((pack) => {
+        {PACKS.filter(pack => enabledPlans[pack.planId]).map((pack) => {
           const Icon = pack.icon
           return (
             <div
@@ -490,6 +514,7 @@ export default function PlanesPage() {
           )
         })}
       </div>
+      )}
 
       {/* Empresarial card */}
       <div className="mt-6 relative rounded-3xl border border-yellow-500/20 overflow-hidden"

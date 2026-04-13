@@ -39,7 +39,28 @@ const PLAN_PRICES = [
 ]
 
 /* ─── Toggle config ─────────────────────────────────────────────── */
-const TOGGLES = [
+const PLAN_TOGGLES = [
+  {
+    key: 'PLAN_BASIC_ENABLED',
+    label: 'Pack Básico',
+    desc: 'Si está desactivado, el Pack Básico no aparece en la tienda.',
+    dot: '#22d3ee',
+  },
+  {
+    key: 'PLAN_PRO_ENABLED',
+    label: 'Pack Pro',
+    desc: 'Si está desactivado, el Pack Pro no aparece en la tienda.',
+    dot: '#a78bfa',
+  },
+  {
+    key: 'PLAN_ELITE_ENABLED',
+    label: 'Pack Elite',
+    desc: 'Si está desactivado, el Pack Elite no aparece en la tienda.',
+    dot: '#fbbf24',
+  },
+]
+
+const PAYMENT_TOGGLES = [
   {
     key: 'STORE_PAYMENT_CRYPTO',
     label: 'Pago con Cripto (USDT)',
@@ -96,9 +117,14 @@ export default function AdminSettingsPage() {
         setPrices(map)
         setPaymentQr(map['PAYMENT_QR_URL'] ?? '')
         setToggles({
-          STORE_PAYMENT_CRYPTO: map['STORE_PAYMENT_CRYPTO'] === 'true',
-          STORE_PAYMENT_MANUAL: map['STORE_PAYMENT_MANUAL'] === 'true',
+          // Métodos de pago — default false salvo que esté explícitamente en 'true'
+          STORE_PAYMENT_CRYPTO:     map['STORE_PAYMENT_CRYPTO'] === 'true',
+          STORE_PAYMENT_MANUAL:     map['STORE_PAYMENT_MANUAL'] === 'true',
           STORE_PAYMENT_FASE_GLOBAL: map['STORE_PAYMENT_FASE_GLOBAL'] === 'true',
+          // Planes — default true (activos) salvo que esté explícitamente en 'false'
+          PLAN_BASIC_ENABLED: map['PLAN_BASIC_ENABLED'] !== 'false',
+          PLAN_PRO_ENABLED:   map['PLAN_PRO_ENABLED']   !== 'false',
+          PLAN_ELITE_ENABLED: map['PLAN_ELITE_ENABLED']  !== 'false',
         })
         setLoading(false)
       })
@@ -314,6 +340,44 @@ export default function AdminSettingsPage() {
             </div>
           </section>
 
+          {/* ── Plan Availability ────────────────────────── */}
+          <section className="space-y-3">
+            <div className="flex items-center gap-2 mb-1">
+              <ToggleLeft size={13} className="text-white/40" />
+              <p className="text-[10px] font-black uppercase tracking-widest text-white/40">Disponibilidad de Planes</p>
+            </div>
+
+            <div className="bg-white/[0.025] border border-white/8 rounded-2xl divide-y divide-white/6 overflow-hidden">
+              {PLAN_TOGGLES.map(t => (
+                <div key={t.key} className="flex items-center justify-between gap-4 px-5 py-4">
+                  <div className="flex items-center gap-3">
+                    <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: t.dot }} />
+                    <div>
+                      <p className="text-sm font-bold text-white">{t.label}</p>
+                      <p className="text-[11px] text-white/35 mt-0.5">{t.desc}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    {saved === t.key && <Check size={11} className="text-green-400" />}
+                    {savingToggle === t.key && <Loader2 size={11} className="text-white/40 animate-spin" />}
+                    <Toggle
+                      on={toggles[t.key] ?? true}
+                      onToggle={() => saveToggle(t.key, !toggles[t.key])}
+                      disabled={savingToggle === t.key}
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="flex items-start gap-2 p-3 rounded-xl bg-white/[0.02] border border-white/6">
+              <Info size={12} className="text-white/25 mt-0.5 shrink-0" />
+              <p className="text-[11px] text-white/30 leading-relaxed">
+                Si <strong className="text-white/45">todos los planes están desactivados</strong>, al hacer clic en "Comprar plan" desde el dashboard, el usuario verá únicamente la opción de <strong className="text-white/45">Fase Global</strong>.
+              </p>
+            </div>
+          </section>
+
           {/* ── Payment Methods (Store) ──────────────────── */}
           <section className="space-y-3">
             <div className="flex items-center gap-2 mb-1">
@@ -322,7 +386,7 @@ export default function AdminSettingsPage() {
             </div>
 
             <div className="bg-white/[0.025] border border-white/8 rounded-2xl divide-y divide-white/6 overflow-hidden">
-              {TOGGLES.map(t => (
+              {PAYMENT_TOGGLES.map(t => (
                 <div key={t.key} className="flex items-center justify-between gap-4 px-5 py-4">
                   <div>
                     <p className="text-sm font-bold text-white">{t.label}</p>

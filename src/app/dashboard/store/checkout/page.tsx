@@ -61,6 +61,7 @@ function CheckoutContent() {
   const router = useRouter()
   const plan = (searchParams.get('plan') ?? '').toUpperCase()
   const isRenewal = searchParams.get('renewal') === 'true'
+  const faseGlobalOnly = searchParams.get('faseGlobalOnly') === 'true'
   const packInfo = PACK_INFO[plan]
 
   const [price, setPrice] = useState<number | null>(null)
@@ -98,6 +99,15 @@ function CheckoutContent() {
           setPrice(parseFloat(s[`PRICE_${plan}`] ?? (plan === 'BASIC' ? '49' : plan === 'PRO' ? '99' : '199')))
         }
         setPaymentQrUrl(s['PAYMENT_QR_URL'] || null)
+        // Si todos los planes están desactivados el admin forzó faseGlobalOnly
+        if (faseGlobalOnly) {
+          setCryptoEnabled(false)
+          setManualEnabled(false)
+          setFaseGlobalEnabled(true)
+          setPaymentMethod('FASE_GLOBAL')
+          setLoadingSettings(false)
+          return
+        }
         const crypto = s['STORE_PAYMENT_CRYPTO'] !== 'false'
         const manual = s['STORE_PAYMENT_MANUAL'] !== 'false'
         const faseGlobal = s['STORE_PAYMENT_FASE_GLOBAL'] === 'true'
@@ -487,6 +497,18 @@ function CheckoutContent() {
       )}
 
       {/* ── FASE GLOBAL ── */}
+      {faseGlobalOnly && (
+        <div className="flex items-start gap-3 bg-blue-500/8 border border-blue-500/20 rounded-2xl px-4 py-3">
+          <span className="text-lg shrink-0">🌐</span>
+          <div>
+            <p className="text-xs font-black text-blue-400">Solo disponible vía Fase Global</p>
+            <p className="text-[11px] text-blue-400/70 mt-0.5 leading-relaxed">
+              En este momento el equipo ha configurado la activación únicamente por recompra de Fase Global. Sube tu comprobante y completa los datos para activar tu Pack Básico.
+            </p>
+          </div>
+        </div>
+      )}
+
       {paymentMethod === 'FASE_GLOBAL' && faseGlobalEnabled && (
         <>
           {/* Aviso Pack Básico forzado */}
