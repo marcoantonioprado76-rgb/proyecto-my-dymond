@@ -72,17 +72,6 @@ export function middleware(request: NextRequest) {
     }
   }
 
-  // Admin panel — requiere admin_session además de auth_token
-  // Excluir /admin/verify (es donde el admin obtiene el código)
-  // Note: solo verificamos que el cookie exista aquí (Edge Runtime no soporta
-  // jsonwebtoken). La verificación JWT real ocurre en getAdminUser() (Node.js runtime).
-  if (pathname.startsWith('/admin') && !pathname.startsWith('/admin/verify')) {
-    const adminSession = request.cookies.get('admin_session')?.value
-    if (!adminSession) {
-      return NextResponse.redirect(new URL('/admin/verify', request.url))
-    }
-  }
-
   return NextResponse.next()
 }
 
