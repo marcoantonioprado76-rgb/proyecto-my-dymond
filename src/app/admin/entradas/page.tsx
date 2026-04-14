@@ -106,7 +106,10 @@ export default function AdminEntradasPage() {
       const res = await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
       const data = await res.json()
       if (!res.ok) { setFormError(data.error ?? 'Error'); setSaving(false); return }
-      setSaving(false); setModal(false); fetchEvents()
+      setSaving(false); setModal(false)
+      // Auto-expand the new event so ticket types section is immediately visible
+      if (!editing && data.event) setActiveEvent({ ...data.event, ticketTypes: data.event.ticketTypes ?? [], ticketCount: 0 })
+      fetchEvents()
     } catch { setFormError('Error de conexión'); setSaving(false) }
   }
 
@@ -206,7 +209,10 @@ export default function AdminEntradasPage() {
                       {ev.date && <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)' }}>📅 {formatDate(ev.date)}</span>}
                       {ev.location && <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)' }}>📍 {ev.location}</span>}
                       <span style={{ fontSize: 11, color: '#D203DD', fontWeight: 700 }}>🎟 {ev.ticketCount} vendidas</span>
-                      <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.3)' }}>{ev.ticketTypes.length} tipo{ev.ticketTypes.length !== 1 ? 's' : ''}</span>
+                      {ev.ticketTypes.length === 0
+                        ? <span style={{ fontSize: 11, color: '#F5A623', fontWeight: 700 }}>⚠ Sin tipos — clic para agregar</span>
+                        : <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.3)' }}>{ev.ticketTypes.length} tipo{ev.ticketTypes.length !== 1 ? 's' : ''}</span>
+                      }
                     </div>
                   </div>
                   <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexShrink: 0 }}>
