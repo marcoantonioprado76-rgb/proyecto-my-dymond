@@ -20,6 +20,7 @@ import {
   Store,
   Mic,
   Cpu,
+  Ticket,
 } from 'lucide-react'
 
 const NAV = [
@@ -33,6 +34,7 @@ const NAV = [
   { href: '/admin/courses', label: 'Cursos', icon: BookOpen },
   { href: '/admin/podcasts', label: 'Podcasts', icon: Mic },
   { href: '/admin/store', label: 'Tienda', icon: Store },
+  { href: '/admin/entradas', label: 'Entradas', icon: Ticket },
   { href: '/admin/settings', label: 'Precios', icon: Settings },
 ]
 

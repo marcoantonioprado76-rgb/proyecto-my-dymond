@@ -251,6 +251,14 @@ export default function PublicTicketPage() {
               <span className="text-sm font-black text-white">${totalPrice.toFixed(2)} USDT</span>
             </div>
 
+            {/* No payment methods available */}
+            {!cryptoEnabled && !manualEnabled && (
+              <div className="flex items-center gap-3 p-4 bg-orange-500/10 border border-orange-500/20 rounded-2xl">
+                <AlertCircle size={18} className="text-orange-400 shrink-0" />
+                <p className="text-sm text-orange-400 font-bold">Los métodos de pago están temporalmente deshabilitados. Contacta al organizador.</p>
+              </div>
+            )}
+
             {/* Method tabs */}
             {(cryptoEnabled || manualEnabled) && (
               <div className="flex gap-2 bg-white/[0.025] border border-white/8 rounded-2xl p-1.5">
@@ -267,7 +275,7 @@ export default function PublicTicketPage() {
               </div>
             )}
 
-            {payMethod === 'MANUAL' && (
+            {payMethod === 'MANUAL' && (cryptoEnabled || manualEnabled) && (
               <div className="space-y-3">
                 {qrUrl && (
                   <div className="flex flex-col items-center gap-2 p-4 rounded-2xl border border-white/8" style={{ background: 'rgba(255,255,255,0.025)' }}>
@@ -285,7 +293,7 @@ export default function PublicTicketPage() {
               </div>
             )}
 
-            {payMethod === 'CRYPTO' && (
+            {payMethod === 'CRYPTO' && (cryptoEnabled || manualEnabled) && (
               <div>
                 <label className={LABEL}>Hash de transacción USDT (BEP-20)</label>
                 <input className={INPUT} value={txHash} onChange={e => setTxHash(e.target.value)} placeholder="0x..." />
@@ -301,14 +309,16 @@ export default function PublicTicketPage() {
 
             <div className="flex gap-3">
               <button onClick={() => { setError(''); setStep('form') }} className="flex-1 py-3 rounded-2xl text-sm font-bold text-white/40 border border-white/10 hover:text-white/60">← Atrás</button>
-              <button
-                onClick={submit}
-                disabled={submitting || uploading}
-                className="flex-[2] py-3 rounded-2xl text-sm font-black uppercase tracking-widest transition-all active:scale-[0.98] disabled:opacity-50"
-                style={{ background: 'linear-gradient(135deg,#D203DD,#0D1E79)', color: '#fff', boxShadow: '0 8px 32px rgba(210,3,221,0.3)' }}
-              >
-                {submitting ? <span className="flex items-center justify-center gap-2"><Loader2 size={15} className="animate-spin" /> Procesando...</span> : 'Confirmar compra'}
-              </button>
+              {(cryptoEnabled || manualEnabled) && (
+                <button
+                  onClick={submit}
+                  disabled={submitting || uploading}
+                  className="flex-[2] py-3 rounded-2xl text-sm font-black uppercase tracking-widest transition-all active:scale-[0.98] disabled:opacity-50"
+                  style={{ background: 'linear-gradient(135deg,#D203DD,#0D1E79)', color: '#fff', boxShadow: '0 8px 32px rgba(210,3,221,0.3)' }}
+                >
+                  {submitting ? <span className="flex items-center justify-center gap-2"><Loader2 size={15} className="animate-spin" /> Procesando...</span> : 'Confirmar compra'}
+                </button>
+              )}
             </div>
           </div>
         ) : (

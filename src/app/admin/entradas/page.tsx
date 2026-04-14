@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState, useRef } from 'react'
-import { Loader2, Plus, Pencil, Trash2, Copy, Check, CheckCircle2, XCircle, Search, ExternalLink, ChevronDown, ChevronUp, Upload } from 'lucide-react'
+import { Loader2, Plus, Pencil, Trash2, Copy, Check, Search, ExternalLink, ChevronDown, ChevronUp, Upload } from 'lucide-react'
 
 interface Event {
   id: string
@@ -178,14 +178,19 @@ export default function AdminEntradasPage() {
       <div style={{ maxWidth: 900, margin: '0 auto', padding: '24px 16px' }}>
 
         {/* Header */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24, flexWrap: 'wrap', gap: 10 }}>
           <div>
             <h1 style={{ fontSize: 22, fontWeight: 900, margin: 0 }}>🎟 Gestión de Entradas</h1>
             <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.3)', margin: '4px 0 0' }}>Crea eventos y administra la venta de entradas</p>
           </div>
-          <button onClick={openCreate} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '9px 16px', borderRadius: 10, background: 'linear-gradient(135deg,#D203DD,#0D1E79)', color: '#fff', fontWeight: 700, fontSize: 13, border: 'none', cursor: 'pointer' }}>
-            <Plus size={15} /> Nuevo evento
-          </button>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <a href="/admin/validar" style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '9px 16px', borderRadius: 10, background: 'rgba(74,222,128,0.12)', border: '1px solid rgba(74,222,128,0.25)', color: '#4ade80', fontWeight: 700, fontSize: 13, textDecoration: 'none' }}>
+              ✓ Validar en puerta
+            </a>
+            <button onClick={openCreate} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '9px 16px', borderRadius: 10, background: 'linear-gradient(135deg,#D203DD,#0D1E79)', color: '#fff', fontWeight: 700, fontSize: 13, border: 'none', cursor: 'pointer' }}>
+              <Plus size={15} /> Nuevo evento
+            </button>
+          </div>
         </div>
 
         {/* Events list */}

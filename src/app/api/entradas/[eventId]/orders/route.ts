@@ -34,17 +34,7 @@ export async function POST(
     if (pm === 'CRYPTO' && !txHash?.trim()) return NextResponse.json({ error: 'Hash de transacción requerido' }, { status: 400 })
     if (pm === 'MANUAL' && !proofUrl?.trim()) return NextResponse.json({ error: 'Comprobante de pago requerido' }, { status: 400 })
 
-    // Check capacity
-    if (event.capacity != null) {
-      const sold = await prisma.ticketOrder.count({
-        where: { eventId: event.id, status: { not: 'REJECTED' } },
-      })
-      if (sold + qty > event.capacity) {
-        return NextResponse.json({ error: 'No hay suficientes entradas disponibles' }, { status: 409 })
-      }
-    }
-
-    // Verify txHash not already used
+    // Verify txHash not already used (before expensive on-chain call)
     if (pm === 'CRYPTO') {
       const used = await prisma.ticketOrder.findFirst({ where: { txHash: txHash.trim() } })
       if (used) return NextResponse.json({ error: 'Esta transacción ya fue usada' }, { status: 409 })
@@ -66,30 +56,47 @@ export async function POST(
 
     // Generate unique ticket code
     let ticketCode = generateTicketCode()
-    let attempts = 0
-    while (attempts < 5) {
+    for (let i = 0; i < 5; i++) {
       const exists = await prisma.ticketOrder.findUnique({ where: { ticketCode } })
       if (!exists) break
       ticketCode = generateTicketCode()
-      attempts++
     }
 
-    const order = await prisma.ticketOrder.create({
-      data: {
-        eventId: event.id,
-        customerName: customerName.trim(),
-        customerEmail: customerEmail.trim().toLowerCase(),
-        customerPhone: customerPhone.trim(),
-        ticketCode,
-        quantity: qty,
-        totalPrice,
-        paymentMethod: pm,
-        proofUrl: pm === 'MANUAL' ? proofUrl.trim() : null,
-        txHash: pm === 'CRYPTO' ? txHash.trim() : null,
-        blockNumber,
-        status: finalStatus as any,
-      },
+    // Create order inside transaction — re-check capacity atomically to prevent race conditions
+    const order = await prisma.$transaction(async (tx) => {
+      if (event.capacity != null) {
+        const sold = await tx.ticketOrder.count({
+          where: { eventId: event.id, status: { not: 'REJECTED' } },
+        })
+        if (sold + qty > event.capacity) {
+          throw new Error('CAPACITY_EXCEEDED')
+        }
+      }
+
+      return tx.ticketOrder.create({
+        data: {
+          eventId: event.id,
+          customerName: customerName.trim(),
+          customerEmail: customerEmail.trim().toLowerCase(),
+          customerPhone: customerPhone.trim(),
+          ticketCode,
+          quantity: qty,
+          totalPrice,
+          paymentMethod: pm,
+          proofUrl: pm === 'MANUAL' ? proofUrl.trim() : null,
+          txHash: pm === 'CRYPTO' ? txHash.trim() : null,
+          blockNumber,
+          status: finalStatus as any,
+        },
+      })
+    }).catch((err: any) => {
+      if (err.message === 'CAPACITY_EXCEEDED') return null
+      throw err
     })
+
+    if (!order) {
+      return NextResponse.json({ error: 'No hay suficientes entradas disponibles' }, { status: 409 })
+    }
 
     // Send ticket email immediately if APPROVED (crypto verified)
     if (finalStatus === 'APPROVED') {
