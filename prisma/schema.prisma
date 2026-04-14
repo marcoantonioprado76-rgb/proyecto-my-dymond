@@ -1162,10 +1162,12 @@ model TicketOrder {
   updatedAt        DateTime     @updatedAt @map("updated_at")
 
   event      Event      @relation(fields: [eventId], references: [id], onDelete: Cascade)
-  ticketType TicketType @relation(fields: [ticketTypeId], references: [id])
+  ticketType TicketType @relation(fields: [ticketTypeId], references: [id], onDelete: Cascade)
 
   @@index([ticketCode])
   @@index([status])
+  @@index([eventId, status])
+  @@index([ticketTypeId, status])
   @@map("ticket_orders")
 }
 

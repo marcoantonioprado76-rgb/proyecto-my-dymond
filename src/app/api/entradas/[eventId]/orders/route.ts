@@ -4,6 +4,8 @@ import { prisma } from '@/lib/prisma'
 import { verifyBscTransaction } from '@/lib/blockchain'
 import { sendTicketEmail } from '@/lib/email'
 
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
 function generateTicketCode(): string {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
   const seg = () => Array.from({ length: 4 }, () => chars[Math.floor(Math.random() * chars.length)]).join('')
@@ -21,9 +23,15 @@ export async function POST(
 
     // Validate required fields
     if (!customerName?.trim()) return NextResponse.json({ error: 'Nombre requerido' }, { status: 400 })
-    if (!customerEmail?.trim() || !customerEmail.includes('@')) return NextResponse.json({ error: 'Email válido requerido' }, { status: 400 })
+    if (!customerEmail?.trim() || !EMAIL_RE.test(customerEmail.trim()))
+      return NextResponse.json({ error: 'Email válido requerido' }, { status: 400 })
     if (!customerPhone?.trim()) return NextResponse.json({ error: 'Teléfono requerido' }, { status: 400 })
     if (!ticketTypeId) return NextResponse.json({ error: 'Tipo de entrada requerido' }, { status: 400 })
+
+    // Validate quantity — must be a positive integer between 1 and 20
+    const qty = parseInt(String(quantity ?? 1), 10)
+    if (!Number.isInteger(qty) || qty < 1 || qty > 20)
+      return NextResponse.json({ error: 'Cantidad inválida (1–20)' }, { status: 400 })
 
     // Load event and ticket type together
     const ticketType = await prisma.ticketType.findUnique({
@@ -34,13 +42,12 @@ export async function POST(
     if (ticketType.eventId !== params.eventId) return NextResponse.json({ error: 'Entrada no pertenece a este evento' }, { status: 400 })
     if (!ticketType.event.active) return NextResponse.json({ error: 'Evento no disponible' }, { status: 404 })
 
-    const qty = Math.max(1, parseInt(quantity) || 1)
     const pm: 'CRYPTO' | 'MANUAL' = paymentMethod === 'CRYPTO' ? 'CRYPTO' : 'MANUAL'
 
     if (pm === 'CRYPTO' && !txHash?.trim()) return NextResponse.json({ error: 'Hash de transacción requerido' }, { status: 400 })
     if (pm === 'MANUAL' && !proofUrl?.trim()) return NextResponse.json({ error: 'Comprobante de pago requerido' }, { status: 400 })
 
-    // Verify txHash not already used
+    // Fast-path duplicate txHash check (best effort — DB unique constraint is the true guard)
     if (pm === 'CRYPTO') {
       const used = await prisma.ticketOrder.findFirst({ where: { txHash: txHash.trim() } })
       if (used) return NextResponse.json({ error: 'Esta transacción ya fue usada' }, { status: 409 })
@@ -61,7 +68,7 @@ export async function POST(
       }
     }
 
-    // Generate unique ticket code
+    // Generate unique ticket code (collision probability ~1 in 10^12 — also guarded by DB unique constraint)
     let ticketCode = generateTicketCode()
     for (let i = 0; i < 5; i++) {
       const exists = await prisma.ticketOrder.findUnique({ where: { ticketCode } })
@@ -101,6 +108,12 @@ export async function POST(
       })
     }).catch((err: any) => {
       if (err.message === 'CAPACITY_EXCEEDED') return null
+      // P2002 = unique constraint violation (duplicate txHash or ticketCode race condition)
+      if (err.code === 'P2002') {
+        const target: string = err.meta?.target ?? ''
+        if (target.includes('tx_hash')) throw Object.assign(new Error('TX_DUPLICATE'), { statusCode: 409 })
+        if (target.includes('ticket_code')) throw Object.assign(new Error('CODE_COLLISION'), { statusCode: 500 })
+      }
       throw err
     })
 
@@ -129,7 +142,11 @@ export async function POST(
         totalPrice: Number(order.totalPrice),
       },
     }, { status: 201 })
-  } catch (err) {
+  } catch (err: any) {
+    if (err.message === 'TX_DUPLICATE')
+      return NextResponse.json({ error: 'Esta transacción ya fue usada' }, { status: 409 })
+    if (err.message === 'CODE_COLLISION')
+      return NextResponse.json({ error: 'Error generando código, intenta de nuevo' }, { status: 500 })
     console.error('[POST /api/entradas/[eventId]/orders]', err)
     return NextResponse.json({ error: 'Error interno del servidor' }, { status: 500 })
   }

@@ -100,7 +100,10 @@ export default function PublicTicketPage() {
     if (!event || !selectedType) return
     setError('')
     if (payMethod === 'MANUAL' && !proofUrl) { setError('Debes subir tu comprobante de pago'); return }
-    if (payMethod === 'CRYPTO' && !txHash.trim()) { setError('Debes ingresar el hash de la transacción'); return }
+    if (payMethod === 'CRYPTO') {
+      if (!txHash.trim()) { setError('Debes ingresar el hash de la transacción'); return }
+      if (!/^0x[a-fA-F0-9]{64}$/.test(txHash.trim())) { setError('Hash de transacción inválido (debe empezar con 0x y tener 64 caracteres hex)'); return }
+    }
     setSubmitting(true)
     try {
       const res = await fetch(`/api/entradas/${eventId}/orders`, {
@@ -203,7 +206,7 @@ export default function PublicTicketPage() {
                     <div>
                       <p className="font-black text-white text-sm">{tt.name}</p>
                       {tt.available != null && !tt.soldOut && tt.available <= 10 && (
-                        <p className="text-xs text-orange-400 mt-0.5">Solo {tt.available} disponibles</p>
+                        <p className="text-xs text-orange-400 mt-0.5">Solo {tt.available} {tt.available === 1 ? 'disponible' : 'disponibles'}</p>
                       )}
                       {tt.soldOut && <p className="text-xs text-red-400 mt-0.5">Agotado</p>}
                     </div>
@@ -269,7 +272,7 @@ export default function PublicTicketPage() {
               <button
                 onClick={() => {
                   if (!name.trim() || !email.trim() || !phone.trim()) { setError('Completa todos los campos'); return }
-                  if (!email.includes('@')) { setError('Email inválido'); return }
+                  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) { setError('Email inválido'); return }
                   setError(''); setStep('payment')
                 }}
                 className="flex-[2] py-3 rounded-2xl text-sm font-black uppercase tracking-widest transition-all active:scale-[0.98]"
