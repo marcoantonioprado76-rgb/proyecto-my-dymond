@@ -1117,16 +1117,18 @@ model Event {
 }
 
 model TicketType {
-  id          String   @id @default(uuid()) @db.Uuid
-  eventId     String   @map("event_id") @db.Uuid
-  name        String
-  description String?
-  image       String?
-  price       Decimal  @db.Decimal(10, 2)
-  capacity    Int?
-  active      Boolean  @default(true)
-  sortOrder   Int      @default(0) @map("sort_order")
-  createdAt   DateTime @default(now()) @map("created_at")
+  id               String   @id @default(uuid()) @db.Uuid
+  eventId          String   @map("event_id") @db.Uuid
+  name             String
+  description      String?
+  image            String?
+  price            Decimal  @db.Decimal(10, 2)
+  capacity         Int?
+  bulkMinQty       Int?     @map("bulk_min_qty")
+  bulkDiscountPct  Decimal? @db.Decimal(5, 2) @map("bulk_discount_pct")
+  active           Boolean  @default(true)
+  sortOrder        Int      @default(0) @map("sort_order")
+  createdAt        DateTime @default(now()) @map("created_at")
 
   event   Event         @relation(fields: [eventId], references: [id], onDelete: Cascade)
   tickets TicketOrder[]
@@ -1158,6 +1160,7 @@ model TicketOrder {
   blockNumber      BigInt?      @map("block_number")
   status           TicketStatus @default(PENDING)
   notes            String?
+  purchaseGroupId  String?      @db.Uuid @map("purchase_group_id")
   checkedIn        Boolean      @default(false) @map("checked_in")
   checkedInAt      DateTime?    @map("checked_in_at")
   createdAt        DateTime     @default(now()) @map("created_at")
@@ -1170,6 +1173,7 @@ model TicketOrder {
   @@index([status])
   @@index([eventId, status])
   @@index([ticketTypeId, status])
+  @@index([purchaseGroupId])
   @@map("ticket_orders")
 }
 

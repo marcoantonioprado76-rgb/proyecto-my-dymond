@@ -8,7 +8,7 @@ export async function PATCH(req: NextRequest, { params }: { params: { eventId: s
   const admin = await getAdminUser()
   if (!admin) return unauthorizedAdmin()
   try {
-    const { name, description, image, price, capacity, active, sortOrder } = await req.json()
+    const { name, description, image, price, capacity, active, sortOrder, bulkMinQty, bulkDiscountPct } = await req.json()
     const tt = await prisma.ticketType.update({
       where: { id: params.typeId },
       data: {
@@ -17,6 +17,8 @@ export async function PATCH(req: NextRequest, { params }: { params: { eventId: s
         ...(image !== undefined && { image: image?.trim() || null }),
         ...(price !== undefined && { price: Number(price) }),
         ...(capacity !== undefined && { capacity: capacity ? parseInt(capacity) : null }),
+        ...(bulkMinQty !== undefined && { bulkMinQty: bulkMinQty ? parseInt(String(bulkMinQty), 10) : null }),
+        ...(bulkDiscountPct !== undefined && { bulkDiscountPct: bulkDiscountPct ? Number(bulkDiscountPct) : null }),
         ...(active !== undefined && { active }),
         ...(sortOrder !== undefined && { sortOrder }),
       },

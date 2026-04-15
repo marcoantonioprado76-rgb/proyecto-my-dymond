@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef } from 'react'
 import { Loader2, Plus, Pencil, Trash2, Copy, Check, Search, ExternalLink, ChevronDown, ChevronUp, Upload, X } from 'lucide-react'
 
-interface TicketType { id: string; name: string; description?: string | null; image?: string | null; price: number; capacity: number | null; active: boolean; sortOrder: number }
+interface TicketType { id: string; name: string; description?: string | null; image?: string | null; price: number; capacity: number | null; bulkMinQty?: number | null; bulkDiscountPct?: number | null; active: boolean; sortOrder: number }
 interface Event {
   id: string; title: string; description: string; image?: string | null
   date?: string | null; location?: string | null; active: boolean
@@ -18,7 +18,7 @@ interface Ticket {
 }
 
 const EMPTY_EVENT = { title: '', description: '', image: '', date: '', location: '', active: true }
-const EMPTY_TYPE = { name: '', description: '', image: '', price: '', capacity: '' }
+const EMPTY_TYPE = { name: '', description: '', image: '', price: '', capacity: '', bulkMinQty: '', bulkDiscountPct: '' }
 const INPUT = 'w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm outline-none focus:border-purple-500/40'
 const LABEL = 'block text-[11px] text-white/40 mb-1'
 const STATUS_COLORS: Record<string, string> = { PENDING: '#F5A623', APPROVED: '#4ade80', REJECTED: '#f87171' }
@@ -125,7 +125,7 @@ export default function AdminEntradasPage() {
   const openCreateType = (eventId: string) => { setTypeModal({ eventId, editing: null }); setTypeForm({ ...EMPTY_TYPE }); setTypeError('') }
   const openEditType = (eventId: string, tt: TicketType) => {
     setTypeModal({ eventId, editing: tt })
-    setTypeForm({ name: tt.name, description: tt.description ?? '', image: tt.image ?? '', price: String(tt.price), capacity: tt.capacity != null ? String(tt.capacity) : '' })
+    setTypeForm({ name: tt.name, description: tt.description ?? '', image: tt.image ?? '', price: String(tt.price), capacity: tt.capacity != null ? String(tt.capacity) : '', bulkMinQty: tt.bulkMinQty != null ? String(tt.bulkMinQty) : '', bulkDiscountPct: tt.bulkDiscountPct != null ? String(tt.bulkDiscountPct) : '' })
     setTypeError('')
   }
   const saveType = async () => {
@@ -133,7 +133,7 @@ export default function AdminEntradasPage() {
     if (!typeForm.name.trim()) { setTypeError('Nombre requerido'); return }
     if (!typeForm.price || isNaN(Number(typeForm.price)) || Number(typeForm.price) < 0) { setTypeError('Precio inválido'); return }
     setTypeSaving(true); setTypeError('')
-    const body = { name: typeForm.name, description: typeForm.description || null, image: typeForm.image || null, price: typeForm.price, capacity: typeForm.capacity || null, active: true }
+    const body = { name: typeForm.name, description: typeForm.description || null, image: typeForm.image || null, price: typeForm.price, capacity: typeForm.capacity || null, bulkMinQty: typeForm.bulkMinQty || null, bulkDiscountPct: typeForm.bulkDiscountPct || null, active: true }
     const url = typeModal.editing
       ? `/api/admin/entradas/${typeModal.eventId}/types/${typeModal.editing.id}`
       : `/api/admin/entradas/${typeModal.eventId}/types`
@@ -422,6 +422,14 @@ export default function AdminEntradasPage() {
               <div style={{ display: 'flex', gap: 8 }}>
                 <div style={{ flex: 1 }}><label className={LABEL}>Precio (USDT) *</label><input className={INPUT} type="number" min="0" step="0.01" value={typeForm.price} onChange={e => setTypeForm(f => ({ ...f, price: e.target.value }))} placeholder="25.00" /></div>
                 <div style={{ flex: 1 }}><label className={LABEL}>Capacidad máx.</label><input className={INPUT} type="number" min="1" value={typeForm.capacity} onChange={e => setTypeForm(f => ({ ...f, capacity: e.target.value }))} placeholder="Sin límite" /></div>
+              </div>
+              <div style={{ padding: '10px 12px', borderRadius: 10, background: 'rgba(210,3,221,0.06)', border: '1px solid rgba(210,3,221,0.15)' }}>
+                <p style={{ fontSize: 11, fontWeight: 700, color: 'rgba(210,3,221,0.8)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: 1 }}>Descuento por cantidad (opcional)</p>
+                <div style={{ display: 'flex', gap: 8 }}>
+                  <div style={{ flex: 1 }}><label className={LABEL}>Mín. entradas</label><input className={INPUT} type="number" min="2" value={typeForm.bulkMinQty} onChange={e => setTypeForm(f => ({ ...f, bulkMinQty: e.target.value }))} placeholder="Ej: 4" /></div>
+                  <div style={{ flex: 1 }}><label className={LABEL}>% descuento</label><input className={INPUT} type="number" min="1" max="99" step="0.5" value={typeForm.bulkDiscountPct} onChange={e => setTypeForm(f => ({ ...f, bulkDiscountPct: e.target.value }))} placeholder="Ej: 10" /></div>
+                </div>
+                <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.25)', marginTop: 6 }}>Si compran {typeForm.bulkMinQty || 'N'} o más entradas de este tipo, se aplica {typeForm.bulkDiscountPct || '0'}% de descuento.</p>
               </div>
             </div>
             {typeError && <p style={{ fontSize: 12, color: '#f87171', marginTop: 10 }}>{typeError}</p>}

@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { verifyBscTransaction } from '@/lib/blockchain'
 import { sendTicketEmail } from '@/lib/email'
+import { randomUUID } from 'crypto'
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
@@ -10,6 +11,15 @@ function generateTicketCode(): string {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
   const seg = () => Array.from({ length: 4 }, () => chars[Math.floor(Math.random() * chars.length)]).join('')
   return `TKT-${seg()}-${seg()}`
+}
+
+async function uniqueCode(): Promise<string> {
+  for (let i = 0; i < 10; i++) {
+    const code = generateTicketCode()
+    const exists = await prisma.ticketOrder.findUnique({ where: { ticketCode: code } })
+    if (!exists) return code
+  }
+  throw new Error('CODE_EXHAUSTED')
 }
 
 /** POST /api/entradas/[eventId]/orders — public ticket purchase (no login required) */
@@ -28,12 +38,11 @@ export async function POST(
     if (!customerPhone?.trim()) return NextResponse.json({ error: 'Teléfono requerido' }, { status: 400 })
     if (!ticketTypeId) return NextResponse.json({ error: 'Tipo de entrada requerido' }, { status: 400 })
 
-    // Validate quantity — must be a positive integer between 1 and 20
     const qty = parseInt(String(quantity ?? 1), 10)
     if (!Number.isInteger(qty) || qty < 1 || qty > 20)
       return NextResponse.json({ error: 'Cantidad inválida (1–20)' }, { status: 400 })
 
-    // Load event and ticket type together
+    // Load ticket type with event and discount info
     const ticketType = await prisma.ticketType.findUnique({
       where: { id: ticketTypeId, active: true },
       include: { event: true },
@@ -47,14 +56,19 @@ export async function POST(
     if (pm === 'CRYPTO' && !txHash?.trim()) return NextResponse.json({ error: 'Hash de transacción requerido' }, { status: 400 })
     if (pm === 'MANUAL' && !proofUrl?.trim()) return NextResponse.json({ error: 'Comprobante de pago requerido' }, { status: 400 })
 
-    // Fast-path duplicate txHash check (best effort — DB unique constraint is the true guard)
+    // Fast-path duplicate txHash check (DB unique constraint is the true guard)
     if (pm === 'CRYPTO') {
       const used = await prisma.ticketOrder.findFirst({ where: { txHash: txHash.trim() } })
       if (used) return NextResponse.json({ error: 'Esta transacción ya fue usada' }, { status: 409 })
     }
 
-    const unitPrice = Number(ticketType.price)
-    const totalPrice = unitPrice * qty
+    // Calculate price — apply bulk discount if configured and quantity meets threshold
+    const basePrice = Number(ticketType.price)
+    const bulkMin = ticketType.bulkMinQty ?? 0
+    const bulkPct = ticketType.bulkDiscountPct ? Number(ticketType.bulkDiscountPct) : 0
+    const hasDiscount = bulkMin > 0 && bulkPct > 0 && qty >= bulkMin
+    const unitPrice = hasDiscount ? parseFloat((basePrice * (1 - bulkPct / 100)).toFixed(2)) : basePrice
+    const totalPrice = parseFloat((unitPrice * qty).toFixed(2))
 
     // On-chain verification for CRYPTO
     let finalStatus: 'PENDING' | 'APPROVED' = 'PENDING'
@@ -68,16 +82,17 @@ export async function POST(
       }
     }
 
-    // Generate unique ticket code (collision probability ~1 in 10^12 — also guarded by DB unique constraint)
-    let ticketCode = generateTicketCode()
-    for (let i = 0; i < 5; i++) {
-      const exists = await prisma.ticketOrder.findUnique({ where: { ticketCode } })
-      if (!exists) break
-      ticketCode = generateTicketCode()
+    // Generate one unique code per ticket
+    const codes: string[] = []
+    for (let i = 0; i < qty; i++) {
+      codes.push(await uniqueCode())
     }
 
-    // Create order in transaction — re-check capacity atomically
-    const order = await prisma.$transaction(async (tx) => {
+    // All tickets from this purchase share a purchaseGroupId
+    const purchaseGroupId = randomUUID()
+
+    // Create all orders atomically — re-check capacity inside transaction
+    const orders = await prisma.$transaction(async (tx) => {
       if (ticketType.capacity != null) {
         const sold = await tx.ticketOrder.aggregate({
           _sum: { quantity: true },
@@ -87,28 +102,32 @@ export async function POST(
         if (soldQty > ticketType.capacity) throw new Error('CAPACITY_EXCEEDED')
       }
 
-      return tx.ticketOrder.create({
-        data: {
-          eventId: params.eventId,
-          ticketTypeId: ticketType.id,
-          ticketTypeName: ticketType.name,
-          customerName: customerName.trim(),
-          customerEmail: customerEmail.trim().toLowerCase(),
-          customerPhone: customerPhone.trim(),
-          ticketCode,
-          quantity: qty,
-          unitPrice,
-          totalPrice,
-          paymentMethod: pm,
-          proofUrl: pm === 'MANUAL' ? proofUrl.trim() : null,
-          txHash: pm === 'CRYPTO' ? txHash.trim() : null,
-          blockNumber,
-          status: finalStatus as any,
-        },
-      })
+      return Promise.all(
+        codes.map((code) =>
+          tx.ticketOrder.create({
+            data: {
+              eventId: params.eventId,
+              ticketTypeId: ticketType.id,
+              ticketTypeName: ticketType.name,
+              customerName: customerName.trim(),
+              customerEmail: customerEmail.trim().toLowerCase(),
+              customerPhone: customerPhone.trim(),
+              ticketCode: code,
+              quantity: 1,
+              unitPrice,
+              totalPrice: unitPrice,
+              paymentMethod: pm,
+              proofUrl: pm === 'MANUAL' ? proofUrl.trim() : null,
+              txHash: pm === 'CRYPTO' && codes.indexOf(code) === 0 ? txHash.trim() : null,
+              blockNumber: pm === 'CRYPTO' && codes.indexOf(code) === 0 ? blockNumber : null,
+              purchaseGroupId,
+              status: finalStatus as any,
+            },
+          })
+        )
+      )
     }).catch((err: any) => {
       if (err.message === 'CAPACITY_EXCEEDED') return null
-      // P2002 = unique constraint violation (duplicate txHash or ticketCode race condition)
       if (err.code === 'P2002') {
         const target: string = err.meta?.target ?? ''
         if (target.includes('tx_hash')) throw Object.assign(new Error('TX_DUPLICATE'), { statusCode: 409 })
@@ -117,35 +136,42 @@ export async function POST(
       throw err
     })
 
-    if (!order) return NextResponse.json({ error: 'No hay suficientes entradas disponibles para ese tipo' }, { status: 409 })
+    if (!orders) return NextResponse.json({ error: 'No hay suficientes entradas disponibles' }, { status: 409 })
 
-    // Send ticket email immediately if APPROVED (crypto auto-verified)
+    // Send one email per ticket code if APPROVED (crypto auto-verified)
     if (finalStatus === 'APPROVED') {
-      sendTicketEmail(order.customerEmail, order.customerName, {
-        ticketCode: order.ticketCode,
-        eventTitle: ticketType.event.title,
-        ticketTypeName: ticketType.name,
-        eventDate: ticketType.event.date,
-        eventLocation: ticketType.event.location,
-        eventImage: ticketType.event.image,
-        quantity: order.quantity,
-        totalPrice: Number(order.totalPrice),
-        paymentMethod: pm,
-      }).catch(e => console.error('[email] ticket auto:', e))
+      const emailImage = ticketType.image ?? ticketType.event.image
+      orders.forEach((order, i) =>
+        sendTicketEmail(order.customerEmail, order.customerName, {
+          ticketCode: order.ticketCode,
+          eventTitle: ticketType.event.title,
+          ticketTypeName: ticketType.name,
+          eventDate: ticketType.event.date,
+          eventLocation: ticketType.event.location,
+          eventImage: emailImage,
+          quantity: 1,
+          totalPrice: unitPrice,
+          paymentMethod: pm,
+          ticketNumber: i + 1,
+          totalTickets: qty,
+        }).catch(e => console.error(`[email] ticket ${i + 1}/${qty}:`, e))
+      )
     }
 
     return NextResponse.json({
-      order: {
-        id: order.id,
-        ticketCode: order.ticketCode,
+      orders: orders.map(o => ({
+        id: o.id,
+        ticketCode: o.ticketCode,
         status: finalStatus,
-        totalPrice: Number(order.totalPrice),
-      },
+      })),
+      totalPrice,
+      hasDiscount,
+      discountPct: hasDiscount ? bulkPct : 0,
     }, { status: 201 })
   } catch (err: any) {
     if (err.message === 'TX_DUPLICATE')
       return NextResponse.json({ error: 'Esta transacción ya fue usada' }, { status: 409 })
-    if (err.message === 'CODE_COLLISION')
+    if (err.message === 'CODE_COLLISION' || err.message === 'CODE_EXHAUSTED')
       return NextResponse.json({ error: 'Error generando código, intenta de nuevo' }, { status: 500 })
     console.error('[POST /api/entradas/[eventId]/orders]', err)
     return NextResponse.json({ error: 'Error interno del servidor' }, { status: 500 })

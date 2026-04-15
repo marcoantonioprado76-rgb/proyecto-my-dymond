@@ -19,7 +19,10 @@ export async function PATCH(req: NextRequest, { params }: { params: { ticketId: 
 
     const ticket = await prisma.ticketOrder.findUnique({
       where: { id: params.ticketId },
-      include: { event: true },
+      include: {
+        event: true,
+        ticketType: { select: { image: true } },
+      },
     })
     if (!ticket) return NextResponse.json({ error: 'Ticket no encontrado' }, { status: 404 })
 
@@ -41,32 +44,57 @@ export async function PATCH(req: NextRequest, { params }: { params: { ticketId: 
       if (ticket.status === 'APPROVED') {
         return NextResponse.json({ error: 'Ya está aprobado' }, { status: 400 })
       }
-      await prisma.ticketOrder.update({
-        where: { id: params.ticketId },
+
+      // Find all tickets in the same purchase group (including this one)
+      const siblings = ticket.purchaseGroupId
+        ? await prisma.ticketOrder.findMany({
+            where: { purchaseGroupId: ticket.purchaseGroupId, status: { not: 'APPROVED' } },
+          })
+        : [ticket]
+
+      // Approve all siblings in one transaction
+      await prisma.ticketOrder.updateMany({
+        where: {
+          id: { in: siblings.map(s => s.id) },
+        },
         data: { status: 'APPROVED', notes: notes || null },
       })
 
-      sendTicketEmail(ticket.customerEmail, ticket.customerName, {
-        ticketCode: ticket.ticketCode,
-        eventTitle: ticket.event.title,
-        ticketTypeName: ticket.ticketTypeName,
-        eventDate: ticket.event.date,
-        eventLocation: ticket.event.location,
-        eventImage: ticket.event.image,
-        quantity: ticket.quantity,
-        totalPrice: Number(ticket.totalPrice),
-        paymentMethod: ticket.paymentMethod,
-      }).catch(e => console.error('[email] ticket approve:', e))
+      // Send one email per ticket code
+      const emailImage = (ticket.ticketType as any)?.image ?? ticket.event.image
+      siblings.forEach((t, i) => {
+        sendTicketEmail(t.customerEmail, t.customerName, {
+          ticketCode: t.ticketCode,
+          eventTitle: ticket.event.title,
+          ticketTypeName: t.ticketTypeName,
+          eventDate: ticket.event.date,
+          eventLocation: ticket.event.location,
+          eventImage: emailImage,
+          quantity: 1,
+          totalPrice: Number(t.totalPrice),
+          paymentMethod: t.paymentMethod,
+          ticketNumber: i + 1,
+          totalTickets: siblings.length,
+        }).catch(e => console.error(`[email] approve ${i + 1}/${siblings.length}:`, e))
+      })
 
-      return NextResponse.json({ ok: true, action: 'approve' })
+      return NextResponse.json({ ok: true, action: 'approve', approvedCount: siblings.length })
     }
 
     if (action === 'reject') {
-      await prisma.ticketOrder.update({
-        where: { id: params.ticketId },
+      // Reject all in the group
+      const groupIds = ticket.purchaseGroupId
+        ? await prisma.ticketOrder.findMany({
+            where: { purchaseGroupId: ticket.purchaseGroupId },
+            select: { id: true },
+          }).then(rows => rows.map(r => r.id))
+        : [ticket.id]
+
+      await prisma.ticketOrder.updateMany({
+        where: { id: { in: groupIds } },
         data: { status: 'REJECTED', notes: notes || null },
       })
-      return NextResponse.json({ ok: true, action: 'reject' })
+      return NextResponse.json({ ok: true, action: 'reject', rejectedCount: groupIds.length })
     }
 
     return NextResponse.json({ error: 'Acción inválida' }, { status: 400 })

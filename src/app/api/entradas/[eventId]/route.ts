@@ -36,6 +36,8 @@ export async function GET(
           description: tt.description,
           image: tt.image,
           price: Number(tt.price),
+          bulkMinQty: tt.bulkMinQty,
+          bulkDiscountPct: tt.bulkDiscountPct ? Number(tt.bulkDiscountPct) : null,
           capacity: tt.capacity,
           available,
           soldOut: available !== null && available <= 0,

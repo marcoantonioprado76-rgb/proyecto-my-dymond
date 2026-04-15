@@ -18,7 +18,10 @@ export async function POST(req: NextRequest) {
 
     const ticket = await prisma.ticketOrder.findUnique({
       where: { ticketCode: code.trim().toUpperCase() },
-      include: { event: { select: { title: true, date: true, location: true } } },
+      include: {
+        event: { select: { title: true, date: true, location: true } },
+        ticketType: { select: { name: true, image: true } },
+      },
     })
 
     if (!ticket) {
@@ -30,14 +33,21 @@ export async function POST(req: NextRequest) {
     }
 
     if (ticket.status === 'PENDING') {
-      return NextResponse.json({ result: 'pending', ticket: { customerName: ticket.customerName, eventTitle: ticket.event.title } }, { status: 200 })
+      return NextResponse.json({
+        result: 'pending',
+        ticket: { customerName: ticket.customerName, eventTitle: ticket.event.title },
+      }, { status: 200 })
     }
 
     // APPROVED
     if (ticket.checkedIn) {
       return NextResponse.json({
         result: 'already_used',
-        ticket: { customerName: ticket.customerName, eventTitle: ticket.event.title, checkedInAt: ticket.checkedInAt },
+        ticket: {
+          customerName: ticket.customerName,
+          eventTitle: ticket.event.title,
+          checkedInAt: ticket.checkedInAt,
+        },
       }, { status: 200 })
     }
 
@@ -48,20 +58,26 @@ export async function POST(req: NextRequest) {
       })
       return NextResponse.json({
         result: 'checked_in',
-        ticket: { customerName: ticket.customerName, quantity: ticket.quantity, eventTitle: ticket.event.title },
+        ticket: {
+          customerName: ticket.customerName,
+          eventTitle: ticket.event.title,
+          ticketTypeName: ticket.ticketTypeName,
+          ticketTypeImage: (ticket.ticketType as any)?.image ?? null,
+        },
       }, { status: 200 })
     }
 
-    // Valid, not yet used — return details for confirmation
+    // Valid, not yet used — return full details for confirmation
     return NextResponse.json({
       result: 'valid',
       ticket: {
         id: ticket.id,
         customerName: ticket.customerName,
         customerEmail: ticket.customerEmail,
-        quantity: ticket.quantity,
         eventTitle: ticket.event.title,
         eventDate: ticket.event.date,
+        ticketTypeName: ticket.ticketTypeName,
+        ticketTypeImage: (ticket.ticketType as any)?.image ?? null,
       },
     }, { status: 200 })
   } catch (err) {

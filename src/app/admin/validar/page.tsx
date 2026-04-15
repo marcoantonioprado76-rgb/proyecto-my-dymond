@@ -14,6 +14,8 @@ interface TicketInfo {
   eventTitle?: string
   eventDate?: string | null
   checkedInAt?: string | null
+  ticketTypeName?: string | null
+  ticketTypeImage?: string | null
 }
 
 const BG: Record<ResultType, string> = {
@@ -135,11 +137,16 @@ export default function ValidarPage() {
 
         {result === 'valid' && ticket && (
           <div style={{ width: '100%', textAlign: 'center' }}>
+            {ticket.ticketTypeImage && (
+              <div style={{ marginBottom: 16, borderRadius: 14, overflow: 'hidden', maxHeight: 160 }}>
+                <img src={ticket.ticketTypeImage} alt="" style={{ width: '100%', height: 160, objectFit: 'contain', background: 'rgba(255,255,255,0.04)' }} />
+              </div>
+            )}
             <CheckCircle2 size={64} color="#4ade80" style={{ margin: '0 auto 16px' }} />
             <p style={{ fontSize: 24, fontWeight: 900, color: '#4ade80', margin: '0 0 6px' }}>ENTRADA VÁLIDA</p>
             <p style={{ fontSize: 16, fontWeight: 700, color: '#fff', margin: '0 0 4px' }}>{ticket.customerName}</p>
             <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.4)', margin: '0 0 4px' }}>{ticket.customerEmail}</p>
-            <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.4)', margin: '0 0 20px' }}>🎟 {ticket.quantity} entrada{(ticket.quantity ?? 1) > 1 ? 's' : ''} · {ticket.eventTitle}</p>
+            <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.4)', margin: '0 0 20px' }}>{ticket.ticketTypeName ?? '🎟'} · {ticket.eventTitle}</p>
             <button
               onClick={confirmCheckin}
               disabled={confirming}
@@ -153,9 +160,15 @@ export default function ValidarPage() {
 
         {result === 'checked_in' && ticket && (
           <div style={{ width: '100%', textAlign: 'center' }}>
+            {ticket.ticketTypeImage && (
+              <div style={{ marginBottom: 16, borderRadius: 14, overflow: 'hidden', maxHeight: 160 }}>
+                <img src={ticket.ticketTypeImage} alt="" style={{ width: '100%', height: 160, objectFit: 'contain', background: 'rgba(255,255,255,0.04)' }} />
+              </div>
+            )}
             <CheckCircle2 size={64} color="#4ade80" style={{ margin: '0 auto 16px' }} />
             <p style={{ fontSize: 24, fontWeight: 900, color: '#4ade80', margin: '0 0 6px' }}>¡INGRESO REGISTRADO!</p>
-            <p style={{ fontSize: 16, fontWeight: 700, color: '#fff', margin: '0 0 20px' }}>{ticket.customerName} — {ticket.quantity} entrada{(ticket.quantity ?? 1) > 1 ? 's' : ''}</p>
+            <p style={{ fontSize: 16, fontWeight: 700, color: '#fff', margin: '0 0 4px' }}>{ticket.customerName}</p>
+            <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)', margin: '0 0 20px' }}>{ticket.ticketTypeName ?? ''}</p>
             <button onClick={reset} style={{ width: '100%', padding: '16px 0', borderRadius: 14, background: 'rgba(74,222,128,0.15)', border: '1px solid rgba(74,222,128,0.3)', color: '#4ade80', fontWeight: 800, fontSize: 16, cursor: 'pointer' }}>Siguiente →</button>
           </div>
         )}

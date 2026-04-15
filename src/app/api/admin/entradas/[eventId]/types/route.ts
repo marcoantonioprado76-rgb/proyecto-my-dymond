@@ -8,7 +8,7 @@ export async function POST(req: NextRequest, { params }: { params: { eventId: st
   const admin = await getAdminUser()
   if (!admin) return unauthorizedAdmin()
   try {
-    const { name, description, image, price, capacity, active, sortOrder } = await req.json()
+    const { name, description, image, price, capacity, active, sortOrder, bulkMinQty, bulkDiscountPct } = await req.json()
     if (!name?.trim()) return NextResponse.json({ error: 'Nombre requerido' }, { status: 400 })
     if (!price || isNaN(Number(price)) || Number(price) < 0) return NextResponse.json({ error: 'Precio inválido' }, { status: 400 })
 
@@ -24,6 +24,8 @@ export async function POST(req: NextRequest, { params }: { params: { eventId: st
         image: image?.trim() || null,
         price: Number(price),
         capacity: parsedCapacity,
+        bulkMinQty: bulkMinQty ? parseInt(String(bulkMinQty), 10) : null,
+        bulkDiscountPct: bulkDiscountPct ? Number(bulkDiscountPct) : null,
         active: active !== false,
         sortOrder: sortOrder ?? 0,
       },

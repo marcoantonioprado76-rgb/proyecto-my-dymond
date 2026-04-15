@@ -10,6 +10,8 @@ interface TicketType {
   description?: string | null
   image?: string | null
   price: number
+  bulkMinQty?: number | null
+  bulkDiscountPct?: number | null
   capacity: number | null
   available: number | null
   soldOut: boolean
@@ -49,7 +51,7 @@ export default function PublicTicketPage() {
   const [uploading, setUploading] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
-  const [ticketCode, setTicketCode] = useState('')
+  const [ticketCodes, setTicketCodes] = useState<string[]>([])
   const [isPending, setIsPending] = useState(false)
   const [copied, setCopied] = useState(false)
 
@@ -119,15 +121,19 @@ export default function PublicTicketPage() {
       })
       const data = await res.json()
       if (!res.ok) { setError(data.error ?? 'Error al procesar'); return }
-      setTicketCode(data.order.ticketCode)
-      setIsPending(data.order.status === 'PENDING')
+      setTicketCodes((data.orders ?? []).map((o: any) => o.ticketCode))
+      setIsPending(data.orders?.[0]?.status === 'PENDING')
       setStep('done')
     } catch { setError('Error de conexión. Intenta de nuevo.') }
     finally { setSubmitting(false) }
   }
 
   const maxQty = selectedType?.available != null ? selectedType.available : 99
-  const totalPrice = selectedType ? selectedType.price * quantity : 0
+  const hasDiscount = selectedType?.bulkMinQty && selectedType?.bulkDiscountPct && quantity >= selectedType.bulkMinQty
+  const unitPrice = hasDiscount && selectedType
+    ? parseFloat((selectedType.price * (1 - selectedType.bulkDiscountPct! / 100)).toFixed(2))
+    : selectedType?.price ?? 0
+  const totalPrice = unitPrice * quantity
 
   const formatDate = (d: string) => new Date(d).toLocaleString('es-ES', {
     weekday: 'long', day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit',
@@ -166,8 +172,8 @@ export default function PublicTicketPage() {
       <div className="max-w-lg mx-auto px-4 py-6 space-y-5">
         {/* Event image */}
         {event.image && (
-          <div className="rounded-2xl overflow-hidden" style={{ maxHeight: 220 }}>
-            <img src={event.image} alt={event.title} className="w-full object-cover" style={{ maxHeight: 220 }} />
+          <div className="rounded-2xl overflow-hidden flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.03)', minHeight: 160 }}>
+            <img src={event.image} alt={event.title} className="w-full object-contain rounded-2xl" style={{ maxHeight: 280 }} />
           </div>
         )}
 
@@ -205,21 +211,31 @@ export default function PublicTicketPage() {
                   }}
                 >
                   {tt.image && selectedType?.id === tt.id && (
-                    <div className="mb-3 -mx-1 -mt-1 rounded-xl overflow-hidden" style={{ maxHeight: 140 }}>
-                      <img src={tt.image} alt={tt.name} className="w-full object-cover" style={{ maxHeight: 140 }} />
+                    <div className="mb-3 -mx-1 -mt-1 rounded-xl overflow-hidden flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.04)', minHeight: 120 }}>
+                      <img src={tt.image} alt={tt.name} className="w-full object-contain rounded-xl" style={{ maxHeight: 200 }} />
                     </div>
                   )}
                   <div className="flex items-center justify-between">
-                    <div>
+                    <div className="flex-1 min-w-0">
                       <p className="font-black text-white text-sm">{tt.name}</p>
                       {tt.description && <p className="text-xs text-white/40 mt-0.5 leading-relaxed">{tt.description}</p>}
+                      {tt.bulkMinQty && tt.bulkDiscountPct && (
+                        <p className="text-xs text-green-400 mt-0.5 font-bold">🏷 {tt.bulkDiscountPct}% dto. comprando {tt.bulkMinQty}+</p>
+                      )}
                       {tt.available != null && !tt.soldOut && tt.available <= 10 && (
                         <p className="text-xs text-orange-400 mt-0.5">Solo {tt.available} {tt.available === 1 ? 'disponible' : 'disponibles'}</p>
                       )}
                       {tt.soldOut && <p className="text-xs text-red-400 mt-0.5">Agotado</p>}
                     </div>
                     <div className="text-right shrink-0 ml-3">
-                      <p className="font-black text-white">${tt.price.toFixed(2)}</p>
+                      {tt.bulkMinQty && tt.bulkDiscountPct && quantity >= tt.bulkMinQty ? (
+                        <>
+                          <p className="text-xs text-white/30 line-through">${tt.price.toFixed(2)}</p>
+                          <p className="font-black text-green-400">${(tt.price * (1 - tt.bulkDiscountPct / 100)).toFixed(2)}</p>
+                        </>
+                      ) : (
+                        <p className="font-black text-white">${tt.price.toFixed(2)}</p>
+                      )}
                       <p className="text-xs text-white/30">USDT</p>
                     </div>
                   </div>
@@ -365,33 +381,48 @@ export default function PublicTicketPage() {
           </div>
 
         ) : (
-          <div className="space-y-4 text-center py-4">
-            <CheckCircle2 size={48} className="mx-auto text-green-400" />
-            <div>
-              <h2 className="text-xl font-black text-white">{isPending ? '¡Solicitud enviada!' : '¡Entrada confirmada!'}</h2>
+          <div className="space-y-4 py-4">
+            <div className="text-center">
+              <CheckCircle2 size={48} className="mx-auto text-green-400 mb-3" />
+              <h2 className="text-xl font-black text-white">
+                {isPending ? '¡Solicitud enviada!' : ticketCodes.length > 1 ? `¡${ticketCodes.length} entradas confirmadas!` : '¡Entrada confirmada!'}
+              </h2>
               <p className="text-sm text-white/40 mt-1">
                 {isPending
-                  ? 'Tu comprobante está en revisión. Al ser aprobado recibirás tu código por correo.'
-                  : `Revisa tu correo: ${email}`}
+                  ? 'Tu comprobante está en revisión. Al aprobarse recibirás tus códigos por correo.'
+                  : `Códigos enviados a: ${email}`}
               </p>
             </div>
 
-            {!isPending && (
-              <div className="p-6 rounded-2xl border-2" style={{ borderColor: 'rgba(210,3,221,0.4)', background: 'rgba(210,3,221,0.06)' }}>
-                <p className="text-xs text-white/30 mb-3 uppercase tracking-widest">Tu código de entrada</p>
-                <p className="text-3xl font-black tracking-[0.2em] text-white" style={{ fontFamily: 'Courier New, monospace' }}>{ticketCode}</p>
-                <button
-                  onClick={() => { navigator.clipboard.writeText(ticketCode); setCopied(true); setTimeout(() => setCopied(false), 2000) }}
-                  className="mt-3 flex items-center gap-1.5 mx-auto text-xs text-white/40 hover:text-white/70 transition-colors"
-                >
-                  <Copy size={12} /> {copied ? '¡Copiado!' : 'Copiar código'}
-                </button>
+            {!isPending && ticketCodes.length > 0 && (
+              <div className="space-y-3">
+                {ticketCodes.map((code, i) => (
+                  <div key={code} className="p-5 rounded-2xl border-2 text-center" style={{ borderColor: 'rgba(210,3,221,0.4)', background: 'rgba(210,3,221,0.06)' }}>
+                    {ticketCodes.length > 1 && (
+                      <p className="text-xs text-white/30 mb-1 uppercase tracking-widest">Entrada {i + 1} de {ticketCodes.length}</p>
+                    )}
+                    <p className="text-2xl font-black tracking-[0.2em] text-white" style={{ fontFamily: 'Courier New, monospace' }}>{code}</p>
+                    <button
+                      onClick={() => { navigator.clipboard.writeText(code); setCopied(true); setTimeout(() => setCopied(false), 2000) }}
+                      className="mt-2 flex items-center gap-1.5 mx-auto text-xs text-white/40 hover:text-white/70 transition-colors"
+                    >
+                      <Copy size={12} /> {copied ? '¡Copiado!' : 'Copiar'}
+                    </button>
+                  </div>
+                ))}
               </div>
             )}
 
-            <p className="text-xs text-white/20">
-              {isPending ? <>Guarda tu código: <strong className="text-white/40">{ticketCode}</strong></> : <>Código también enviado a: <strong className="text-white/40">{email}</strong></>}
-            </p>
+            {isPending && ticketCodes.length > 0 && (
+              <div className="p-4 rounded-2xl border border-white/10 text-center" style={{ background: 'rgba(255,255,255,0.03)' }}>
+                <p className="text-xs text-white/30 mb-2">Tus códigos (guárdalos)</p>
+                {ticketCodes.map(code => (
+                  <p key={code} className="text-sm font-black text-white/60 tracking-widest" style={{ fontFamily: 'Courier New, monospace' }}>{code}</p>
+                ))}
+              </div>
+            )}
+
+            <p className="text-xs text-white/20 text-center">Cada código es de uso único y personal.</p>
           </div>
         )}
       </div>

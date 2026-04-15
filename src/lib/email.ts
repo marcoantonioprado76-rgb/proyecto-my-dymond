@@ -655,14 +655,19 @@ export async function sendTicketEmail(
     quantity: number
     totalPrice: number
     paymentMethod: string
+    ticketNumber?: number
+    totalTickets?: number
   }
 ): Promise<boolean> {
   const dateStr = ticket.eventDate
     ? new Date(ticket.eventDate).toLocaleString('es-ES', { day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })
     : null
 
+  const isMulti = (ticket.totalTickets ?? 1) > 1
+  const ticketLabel = isMulti ? `Entrada ${ticket.ticketNumber} de ${ticket.totalTickets}` : 'Entrada Confirmada'
+
   const content = `
-    <p style="color:#D203DD;font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;margin:0 0 16px;">🎟 Entrada Confirmada</p>
+    <p style="color:#D203DD;font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;margin:0 0 16px;">🎟 ${ticketLabel}</p>
 
     <h1 style="color:#ffffff;font-size:22px;font-weight:800;margin:0 0 6px;letter-spacing:-0.3px;line-height:1.3;">
       ¡Tu entrada está lista!
@@ -674,8 +679,8 @@ export async function sendTicketEmail(
     ${ticket.eventImage ? `
     <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:20px;">
       <tr>
-        <td style="border-radius:14px;overflow:hidden;">
-          <img src="${ticket.eventImage}" alt="${ticket.eventTitle}" width="100%" style="border-radius:14px;display:block;max-height:220px;object-fit:cover;" />
+        <td style="border-radius:14px;overflow:hidden;background:#111;">
+          <img src="${ticket.eventImage}" alt="${ticket.eventTitle}" width="100%" style="border-radius:14px;display:block;max-height:220px;object-fit:contain;" />
         </td>
       </tr>
     </table>` : ''}
@@ -700,7 +705,6 @@ export async function sendTicketEmail(
           ${dateStr ? `<p style="color:rgba(255,255,255,0.5);font-size:12px;margin:0 0 4px;">📅 ${dateStr}</p>` : ''}
           ${ticket.eventLocation ? `<p style="color:rgba(255,255,255,0.5);font-size:12px;margin:0 0 4px;">📍 ${ticket.eventLocation}</p>` : ''}
           ${ticket.ticketTypeName ? `<p style="color:rgba(255,255,255,0.5);font-size:12px;margin:0 0 4px;">🏷 ${ticket.ticketTypeName}</p>` : ''}
-          <p style="color:rgba(255,255,255,0.5);font-size:12px;margin:0 0 4px;">🎟 ${ticket.quantity} entrada${ticket.quantity > 1 ? 's' : ''}</p>
           <p style="color:#F5A623;font-size:13px;font-weight:700;margin:8px 0 0;">Total: $${ticket.totalPrice.toFixed(2)} USDT</p>
         </td>
       </tr>
