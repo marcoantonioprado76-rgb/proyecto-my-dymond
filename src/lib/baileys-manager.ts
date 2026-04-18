@@ -433,7 +433,14 @@ export const BaileysManager = {
 
         try {
             const { state, saveCreds } = await useMultiFileAuthState(sessionDir)
-            const { version } = await fetchLatestBaileysVersion()
+            let version: number[]
+            try {
+                const result = await fetchLatestBaileysVersion()
+                version = result.version
+            } catch {
+                // Si falla la consulta de versión, usar una versión conocida como fallback
+                version = [2, 3000, 1015901307]
+            }
             const sock = makeWASocket({
                 version,
                 auth: {
@@ -503,6 +510,8 @@ export const BaileysManager = {
         } catch (err) {
             console.error(`[BAILEYS] Error al iniciar conexión para bot ${botId}:`, err)
             connections.delete(botId)
+            // Reintentar en 10s para no quedar desconectado permanentemente
+            setTimeout(() => BaileysManager.connect(botId, botName, openaiKey, reportPhone), 10_000)
         }
     },
 
