@@ -444,6 +444,9 @@ export const BaileysManager = {
                 browser: ['Ubuntu', 'Chrome', '120.0.0'],
                 syncFullHistory: false,
                 markOnlineOnConnect: false,
+                keepAliveIntervalMs: 30_000,
+                connectTimeoutMs: 60_000,
+                retryRequestDelayMs: 2_000,
             })
 
             conn.sock = sock
@@ -473,8 +476,17 @@ export const BaileysManager = {
                         await prisma.bot.update({ where: { id: botId }, data: { baileysPhone: null } }).catch(() => { })
                         console.log(`[BAILEYS] Bot ${botId} logged out por WhatsApp — sesión borrada`)
                     } else {
-                        // Desconexión temporal — reconectar en 5s
-                        setTimeout(() => BaileysManager.connect(botId, botName, openaiKey, reportPhone), 5000)
+                        // Desconexión temporal — reconectar en 5s con credenciales frescas de DB
+                        setTimeout(async () => {
+                            try {
+                                const fresh = await prisma.botSecret.findUnique({ where: { botId } })
+                                const freshKey = fresh?.openaiApiKeyEnc ? decrypt(fresh.openaiApiKeyEnc) : openaiKey
+                                const freshPhone = fresh?.reportPhone ?? reportPhone
+                                BaileysManager.connect(botId, botName, freshKey, freshPhone)
+                            } catch {
+                                BaileysManager.connect(botId, botName, openaiKey, reportPhone)
+                            }
+                        }, 5000)
                     }
                 }
             })
