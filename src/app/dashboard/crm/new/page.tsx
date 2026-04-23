@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import {
@@ -63,7 +63,7 @@ export default function NewCrmCampaignPage() {
     const [uploadingImg, setUploadingImg] = useState(false)
     const [error, setError] = useState<string | null>(null)
 
-    useState(() => { fetchTemplates() })
+    useEffect(() => { fetchTemplates() }, [])
 
     async function fetchTemplates() {
         try {
