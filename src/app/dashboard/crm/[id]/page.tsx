@@ -466,7 +466,7 @@ export default function CrmCampaignDetailPage() {
                             <button
                                 onClick={saveEdit}
                                 disabled={savingEdit}
-                                className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-black text-black transition-all disabled:opacity-50" style={{ background: 'linear-gradient(135deg, #D203DD, #00FF88)' }}"
+                                className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-black text-black transition-all disabled:opacity-50" style={{ background: 'linear-gradient(135deg, #D203DD, #00FF88)' }}
                             >
                                 {savingEdit ? <Loader2 size={13} className="animate-spin" /> : <Save size={13} />}
                                 Guardar
