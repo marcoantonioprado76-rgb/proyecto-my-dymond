@@ -3,6 +3,54 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getAdminUser, unauthorizedAdmin } from '@/lib/admin-auth'
 import { prisma } from '@/lib/prisma'
 
+export async function POST(req: NextRequest) {
+  const admin = await getAdminUser()
+  if (!admin) return unauthorizedAdmin()
+
+  try {
+    const body = await req.json()
+    const { userId, ...productData } = body
+    if (!userId) return NextResponse.json({ error: 'userId requerido' }, { status: 400 })
+    if (!productData.name?.trim()) return NextResponse.json({ error: 'Nombre requerido' }, { status: 400 })
+
+    const user = await prisma.user.findUnique({ where: { id: userId }, select: { id: true, plan: true } })
+    if (!user) return NextResponse.json({ error: 'Usuario no encontrado' }, { status: 404 })
+
+    const product = await prisma.product.create({
+      data: {
+        userId,
+        name: productData.name.trim(),
+        category: productData.category || null,
+        benefits: productData.benefits || null,
+        usage: productData.usage || null,
+        warnings: productData.warnings || null,
+        priceUnit: productData.priceUnit ?? null,
+        pricePromo2: productData.pricePromo2 ?? null,
+        priceSuper6: productData.priceSuper6 ?? null,
+        currency: productData.currency || 'USD',
+        welcomeMessage: productData.welcomeMessage || null,
+        firstMessage: productData.firstMessage || null,
+        hooks: productData.hooks ?? [],
+        imageMainUrls: productData.imageMainUrls ?? [],
+        imagePriceUnitUrl: productData.imagePriceUnitUrl || null,
+        imagePricePromoUrl: productData.imagePricePromoUrl || null,
+        imagePriceSuperUrl: productData.imagePriceSuperUrl || null,
+        productVideoUrls: productData.productVideoUrls ?? [],
+        testimonialsVideoUrls: productData.testimonialsVideoUrls ?? [],
+        shippingInfo: productData.shippingInfo || null,
+        coverage: productData.coverage || null,
+        tags: productData.tags ?? [],
+        active: productData.active ?? true,
+      },
+    })
+
+    return NextResponse.json({ product })
+  } catch (err) {
+    console.error('[POST /api/admin/products]', err)
+    return NextResponse.json({ error: 'Error interno' }, { status: 500 })
+  }
+}
+
 export async function GET(req: NextRequest) {
   const admin = await getAdminUser()
   if (!admin) return unauthorizedAdmin()

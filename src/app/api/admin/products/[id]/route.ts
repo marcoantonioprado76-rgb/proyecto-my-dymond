@@ -9,7 +9,9 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
 
   const body = await req.json()
   const { name, category, benefits, usage, warnings, priceUnit, pricePromo2, priceSuper6,
-    currency, welcomeMessage, firstMessage, shippingInfo, coverage, active } = body
+    currency, welcomeMessage, firstMessage, shippingInfo, coverage, active,
+    hooks, imageMainUrls, imagePriceUnitUrl, imagePricePromoUrl, imagePriceSuperUrl,
+    productVideoUrls, testimonialsVideoUrls, tags } = body
 
   const product = await prisma.product.findUnique({ where: { id: params.id } })
   if (!product) return NextResponse.json({ error: 'Producto no encontrado' }, { status: 404 })
@@ -31,6 +33,14 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
       ...(shippingInfo !== undefined ? { shippingInfo: shippingInfo || null } : {}),
       ...(coverage !== undefined ? { coverage: coverage || null } : {}),
       ...(active !== undefined ? { active: Boolean(active) } : {}),
+      ...(hooks !== undefined ? { hooks } : {}),
+      ...(imageMainUrls !== undefined ? { imageMainUrls } : {}),
+      ...(imagePriceUnitUrl !== undefined ? { imagePriceUnitUrl: imagePriceUnitUrl || null } : {}),
+      ...(imagePricePromoUrl !== undefined ? { imagePricePromoUrl: imagePricePromoUrl || null } : {}),
+      ...(imagePriceSuperUrl !== undefined ? { imagePriceSuperUrl: imagePriceSuperUrl || null } : {}),
+      ...(productVideoUrls !== undefined ? { productVideoUrls } : {}),
+      ...(testimonialsVideoUrls !== undefined ? { testimonialsVideoUrls } : {}),
+      ...(tags !== undefined ? { tags } : {}),
     },
     include: { user: { select: { username: true, fullName: true } } },
   })
