@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation'
 import {
     Plus, Play, Pause, Trash2, Eye,
     Loader2, MessageSquare, AlertCircle,
-    Download, Wifi, RotateCcw, Smartphone
+    Wifi, RotateCcw, Smartphone
 } from 'lucide-react'
 import { usePlanGuard } from '@/hooks/usePlanGuard'
 
@@ -103,12 +103,6 @@ export default function CrmPage() {
                     <p className="text-white/40 text-sm mt-0.5">Envíos masivos por WhatsApp con IA</p>
                 </div>
                 <div className="flex items-center gap-2">
-                    <Link
-                        href="/dashboard/crm/export"
-                        className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold border border-white/10 bg-white/5 text-white/60 hover:text-purple-400 hover:border-purple-500/40 transition-all"
-                    >
-                        <Download size={15} /> Exportar
-                    </Link>
                     <Link
                         href="/dashboard/crm/new"
                         className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-black uppercase tracking-wide text-white transition-all hover:opacity-90"
