@@ -21,6 +21,8 @@ import {
   Mic,
   Cpu,
   Ticket,
+  Package,
+  BrainCircuit,
 } from 'lucide-react'
 
 const NAV = [
@@ -30,6 +32,8 @@ const NAV = [
   { href: '/admin/withdrawals', label: 'Retiros', icon: Wallet },
   { href: '/admin/bonuses', label: 'Bonos Extra', icon: Gift },
   { href: '/admin/ai-credits', label: 'Créditos AI', icon: Cpu },
+  { href: '/admin/products', label: 'Productos Bots', icon: Package },
+  { href: '/admin/bot-templates', label: 'Plantillas AI', icon: BrainCircuit },
   { href: '/admin/clipping', label: 'Clipping', icon: Play },
   { href: '/admin/courses', label: 'Cursos', icon: BookOpen },
   { href: '/admin/podcasts', label: 'Podcasts', icon: Mic },

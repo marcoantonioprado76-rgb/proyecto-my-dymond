@@ -421,6 +421,19 @@ export const BaileysManager = {
         }
     },
 
+    async sendImage(botId: string, toPhone: string, imageUrl: string, caption?: string): Promise<boolean> {
+        const conn = connections.get(botId)
+        if (!conn?.sock || conn.status !== 'connected') return false
+        const jid = `${toPhone.replace(/^\+/, '').replace(/[\s\-\(\)\.]/g, '')}@s.whatsapp.net`
+        try {
+            await conn.sock.sendMessage(jid, { image: { url: imageUrl }, ...(caption ? { caption } : {}) })
+            return true
+        } catch (err) {
+            console.error('[BAILEYS] sendImage error:', err)
+            return false
+        }
+    },
+
     async connect(botId: string, botName: string, openaiKey: string, reportPhone: string) {
         const existing = connections.get(botId)
         if (existing?.status === 'connected' || existing?.status === 'connecting') return

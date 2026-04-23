@@ -58,6 +58,7 @@ model User {
   trustedDevices       TrustedDevice[]
   deviceVerifyCodes    DeviceVerifyCode[]
   adminOtpCodes        AdminOtpCode[]
+  broadcastCampaigns   BroadcastCampaign[]
 
   @@map("users")
 }
@@ -94,10 +95,11 @@ model Bot {
   createdAt            DateTime       @default(now()) @map("created_at")
   updatedAt            DateTime       @updatedAt @map("updated_at")
   secret               BotSecret?
-  user                 User           @relation(fields: [userId], references: [id])
+  user                 User               @relation(fields: [userId], references: [id])
   conversations        Conversation[]
   assignedProducts     BotProduct[]
   stores               Store[]
+  broadcastCampaigns   BroadcastCampaign[]
 
   @@index([userId])
   @@map("bots")
@@ -214,6 +216,25 @@ model BotState {
   conversation      Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
 
   @@map("bot_states")
+}
+
+model BotTemplate {
+  id                   String   @id @default(uuid()) @db.Uuid
+  name                 String
+  description          String?
+  category             String?
+  systemPromptTemplate String   @map("system_prompt_template")
+  aiModel              String   @default("gpt-4o") @map("ai_model")
+  maxCharsMensaje1     Int?     @map("max_chars_mensaje1")
+  maxCharsMensaje2     Int?     @map("max_chars_mensaje2")
+  maxCharsMensaje3     Int?     @map("max_chars_mensaje3")
+  followUp1Delay       Int      @default(15) @map("follow_up_1_delay")
+  followUp2Delay       Int      @default(4320) @map("follow_up_2_delay")
+  active               Boolean  @default(true)
+  createdAt            DateTime @default(now()) @map("created_at")
+  updatedAt            DateTime @updatedAt @map("updated_at")
+
+  @@map("bot_templates")
 }
 
 model Store {
@@ -1341,4 +1362,98 @@ model AdminConfig {
   updatedAt    DateTime @updatedAt @map("updated_at")
 
   @@map("admin_configs")
+}
+
+// ─── CRM Broadcast ────────────────────────────────────────────────────────────
+
+enum BroadcastStatus {
+  DRAFT
+  SCHEDULED
+  RUNNING
+  COMPLETED
+  PAUSED
+  FAILED
+}
+
+enum BroadcastLogStatus {
+  PENDING
+  SENT
+  FAILED
+}
+
+model BroadcastCampaign {
+  id             String          @id @default(uuid()) @db.Uuid
+  userId         String          @map("user_id") @db.Uuid
+  botId          String          @map("bot_id") @db.Uuid
+  name           String
+  prompt         String          @db.Text
+  messageExample String?         @db.Text @map("message_example")
+  status         BroadcastStatus @default(DRAFT)
+  delayValue     Int             @default(30) @map("delay_value")
+  delayUnit      String          @default("seconds") @map("delay_unit")
+  scheduledAt    DateTime?       @map("scheduled_at")
+  startedAt      DateTime?       @map("started_at")
+  completedAt    DateTime?       @map("completed_at")
+  imageIndex     Int             @default(0) @map("image_index")
+  totalContacts  Int             @default(0) @map("total_contacts")
+  sentCount      Int             @default(0) @map("sent_count")
+  failedCount    Int             @default(0) @map("failed_count")
+  createdAt      DateTime        @default(now()) @map("created_at")
+  updatedAt      DateTime        @updatedAt @map("updated_at")
+
+  user     User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bot      Bot                @relation(fields: [botId], references: [id], onDelete: Cascade)
+  images   BroadcastImage[]
+  contacts BroadcastContact[]
+  logs     BroadcastLog[]
+
+  @@index([userId, status])
+  @@map("broadcast_campaigns")
+}
+
+model BroadcastImage {
+  id         String   @id @default(uuid()) @db.Uuid
+  campaignId String   @map("campaign_id") @db.Uuid
+  url        String
+  type       String   @default("IMAGE")
+  order      Int      @default(0)
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  campaign BroadcastCampaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+
+  @@index([campaignId])
+  @@map("broadcast_images")
+}
+
+model BroadcastContact {
+  id         String             @id @default(uuid()) @db.Uuid
+  campaignId String             @map("campaign_id") @db.Uuid
+  name       String?
+  phone      String
+  status     BroadcastLogStatus @default(PENDING)
+  sentAt     DateTime?          @map("sent_at")
+  error      String?
+  createdAt  DateTime           @default(now()) @map("created_at")
+
+  campaign BroadcastCampaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+
+  @@index([campaignId, status])
+  @@map("broadcast_contacts")
+}
+
+model BroadcastLog {
+  id         String             @id @default(uuid()) @db.Uuid
+  campaignId String             @map("campaign_id") @db.Uuid
+  phone      String
+  name       String?
+  message    String             @db.Text
+  imageUrl   String?            @map("image_url")
+  status     BroadcastLogStatus @default(SENT)
+  error      String?
+  sentAt     DateTime           @default(now()) @map("sent_at")
+
+  campaign BroadcastCampaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+
+  @@index([campaignId])
+  @@map("broadcast_logs")
 }

@@ -164,8 +164,17 @@ async function callChatCompletion(
   apiKey: string,
   model: string = 'gpt-5.1',
 ): Promise<string> {
+  const { content } = await callChatCompletionWithUsage(messages, apiKey, model)
+  return content
+}
+
+async function callChatCompletionWithUsage(
+  messages: Array<{ role: string; content: string }>,
+  apiKey: string,
+  model: string = 'gpt-5.1',
+): Promise<{ content: string; promptTokens: number; completionTokens: number }> {
   const controller = new AbortController()
-  const timeout = setTimeout(() => controller.abort(), 60000) // 1 min timeout
+  const timeout = setTimeout(() => controller.abort(), 60000)
 
   try {
     const res = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -189,9 +198,62 @@ async function callChatCompletion(
     }
 
     const data = await res.json()
-    return (data.choices?.[0]?.message?.content as string) || '{}'
+    return {
+      content: (data.choices?.[0]?.message?.content as string) || '{}',
+      promptTokens: (data.usage?.prompt_tokens as number) ?? 0,
+      completionTokens: (data.usage?.completion_tokens as number) ?? 0,
+    }
   } finally {
     clearTimeout(timeout)
+  }
+}
+
+export interface ChatWithUsageResult {
+  response: BotJsonResponse
+  promptTokens: number
+  completionTokens: number
+}
+
+export async function chatWithUsage(
+  systemPrompt: string,
+  history: ChatMessage[],
+  apiKey: string,
+  model: string = 'gpt-4o',
+): Promise<ChatWithUsageResult> {
+  const messages: Array<{ role: string; content: string }> = [
+    { role: 'system', content: systemPrompt },
+    ...history,
+  ]
+
+  let result = await callChatCompletionWithUsage(messages, apiKey, model)
+  let totalPrompt = result.promptTokens
+  let totalCompletion = result.completionTokens
+
+  let parsed: Record<string, unknown>
+  try {
+    parsed = JSON.parse(result.content)
+  } catch {
+    messages.push(
+      { role: 'assistant', content: result.content },
+      { role: 'user', content: 'El JSON no es válido. Devuelve SOLO JSON con el schema exacto indicado.' },
+    )
+    result = await callChatCompletionWithUsage(messages, apiKey, model)
+    totalPrompt += result.promptTokens
+    totalCompletion += result.completionTokens
+    parsed = JSON.parse(result.content)
+  }
+
+  return {
+    response: {
+      mensaje1: typeof parsed.mensaje1 === 'string' ? parsed.mensaje1 : '',
+      mensaje2: typeof parsed.mensaje2 === 'string' ? parsed.mensaje2 : '',
+      mensaje3: typeof parsed.mensaje3 === 'string' ? parsed.mensaje3 : '',
+      fotos_mensaje1: normalizeFotos(parsed.fotos_mensaje1),
+      videos_mensaje1: normalizeFotos(parsed.videos_mensaje1),
+      reporte: typeof parsed.reporte === 'string' ? parsed.reporte : '',
+    },
+    promptTokens: totalPrompt,
+    completionTokens: totalCompletion,
   }
 }
 

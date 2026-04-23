@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { ShoppingCart, MessageCircle, Layout, ArrowRight, Megaphone, Play, Lock, AlertTriangle, Send, Zap } from 'lucide-react'
+import { ShoppingCart, MessageCircle, Layout, ArrowRight, Megaphone, Play, Lock, AlertTriangle, Send, Zap, Users } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 
@@ -70,6 +70,16 @@ const services = [
     from: '#FF2DF7', to: '#FF8800',
     features: ['4 redes sociales', 'Contenido con IA', 'Programación'],
     link: '/dashboard/services/social',
+    requiredPlan: 'BASIC' as UserPlan,
+  },
+  {
+    id: 8,
+    title: 'CRM Broadcast',
+    description: 'Enviá mensajes masivos por WhatsApp con imágenes y texto generado por IA a tus contactos.',
+    icon: Users,
+    from: '#22C55E', to: '#16A34A',
+    features: ['Mensajes con IA', 'Rotación de imágenes', 'Delay configurable'],
+    link: '/dashboard/crm',
     requiredPlan: 'BASIC' as UserPlan,
   },
 ]
