@@ -12,6 +12,7 @@ const serviceItems = [
   { href: '/dashboard/services/landing-pages', iconClass: 'fa-solid fa-file',         label: 'Landing' },
   { href: '/dashboard/services/virtual-store', iconClass: 'fa-solid fa-shop',         label: 'Tienda' },
   { href: '/dashboard/services/clipping',      iconClass: 'fa-solid fa-newspaper',    label: 'Clipping' },
+  { href: '/dashboard/crm',                    iconClass: 'fa-solid fa-users-gear',   label: 'CRM Broadcast' },
 ]
 
 const academyItems = [
@@ -39,7 +40,7 @@ async function logout() {
 
 export default function Navbar() {
   const pathname = usePathname()
-  const isInServices = pathname.startsWith('/dashboard/services')
+  const isInServices = pathname.startsWith('/dashboard/services') || pathname.startsWith('/dashboard/crm')
   const isInAcademy  = pathname.startsWith('/dashboard/courses') || pathname.startsWith('/dashboard/podcasts') || pathname === '/dashboard/academy'
 
   const [servicesOpen, setServicesOpen] = useState(isInServices)

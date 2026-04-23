@@ -265,7 +265,7 @@ export default function NewCrmCampaignPage() {
                         onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
                         placeholder="Ej: Promo Navidad 2025"
                         required
-                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-white/20 focus:outline-none focus:border-amber-500/50 focus:ring-1 focus:ring-amber-500/10"
+                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-white/20 focus:outline-none focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/10"
                     />
                 </div>
 
@@ -279,7 +279,7 @@ export default function NewCrmCampaignPage() {
                             <button
                                 type="button"
                                 onClick={() => setShowTemplates(!showTemplates)}
-                                className="flex items-center gap-1.5 text-[11px] font-bold text-amber-400/70 hover:text-amber-400 transition-all"
+                                className="flex items-center gap-1.5 text-[11px] font-bold text-purple-400/70 hover:text-purple-400 transition-all"
                             >
                                 <FileText size={12} />
                                 Usar plantilla
@@ -292,16 +292,16 @@ export default function NewCrmCampaignPage() {
                     </p>
 
                     {showTemplates && templates.length > 0 && (
-                        <div className="mb-3 space-y-2 max-h-48 overflow-y-auto rounded-xl border border-amber-500/20 bg-amber-500/5 p-3">
+                        <div className="mb-3 space-y-2 max-h-48 overflow-y-auto rounded-xl border border-purple-500/20 bg-purple-500/5 p-3">
                             {templates.map(t => (
                                 <button
                                     key={t.id}
                                     type="button"
                                     onClick={() => applyTemplate(t)}
-                                    className="w-full text-left p-3 rounded-xl bg-white/5 border border-white/8 hover:border-amber-500/40 hover:bg-amber-500/5 transition-all group"
+                                    className="w-full text-left p-3 rounded-xl bg-white/5 border border-white/8 hover:border-purple-500/40 hover:bg-purple-500/5 transition-all group"
                                 >
                                     <div className="flex items-center justify-between">
-                                        <p className="text-sm font-bold text-white group-hover:text-amber-400 transition-all">{t.name}</p>
+                                        <p className="text-sm font-bold text-white group-hover:text-purple-400 transition-all">{t.name}</p>
                                         <span className="text-[10px] text-white/20">{t.usageCount} usos</span>
                                     </div>
                                     {t.description && <p className="text-[11px] text-white/30 mt-0.5">{t.description}</p>}
@@ -317,7 +317,7 @@ export default function NewCrmCampaignPage() {
                         placeholder="Ej: Promoción especial de fin de año, descuento del 30% en todos nuestros productos, solo por esta semana. Tono cálido y urgente."
                         required
                         rows={4}
-                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-white/20 focus:outline-none focus:border-amber-500/50 focus:ring-1 focus:ring-amber-500/10 resize-none leading-relaxed"
+                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-white/20 focus:outline-none focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/10 resize-none leading-relaxed"
                     />
 
                     <div className="mt-4">
@@ -332,7 +332,7 @@ export default function NewCrmCampaignPage() {
                             onChange={e => setForm(f => ({ ...f, messageExample: e.target.value }))}
                             placeholder="Ej: ¡Hola! 👋 Tenemos una oferta increíble para vos esta semana. No te la perdás 🔥"
                             rows={3}
-                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-white/20 focus:outline-none focus:border-amber-500/50 focus:ring-1 focus:ring-amber-500/10 resize-none leading-relaxed"
+                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-white/20 focus:outline-none focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/10 resize-none leading-relaxed"
                         />
                     </div>
                 </div>
@@ -361,7 +361,7 @@ export default function NewCrmCampaignPage() {
                         <button
                             type="button"
                             onClick={() => fileInputRef.current?.click()}
-                            className="w-20 h-20 rounded-xl border-2 border-dashed border-white/15 hover:border-amber-500/40 flex flex-col items-center justify-center gap-1 text-white/30 hover:text-amber-400 transition-all"
+                            className="w-20 h-20 rounded-xl border-2 border-dashed border-white/15 hover:border-purple-500/40 flex flex-col items-center justify-center gap-1 text-white/30 hover:text-purple-400 transition-all"
                         >
                             <Upload size={16} />
                             <span className="text-[9px] font-bold">Agregar</span>
@@ -383,12 +383,12 @@ export default function NewCrmCampaignPage() {
                             max="3600"
                             value={form.delayValue}
                             onChange={e => setForm(f => ({ ...f, delayValue: e.target.value }))}
-                            className="w-28 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-amber-500/50"
+                            className="w-28 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-purple-500/50"
                         />
                         <select
                             value={form.delayUnit}
                             onChange={e => setForm(f => ({ ...f, delayUnit: e.target.value }))}
-                            className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-amber-500/50"
+                            className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-purple-500/50"
                         >
                             <option value="seconds">Segundos</option>
                             <option value="minutes">Minutos</option>
@@ -409,7 +409,7 @@ export default function NewCrmCampaignPage() {
                         type="datetime-local"
                         value={form.scheduledAt}
                         onChange={e => setForm(f => ({ ...f, scheduledAt: e.target.value }))}
-                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-amber-500/50"
+                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-purple-500/50"
                         style={{ colorScheme: 'dark' }}
                     />
                 </div>
@@ -423,14 +423,14 @@ export default function NewCrmCampaignPage() {
                         <button
                             type="button"
                             onClick={() => setShowAddContact(v => !v)}
-                            className="flex items-center gap-1.5 text-[11px] font-bold px-3 py-1.5 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-400 hover:bg-amber-500/20 transition-all"
+                            className="flex items-center gap-1.5 text-[11px] font-bold px-3 py-1.5 rounded-lg bg-purple-500/10 border border-purple-500/20 text-purple-400 hover:bg-purple-500/20 transition-all"
                         >
                             <Plus size={12} /> Agregar manual
                         </button>
                     </div>
 
                     {showAddContact && (
-                        <div className="flex gap-2 mb-3 p-3 rounded-xl bg-white/5 border border-amber-500/20">
+                        <div className="flex gap-2 mb-3 p-3 rounded-xl bg-white/5 border border-purple-500/20">
                             <input
                                 value={newPhone}
                                 onChange={e => setNewPhone(e.target.value)}
@@ -461,7 +461,7 @@ export default function NewCrmCampaignPage() {
                     <button
                         type="button"
                         onClick={() => excelInputRef.current?.click()}
-                        className={`w-full flex items-center gap-3 p-4 rounded-xl border-2 border-dashed transition-all ${excelFile ? 'border-green-500/40 bg-green-500/5' : 'border-white/15 hover:border-amber-500/40'}`}
+                        className={`w-full flex items-center gap-3 p-4 rounded-xl border-2 border-dashed transition-all ${excelFile ? 'border-green-500/40 bg-green-500/5' : 'border-white/15 hover:border-purple-500/40'}`}
                     >
                         {excelFile ? (
                             <>
@@ -523,7 +523,7 @@ export default function NewCrmCampaignPage() {
                                                     {c.name && <p className="text-xs font-bold text-white/80 truncate">{c.name}</p>}
                                                     <p className="text-xs text-white/60">{c.phone}</p>
                                                 </div>
-                                                <button type="button" onClick={() => startEdit(i)} className="opacity-0 group-hover:opacity-100 text-white/30 hover:text-amber-400 transition-all">
+                                                <button type="button" onClick={() => startEdit(i)} className="opacity-0 group-hover:opacity-100 text-white/30 hover:text-purple-400 transition-all">
                                                     <Pencil size={12} />
                                                 </button>
                                                 <button type="button" onClick={() => deleteContact(i)} className="opacity-0 group-hover:opacity-100 text-white/30 hover:text-red-400 transition-all">
@@ -549,7 +549,7 @@ export default function NewCrmCampaignPage() {
                     type="submit"
                     disabled={loading}
                     className="w-full flex items-center justify-center gap-2 py-4 rounded-2xl text-sm font-black uppercase tracking-widest text-white transition-all disabled:opacity-50"
-                    style={{ background: 'linear-gradient(135deg, #B45309, #D97706, #FFD700)' }}
+                    style={{ background: 'linear-gradient(135deg, #D203DD, #00FF88)' }}
                 >
                     {loading ? (
                         <>

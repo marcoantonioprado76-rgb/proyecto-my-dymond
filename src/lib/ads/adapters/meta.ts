@@ -104,20 +104,14 @@ export class MetaAdapter implements IAdsAdapter {
             let whatsappNumbers: string[] = []
 
             try {
-                // v21.0 with page token — tries whatsapp_number + whatsapp_accounts edge
                 const wpRes = await this.api.get<any>(`/v21.0/${page.id}`, {
                     params: {
                         access_token: pageToken,
-                        fields: 'whatsapp_number,whatsapp_accounts{phone_number,default_whatsapp_number}'
+                        fields: 'whatsapp_number'
                     }
                 })
-                console.log(`[listPages] Page "${page.name}" — whatsapp:`, wpRes.whatsapp_number || 'none')
                 whatsappNumber = wpRes.whatsapp_number || null
-                const waAccounts = wpRes.whatsapp_accounts?.data || []
-                if (waAccounts.length > 0) {
-                    whatsappNumbers = waAccounts.map((a: any) => a.phone_number || a.default_whatsapp_number).filter(Boolean)
-                    if (!whatsappNumber) whatsappNumber = whatsappNumbers[0] || null
-                }
+                if (whatsappNumber) whatsappNumbers = [whatsappNumber]
             } catch (e) { console.log(`[listPages] Page "${page.name}" error:`, e) }
 
             return {

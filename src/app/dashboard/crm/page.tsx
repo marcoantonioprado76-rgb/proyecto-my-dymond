@@ -11,7 +11,7 @@ import {
 
 const STATUS_COLORS: Record<string, string> = {
     DRAFT: 'text-white/40 bg-white/5',
-    SCHEDULED: 'text-amber-400 bg-amber-400/10',
+    SCHEDULED: 'text-purple-400 bg-purple-500/10',
     RUNNING: 'text-green-400 bg-green-400/10',
     COMPLETED: 'text-blue-400 bg-blue-400/10',
     PAUSED: 'text-orange-400 bg-orange-400/10',
@@ -88,7 +88,7 @@ export default function CrmPage() {
 
     if (loading) return (
         <div className="flex items-center justify-center min-h-[60vh]">
-            <Loader2 className="animate-spin text-amber-400" size={32} />
+            <Loader2 className="animate-spin text-purple-400" size={32} />
         </div>
     )
 
@@ -103,14 +103,14 @@ export default function CrmPage() {
                 <div className="flex items-center gap-2">
                     <Link
                         href="/dashboard/crm/export"
-                        className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold border border-white/10 bg-white/5 text-white/60 hover:text-amber-400 hover:border-amber-500/40 transition-all"
+                        className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold border border-white/10 bg-white/5 text-white/60 hover:text-purple-400 hover:border-purple-500/40 transition-all"
                     >
                         <Download size={15} /> Exportar
                     </Link>
                     <Link
                         href="/dashboard/crm/new"
                         className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-black uppercase tracking-wide text-white transition-all hover:opacity-90"
-                        style={{ background: 'linear-gradient(135deg, #B45309, #D97706, #FFD700)' }}
+                        style={{ background: 'linear-gradient(135deg, #D203DD, #00FF88)' }}
                     >
                         <Plus size={15} /> Nueva campaña
                     </Link>
@@ -127,11 +127,11 @@ export default function CrmPage() {
 
             {campaigns.length === 0 ? (
                 <div className="text-center py-24">
-                    <div className="w-16 h-16 rounded-2xl bg-amber-500/10 flex items-center justify-center mx-auto mb-4">
-                        <MessageSquare size={28} className="text-amber-400" />
+                    <div className="w-16 h-16 rounded-2xl bg-purple-500/10 flex items-center justify-center mx-auto mb-4">
+                        <MessageSquare size={28} className="text-purple-400" />
                     </div>
                     <p className="text-white/40 text-sm mb-2">No tenés campañas todavía</p>
-                    <Link href="/dashboard/crm/new" className="text-amber-400 font-bold text-sm hover:underline">
+                    <Link href="/dashboard/crm/new" className="text-purple-400 font-bold text-sm hover:underline">
                         Crear primera campaña →
                     </Link>
                 </div>
@@ -185,7 +185,7 @@ export default function CrmPage() {
                                     </div>
                                     <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
                                         <div
-                                            className="h-full bg-gradient-to-r from-amber-600 to-amber-400 rounded-full transition-all"
+                                            className="h-full bg-gradient-to-r from-[#D203DD] to-[#00FF88] rounded-full transition-all"
                                             style={{ width: `${Math.min(100, (c.sentCount / c.totalContacts) * 100)}%` }}
                                         />
                                     </div>
