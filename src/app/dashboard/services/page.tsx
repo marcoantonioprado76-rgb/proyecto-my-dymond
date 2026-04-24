@@ -109,14 +109,20 @@ export default function ServicesPage() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    fetch('/api/plan-status')
-      .then(r => r.json())
-      .then(d => {
-        setPlan((d.plan ?? 'NONE') as UserPlan)
-        setExpired(!!d.expired)
-      })
-      .catch(() => {})
-      .finally(() => setLoading(false))
+    const load = () =>
+      fetch('/api/plan-status')
+        .then(r => {
+          if (!r.ok) throw new Error(`status ${r.status}`)
+          return r.json()
+        })
+        .then(d => {
+          setPlan((d.plan ?? 'NONE') as UserPlan)
+          setExpired(!!d.expired)
+          setLoading(false)
+        })
+        .catch(() => setTimeout(load, 1500))
+
+    load()
   }, [])
 
   function isUnlocked(requiredPlan: UserPlan | null) {
