@@ -318,7 +318,7 @@ export interface SuggestedStrategy {
 export async function generateStrategySuggestions(
     brief: BusinessBriefData,
     apiKey: string,
-    model = 'gpt-5.1',
+    model = 'gpt-4o',
     platform?: string,
     objective?: string,
     destination?: string,
@@ -473,7 +473,7 @@ ${platform === 'META' ? 'Destinos válidos para META: instagram, whatsapp, websi
 export async function generateAudienceInterests(
     brief: BusinessBriefData,
     apiKey: string,
-    model = 'gpt-5.1'
+    model = 'gpt-4o'
 ): Promise<string[]> {
     const prompt = `You are a senior Meta Ads specialist with deep knowledge of Meta's interest targeting taxonomy. Your job is to generate search terms that will find REAL, EXISTING interests in Meta's Targeting Search API.
 

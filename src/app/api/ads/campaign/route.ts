@@ -93,7 +93,7 @@ export async function POST(req: Request) {
             platform: strategy.platform as AdPlatform,
             name: name.trim(),
             status: 'DRAFT',
-            dailyBudgetUSD: parseFloat(dailyBudgetUSD || '0'),
+            dailyBudgetUSD: Math.max(0, parseFloat(dailyBudgetUSD) || 0),
             locations: locations || [],
             connectedAccountId,
             pageId: pageId || null,

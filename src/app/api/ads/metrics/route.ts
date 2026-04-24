@@ -67,9 +67,9 @@ export async function GET(req: Request) {
                     date: row.date instanceof Date ? row.date.toISOString().split('T')[0] : row.date,
                     campaignId: camp?.id,
                     campaignName: camp?.name,
-                    ctr: row.impressions > 0 ? ((row.clicks / row.impressions) * 100).toFixed(2) : '0.00',
-                    cpc: row.clicks > 0 ? (row.spend / row.clicks).toFixed(2) : '0.00',
-                    cpa: row.conversions > 0 ? (row.spend / row.conversions).toFixed(2) : '0.00',
+                    ctr: row.impressions > 0 ? +((row.clicks / row.impressions) * 100).toFixed(2) : 0,
+                    cpc: row.clicks > 0 ? +(row.spend / row.clicks).toFixed(2) : 0,
+                    cpa: row.conversions > 0 ? +(row.spend / row.conversions).toFixed(2) : 0,
                 })
             }
         } catch (err: any) {
@@ -92,10 +92,10 @@ export async function GET(req: Request) {
 
     const totals = Array.from(totalsMap.values()).map(t => ({
         ...t,
-        spend: t.spend.toFixed(2),
-        ctr: t.impressions > 0 ? ((t.clicks / t.impressions) * 100).toFixed(2) : '0.00',
-        cpc: t.clicks > 0 ? (t.spend / t.clicks).toFixed(2) : '0.00',
-        cpa: t.conversions > 0 ? (t.spend / t.conversions).toFixed(2) : null,
+        spend: +t.spend.toFixed(2),
+        ctr: t.impressions > 0 ? +((t.clicks / t.impressions) * 100).toFixed(2) : 0,
+        cpc: t.clicks > 0 ? +(t.spend / t.clicks).toFixed(2) : 0,
+        cpa: t.conversions > 0 ? +(t.spend / t.conversions).toFixed(2) : 0,
     }))
 
     // Only surface campaigns that actually had a valid token (others have no data)

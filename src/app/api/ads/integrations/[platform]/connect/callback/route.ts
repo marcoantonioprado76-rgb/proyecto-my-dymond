@@ -23,7 +23,7 @@ export async function GET(
 
     const cookieHeader = req.headers.get('cookie') || ''
     const stateFromCookie = cookieHeader.match(/ads_oauth_state=([^;]+)/)?.[1]
-    if (stateFromCookie && stateFromUrl !== stateFromCookie) {
+    if (stateFromUrl !== stateFromCookie) {
         const appUrl = process.env.NEXT_PUBLIC_APP_URL || `https://${new URL(req.url).host}`
         return NextResponse.redirect(new URL('/dashboard/services/ads?error=state_mismatch', appUrl))
     }
