@@ -789,23 +789,25 @@ function CampaignPageInner() {
                                 <label className="text-[10px] font-bold text-white/30 uppercase tracking-widest block mb-1.5">Saludo</label>
                                 <textarea
                                     value={form.welcomeMessage}
-                                    onChange={e => setForm(f => ({ ...f, welcomeMessage: e.target.value }))}
+                                    onChange={e => setForm(f => ({ ...f, welcomeMessage: e.target.value.slice(0, 180) }))}
                                     placeholder="Ej: ¡Hola! ¿Cómo podemos ayudarte? 👋"
                                     rows={2}
+                                    maxLength={180}
                                     className="w-full bg-[#1c1d2e] border border-white/20 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-green-500/50 placeholder:text-white/20 resize-none"
                                 />
+                                <p className="text-[9px] text-white/15 mt-1">{180 - form.welcomeMessage.length} caracteres restantes</p>
                             </div>
                             <div>
                                 <label className="text-[10px] font-bold text-white/30 uppercase tracking-widest block mb-1.5">Botón de respuesta rápida</label>
                                 <input
                                     type="text"
                                     value={form.whatsappQuestion}
-                                    onChange={e => setForm(f => ({ ...f, whatsappQuestion: e.target.value.slice(0, 20) }))}
+                                    onChange={e => setForm(f => ({ ...f, whatsappQuestion: e.target.value.slice(0, 160) }))}
                                     placeholder="Ej: Quiero más información"
-                                    maxLength={20}
+                                    maxLength={160}
                                     className="w-full bg-[#1c1d2e] border border-white/20 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-green-500/50 placeholder:text-white/20"
                                 />
-                                <p className="text-[9px] text-white/15 mt-1">{20 - form.whatsappQuestion.length} caracteres restantes</p>
+                                <p className="text-[9px] text-white/15 mt-1">{160 - form.whatsappQuestion.length} caracteres restantes</p>
                             </div>
                             {(form.welcomeMessage || form.whatsappQuestion) && (
                                 <div className="rounded-xl bg-green-900/20 border border-green-500/20 p-3 space-y-2">
