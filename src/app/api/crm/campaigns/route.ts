@@ -55,6 +55,7 @@ export async function POST(req: NextRequest) {
                 delayUnit: delayUnit || 'seconds',
                 scheduledAt: scheduledAt ? new Date(scheduledAt) : null,
                 status: scheduledAt ? 'SCHEDULED' : 'DRAFT',
+                imageIndex: 0,
             },
             include: {
                 bot: { select: { id: true, name: true, type: true } },

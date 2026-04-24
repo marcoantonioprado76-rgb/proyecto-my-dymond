@@ -155,7 +155,7 @@ export async function executeBroadcast(campaignId: string) {
                     campaign.bot?.systemPromptTemplate,
                     campaign.messageExample,
                 )
-                : (campaign.messageExample?.trim() || campaign.prompt || '')
+                : (campaign.prompt?.trim() || campaign.messageExample?.trim() || '')
 
             const nextIndex = images.length > 0 ? (imageIndex + 1) % images.length : 0
             let logImageUrl: string | null = null
