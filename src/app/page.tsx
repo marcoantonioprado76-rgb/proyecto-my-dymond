@@ -376,7 +376,7 @@ export default function HomePage() {
       <nav style={{ position:'fixed', top:0, left:0, right:0, zIndex:100, background:'rgba(28,25,44,0.88)', backdropFilter:'blur(20px)', borderBottom:'1px solid rgba(255,255,255,0.06)' }}>
         <div style={{ maxWidth:1200, margin:'0 auto', padding:'0 24px', height:60, display:'flex', alignItems:'center', justifyContent:'space-between' }}>
           <div style={{ display:'flex', alignItems:'center', gap:10 }}>
-            <div style={{ width:32, height:32, borderRadius:10, overflow:'hidden', border:'1px solid rgba(255,255,255,0.1)' }}>
+            <div style={{ width:48, height:48, borderRadius:13, overflow:'hidden', border:'1px solid rgba(255,255,255,0.15)', boxShadow:'0 4px 18px rgba(210,3,221,0.45), 0 0 8px rgba(155,0,255,0.3)' }}>
               <img src="/logo.png" alt="MY DIAMOND" style={{ width:'100%', height:'100%', objectFit:'contain' }} />
             </div>
             <span style={{ fontSize:13, fontWeight:900, letterSpacing:'0.18em', color:'#fff' }}>MY DIAMOND</span>
