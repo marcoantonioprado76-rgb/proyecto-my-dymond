@@ -140,14 +140,7 @@
     color: var(--clr-muted);
 }
 
-.u-live-dot {
-    display: inline-block;
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: var(--clr-green);
-    animation: blink 1.8s ease-in-out infinite;
-}
+/* .u-live-dot defined below in sidebar__logo-badge section */
 
 @keyframes blink {
 
@@ -702,76 +695,125 @@
 .sidebar__logo {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 20px 18px 18px;
-    border-bottom: 1px solid var(--clr-border);
+    gap: 14px;
+    padding: 22px 18px 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
     text-decoration: none;
     position: relative;
-    background: linear-gradient(180deg, rgba(210, 3, 221, 0.04) 0%, transparent 100%);
+    overflow: hidden;
+    background: linear-gradient(160deg,
+        rgba(10, 6, 40, 0.95) 0%,
+        rgba(40, 8, 80, 0.85) 45%,
+        rgba(8, 4, 28, 0.98) 100%
+    );
+}
+
+/* línea de luz superior */
+.sidebar__logo::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(210,3,221,0.7), rgba(100,60,255,0.5), transparent);
+}
+
+/* glow ambiental */
+.sidebar__logo::after {
+    content: '';
+    position: absolute;
+    top: -30px; left: -20px;
+    width: 120px; height: 120px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(155,0,255,0.18) 0%, transparent 70%);
+    pointer-events: none;
 }
 
 .sidebar__logo-ring {
     position: relative;
-    width: 44px;
-    height: 44px;
+    width: 52px;
+    height: 52px;
     flex-shrink: 0;
-    border-radius: 12px;
+    border-radius: 16px;
     padding: 2px;
-    background: linear-gradient(135deg, var(--clr-accent-lt), #D203DD, #D203DD);
-    box-shadow: 0 0 14px rgba(210, 3, 221, 0.40), 0 0 28px rgba(210, 3, 221, 0.15);
+    background: linear-gradient(135deg, #b44fff, #D203DD, #6a00ff);
+    box-shadow:
+        0 0 0 1px rgba(180, 79, 255, 0.25),
+        0 4px 20px rgba(210, 3, 221, 0.55),
+        0 8px 40px rgba(155, 0, 255, 0.30),
+        inset 0 1px 0 rgba(255,255,255,0.15);
+    z-index: 1;
 }
 
 .sidebar__logo-ring img {
     width: 100%;
     height: 100%;
-    border-radius: 10px;
+    border-radius: 14px;
     object-fit: contain;
     object-position: center;
     display: block;
-    background: #12003D;
-    padding: 4px;
+    background: transparent;
+    padding: 5px;
+    filter: drop-shadow(0 0 6px rgba(210,3,221,0.6)) brightness(1.1);
 }
 
 .sidebar__logo-info {
     display: flex;
     flex-direction: column;
-    gap: 1px;
+    gap: 2px;
+    z-index: 1;
 }
 
 .sidebar__logo-jd {
-    font-size: 0.72rem;
-    font-weight: 300;
+    font-size: 0.62rem;
+    font-weight: 400;
     line-height: 1;
-    letter-spacing: 0.22em;
-    color: rgba(255,255,255,0.55);
+    letter-spacing: 0.35em;
+    color: rgba(200, 160, 255, 0.55);
     text-transform: uppercase;
 }
 
 .sidebar__logo-intl {
-    font-size: 1.15rem;
+    font-size: 1.35rem;
     font-weight: 900;
-    letter-spacing: -0.01em;
+    letter-spacing: 0.04em;
     line-height: 1;
-    background: linear-gradient(135deg, #fff 0%, var(--clr-accent-lt) 60%, #D203DD 100%);
+    background: linear-gradient(135deg, #ffffff 0%, #e8b4ff 40%, #D203DD 75%, #9B00FF 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
     text-transform: uppercase;
+    text-shadow: none;
+    filter: drop-shadow(0 0 12px rgba(210,3,221,0.35));
 }
 
 .sidebar__logo-badge {
     display: inline-flex;
     align-items: center;
-    margin-top: 4px;
-    font-size: 0.58rem;
-    font-weight: 600;
-    color: var(--clr-accent-lt);
-    background: rgba(210, 3, 221, 0.10);
-    border: 1px solid rgba(210, 3, 221, 0.22);
+    gap: 5px;
+    margin-top: 5px;
+    font-size: 0.56rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #fff;
+    background: linear-gradient(135deg, rgba(155,0,255,0.55), rgba(210,3,221,0.45));
+    border: 1px solid rgba(210,3,221,0.35);
     border-radius: 99px;
-    padding: 2px 7px;
+    padding: 3px 8px;
     width: fit-content;
-    letter-spacing: 0.04em;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 2px 10px rgba(155,0,255,0.25);
+}
+
+.u-live-dot {
+    display: inline-block;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: #22c55e;
+    box-shadow: 0 0 6px rgba(34,197,94,0.9), 0 0 12px rgba(34,197,94,0.4);
+    animation: blink 1.8s ease-in-out infinite;
+    flex-shrink: 0;
 }
 
 .sidebar__nav {
