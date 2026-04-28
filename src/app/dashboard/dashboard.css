@@ -1,4 +1,5 @@
 @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css');
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
 
 /* ─────────────────────────────────────────────────────────────
    DESIGN TOKENS
@@ -692,51 +693,81 @@
     overflow-y: auto;
 }
 
+/* ── ANIMACIONES HEADER ─────────────────────────────────── */
+@keyframes logo-float {
+    0%, 100% { transform: translateY(0px);   }
+    50%       { transform: translateY(-4px);  }
+}
+
+@keyframes logo-glow-pulse {
+    0%, 100% { opacity: 0.6; transform: translateY(-50%) scale(1);    }
+    50%       { opacity: 1;   transform: translateY(-50%) scale(1.2);  }
+}
+
+@keyframes shimmer-sweep {
+    0%   { background-position: -200% center; }
+    100% { background-position:  200% center; }
+}
+
+@keyframes neon-line {
+    0%, 100% { opacity: 0.5; }
+    50%       { opacity: 1;   }
+}
+
+/* ── HEADER CONTAINER ───────────────────────────────────── */
 .sidebar__logo {
     display: flex;
     align-items: center;
     gap: 14px;
-    padding: 24px 18px 22px;
-    border-bottom: 1px solid rgba(255,255,255,0.05);
+    padding: 22px 18px 0;
+    border-bottom: none;
     text-decoration: none;
     position: relative;
-    background: transparent;
+    background: #0A1F2F;
+    overflow: hidden;
+}
+
+/* línea neón inferior */
+.sidebar__logo::before {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg,
+        transparent 0%,
+        rgba(0,180,255,0.6) 25%,
+        rgba(120,0,255,0.9) 55%,
+        rgba(0,180,255,0.4) 80%,
+        transparent 100%
+    );
+    animation: neon-line 3s ease-in-out infinite;
 }
 
 /* glow ambiental detrás del diamante */
 .sidebar__logo::after {
     content: '';
     position: absolute;
-    top: 50%; left: 10px;
+    top: 50%; left: 8px;
     transform: translateY(-50%);
-    width: 70px; height: 70px;
+    width: 80px; height: 80px;
     border-radius: 50%;
-    background: radial-gradient(circle, rgba(210,3,221,0.22) 0%, rgba(155,0,255,0.08) 50%, transparent 75%);
+    background: radial-gradient(circle, rgba(0,160,255,0.18) 0%, rgba(120,0,255,0.10) 50%, transparent 75%);
     pointer-events: none;
-    animation: logo-glow-pulse 3s ease-in-out infinite;
+    animation: logo-glow-pulse 3.5s ease-in-out infinite;
 }
 
-@keyframes logo-glow-pulse {
-    0%, 100% { opacity: 0.7; transform: translateY(-50%) scale(1);   }
-    50%       { opacity: 1;   transform: translateY(-50%) scale(1.15); }
-}
-
-@keyframes logo-float {
-    0%, 100% { transform: translateY(0px);  }
-    50%       { transform: translateY(-3px); }
-}
-
+/* ── DIAMANTE ───────────────────────────────────────────── */
 .sidebar__logo-ring {
     position: relative;
-    width: 58px;
-    height: 58px;
+    width: 66px;
+    height: 66px;
     flex-shrink: 0;
-    border-radius: 0;
-    padding: 0;
     background: transparent;
     box-shadow: none;
+    border-radius: 0;
+    padding: 0;
     z-index: 1;
-    animation: logo-float 4s ease-in-out infinite;
+    animation: logo-float 4.5s ease-in-out infinite;
 }
 
 .sidebar__logo-ring img {
@@ -749,62 +780,70 @@
     border-radius: 0;
     padding: 0;
     filter:
-        drop-shadow(0 0 8px rgba(210,3,221,0.70))
-        drop-shadow(0 0 20px rgba(155,0,255,0.40))
-        drop-shadow(0 2px 12px rgba(0,0,0,0.50))
-        brightness(1.15) contrast(1.05);
+        drop-shadow(0 0 10px rgba(0,180,255,0.65))
+        drop-shadow(0 0 22px rgba(120,0,255,0.45))
+        drop-shadow(0 3px 14px rgba(0,0,0,0.60))
+        brightness(1.18) contrast(1.06) saturate(1.1);
 }
 
+/* ── TEXTO ──────────────────────────────────────────────── */
 .sidebar__logo-info {
     display: flex;
     flex-direction: column;
-    gap: 1px;
+    gap: 0px;
     z-index: 1;
+    padding-bottom: 18px;
 }
 
 .sidebar__logo-jd {
-    font-size: 0.58rem;
-    font-weight: 500;
-    line-height: 1;
-    letter-spacing: 0.45em;
-    color: rgba(210, 160, 255, 0.45);
+    font-family: 'Space Grotesk', 'Inter', system-ui, sans-serif;
+    font-size: 0.60rem;
+    font-weight: 400;
+    line-height: 1.2;
+    letter-spacing: 0.40em;
+    color: rgba(200, 220, 255, 0.50);
     text-transform: uppercase;
 }
 
 .sidebar__logo-intl {
-    font-size: 1.45rem;
-    font-weight: 900;
-    letter-spacing: 0.06em;
+    font-family: 'Space Grotesk', 'Inter', system-ui, sans-serif;
+    font-size: 1.50rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
     line-height: 1;
-    background: linear-gradient(135deg,
-        #ffffff   0%,
-        #f0d0ff  30%,
-        #D203DD  65%,
-        #9B00FF 100%
+    background: linear-gradient(100deg,
+        #00B4FF  0%,
+        #7B2FFF 45%,
+        #B060FF 70%,
+        #00B4FF 100%
     );
+    background-size: 200% auto;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
     text-transform: uppercase;
-    filter: drop-shadow(0 0 14px rgba(210,3,221,0.30));
+    animation: shimmer-sweep 4s linear infinite;
+    filter: drop-shadow(0 0 10px rgba(0,160,255,0.25));
 }
 
 .sidebar__logo-badge {
     display: inline-flex;
     align-items: center;
     gap: 5px;
-    margin-top: 6px;
-    font-size: 0.54rem;
-    font-weight: 700;
-    letter-spacing: 0.12em;
+    margin-top: 7px;
+    font-family: 'Space Grotesk', system-ui, sans-serif;
+    font-size: 0.52rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
-    color: rgba(255,255,255,0.80);
-    background: rgba(155,0,255,0.12);
-    border: 1px solid rgba(210,3,221,0.20);
+    color: rgba(160,210,255,0.85);
+    background: rgba(0,150,255,0.08);
+    border: 1px solid rgba(0,180,255,0.18);
     border-radius: 99px;
-    padding: 3px 8px;
+    padding: 3px 9px;
     width: fit-content;
-    backdrop-filter: blur(6px);
+    backdrop-filter: blur(8px);
+    box-shadow: 0 1px 8px rgba(0,180,255,0.12);
 }
 
 .u-live-dot {
