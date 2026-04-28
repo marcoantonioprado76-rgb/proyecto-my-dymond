@@ -696,113 +696,115 @@
     display: flex;
     align-items: center;
     gap: 14px;
-    padding: 22px 18px 20px;
-    border-bottom: 1px solid rgba(255,255,255,0.06);
+    padding: 24px 18px 22px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
     text-decoration: none;
     position: relative;
-    overflow: hidden;
-    background: linear-gradient(160deg,
-        rgba(10, 6, 40, 0.95) 0%,
-        rgba(40, 8, 80, 0.85) 45%,
-        rgba(8, 4, 28, 0.98) 100%
-    );
+    background: transparent;
 }
 
-/* línea de luz superior */
-.sidebar__logo::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(210,3,221,0.7), rgba(100,60,255,0.5), transparent);
-}
-
-/* glow ambiental */
+/* glow ambiental detrás del diamante */
 .sidebar__logo::after {
     content: '';
     position: absolute;
-    top: -30px; left: -20px;
-    width: 120px; height: 120px;
+    top: 50%; left: 10px;
+    transform: translateY(-50%);
+    width: 70px; height: 70px;
     border-radius: 50%;
-    background: radial-gradient(circle, rgba(155,0,255,0.18) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(210,3,221,0.22) 0%, rgba(155,0,255,0.08) 50%, transparent 75%);
     pointer-events: none;
+    animation: logo-glow-pulse 3s ease-in-out infinite;
+}
+
+@keyframes logo-glow-pulse {
+    0%, 100% { opacity: 0.7; transform: translateY(-50%) scale(1);   }
+    50%       { opacity: 1;   transform: translateY(-50%) scale(1.15); }
+}
+
+@keyframes logo-float {
+    0%, 100% { transform: translateY(0px);  }
+    50%       { transform: translateY(-3px); }
 }
 
 .sidebar__logo-ring {
     position: relative;
-    width: 52px;
-    height: 52px;
+    width: 58px;
+    height: 58px;
     flex-shrink: 0;
-    border-radius: 16px;
-    padding: 2px;
-    background: linear-gradient(135deg, #b44fff, #D203DD, #6a00ff);
-    box-shadow:
-        0 0 0 1px rgba(180, 79, 255, 0.25),
-        0 4px 20px rgba(210, 3, 221, 0.55),
-        0 8px 40px rgba(155, 0, 255, 0.30),
-        inset 0 1px 0 rgba(255,255,255,0.15);
+    border-radius: 0;
+    padding: 0;
+    background: transparent;
+    box-shadow: none;
     z-index: 1;
+    animation: logo-float 4s ease-in-out infinite;
 }
 
 .sidebar__logo-ring img {
     width: 100%;
     height: 100%;
-    border-radius: 14px;
     object-fit: contain;
     object-position: center;
     display: block;
     background: transparent;
-    padding: 5px;
-    filter: drop-shadow(0 0 6px rgba(210,3,221,0.6)) brightness(1.1);
+    border-radius: 0;
+    padding: 0;
+    filter:
+        drop-shadow(0 0 8px rgba(210,3,221,0.70))
+        drop-shadow(0 0 20px rgba(155,0,255,0.40))
+        drop-shadow(0 2px 12px rgba(0,0,0,0.50))
+        brightness(1.15) contrast(1.05);
 }
 
 .sidebar__logo-info {
     display: flex;
     flex-direction: column;
-    gap: 2px;
+    gap: 1px;
     z-index: 1;
 }
 
 .sidebar__logo-jd {
-    font-size: 0.62rem;
-    font-weight: 400;
+    font-size: 0.58rem;
+    font-weight: 500;
     line-height: 1;
-    letter-spacing: 0.35em;
-    color: rgba(200, 160, 255, 0.55);
+    letter-spacing: 0.45em;
+    color: rgba(210, 160, 255, 0.45);
     text-transform: uppercase;
 }
 
 .sidebar__logo-intl {
-    font-size: 1.35rem;
+    font-size: 1.45rem;
     font-weight: 900;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.06em;
     line-height: 1;
-    background: linear-gradient(135deg, #ffffff 0%, #e8b4ff 40%, #D203DD 75%, #9B00FF 100%);
+    background: linear-gradient(135deg,
+        #ffffff   0%,
+        #f0d0ff  30%,
+        #D203DD  65%,
+        #9B00FF 100%
+    );
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
     text-transform: uppercase;
-    text-shadow: none;
-    filter: drop-shadow(0 0 12px rgba(210,3,221,0.35));
+    filter: drop-shadow(0 0 14px rgba(210,3,221,0.30));
 }
 
 .sidebar__logo-badge {
     display: inline-flex;
     align-items: center;
     gap: 5px;
-    margin-top: 5px;
-    font-size: 0.56rem;
+    margin-top: 6px;
+    font-size: 0.54rem;
     font-weight: 700;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.12em;
     text-transform: uppercase;
-    color: #fff;
-    background: linear-gradient(135deg, rgba(155,0,255,0.55), rgba(210,3,221,0.45));
-    border: 1px solid rgba(210,3,221,0.35);
+    color: rgba(255,255,255,0.80);
+    background: rgba(155,0,255,0.12);
+    border: 1px solid rgba(210,3,221,0.20);
     border-radius: 99px;
     padding: 3px 8px;
     width: fit-content;
-    backdrop-filter: blur(8px);
-    box-shadow: 0 2px 10px rgba(155,0,255,0.25);
+    backdrop-filter: blur(6px);
 }
 
 .u-live-dot {
@@ -810,10 +812,10 @@
     width: 5px;
     height: 5px;
     border-radius: 50%;
-    background: #22c55e;
-    box-shadow: 0 0 6px rgba(34,197,94,0.9), 0 0 12px rgba(34,197,94,0.4);
-    animation: blink 1.8s ease-in-out infinite;
     flex-shrink: 0;
+    background: #22c55e;
+    box-shadow: 0 0 5px rgba(34,197,94,1), 0 0 10px rgba(34,197,94,0.5);
+    animation: blink 1.8s ease-in-out infinite;
 }
 
 .sidebar__nav {
