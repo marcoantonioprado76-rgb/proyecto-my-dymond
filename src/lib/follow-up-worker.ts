@@ -119,8 +119,27 @@ IMPORTANTE: Responde únicamente en formato JSON con este schema exacto:
   "mensaje1": "mensaje aquí"
 }`
 
-        const aiResponse = await chat(prompt, [], openaiKey, FOLLOWUP_MODEL)
-        const messageText = aiResponse.mensaje1 || "¿Hola? ¿Sigues ahí? Queríamos saber si tienes alguna duda con tu pedido."
+        const FALLBACKS_1 = [
+            "¡Hola! ¿Sigues por ahí? Cualquier duda dime y te ayudo 😊",
+            "Hola de nuevo, ¿pudiste revisar lo que te pasé? Quedo atento.",
+            "¿Cómo vas? Me cuentas si seguimos con el pedido 🙌",
+        ]
+        const FALLBACKS_2 = [
+            "¡Hola! Pasaba a saludar y ver si necesitas algo más 🙌",
+            "Hola, ¿pudiste decidirte? Aún tengo el producto disponible.",
+            "¿Qué tal? Cualquier consulta aquí estoy para ayudarte 😊",
+        ]
+        const fallbackPool = type === 1 ? FALLBACKS_1 : FALLBACKS_2
+        const fallback = fallbackPool[Math.floor(Math.random() * fallbackPool.length)]
+
+        let messageText: string
+        try {
+            const aiResponse = await chat(prompt, [], openaiKey, FOLLOWUP_MODEL)
+            messageText = aiResponse.mensaje1 || fallback
+        } catch (aiErr) {
+            console.warn(`[WORKER] OpenAI falló para seguimiento ${type} de ${userPhone}, usando mensaje predeterminado:`, (aiErr as Error).message?.slice(0, 120))
+            messageText = fallback
+        }
 
         // Enviar según el tipo de bot
         let sent = false
