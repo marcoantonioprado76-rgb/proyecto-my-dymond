@@ -49,7 +49,7 @@ export async function GET(req: Request) {
 
     const allRows: any[] = []
 
-    for (const [adAccountId, group] of byAccount) {
+    for (const [adAccountId, group] of Array.from(byAccount.entries())) {
         const rep = group[0]
         try {
             const accessToken = decrypt(rep.connectedAccount.integration.token.accessTokenEncrypted, ENC_KEY!)

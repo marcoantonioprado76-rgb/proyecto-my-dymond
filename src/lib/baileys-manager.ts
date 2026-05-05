@@ -445,11 +445,12 @@ export const BaileysManager = {
         connections.set(botId, conn)
 
         try {
+            // eslint-disable-next-line react-hooks/rules-of-hooks
             const { state, saveCreds } = await useMultiFileAuthState(sessionDir)
-            let version: number[]
+            let version: [number, number, number]
             try {
                 const result = await fetchLatestBaileysVersion()
-                version = result.version
+                version = result.version as [number, number, number]
             } catch {
                 // Si falla la consulta de versión, usar una versión conocida como fallback
                 version = [2, 3000, 1015901307]

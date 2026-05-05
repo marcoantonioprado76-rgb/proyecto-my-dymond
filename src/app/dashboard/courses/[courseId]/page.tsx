@@ -138,7 +138,7 @@ export default function CourseDetailPage() {
       const player = new Vimeo.Player(iframeRef.current)
       vimeoPlayer.current = player
 
-      const vidId = selectedVideoId
+      const vidId = selectedVideoId as string
       player.on('timeupdate', (data: { percent: number }) => {
         const pct = Math.round(data.percent * 100)
         if (pct >= 95 && !reportedRef.current.has(vidId)) {
