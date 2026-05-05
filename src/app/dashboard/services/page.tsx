@@ -51,17 +51,17 @@ const services = [
     link: '/dashboard/services/ads',
     requiredPlan: 'BASIC' as UserPlan,
   },
-  {
-    id: 5,
-    title: 'Clipping — Gana por Vistas',
-    description: 'Sube clips a YouTube y TikTok y genera ingresos reales por cada mil vistas.',
-    icon: Play,
-    from: '#FF2D55', to: '#FF6B00',
-    features: ['Ingresos por CPM', 'YouTube & TikTok', 'Retiros a wallet'],
-    link: '/dashboard/services/clipping',
-    requiredPlan: null,
-    free: true,
-  },
+  // {
+  //   id: 5,
+  //   title: 'Clipping — Gana por Vistas',
+  //   description: 'Sube clips a YouTube y TikTok y genera ingresos reales por cada mil vistas.',
+  //   icon: Play,
+  //   from: '#FF2D55', to: '#FF6B00',
+  //   features: ['Ingresos por CPM', 'YouTube & TikTok', 'Retiros a wallet'],
+  //   link: '/dashboard/services/clipping',
+  //   requiredPlan: null,
+  //   free: true,
+  // }, // oculto temporalmente
   {
     id: 7,
     title: 'Publicador Social',
