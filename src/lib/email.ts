@@ -31,10 +31,10 @@ function emailWrapper(content: string, accentColor = '#D203DD'): string {
             <table cellpadding="0" cellspacing="0">
               <tr>
                 <td style="background:linear-gradient(135deg,#D203DD 0%,#9B00FF 100%);border-radius:10px;padding:8px 13px;">
-                  <span style="color:#000;font-size:15px;font-weight:900;letter-spacing:2px;">JD</span>
+                  <span style="color:#fff;font-size:15px;font-weight:900;letter-spacing:2px;">MD</span>
                 </td>
                 <td style="padding-left:10px;vertical-align:middle;">
-                  <span style="color:rgba(255,255,255,0.85);font-size:13px;font-weight:700;letter-spacing:3.5px;">INTERNACIONAL</span>
+                  <span style="color:rgba(255,255,255,0.85);font-size:13px;font-weight:700;letter-spacing:3.5px;">MY DIAMOND</span>
                 </td>
               </tr>
             </table>
