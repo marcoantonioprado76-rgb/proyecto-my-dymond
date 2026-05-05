@@ -3,6 +3,7 @@ import { chat, FOLLOWUP_MODEL } from './openai'
 import { sendText } from './ycloud'
 import { decrypt } from './crypto'
 import { BaileysManager } from './baileys-manager'
+import { notifyCreditsExhausted } from './notify-credits'
 
 const sleep = (ms: number) => new Promise<void>(resolve => setTimeout(resolve, ms))
 
@@ -137,8 +138,14 @@ IMPORTANTE: Responde únicamente en formato JSON con este schema exacto:
             const aiResponse = await chat(prompt, [], openaiKey, FOLLOWUP_MODEL)
             messageText = aiResponse.mensaje1 || fallback
         } catch (aiErr) {
-            console.warn(`[WORKER] OpenAI falló para seguimiento ${type} de ${userPhone}, usando mensaje predeterminado:`, (aiErr as Error).message?.slice(0, 120))
+            const errMsg = (aiErr as Error).message || ''
+            console.warn(`[WORKER] OpenAI falló para seguimiento ${type} de ${userPhone}, usando mensaje predeterminado:`, errMsg.slice(0, 120))
             messageText = fallback
+            // Si es por quota agotada, avisar al dueño (con cooldown de 12h)
+            const isQuotaError = errMsg.includes('insufficient_quota') || errMsg.includes('429')
+            if (isQuotaError && bot.userId) {
+                notifyCreditsExhausted(bot.userId, bot.name).catch(() => {})
+            }
         }
 
         // Enviar según el tipo de bot

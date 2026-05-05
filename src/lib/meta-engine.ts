@@ -14,6 +14,7 @@ import { transcribeAudio, analyzeImage, chat, ChatMessage } from './openai'
 import { sendMetaText, sendMetaImage, sendMetaVideo, markMetaAsRead } from './meta'
 import { buildSystemPrompt, detectIdentifiedProduct, enforceCharLimits, extractSentUrls } from './bot-engine'
 import { createNotification } from './notifications'
+import { notifyCreditsExhausted } from './notify-credits'
 
 const BUFFER_DELAY_MS = 15_000
 const MAX_HISTORY_MESSAGES = 6
@@ -296,12 +297,7 @@ export class MetaBotEngine {
       const isQuotaError = aiErr.message?.includes('insufficient_quota') || aiErr.message?.includes('429')
       if (isQuotaError) {
         await prisma.bot.update({ where: { id: botId }, data: { status: 'PAUSED' } }).catch(() => {})
-        createNotification(
-          bot.user.id,
-          '⚠️ Bot pausado — Sin saldo en OpenAI',
-          `El bot "${bot.name}" fue pausado automáticamente porque tu API key de OpenAI no tiene saldo. Recarga créditos y reactívalo manualmente.`,
-          '/dashboard/services/whatsapp',
-        ).catch(() => {})
+        notifyCreditsExhausted(bot.user.id, bot.name).catch(() => {})
         console.warn(`[META] Bot ${botId} PAUSADO automáticamente por quota insuficiente en OpenAI`)
       } else {
         await sendMetaText(senderId, '¡Hola! Recibí tu mensaje, en un momento te atiendo 😊', pageToken).catch(() => {})

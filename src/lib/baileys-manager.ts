@@ -22,6 +22,7 @@ import { toDataURL } from 'qrcode'
 import { processFollowUps } from './follow-up-worker'
 import { buildSystemPrompt, detectIdentifiedProduct, enforceCharLimits } from './bot-engine'
 import { createNotification } from './notifications'
+import { notifyCreditsExhausted } from './notify-credits'
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -311,12 +312,7 @@ async function handleMessage(
         if (isQuotaError) {
             // Sin saldo → pausar bot automáticamente (igual que si el dueño lo desactiva)
             await prisma.bot.update({ where: { id: conn.botId }, data: { status: 'PAUSED' } }).catch(() => {})
-            createNotification(
-                bot.user.id,
-                '⚠️ Bot pausado — Sin saldo en OpenAI',
-                `El bot "${bot.name}" fue pausado automáticamente porque tu API key de OpenAI no tiene saldo. Recarga créditos y reactívalo manualmente.`,
-                '/dashboard/services/whatsapp',
-            ).catch(() => {})
+            notifyCreditsExhausted(bot.user.id, bot.name).catch(() => {})
             console.warn(`[BAILEYS] Bot ${conn.botId} PAUSADO automáticamente por quota insuficiente en OpenAI`)
         } else {
             // Otro error transitorio → respaldo para no dejar al usuario en visto
