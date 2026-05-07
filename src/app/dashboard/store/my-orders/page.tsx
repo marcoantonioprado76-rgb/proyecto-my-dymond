@@ -83,7 +83,7 @@ export default function MyOrdersPage() {
                   <div>
                     <p style={{ fontSize: 12, fontWeight: 700, color: '#fff', letterSpacing: '0.05em' }}>#{order.id.slice(0, 8).toUpperCase()}</p>
                     <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.25)', marginTop: 2 }}>
-                      {new Date(order.createdAt).toLocaleString('es-ES', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                      {new Date(order.createdAt).toLocaleString('es-BO', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', timeZone: 'America/La_Paz' })}
                       {' · '}{order.city}, {order.country}
                     </p>
                   </div>

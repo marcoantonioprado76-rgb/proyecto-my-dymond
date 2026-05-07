@@ -588,7 +588,7 @@ function GlobalBotChart({ bots }: { bots: Bot[] }) {
                         {s.userName || 'Sin nombre'}
                       </span>
                       <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.3)', flexShrink: 0 }}>
-                        {s.soldAt ? new Date(s.soldAt).toLocaleDateString('es', { day: '2-digit', month: 'short', year: 'numeric' }) : '—'}
+                        {s.soldAt ? new Date(s.soldAt).toLocaleDateString('es-BO', { day: '2-digit', month: 'short', year: 'numeric', timeZone: 'America/La_Paz' }) : '—'}
                       </span>
                     </div>
                     {/* Teléfono — línea propia para que no desborde */}
@@ -2764,7 +2764,7 @@ function ChatsTab({ bot }: { bot: Bot }) {
                     <div className="flex items-center justify-between gap-1 mb-0.5">
                       <span className="text-sm font-medium truncate" style={{ color: '#e9edef' }}>{displayName}</span>
                       <span className="text-[10px] shrink-0" style={{ color: '#8696a0' }}>
-                        {new Date(c.updatedAt).toLocaleDateString('es-ES', { day: '2-digit', month: 'short' })}
+                        {new Date(c.updatedAt).toLocaleDateString('es-BO', { day: '2-digit', month: 'short', timeZone: 'America/La_Paz' })}
                       </span>
                     </div>
                     <div className="flex items-center gap-1">
@@ -2878,7 +2878,7 @@ function ChatsTab({ bot }: { bot: Bot }) {
                 {!loadingMsgs && messages.map(msg => {
                   const isBot = msg.role === 'assistant'
                   const text = isBot ? parseAssistantContent(msg.content) : msg.content
-                  const time = new Date(msg.createdAt).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })
+                  const time = new Date(msg.createdAt).toLocaleTimeString('es-BO', { hour: '2-digit', minute: '2-digit', timeZone: 'America/La_Paz' })
                   return (
                     <div key={msg.id} className={`flex mb-1 ${isBot ? 'justify-end' : 'justify-start'}`}>
                       <div

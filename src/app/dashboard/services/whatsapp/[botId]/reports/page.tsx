@@ -185,7 +185,7 @@ export default function BotReportsPage() {
   function fmtDate(iso: string | null) {
     if (!iso) return '—'
     const d = new Date(iso)
-    return d.toLocaleDateString('es', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })
+    return d.toLocaleDateString('es-BO', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit', timeZone: 'America/La_Paz' })
   }
 
   if (loading) {

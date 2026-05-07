@@ -173,9 +173,10 @@ export async function sendOrderConfirmedEmail(
   }
 ): Promise<boolean> {
   const orderId = order.id.slice(0, 8).toUpperCase()
-  const dateStr = new Date(order.createdAt).toLocaleString('es-ES', {
+  const dateStr = new Date(order.createdAt).toLocaleString('es-BO', {
     day: '2-digit', month: 'long', year: 'numeric',
     hour: '2-digit', minute: '2-digit',
+    timeZone: 'America/La_Paz',
   })
 
   const itemsRows = order.items.map(oi => {
@@ -308,9 +309,10 @@ export async function sendPlanPurchaseConfirmedEmail(
   const purchaseId = purchase.id.slice(0, 8).toUpperCase()
   const planLabel: Record<string, string> = { BASIC: 'Pack Básico', PRO: 'Pack Pro', ELITE: 'Pack Elite' }
   const planName = planLabel[purchase.plan] ?? purchase.plan
-  const dateStr = new Date(purchase.createdAt).toLocaleString('es-ES', {
+  const dateStr = new Date(purchase.createdAt).toLocaleString('es-BO', {
     day: '2-digit', month: 'long', year: 'numeric',
     hour: '2-digit', minute: '2-digit',
+    timeZone: 'America/La_Paz',
   })
 
   const content = `
@@ -723,7 +725,7 @@ export async function sendTicketEmail(
   }
 ): Promise<boolean> {
   const dateStr = ticket.eventDate
-    ? new Date(ticket.eventDate).toLocaleString('es-ES', { day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+    ? new Date(ticket.eventDate).toLocaleString('es-BO', { day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit', timeZone: 'America/La_Paz' })
     : null
 
   const isMulti = (ticket.totalTickets ?? 1) > 1
@@ -810,7 +812,7 @@ export async function sendTicketGroupEmail(
   totalPrice: number
 ): Promise<boolean> {
   const dateStr = event.date
-    ? new Date(event.date).toLocaleString('es-ES', { day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+    ? new Date(event.date).toLocaleString('es-BO', { day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit', timeZone: 'America/La_Paz' })
     : null
 
   const isMulti = tickets.length > 1
