@@ -293,9 +293,14 @@ export class MetaBotEngine {
     try {
       response = await chat(systemPrompt, chatHistory, openaiKey, (bot as any).aiModel || 'gpt-4o')
     } catch (aiErr: any) {
-      console.error(`[META] OpenAI error para ${senderId}:`, aiErr.message)
-      const isQuotaError = aiErr.message?.includes('insufficient_quota') || aiErr.message?.includes('429')
-      if (isQuotaError) {
+      const errMsg: string = aiErr?.message || ''
+      console.error(`[META] OpenAI error para ${senderId}:`, errMsg)
+      // Solo pausamos y notificamos si es saldo realmente agotado, NO por rate-limit.
+      const isQuotaExhausted =
+        errMsg.includes('insufficient_quota') ||
+        errMsg.includes('exceeded your current quota') ||
+        errMsg.includes('billing_hard_limit_reached')
+      if (isQuotaExhausted) {
         await prisma.bot.update({ where: { id: botId }, data: { status: 'PAUSED' } }).catch(() => {})
         notifyCreditsExhausted(bot.user.id, bot.name).catch(() => {})
         console.warn(`[META] Bot ${botId} PAUSADO automáticamente por quota insuficiente en OpenAI`)

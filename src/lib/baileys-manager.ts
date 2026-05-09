@@ -309,15 +309,20 @@ async function handleMessage(
     try {
         response = await chat(systemPrompt, chatHistory, openaiKey, (bot as any).aiModel || 'gpt-4o')
     } catch (aiErr: any) {
-        console.error(`[BAILEYS] OpenAI error para ${userPhone}:`, aiErr.message)
-        const isQuotaError = aiErr.message?.includes('insufficient_quota') || aiErr.message?.includes('429')
-        if (isQuotaError) {
-            // Sin saldo → pausar bot automáticamente (igual que si el dueño lo desactiva)
+        const errMsg: string = aiErr?.message || ''
+        console.error(`[BAILEYS] OpenAI error para ${userPhone}:`, errMsg)
+        // Diferenciar saldo realmente agotado vs rate-limit transitorio.
+        // Solo pausamos y notificamos cuando es saldo agotado (no se resuelve solo).
+        const isQuotaExhausted =
+            errMsg.includes('insufficient_quota') ||
+            errMsg.includes('exceeded your current quota') ||
+            errMsg.includes('billing_hard_limit_reached')
+        if (isQuotaExhausted) {
             await prisma.bot.update({ where: { id: conn.botId }, data: { status: 'PAUSED' } }).catch(() => {})
             notifyCreditsExhausted(bot.user.id, bot.name).catch(() => {})
             console.warn(`[BAILEYS] Bot ${conn.botId} PAUSADO automáticamente por quota insuficiente en OpenAI`)
         } else {
-            // Otro error transitorio → respaldo para no dejar al usuario en visto
+            // Rate-limit u otro error transitorio → respaldo para no dejar al usuario en visto
             await sock.sendMessage(jid, { text: '¡Hola! Recibí tu mensaje, en un momento te atiendo 😊' }).catch(() => {})
         }
         return

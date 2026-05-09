@@ -141,9 +141,13 @@ IMPORTANTE: Responde únicamente en formato JSON con este schema exacto:
             const errMsg = (aiErr as Error).message || ''
             console.warn(`[WORKER] OpenAI falló para seguimiento ${type} de ${userPhone}, usando mensaje predeterminado:`, errMsg.slice(0, 120))
             messageText = fallback
-            // Si es por quota agotada, avisar al dueño (con cooldown de 12h)
-            const isQuotaError = errMsg.includes('insufficient_quota') || errMsg.includes('429')
-            if (isQuotaError && bot.userId) {
+            // Solo avisar si es saldo realmente agotado, NO por rate-limit transitorio.
+            // OpenAI usa 429 para ambos: insufficient_quota = sin saldo, Rate limit = velocidad.
+            const isQuotaExhausted =
+                errMsg.includes('insufficient_quota') ||
+                errMsg.includes('exceeded your current quota') ||
+                errMsg.includes('billing_hard_limit_reached')
+            if (isQuotaExhausted && bot.userId) {
                 notifyCreditsExhausted(bot.userId, bot.name).catch(() => {})
             }
         }
