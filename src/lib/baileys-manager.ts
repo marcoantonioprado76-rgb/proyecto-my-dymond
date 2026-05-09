@@ -45,6 +45,8 @@ declare global {
     var __baileys_connections: Map<string, BaileysConnection> | undefined
     // eslint-disable-next-line no-var
     var __follow_up_worker_started: boolean | undefined
+    // eslint-disable-next-line no-var
+    var __social_scheduler_started: boolean | undefined
 }
 
 const connections: Map<string, BaileysConnection> =
@@ -539,5 +541,19 @@ if (!global.__follow_up_worker_started) {
     global.__follow_up_worker_started = true
     setInterval(() => {
         processFollowUps().catch(() => { })
+    }, 60 * 1000)
+}
+
+// Social scheduler — publica posts programados cada 60s
+if (!global.__social_scheduler_started) {
+    global.__social_scheduler_started = true
+    setInterval(async () => {
+        try {
+            const { processScheduledSocialPosts } = await import('./social/scheduler-worker')
+            const n = await processScheduledSocialPosts()
+            if (n > 0) console.log(`[CRON] social-scheduler: ${n} post(s) publicado(s)`)
+        } catch (err) {
+            console.error('[CRON] social-scheduler error:', err)
+        }
     }, 60 * 1000)
 }
