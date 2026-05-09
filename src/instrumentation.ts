@@ -23,11 +23,25 @@ async function expirePlans() {
     }
 }
 
+async function runSocialScheduler() {
+    try {
+        const { processScheduledSocialPosts } = await import('@/lib/social/scheduler-worker')
+        const n = await processScheduledSocialPosts()
+        if (n > 0) console.log(`[CRON] social-scheduler: ${n} post(s) publicado(s)`)
+    } catch (err) {
+        console.error('[CRON] social-scheduler error:', err)
+    }
+}
+
 export async function register() {
     if (process.env.NEXT_RUNTIME === 'nodejs') {
         // ── Cron: expirar planes vencidos cada hora ──────────────────────────
         expirePlans() // ejecutar al iniciar también
         setInterval(expirePlans, 60 * 60 * 1000)
+
+        // ── Cron: publicar posts programados cada 60s ────────────────────────
+        runSocialScheduler()
+        setInterval(runSocialScheduler, 60 * 1000)
 
         // ── Reconectar bots Baileys en background (no bloquea el arranque) ──
         setTimeout(async () => {
