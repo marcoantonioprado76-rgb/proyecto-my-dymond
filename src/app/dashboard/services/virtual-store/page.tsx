@@ -246,7 +246,12 @@ export default function VirtualStorePage() {
     const convertStoreType = async (store: StoreRecord) => {
         const newType = store.type === 'NETWORK_MARKETING' ? 'GENERAL_BUSINESS' : 'NETWORK_MARKETING'
         const label = newType === 'GENERAL_BUSINESS' ? 'Mi Negocio (General)' : 'Network Marketing (PV)'
-        if (!confirm(`¿Crear una copia de "${store.name}" como ${label}? La tienda original no se modificará.`)) return
+        if (!confirm(
+            `¿Crear una copia de "${store.name}" como ${label}?\n\n` +
+            `• La tienda original NO se modificará.\n` +
+            `• La copia se creará como BORRADOR (inactiva).\n` +
+            `• Tendrás que activarla manualmente desde el panel cuando esté lista para publicar.`
+        )) return
         try {
             const res = await fetch(`/api/stores/${store.id}/clone`, {
                 method: 'POST',
