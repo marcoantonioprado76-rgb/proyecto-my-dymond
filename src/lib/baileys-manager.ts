@@ -22,6 +22,7 @@ import { toDataURL } from 'qrcode'
 import { processFollowUps } from './follow-up-worker'
 import { buildSystemPrompt, detectIdentifiedProduct, enforceCharLimits } from './bot-engine'
 import { createNotification } from './notifications'
+import { sendBotSaleReportEmail } from './email'
 import { notifyCreditsExhausted } from './notify-credits'
 
 // ── Types ──────────────────────────────────────────────────────────────────────
@@ -283,7 +284,7 @@ async function handleMessage(
 
     const bot = await prisma.bot.findUnique({
         where: { id: conn.botId },
-        include: { user: { select: { id: true } } },
+        include: { user: { select: { id: true, email: true, fullName: true } } },
     })
     if (!bot) return
 
@@ -356,24 +357,34 @@ async function handleMessage(
     if (response.mensaje3) await sendMsg(response.mensaje3)
 
     if (response.reporte && conn.reportPhone) {
-        const reportJid = `${conn.reportPhone.replace(/^\+/, '')}@s.whatsapp.net`
-        if (reportJid) await sock.sendMessage(reportJid, { text: response.reporte }).catch(() => { })
-
-        // Marcar como sold para pausar el bot
+        // Persistir SIEMPRE el reporte en BD aunque falle el envío por WhatsApp.
         await prisma.conversation.update({
             where: { id: conversationId },
-            data: { sold: true, soldAt: new Date() }
+            data: { sold: true, soldAt: new Date(), orderReport: response.reporte }
         }).catch(() => { })
+
+        const reportJid = `${conn.reportPhone.replace(/^\+/, '')}@s.whatsapp.net`
+        const sendOk = await sock.sendMessage(reportJid, { text: response.reporte })
+            .then(() => true)
+            .catch((e: any) => { console.error('[BAILEYS] sendReport ERROR:', e?.message); return false })
 
         // Notificación push al dueño del bot
         createNotification(
             bot.user.id,
-            `🤖 Nueva venta — ${bot.name}`,
+            sendOk ? `🤖 Nueva venta — ${bot.name}` : `🤖 Nueva venta — ${bot.name} (reporte WhatsApp no entregado)`,
             response.reporte.slice(0, 120),
             '/dashboard/services/whatsapp',
         ).catch(() => {})
 
-        console.log(`[BAILEYS] Conversación ${conversationId} finalizada (Reporte generado)`)
+        // Email al dueño con el reporte completo
+        sendBotSaleReportEmail(
+            bot.user.email,
+            bot.user.fullName,
+            bot.name,
+            response.reporte,
+        ).catch(() => {})
+
+        console.log(`[BAILEYS] Conversación ${conversationId} finalizada (Reporte ${sendOk ? 'enviado' : 'NO enviado'})`)
 
         // Etiquetar
         try {

@@ -14,6 +14,7 @@ import { transcribeAudio, analyzeImage, chat, ChatMessage } from './openai'
 import { sendMetaText, sendMetaImage, sendMetaVideo, markMetaAsRead } from './meta'
 import { buildSystemPrompt, detectIdentifiedProduct, enforceCharLimits, extractSentUrls } from './bot-engine'
 import { createNotification } from './notifications'
+import { sendBotSaleReportEmail } from './email'
 import { notifyCreditsExhausted } from './notify-credits'
 
 const BUFFER_DELAY_MS = 15_000
@@ -74,7 +75,7 @@ export class MetaBotEngine {
     // 1. Load bot + secret + owner
     const bot = await prisma.bot.findUnique({
       where: { id: botId },
-      include: { secret: true, user: { select: { id: true } } },
+      include: { secret: true, user: { select: { id: true, email: true, fullName: true } } },
     })
     if (!bot || bot.status !== 'ACTIVE' || !bot.secret) {
       console.warn(`[META] Bot ${botId} no activo o sin credenciales`)
@@ -363,9 +364,10 @@ export class MetaBotEngine {
 
     // 16. Handle sale report
     if (response.reporte) {
+      // Persistir SIEMPRE el reporte en BD para que el dueño pueda verlo.
       await prisma.conversation.update({
         where: { id: conversationId },
-        data: { sold: true, soldAt: new Date() },
+        data: { sold: true, soldAt: new Date(), orderReport: response.reporte },
       }).catch(() => {})
 
       // In-app notification + Web Push to bot owner
@@ -374,6 +376,14 @@ export class MetaBotEngine {
         `🤖 Nueva venta — ${bot.name} (Messenger)`,
         response.reporte.slice(0, 120),
         '/dashboard/services/whatsapp',
+      ).catch(() => {})
+
+      // Email al dueño con el reporte completo
+      sendBotSaleReportEmail(
+        bot.user.email,
+        bot.user.fullName,
+        bot.name,
+        response.reporte,
       ).catch(() => {})
 
       console.log(`[META] Conversación ${conversationId} finalizada — venta confirmada para ${senderId}`)

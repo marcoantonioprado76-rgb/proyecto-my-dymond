@@ -17,6 +17,7 @@ import { decrypt } from './crypto'
 import { transcribeAudio, analyzeImage, chat, ChatMessage } from './openai'
 import { markAsRead, sendText, sendImage, sendVideo } from './ycloud'
 import { createNotification } from './notifications'
+import { sendBotSaleReportEmail } from './email'
 
 /** Tiempo de espera del buffer en milisegundos (15 segundos). */
 const BUFFER_DELAY_MS = 15_000
@@ -642,7 +643,7 @@ export class BotEngine {
     // 1. Cargar bot con credenciales y dueño
     const bot = await prisma.bot.findUnique({
       where: { id: botId },
-      include: { secret: true, user: { select: { id: true } } },
+      include: { secret: true, user: { select: { id: true, email: true, fullName: true } } },
     })
 
     if (!bot || bot.status !== 'ACTIVE' || !bot.secret) {
@@ -975,25 +976,35 @@ export class BotEngine {
     }
 
     if (response.reporte && reportPhone) {
-      await sendText(from, reportPhone.replace(/^\+/, ''), response.reporte, apiKey).catch(e =>
-        console.error('[BOT] sendReport ERROR:', e.message),
-      )
-
-      // Marcar como sold para que el bot no siga respondiendo
+      // Persistir SIEMPRE el reporte en BD aunque falle el envío por WhatsApp.
+      // Así el dueño puede verlo desde el dashboard si YCloud rechazó por
+      // ventana 24h, rate-limit, etc.
       await prisma.conversation.update({
         where: { id: conversationId },
-        data: { sold: true, soldAt: new Date() }
+        data: { sold: true, soldAt: new Date(), orderReport: response.reporte }
       }).catch(() => { })
+
+      const sendOk = await sendText(from, reportPhone.replace(/^\+/, ''), response.reporte, apiKey)
+        .then(() => true)
+        .catch(e => { console.error('[BOT] sendReport ERROR:', e?.message); return false })
 
       // Notificación push + campana al dueño del bot
       createNotification(
         bot.user.id,
-        `🤖 Nueva venta — ${bot.name}`,
+        sendOk ? `🤖 Nueva venta — ${bot.name}` : `🤖 Nueva venta — ${bot.name} (reporte WhatsApp no entregado)`,
         response.reporte.slice(0, 120),
         '/dashboard/services/whatsapp',
       ).catch(() => {})
 
-      console.log(`[BOT] Conversación ${conversationId} finalizada (Reporte generado para ${userPhone})`)
+      // Email al dueño del bot con el reporte completo
+      sendBotSaleReportEmail(
+        bot.user.email,
+        bot.user.fullName,
+        bot.name,
+        response.reporte,
+      ).catch(() => {})
+
+      console.log(`[BOT] Conversación ${conversationId} finalizada (Reporte ${sendOk ? 'enviado' : 'NO enviado'} para ${userPhone})`)
     } else {
       // Si NO es sold, programar seguimientos automáticos
       const now = new Date()
