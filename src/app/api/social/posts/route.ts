@@ -87,7 +87,16 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: 'Redes sociales inválidas' }, { status: 400 })
         }
 
-        const schedDate = scheduledAt ? new Date(scheduledAt) : null
+        // Parsear y validar fecha: si el cliente manda un string inválido,
+        // new Date() retorna un "Invalid Date" truthy que crashea Prisma más abajo.
+        let schedDate: Date | null = null
+        if (scheduledAt) {
+            const parsed = new Date(scheduledAt)
+            if (isNaN(parsed.getTime())) {
+                return NextResponse.json({ error: 'Fecha de programación inválida' }, { status: 400 })
+            }
+            schedDate = parsed
+        }
         if (schedDate && schedDate <= new Date()) {
             return NextResponse.json({ error: 'La fecha de programación debe ser en el futuro' }, { status: 400 })
         }
