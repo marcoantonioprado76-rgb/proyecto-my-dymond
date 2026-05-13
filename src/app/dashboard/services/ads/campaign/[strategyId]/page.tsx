@@ -327,6 +327,14 @@ function CampaignPageInner() {
 
     async function handleFileUpload(slotIndex: number, file: File) {
         if (!campaign) return
+        // Validación de tamaño antes de subir (evita upload colgado)
+        const isVideo = file.type.startsWith('video')
+        const maxMB = isVideo ? 100 : 10
+        if (file.size > maxMB * 1024 * 1024) {
+            const sizeMB = (file.size / (1024 * 1024)).toFixed(1)
+            setError(`El ${isVideo ? 'video' : 'archivo'} pesa ${sizeMB} MB y supera el límite de ${maxMB} MB. Comprímelo o usa uno más liviano.`)
+            return
+        }
         const blobUrl = URL.createObjectURL(file)
         setCreatives(prev => prev.map(c =>
             c.slotIndex === slotIndex ? { ...c, mediaUrl: blobUrl, mediaType: file.type.startsWith('video') ? 'video' : 'image', uploading: true } : c

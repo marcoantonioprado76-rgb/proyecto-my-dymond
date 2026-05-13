@@ -1,10 +1,13 @@
 export const dynamic = 'force-dynamic'
+export const maxDuration = 300 // 5 min para uploads pesados (videos)
 import { NextResponse } from 'next/server'
 import { getAuthUser } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { supabaseAdmin } from '@/lib/supabase'
 
 const BUCKET = 'ad-creatives'
+const MAX_IMAGE_SIZE = 10 * 1024 * 1024  // 10 MB
+const MAX_VIDEO_SIZE = 100 * 1024 * 1024 // 100 MB
 
 export async function POST(
     req: Request,
@@ -28,6 +31,17 @@ export async function POST(
         const creativeId = formData.get('creativeId') as string | null
 
         if (!file) return NextResponse.json({ error: 'No se recibió archivo' }, { status: 400 })
+
+        // Validar tamaño antes de leer en memoria
+        const isVideo = file.type.startsWith('video')
+        const maxSize = isVideo ? MAX_VIDEO_SIZE : MAX_IMAGE_SIZE
+        if (file.size > maxSize) {
+            const limitMB = Math.floor(maxSize / (1024 * 1024))
+            const sizeMB = (file.size / (1024 * 1024)).toFixed(1)
+            return NextResponse.json({
+                error: `El ${isVideo ? 'video' : 'archivo'} pesa ${sizeMB} MB y supera el límite de ${limitMB} MB. Comprímelo o usa un archivo más liviano.`
+            }, { status: 413 })
+        }
 
         // Validate Supabase config
         if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
