@@ -173,6 +173,15 @@ export default function Navbar() {
             </Link>
           )
         })}
+        <button
+          onClick={logout}
+          className="bnav__item"
+          style={{ color: 'rgba(255,100,100,0.85)', cursor: 'pointer' }}
+          aria-label="Cerrar sesión"
+        >
+          <i className="fa-solid fa-right-from-bracket"></i>
+          Salir
+        </button>
       </nav>
     </>
   )
