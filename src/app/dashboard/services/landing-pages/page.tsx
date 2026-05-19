@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Layout, Plus, ExternalLink, Edit3, Trash2, Users, Loader2, Eye, Sparkles } from 'lucide-react'
+import { Layout, Plus, ExternalLink, Edit3, Trash2, Users, Loader2, Sparkles } from 'lucide-react'
 import Link from 'next/link'
 import { usePlanGuard } from '@/hooks/usePlanGuard'
 
@@ -296,13 +296,7 @@ export default function LandingPagesPage() {
                                     {/* métricas compactas */}
                                     <div className="flex items-center gap-3 mb-4">
                                         <div className="flex items-center gap-1.5 text-[11px]" style={{ color: 'rgba(255,255,255,0.65)' }}>
-                                            <Eye className="w-3.5 h-3.5" style={{ color: p.accent }} />
-                                            <span className="font-bold text-white">0</span>
-                                            <span style={{ color: 'rgba(255,255,255,0.35)' }}>vistas</span>
-                                        </div>
-                                        <span className="w-px h-3" style={{ background: 'rgba(255,255,255,0.1)' }} />
-                                        <div className="flex items-center gap-1.5 text-[11px]" style={{ color: 'rgba(255,255,255,0.65)' }}>
-                                            <Users className="w-3.5 h-3.5" style={{ color: p.accent, opacity: 0.8 }} />
+                                            <Users className="w-3.5 h-3.5" style={{ color: p.accent }} />
                                             <span className="font-bold text-white">{page._count.leads}</span>
                                             <span style={{ color: 'rgba(255,255,255,0.35)' }}>leads</span>
                                         </div>
