@@ -191,6 +191,14 @@ export default function DashboardPage() {
                     display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 5,
                   }}
                 >
+                  {/* figura gigante del servicio integrada en el fondo (recortada a la card) */}
+                  <div style={{ position: 'absolute', inset: 0, borderRadius: 18, overflow: 'hidden', pointerEvents: 'none' }}>
+                    <i className={s.icon} style={{
+                      position: 'absolute', right: -10, bottom: -16, fontSize: 92,
+                      color: s.accent, opacity: 0.07, filter: 'blur(1.2px)',
+                      transform: 'rotate(-8deg)',
+                    }} />
+                  </div>
                   {/* reflejo glass diagonal tenue */}
                   <div style={{ position: 'absolute', inset: 0, borderRadius: 18, background: 'linear-gradient(152deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0) 36%)', pointerEvents: 'none' }} />
                   {/* línea de reflejo superior */}
@@ -354,6 +362,14 @@ export default function DashboardPage() {
                       el.style.background = `radial-gradient(120% 72% at 50% -4%, ${s.accent}24, rgba(255,255,255,0) 58%), linear-gradient(180deg, rgba(17,19,40,0.78) 0%, rgba(10,11,24,0.66) 52%, rgba(14,16,34,0.55) 100%)`
                     }}
                   >
+                    {/* figura gigante del servicio integrada en el fondo (recortada a la card) */}
+                    <div style={{ position: 'absolute', inset: 0, borderRadius: 20, overflow: 'hidden', pointerEvents: 'none' }}>
+                      <i className={s.icon} style={{
+                        position: 'absolute', right: -14, bottom: -22, fontSize: 132,
+                        color: s.accent, opacity: 0.07, filter: 'blur(1.5px)',
+                        transform: 'rotate(-8deg)',
+                      }} />
+                    </div>
                     {/* reflejo glass diagonal tenue */}
                     <div style={{ position: 'absolute', inset: 0, borderRadius: 20, background: 'linear-gradient(152deg, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0) 36%)', pointerEvents: 'none' }} />
                     {/* línea de reflejo superior */}
