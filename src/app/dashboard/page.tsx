@@ -178,14 +178,14 @@ export default function DashboardPage() {
             Activa tu sistema de automatización.
           </p>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', columnGap: 14, rowGap: 32 }}>
-            {SERVICES.filter(s => !s.hidden).map(s => (
+            {SERVICES.filter(s => !s.hidden).map((s, i) => (
               <Link key={s.href} href={s.href} style={{ textDecoration: 'none', display: 'block' }}>
                 <div
                   className="svc-card"
                   style={{
                     position: 'relative', borderRadius: 18,
-                    padding: '36px 14px 16px',
-                    background: `radial-gradient(120% 80% at 50% 0%, ${s.accent}14, rgba(255,255,255,0) 60%), rgba(255,255,255,0.025)`,
+                    padding: '36px 14px 18px',
+                    background: `radial-gradient(120% 80% at 50% 0%, ${s.accent}14, rgba(255,255,255,0) 60%), linear-gradient(180deg, rgba(13,16,34,0.55), rgba(255,255,255,0.025))`,
                     border: '1px solid rgba(255,255,255,0.08)',
                     boxShadow: '0 12px 26px -16px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.04)',
                     display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 5,
@@ -193,10 +193,12 @@ export default function DashboardPage() {
                 >
                   {/* línea de reflejo superior */}
                   <div style={{ position: 'absolute', top: 0, left: 14, right: 14, height: 1, background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.09), transparent)', pointerEvents: 'none' }} />
+                  {/* figura geométrica flotante (rombo sutil) */}
+                  <div className="svc-shape" style={{ position: 'absolute', top: 16, right: 12, width: 30, height: 30, borderRadius: 7, border: `1px solid ${s.accent}24`, transform: 'rotate(45deg)', pointerEvents: 'none', opacity: 0.5 }} />
                   {/* iluminación ambiental detrás del icono */}
-                  <div style={{ position: 'absolute', top: -12, left: '50%', transform: 'translateX(-50%)', width: 78, height: 50, borderRadius: '50%', background: `radial-gradient(ellipse, ${s.accent}26, transparent 70%)`, filter: 'blur(7px)', pointerEvents: 'none' }} />
+                  <div className="svc-glow-pulse" style={{ position: 'absolute', top: -12, left: '50%', transform: 'translateX(-50%)', width: 78, height: 50, borderRadius: '50%', background: `radial-gradient(ellipse, ${s.accent}26, transparent 70%)`, filter: 'blur(7px)', pointerEvents: 'none' }} />
                   {/* icono sobresaliendo desde arriba */}
-                  <div style={{
+                  <div className="svc-float" style={{
                     position: 'absolute', top: -20, left: '50%', transform: 'translateX(-50%)',
                     width: 44, height: 44, borderRadius: 14,
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -208,8 +210,20 @@ export default function DashboardPage() {
                   }}>
                     <i className={s.icon} style={{ filter: `drop-shadow(0 0 5px ${s.accent}40)` }} />
                   </div>
-                  <p style={{ fontSize: 12.5, fontWeight: 600, color: '#fff', margin: 0, lineHeight: 1.2, textAlign: 'center', letterSpacing: '-0.015em' }}>{s.label}</p>
-                  <p style={{ fontSize: 9.5, color: 'rgba(255,255,255,0.38)', margin: 0, lineHeight: 1.3, textAlign: 'center', letterSpacing: '0.02em' }}>{s.desc}</p>
+                  <p style={{ fontSize: 13, fontWeight: 700, color: '#fff', margin: 0, lineHeight: 1.18, textAlign: 'center', letterSpacing: '-0.02em' }}>{s.label}</p>
+                  <p style={{ fontSize: 9.5, fontWeight: 300, color: 'rgba(255,255,255,0.36)', margin: 0, lineHeight: 1.3, textAlign: 'center', letterSpacing: '0.03em' }}>{s.desc}</p>
+                  {/* wave glow inferior, fina a gruesa */}
+                  <svg width="100%" height="18" viewBox="0 0 200 18" preserveAspectRatio="none" className="svc-wave"
+                    style={{ position: 'absolute', bottom: 0, left: 0, right: 0, pointerEvents: 'none' }}>
+                    <defs>
+                      <linearGradient id={`svcw-m-${i}`} x1="0" y1="0" x2="1" y2="0">
+                        <stop offset="0" stopColor={s.accent} stopOpacity="0" />
+                        <stop offset="0.55" stopColor={s.accent} stopOpacity="0.5" />
+                        <stop offset="1" stopColor={s.accent} stopOpacity="0" />
+                      </linearGradient>
+                    </defs>
+                    <path d="M0 11 Q 100 2 200 13 L 200 15 Q 100 6 0 15 Z" fill={`url(#svcw-m-${i})`} />
+                  </svg>
                 </div>
               </Link>
             ))}
@@ -308,13 +322,13 @@ export default function DashboardPage() {
               Activa tu sistema de automatización.
             </p>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', columnGap: 18, rowGap: 44 }}>
-              {SERVICES.filter(s => !s.hidden).map(s => (
+              {SERVICES.filter(s => !s.hidden).map((s, i) => (
                 <Link key={s.href} href={s.href} style={{ textDecoration: 'none', display: 'block' }}>
                   <div
                     style={{
                       position: 'relative', borderRadius: 20,
-                      padding: '44px 20px 22px',
-                      background: `radial-gradient(115% 78% at 50% 0%, ${s.accent}14, rgba(255,255,255,0) 60%), rgba(255,255,255,0.022)`,
+                      padding: '44px 20px 24px',
+                      background: `radial-gradient(115% 78% at 50% 0%, ${s.accent}14, rgba(255,255,255,0) 60%), linear-gradient(180deg, rgba(13,16,34,0.55), rgba(255,255,255,0.022))`,
                       border: '1px solid rgba(255,255,255,0.08)',
                       boxShadow: '0 16px 36px -18px rgba(0,0,0,0.65), inset 0 1px 0 rgba(255,255,255,0.045)',
                       display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 7,
@@ -326,22 +340,24 @@ export default function DashboardPage() {
                       el.style.transform = 'translateY(-4px)'
                       el.style.borderColor = `${s.accent}4d`
                       el.style.boxShadow = `0 22px 46px -18px rgba(0,0,0,0.7), 0 0 24px -6px ${s.accent}33, inset 0 1px 0 rgba(255,255,255,0.07)`
-                      el.style.background = `radial-gradient(115% 78% at 50% 0%, ${s.accent}1f, rgba(255,255,255,0) 62%), rgba(255,255,255,0.035)`
+                      el.style.background = `radial-gradient(115% 78% at 50% 0%, ${s.accent}1f, rgba(255,255,255,0) 62%), linear-gradient(180deg, rgba(13,16,34,0.6), rgba(255,255,255,0.035))`
                     }}
                     onMouseLeave={e => {
                       const el = e.currentTarget as HTMLElement
                       el.style.transform = 'translateY(0)'
                       el.style.borderColor = 'rgba(255,255,255,0.08)'
                       el.style.boxShadow = '0 16px 36px -18px rgba(0,0,0,0.65), inset 0 1px 0 rgba(255,255,255,0.045)'
-                      el.style.background = `radial-gradient(115% 78% at 50% 0%, ${s.accent}14, rgba(255,255,255,0) 60%), rgba(255,255,255,0.022)`
+                      el.style.background = `radial-gradient(115% 78% at 50% 0%, ${s.accent}14, rgba(255,255,255,0) 60%), linear-gradient(180deg, rgba(13,16,34,0.55), rgba(255,255,255,0.022))`
                     }}
                   >
                     {/* línea de reflejo superior */}
                     <div style={{ position: 'absolute', top: 0, left: 16, right: 16, height: 1, background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.10), transparent)', pointerEvents: 'none' }} />
+                    {/* figura geométrica flotante (rombo sutil) */}
+                    <div className="svc-shape" style={{ position: 'absolute', top: 20, right: 16, width: 40, height: 40, borderRadius: 9, border: `1px solid ${s.accent}26`, transform: 'rotate(45deg)', pointerEvents: 'none', opacity: 0.5 }} />
                     {/* iluminación ambiental detrás del icono */}
-                    <div style={{ position: 'absolute', top: -14, left: '50%', transform: 'translateX(-50%)', width: 96, height: 60, borderRadius: '50%', background: `radial-gradient(ellipse, ${s.accent}26, transparent 70%)`, filter: 'blur(8px)', pointerEvents: 'none' }} />
+                    <div className="svc-glow-pulse" style={{ position: 'absolute', top: -14, left: '50%', transform: 'translateX(-50%)', width: 96, height: 60, borderRadius: '50%', background: `radial-gradient(ellipse, ${s.accent}26, transparent 70%)`, filter: 'blur(8px)', pointerEvents: 'none' }} />
                     {/* icono premium sobresaliendo desde arriba */}
-                    <div style={{
+                    <div className="svc-float" style={{
                       position: 'absolute', top: -26, left: '50%', transform: 'translateX(-50%)',
                       width: 56, height: 56, borderRadius: 18,
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -353,8 +369,20 @@ export default function DashboardPage() {
                     }}>
                       <i className={s.icon} style={{ filter: `drop-shadow(0 0 6px ${s.accent}40)` }} />
                     </div>
-                    <p style={{ fontSize: 14.5, fontWeight: 600, color: '#fff', margin: 0, lineHeight: 1.25, textAlign: 'center', letterSpacing: '-0.015em' }}>{s.label}</p>
-                    <p style={{ fontSize: 10.5, color: 'rgba(255,255,255,0.36)', margin: 0, lineHeight: 1.4, textAlign: 'center', letterSpacing: '0.02em' }}>{s.desc}</p>
+                    <p style={{ fontSize: 15, fontWeight: 700, color: '#fff', margin: 0, lineHeight: 1.22, textAlign: 'center', letterSpacing: '-0.02em' }}>{s.label}</p>
+                    <p style={{ fontSize: 10.5, fontWeight: 300, color: 'rgba(255,255,255,0.34)', margin: 0, lineHeight: 1.4, textAlign: 'center', letterSpacing: '0.03em' }}>{s.desc}</p>
+                    {/* wave glow inferior, fina a gruesa */}
+                    <svg width="100%" height="22" viewBox="0 0 200 22" preserveAspectRatio="none" className="svc-wave"
+                      style={{ position: 'absolute', bottom: 0, left: 0, right: 0, pointerEvents: 'none' }}>
+                      <defs>
+                        <linearGradient id={`svcw-d-${i}`} x1="0" y1="0" x2="1" y2="0">
+                          <stop offset="0" stopColor={s.accent} stopOpacity="0" />
+                          <stop offset="0.55" stopColor={s.accent} stopOpacity="0.55" />
+                          <stop offset="1" stopColor={s.accent} stopOpacity="0" />
+                        </linearGradient>
+                      </defs>
+                      <path d="M0 14 Q 100 2 200 16 L 200 19 Q 100 8 0 18 Z" fill={`url(#svcw-d-${i})`} />
+                    </svg>
                   </div>
                 </Link>
               ))}
