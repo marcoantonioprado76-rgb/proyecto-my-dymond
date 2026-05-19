@@ -196,41 +196,45 @@ export default function ServicesPage() {
 
               return (
                 <div key={service.id}
-                  className={`relative rounded-3xl overflow-hidden transition-all duration-500 group ${unlocked ? 'hover:-translate-y-2' : 'opacity-60'}`}
+                  className={`relative rounded-3xl overflow-hidden transition-all duration-500 group ${unlocked ? 'hover:-translate-y-1.5' : 'opacity-55'}`}
                   style={{
-                    background: unlocked ? 'linear-gradient(135deg, rgba(154, 203, 255, 0.12) 0%, rgba(255, 125, 224, 0.12) 50%, rgba(162, 102, 255, 0.12) 100%)' : '#2B2644',
-                    backdropFilter: unlocked ? 'blur(16px)' : 'none',
-                    WebkitBackdropFilter: unlocked ? 'blur(16px)' : 'none',
-                    border: `1px solid ${unlocked ? 'rgba(255,255,255,0.15)' : 'rgba(255,255,255,0.05)'}`,
-                    boxShadow: unlocked ? `0 8px 32px rgba(0,0,0,0.35), 0 0 0 0 ${service.from}00` : 'none',
+                    background: unlocked
+                      ? `radial-gradient(120% 72% at 50% -8%, ${service.from}1f, rgba(255,255,255,0) 58%), linear-gradient(180deg, rgba(17,19,40,0.85) 0%, rgba(10,11,24,0.8) 54%, rgba(14,16,34,0.74) 100%)`
+                      : 'linear-gradient(180deg, rgba(22,22,34,0.85), rgba(14,14,24,0.85))',
+                    border: `1px solid ${unlocked ? 'rgba(255,255,255,0.10)' : 'rgba(255,255,255,0.05)'}`,
+                    boxShadow: unlocked ? '0 26px 54px -24px rgba(0,0,0,0.82), inset 0 1px 0 rgba(255,255,255,0.05)' : 'none',
                   }}
                   onMouseEnter={e => {
                     if (!unlocked) return
-                    e.currentTarget.style.boxShadow = `inset 0 0 16px rgba(255,255,255,0.5), 0 20px 60px rgba(0,0,0,0.5), 0 0 40px rgba(255, 125, 224, 0.3)`
-                    e.currentTarget.style.borderColor = `rgba(255,255,255,0.7)`
+                    e.currentTarget.style.boxShadow = `0 34px 64px -24px rgba(0,0,0,0.88), 0 0 30px -8px ${service.from}40, inset 0 1px 0 rgba(255,255,255,0.08)`
+                    e.currentTarget.style.borderColor = `${service.from}55`
                   }}
                   onMouseLeave={e => {
                     if (!unlocked) return
-                    e.currentTarget.style.boxShadow = `inset 0 0 10px rgba(255,255,255,0.3), 0 8px 32px rgba(0,0,0,0.35)`
-                    e.currentTarget.style.borderColor = `rgba(255,255,255,0.4)`
+                    e.currentTarget.style.boxShadow = '0 26px 54px -24px rgba(0,0,0,0.82), inset 0 1px 0 rgba(255,255,255,0.05)'
+                    e.currentTarget.style.borderColor = 'rgba(255,255,255,0.10)'
                   }}>
 
-                  {/* Neon top bar */}
-                  <div className="absolute top-0 left-0 right-0 h-[2px] transition-opacity duration-500"
+                  {/* Figura gigante del servicio integrada en el fondo */}
+                  <service.icon className="absolute -bottom-6 -right-5 pointer-events-none select-none"
+                    style={{ width: 168, height: 168, color: service.from, opacity: unlocked ? 0.06 : 0.03, filter: 'blur(1.5px)', transform: 'rotate(-8deg)' }} />
+
+                  {/* Reflejo glass diagonal tenue */}
+                  <div className="absolute inset-0 pointer-events-none"
+                    style={{ background: 'linear-gradient(152deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0) 36%)' }} />
+
+                  {/* Línea de reflejo superior premium */}
+                  <div className="absolute top-0 left-5 right-5 h-px transition-opacity duration-500 pointer-events-none"
                     style={{
-                      background: `linear-gradient(90deg, transparent, ${service.from}, ${service.to}, transparent)`,
-                      opacity: unlocked ? 1 : 0.2,
+                      background: `linear-gradient(90deg, transparent, ${unlocked ? service.from + 'aa' : 'rgba(255,255,255,0.12)'}, transparent)`,
+                      opacity: unlocked ? 1 : 0.4,
                     }} />
 
-                  {/* Background number watermark */}
-                  <div className="absolute -bottom-3 -right-2 font-black select-none pointer-events-none leading-none"
-                    style={{ fontSize: 96, color: service.from + '07' }}>
-                    {service.id}
-                  </div>
-
-                  {/* Glow orb on hover */}
-                  <div className="absolute top-0 left-0 w-48 h-48 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-20 transition-opacity duration-700 pointer-events-none"
-                    style={{ background: service.from }} />
+                  {/* Halo ambiental cinematográfico */}
+                  {unlocked && (
+                    <div className="svc-glow-pulse absolute -top-10 left-1/2 -translate-x-1/2 rounded-full pointer-events-none"
+                      style={{ width: 200, height: 110, background: `radial-gradient(ellipse, ${service.from}33, transparent 72%)`, filter: 'blur(22px)' }} />
+                  )}
 
                   <div className="relative z-10 p-6 flex flex-col h-full">
 
@@ -240,54 +244,54 @@ export default function ServicesPage() {
                         <div className="w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-300"
                           style={{
                             background: unlocked
-                              ? `linear-gradient(135deg, ${service.from}22, ${service.to}12)`
+                              ? `linear-gradient(155deg, rgba(255,255,255,0.12), rgba(255,255,255,0.02)), rgba(18,15,32,0.7)`
                               : 'rgba(255,255,255,0.04)',
-                            border: `1.5px solid ${unlocked ? service.from + '40' : 'rgba(255,255,255,0.08)'}`,
-                            boxShadow: unlocked ? `0 0 20px ${service.from}18` : 'none',
+                            border: `1px solid ${unlocked ? service.from + '55' : 'rgba(255,255,255,0.08)'}`,
+                            boxShadow: unlocked ? `0 14px 30px -10px rgba(0,0,0,0.7), 0 0 16px -2px ${service.from}3a, inset 0 1px 0 rgba(255,255,255,0.12)` : 'none',
                           }}>
                           <service.icon className="w-7 h-7 transition-transform duration-300 group-hover:scale-110"
-                            style={{ color: unlocked ? service.from : 'rgba(255,255,255,0.2)' }} />
+                            style={{ color: unlocked ? service.from : 'rgba(255,255,255,0.2)', filter: unlocked ? `drop-shadow(0 0 7px ${service.from}55)` : 'none' }} />
                         </div>
                         {/* Live dot */}
                         {unlocked && (
-                          <span className="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full border-2 border-[#0D1E79]"
+                          <span className="absolute -top-1 -right-1 w-3 h-3 rounded-full border-2 border-[#0b0c1a] svc-glow-pulse"
                             style={{ background: service.from, boxShadow: `0 0 8px ${service.from}` }} />
                         )}
                       </div>
 
                       {/* Badge */}
-                      <span className="text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full"
+                      <span className="text-[9px] font-bold uppercase tracking-[0.18em] px-3 py-1 rounded-full backdrop-blur-sm"
                         style={
                           isFree
-                            ? { background: 'rgba(210,3,221,0.15)', color: '#FF2DF7', border: '1px solid rgba(210,3,221,0.3)' }
+                            ? { background: 'rgba(210,3,221,0.12)', color: '#FF2DF7', border: '1px solid rgba(210,3,221,0.3)' }
                             : unlocked
-                              ? { background: `${service.from}18`, color: service.from, border: `1px solid ${service.from}35` }
-                              : { background: 'rgba(255,255,255,0.04)', color: 'rgba(255,255,255,0.25)', border: '1px solid rgba(255,255,255,0.08)' }
+                              ? { background: `${service.from}1c`, color: service.from, border: `1px solid ${service.from}45`, boxShadow: `0 0 12px -3px ${service.from}55` }
+                              : { background: 'rgba(255,255,255,0.04)', color: 'rgba(255,255,255,0.28)', border: '1px solid rgba(255,255,255,0.08)' }
                         }>
-                        {isFree ? '✦ GRATIS' : unlocked ? '● ACTIVO' : expired ? 'VENCIDO' : '🔒 BLOQ.'}
+                        {isFree ? '✦ Gratis' : unlocked ? '● Activo' : expired ? 'Vencido' : '🔒 Bloqueado'}
                       </span>
                     </div>
 
                     {/* Title */}
-                    <h3 className="text-base font-black mb-2 leading-tight"
-                      style={{ color: '#fff' }}>
+                    <h3 className="text-base font-bold mb-2 leading-tight"
+                      style={{ color: '#fff', letterSpacing: '-0.02em', textShadow: '0 1px 14px rgba(0,0,0,0.45)' }}>
                       {service.title}
                     </h3>
 
                     {/* Description */}
                     <p className="text-xs leading-relaxed mb-5 flex-1"
-                      style={{ color: unlocked ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.2)' }}>
+                      style={{ color: unlocked ? 'rgba(255,255,255,0.55)' : 'rgba(255,255,255,0.2)', fontWeight: 400, letterSpacing: '0.01em' }}>
                       {service.description}
                     </p>
 
                     {/* Feature pills */}
                     <div className="flex flex-wrap gap-1.5 mb-5">
                       {service.features.map((f, i) => (
-                        <span key={i} className="text-[10px] font-semibold px-2.5 py-1 rounded-full"
+                        <span key={i} className="text-[10px] font-medium px-2.5 py-1 rounded-full"
                           style={{
-                            background: unlocked ? 'rgba(255,255,255,0.15)' : 'rgba(255,255,255,0.03)',
-                            border: `1px solid ${unlocked ? 'rgba(255,255,255,0.3)' : 'rgba(255,255,255,0.06)'}`,
-                            color: unlocked ? '#fff' : 'rgba(255,255,255,0.18)',
+                            background: unlocked ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.03)',
+                            border: `1px solid ${unlocked ? 'rgba(255,255,255,0.10)' : 'rgba(255,255,255,0.06)'}`,
+                            color: unlocked ? 'rgba(255,255,255,0.7)' : 'rgba(255,255,255,0.18)',
                           }}>
                           {f}
                         </span>
@@ -297,22 +301,22 @@ export default function ServicesPage() {
                     {/* CTA */}
                     {unlocked ? (
                       <Link href={service.link}
-                        className="flex items-center justify-center gap-2 w-full py-3 rounded-2xl font-black text-sm text-white transition-all duration-300 group-hover:gap-3"
+                        className="flex items-center justify-center gap-2 w-full py-3 rounded-2xl font-bold text-sm text-white transition-all duration-300 group-hover:gap-3 active:scale-[0.98]"
                         style={{
-                          background: 'rgba(255,255,255,0.2)',
-                          border: '1px solid rgba(255,255,255,0.3)',
-                          boxShadow: `0 4px 24px rgba(0,0,0,0.15)`,
+                          background: `linear-gradient(135deg, ${service.from}2e, ${service.to}24)`,
+                          border: `1px solid ${service.from}4d`,
+                          boxShadow: `0 8px 22px -10px ${service.from}66, inset 0 1px 0 rgba(255,255,255,0.10)`,
                         }}>
                         Abrir Servicio
                         <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
                       </Link>
                     ) : (
                       <button onClick={() => router.push('/dashboard/planes')}
-                        className="flex items-center justify-center gap-2 w-full py-3 rounded-2xl font-black text-sm transition-all duration-300"
+                        className="flex items-center justify-center gap-2 w-full py-3 rounded-2xl font-bold text-sm transition-all duration-300 active:scale-[0.98]"
                         style={{
                           background: 'rgba(210,3,221,0.07)',
                           border: '1px solid rgba(210,3,221,0.2)',
-                          color: 'rgba(210,3,221,0.5)',
+                          color: 'rgba(210,3,221,0.6)',
                         }}
                         onMouseEnter={e => {
                           e.currentTarget.style.background = 'rgba(210,3,221,0.14)'
@@ -322,13 +326,31 @@ export default function ServicesPage() {
                         onMouseLeave={e => {
                           e.currentTarget.style.background = 'rgba(210,3,221,0.07)'
                           e.currentTarget.style.borderColor = 'rgba(210,3,221,0.2)'
-                          e.currentTarget.style.color = 'rgba(210,3,221,0.5)'
+                          e.currentTarget.style.color = 'rgba(210,3,221,0.6)'
                         }}>
                         <Lock className="w-4 h-4" />
                         {expired ? 'Renovar Plan' : 'Ver Planes'}
                       </button>
                     )}
                   </div>
+
+                  {/* Wave glow inferior — energía elegante difuminada */}
+                  {unlocked && (
+                    <svg width="100%" height="30" viewBox="0 0 200 30" preserveAspectRatio="none" className="svc-wave absolute bottom-0 left-0 right-0 pointer-events-none">
+                      <defs>
+                        <linearGradient id={`svcw-srv-${service.id}`} x1="0" y1="0" x2="1" y2="0">
+                          <stop offset="0" stopColor={service.from} stopOpacity="0" />
+                          <stop offset="0.5" stopColor={service.from} stopOpacity="0.75" />
+                          <stop offset="1" stopColor={service.from} stopOpacity="0" />
+                        </linearGradient>
+                        <filter id={`svcwb-srv-${service.id}`} x="-20%" y="-60%" width="140%" height="240%">
+                          <feGaussianBlur stdDeviation="2.2" />
+                        </filter>
+                      </defs>
+                      <path d="M0 18 Q 100 4 200 20 L 200 25 Q 100 10 0 24 Z" fill={`url(#svcw-srv-${service.id})`} opacity="0.5" filter={`url(#svcwb-srv-${service.id})`} />
+                      <path d="M0 19 Q 100 6 200 21" stroke={`url(#svcw-srv-${service.id})`} strokeWidth="1.3" fill="none" strokeLinecap="round" />
+                    </svg>
+                  )}
                 </div>
               )
             })}
