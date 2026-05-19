@@ -166,10 +166,10 @@ function CreateBotForm({ onCreated }: { onCreated: (bot: Bot, webhookUrl: string
 
   return (
     <form onSubmit={handleSubmit} className="rounded-2xl p-4"
-      style={{ background: 'radial-gradient(120% 80% at 50% -10%, rgba(0,229,138,0.10), rgba(255,255,255,0) 58%), linear-gradient(180deg, rgba(17,19,40,0.82), rgba(12,13,26,0.8))', border: '1px solid rgba(255,255,255,0.08)', boxShadow: '0 16px 36px -22px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.04)' }}>
+      style={{ background: 'radial-gradient(120% 80% at 50% -10%, rgba(34,183,255,0.12), rgba(255,255,255,0) 58%), radial-gradient(90% 70% at 100% 110%, rgba(123,91,255,0.12), rgba(255,255,255,0) 60%), linear-gradient(180deg, rgba(16,18,38,0.85), rgba(11,12,26,0.82))', border: '1px solid rgba(255,255,255,0.08)', boxShadow: '0 16px 36px -22px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.04)' }}>
       <div className="flex items-center gap-2 mb-3">
-        <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: 'rgba(0,229,138,0.12)', border: '1px solid rgba(0,229,138,0.3)' }}>
-          <Plus className="w-3.5 h-3.5 text-neon-green" />
+        <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: 'rgba(34,183,255,0.14)', border: '1px solid rgba(34,183,255,0.35)' }}>
+          <Plus className="w-3.5 h-3.5" style={{ color: '#22B7FF' }} />
         </div>
         <h3 className="text-sm font-bold text-white" style={{ letterSpacing: '-0.01em' }}>Crear nuevo agente</h3>
       </div>
@@ -178,7 +178,7 @@ function CreateBotForm({ onCreated }: { onCreated: (bot: Bot, webhookUrl: string
       <div className="grid grid-cols-3 gap-2 mb-3">
         {([
           { t: 'YCLOUD', icon: Webhook, label: 'YCloud', sub: 'WhatsApp API', c: '#38bdf8' },
-          { t: 'BAILEYS', icon: Smartphone, label: 'WA Web', sub: 'Escanear QR', c: '#00E58A' },
+          { t: 'BAILEYS', icon: Smartphone, label: 'WA Web', sub: 'Escanear QR', c: '#22B7FF' },
           { t: 'META', icon: MessageSquare, label: 'Messenger', sub: 'FB / IG', c: '#9B6BFF' },
         ] as const).map(o => {
           const sel = type === o.t
@@ -215,9 +215,9 @@ function CreateBotForm({ onCreated }: { onCreated: (bot: Bot, webhookUrl: string
           disabled={loading || !name.trim()}
           className="w-full sm:w-auto px-5 py-2.5 font-bold rounded-xl text-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition-all duration-200 active:scale-[0.98]"
           style={{
-            background: 'linear-gradient(135deg, #00E58A, #00C2FF)',
-            color: '#06231a',
-            boxShadow: '0 10px 24px -10px rgba(0,229,138,0.6), inset 0 1px 0 rgba(255,255,255,0.25)',
+            background: 'linear-gradient(135deg, #22B7FF, #7B5BFF)',
+            color: '#ffffff',
+            boxShadow: '0 10px 24px -10px rgba(34,183,255,0.6), inset 0 1px 0 rgba(255,255,255,0.25)',
           }}
         >
           {loading ? <Spinner /> : <Plus className="w-4 h-4" />}
@@ -340,7 +340,7 @@ function GlobalBotChart({ bots }: { bots: Bot[] }) {
           </p>
           <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.28)', margin: '4px 0 0' }}>
             <span style={{ color: '#D203DD', fontWeight: 700 }}>{visibleDays.reduce((s, d) => s + d.conversations, 0)}</span> personas ·{' '}
-            <span style={{ color: '#00FF88', fontWeight: 700 }}>{visibleDays.reduce((s, d) => s + d.sales, 0)}</span> ventas
+            <span style={{ color: '#7B5BFF', fontWeight: 700 }}>{visibleDays.reduce((s, d) => s + d.sales, 0)}</span> ventas
           </p>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
@@ -349,7 +349,7 @@ function GlobalBotChart({ bots }: { bots: Bot[] }) {
             ● Personas
           </span>
           <span style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 11, color: 'rgba(255,255,255,0.45)' }}>
-            <span style={{ display: 'inline-block', width: 10, height: 3, borderRadius: 99, background: '#00FF88' }} />
+            <span style={{ display: 'inline-block', width: 10, height: 3, borderRadius: 99, background: '#7B5BFF' }} />
             ✦ Ventas
           </span>
         </div>
@@ -413,14 +413,14 @@ function GlobalBotChart({ bots }: { bots: Bot[] }) {
               <stop offset="0%"   stopColor="#7DD3FC" />
               <stop offset="100%" stopColor="#0D1E79" />
             </linearGradient>
-            {/* Sales — green */}
+            {/* Sales — purple */}
             <linearGradient id="gc-sales-area" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%"   stopColor="#00FF88" stopOpacity="0.20" />
-              <stop offset="100%" stopColor="#00FF88" stopOpacity="0" />
+              <stop offset="0%"   stopColor="#7B5BFF" stopOpacity="0.20" />
+              <stop offset="100%" stopColor="#7B5BFF" stopOpacity="0" />
             </linearGradient>
             <linearGradient id="gc-sales-line" x1="0" y1="0" x2="1" y2="0">
-              <stop offset="0%"   stopColor="#6EE7B7" />
-              <stop offset="100%" stopColor="#00FF88" />
+              <stop offset="0%"   stopColor="#A78BFA" />
+              <stop offset="100%" stopColor="#7B5BFF" />
             </linearGradient>
             <filter id="gc-glow-conv" x="-30%" y="-30%" width="160%" height="160%">
               <feGaussianBlur stdDeviation="2" result="blur"/>
@@ -466,11 +466,11 @@ function GlobalBotChart({ bots }: { bots: Bot[] }) {
             if (p.val === 0) return null
             return (
               <g key={i} filter="url(#gc-dot-glow)">
-                <circle cx={p.x} cy={p.y} r="10" fill="#00FF88" opacity="0.07" />
-                <rect x={p.x - 11} y={p.y - 30} width="22" height="15" rx="5" fill="#00FF88" opacity="0.92" />
-                <text x={p.x} y={p.y - 19} textAnchor="middle" fontSize="8" fontWeight="800" fill="#000">{p.val}</text>
-                <line x1={p.x} y1={p.y - 15} x2={p.x} y2={p.y - 5} stroke="#00FF88" strokeWidth="1" opacity="0.4" />
-                <circle cx={p.x} cy={p.y} r="4" fill="#00FF88" stroke="rgba(0,0,0,0.7)" strokeWidth="1.5" />
+                <circle cx={p.x} cy={p.y} r="10" fill="#7B5BFF" opacity="0.07" />
+                <rect x={p.x - 11} y={p.y - 30} width="22" height="15" rx="5" fill="#7B5BFF" opacity="0.92" />
+                <text x={p.x} y={p.y - 19} textAnchor="middle" fontSize="8" fontWeight="800" fill="#fff">{p.val}</text>
+                <line x1={p.x} y1={p.y - 15} x2={p.x} y2={p.y - 5} stroke="#7B5BFF" strokeWidth="1" opacity="0.4" />
+                <circle cx={p.x} cy={p.y} r="4" fill="#7B5BFF" stroke="rgba(0,0,0,0.7)" strokeWidth="1.5" />
                 <circle cx={p.x} cy={p.y} r="2" fill="#fff" opacity="0.5" />
               </g>
             )
@@ -574,7 +574,7 @@ function GlobalBotChart({ bots }: { bots: Bot[] }) {
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 {recentSales.map((s, i) => (
                   <div key={i} style={{
-                    background: 'rgba(0,255,136,0.03)', border: '1px solid rgba(0,255,136,0.08)',
+                    background: 'rgba(123,91,255,0.04)', border: '1px solid rgba(123,91,255,0.10)',
                     borderRadius: 12, padding: '10px 12px',
                   }}>
                     {/* Nombre + fecha */}
@@ -602,7 +602,7 @@ function GlobalBotChart({ bots }: { bots: Bot[] }) {
                         fontSize: 11, color: 'rgba(255,255,255,0.6)',
                         background: 'rgba(0,0,0,0.25)', borderRadius: 8,
                         padding: '7px 10px', lineHeight: 1.6,
-                        borderLeft: '2px solid rgba(0,255,136,0.3)',
+                        borderLeft: '2px solid rgba(123,91,255,0.3)',
                         whiteSpace: 'pre-wrap', wordBreak: 'break-word',
                       }}>
                         {s.reporte}
@@ -624,7 +624,7 @@ function GlobalBotChart({ bots }: { bots: Bot[] }) {
 
 function BotCard({ bot, onSelect }: { bot: Bot; onSelect: (bot: Bot) => void }) {
   const isActive = bot.status === 'ACTIVE'
-  const accent = isActive ? '#00E58A' : '#7C82A8'
+  const accent = isActive ? '#22B7FF' : '#7C82A8'
   const channel = bot.type === 'YCLOUD' ? 'YCloud' : bot.type === 'BAILEYS' ? 'WhatsApp Web' : 'Messenger'
   const stats = [
     { icon: ShoppingBag, label: 'Productos', value: bot._count?.assignedProducts ?? 0 },
@@ -637,7 +637,7 @@ function BotCard({ bot, onSelect }: { bot: Bot; onSelect: (bot: Bot) => void }) 
       className="relative w-full text-left rounded-xl overflow-hidden group transition-all duration-300 hover:-translate-y-0.5"
       style={{
         background: isActive
-          ? `radial-gradient(115% 80% at 50% -12%, ${accent}1a, rgba(255,255,255,0) 56%), linear-gradient(180deg, rgba(17,19,40,0.9) 0%, rgba(11,12,26,0.86) 100%)`
+          ? `radial-gradient(120% 85% at 50% -12%, ${accent}1f, rgba(255,255,255,0) 56%), radial-gradient(90% 70% at 100% 110%, rgba(123,91,255,0.14), rgba(255,255,255,0) 60%), linear-gradient(180deg, rgba(16,18,38,0.92) 0%, rgba(10,11,26,0.88) 100%)`
           : 'linear-gradient(180deg, rgba(20,20,32,0.85), rgba(14,14,24,0.85))',
         border: `1px solid ${isActive ? 'rgba(255,255,255,0.09)' : 'rgba(255,255,255,0.05)'}`,
         boxShadow: isActive ? '0 16px 34px -20px rgba(0,0,0,0.78), inset 0 1px 0 rgba(255,255,255,0.045)' : 'none',
@@ -676,12 +676,12 @@ function BotCard({ bot, onSelect }: { bot: Bot; onSelect: (bot: Bot) => void }) 
         <div className="svc-glow-pulse absolute -top-6 left-8 rounded-full pointer-events-none" style={{ width: 120, height: 70, background: `radial-gradient(ellipse, ${accent}26, transparent 72%)`, filter: 'blur(18px)' }} />
       )}
 
-      <div className="relative z-10 p-3.5">
+      <div className="relative z-10 p-5">
         {/* header compacto */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3.5">
           <div className="relative shrink-0">
-            <div className="svc-glow-pulse absolute inset-0 rounded-full pointer-events-none" style={{ background: `radial-gradient(circle, ${accent}33, transparent 70%)`, filter: 'blur(6px)' }} />
-            <div className="relative w-11 h-11 rounded-full overflow-hidden flex items-center justify-center"
+            <div className="svc-glow-pulse absolute inset-0 rounded-full pointer-events-none" style={{ background: `radial-gradient(circle, ${accent}3a, transparent 70%)`, filter: 'blur(7px)' }} />
+            <div className="relative w-12 h-12 rounded-full overflow-hidden flex items-center justify-center"
               style={{
                 background: `linear-gradient(155deg, rgba(255,255,255,0.13), rgba(255,255,255,0.02)), rgba(18,15,32,0.7)`,
                 border: `1px solid ${accent}55`,
@@ -725,15 +725,21 @@ function BotCard({ bot, onSelect }: { bot: Bot; onSelect: (bot: Bot) => void }) 
           </div>
         </div>
 
-        {/* mini stats — strip compacto */}
-        <div className="flex items-stretch mt-3 rounded-lg overflow-hidden"
-          style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
+        {/* mini stats — strip compacto con aire */}
+        <div className="flex items-stretch mt-4 rounded-xl overflow-hidden"
+          style={{
+            background: isActive ? `linear-gradient(180deg, ${accent}0f, rgba(255,255,255,0.025))` : 'rgba(255,255,255,0.03)',
+            border: `1px solid ${isActive ? accent + '22' : 'rgba(255,255,255,0.06)'}`,
+            boxShadow: isActive ? `inset 0 0 18px -10px ${accent}55` : 'none',
+          }}>
           {stats.map((st, idx) => (
-            <div key={st.label} className="flex-1 flex items-center justify-center gap-1.5 py-1.5"
+            <div key={st.label} className="flex-1 flex flex-col items-center justify-center gap-1 py-2.5"
               style={idx < stats.length - 1 ? { borderRight: '1px solid rgba(255,255,255,0.06)' } : undefined}>
-              <st.icon className="w-3 h-3 shrink-0" style={{ color: isActive ? accent : 'rgba(255,255,255,0.28)' }} />
-              <span className="text-xs font-bold text-white leading-none" style={{ letterSpacing: '-0.02em' }}>{st.value}</span>
-              <span className="text-[8px] uppercase tracking-[0.08em]" style={{ color: 'rgba(255,255,255,0.3)' }}>{st.label}</span>
+              <div className="flex items-center gap-1.5">
+                <st.icon className="w-3 h-3 shrink-0" style={{ color: isActive ? accent : 'rgba(255,255,255,0.28)' }} />
+                <span className="text-sm font-bold text-white leading-none" style={{ letterSpacing: '-0.02em' }}>{st.value}</span>
+              </div>
+              <span className="text-[8px] uppercase tracking-[0.1em]" style={{ color: 'rgba(255,255,255,0.34)' }}>{st.label}</span>
             </div>
           ))}
         </div>
@@ -3347,12 +3353,12 @@ export default function WhatsAppPage() {
                 <div className="text-xs text-dark-400">Total agentes</div>
               </div>
             </div>
-            <div className="glass-panel p-4 rounded-xl flex items-center gap-3 border border-neon-green/10">
-              <div className="w-10 h-10 rounded-xl bg-neon-green/10 border border-neon-green/20 flex items-center justify-center shrink-0">
-                <Zap className="w-5 h-5 text-neon-green" />
+            <div className="glass-panel p-4 rounded-xl flex items-center gap-3" style={{ border: '1px solid rgba(34,183,255,0.14)' }}>
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style={{ background: 'rgba(34,183,255,0.12)', border: '1px solid rgba(34,183,255,0.28)' }}>
+                <Zap className="w-5 h-5" style={{ color: '#22B7FF' }} />
               </div>
               <div>
-                <div className="text-2xl font-bold text-neon-green">{activeBots}</div>
+                <div className="text-2xl font-bold" style={{ color: '#22B7FF' }}>{activeBots}</div>
                 <div className="text-xs text-dark-400">Activos ahora</div>
               </div>
             </div>
