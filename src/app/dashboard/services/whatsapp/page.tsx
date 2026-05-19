@@ -634,53 +634,58 @@ function BotCard({ bot, onSelect }: { bot: Bot; onSelect: (bot: Bot) => void }) 
   return (
     <button
       onClick={() => onSelect(bot)}
-      className="relative w-full text-left rounded-2xl overflow-hidden group transition-all duration-300 hover:-translate-y-1"
+      className="relative w-full text-left rounded-xl overflow-hidden group transition-all duration-300 hover:-translate-y-0.5"
       style={{
         background: isActive
-          ? `radial-gradient(120% 78% at 50% -10%, ${accent}1c, rgba(255,255,255,0) 58%), linear-gradient(180deg, rgba(17,19,40,0.9) 0%, rgba(10,11,24,0.85) 55%, rgba(14,16,34,0.78) 100%)`
+          ? `radial-gradient(115% 80% at 50% -12%, ${accent}1a, rgba(255,255,255,0) 56%), linear-gradient(180deg, rgba(17,19,40,0.9) 0%, rgba(11,12,26,0.86) 100%)`
           : 'linear-gradient(180deg, rgba(20,20,32,0.85), rgba(14,14,24,0.85))',
-        border: `1px solid ${isActive ? 'rgba(255,255,255,0.10)' : 'rgba(255,255,255,0.05)'}`,
-        boxShadow: isActive ? '0 24px 50px -24px rgba(0,0,0,0.82), inset 0 1px 0 rgba(255,255,255,0.05)' : 'none',
+        border: `1px solid ${isActive ? 'rgba(255,255,255,0.09)' : 'rgba(255,255,255,0.05)'}`,
+        boxShadow: isActive ? '0 16px 34px -20px rgba(0,0,0,0.78), inset 0 1px 0 rgba(255,255,255,0.045)' : 'none',
         opacity: isActive ? 1 : 0.62,
       }}
       onMouseEnter={e => {
         if (!isActive) return
-        e.currentTarget.style.boxShadow = `0 32px 60px -24px rgba(0,0,0,0.88), 0 0 30px -8px ${accent}40, inset 0 1px 0 rgba(255,255,255,0.08)`
-        e.currentTarget.style.borderColor = `${accent}55`
+        e.currentTarget.style.boxShadow = `0 22px 44px -20px rgba(0,0,0,0.85), 0 0 22px -8px ${accent}3a, inset 0 1px 0 rgba(255,255,255,0.07)`
+        e.currentTarget.style.borderColor = `${accent}4d`
       }}
       onMouseLeave={e => {
         if (!isActive) return
-        e.currentTarget.style.boxShadow = '0 24px 50px -24px rgba(0,0,0,0.82), inset 0 1px 0 rgba(255,255,255,0.05)'
-        e.currentTarget.style.borderColor = 'rgba(255,255,255,0.10)'
+        e.currentTarget.style.boxShadow = '0 16px 34px -20px rgba(0,0,0,0.78), inset 0 1px 0 rgba(255,255,255,0.045)'
+        e.currentTarget.style.borderColor = 'rgba(255,255,255,0.09)'
       }}
     >
-      {/* figura IA gigante integrada en el fondo */}
-      <Bot className="absolute -bottom-5 -right-4 pointer-events-none select-none"
-        style={{ width: 132, height: 132, color: accent, opacity: isActive ? 0.06 : 0.03, filter: 'blur(1.5px)', transform: 'rotate(-8deg)' }} />
-      {/* grid tecnológico sutil */}
+      {/* avatar IA gigante integrado como presencia holográfica */}
+      <img
+        src="https://i.ibb.co/gxR9G7X/envato-labs-image-edit-73.png"
+        alt=""
+        aria-hidden
+        className="absolute -bottom-6 -right-5 w-28 h-28 object-cover pointer-events-none select-none"
+        style={{ opacity: isActive ? 0.10 : 0.04, filter: 'blur(2px) saturate(1.1)', maskImage: 'radial-gradient(circle at 60% 60%, #000 40%, transparent 75%)', WebkitMaskImage: 'radial-gradient(circle at 60% 60%, #000 40%, transparent 75%)' }}
+      />
+      {/* grid tecnológico fino */}
       <div className="absolute inset-0 pointer-events-none" style={{
-        backgroundImage: 'linear-gradient(rgba(255,255,255,0.022) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.022) 1px, transparent 1px)',
-        backgroundSize: '34px 34px', maskImage: 'radial-gradient(ellipse at 50% 0%, #000 30%, transparent 75%)', WebkitMaskImage: 'radial-gradient(ellipse at 50% 0%, #000 30%, transparent 75%)',
+        backgroundImage: 'linear-gradient(rgba(255,255,255,0.018) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.018) 1px, transparent 1px)',
+        backgroundSize: '30px 30px', maskImage: 'radial-gradient(ellipse at 50% 0%, #000 25%, transparent 72%)', WebkitMaskImage: 'radial-gradient(ellipse at 50% 0%, #000 25%, transparent 72%)',
       }} />
       {/* reflejo glass diagonal */}
-      <div className="absolute inset-0 pointer-events-none" style={{ background: 'linear-gradient(152deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0) 36%)' }} />
+      <div className="absolute inset-0 pointer-events-none" style={{ background: 'linear-gradient(152deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0) 34%)' }} />
       {/* línea superior premium */}
-      <div className="absolute top-0 left-5 right-5 h-px pointer-events-none" style={{ background: `linear-gradient(90deg, transparent, ${isActive ? accent + 'aa' : 'rgba(255,255,255,0.12)'}, transparent)` }} />
+      <div className="absolute top-0 left-4 right-4 h-px pointer-events-none" style={{ background: `linear-gradient(90deg, transparent, ${isActive ? accent + '99' : 'rgba(255,255,255,0.10)'}, transparent)` }} />
       {/* halo ambiental */}
       {isActive && (
-        <div className="svc-glow-pulse absolute -top-8 left-10 rounded-full pointer-events-none" style={{ width: 150, height: 90, background: `radial-gradient(ellipse, ${accent}2e, transparent 72%)`, filter: 'blur(20px)' }} />
+        <div className="svc-glow-pulse absolute -top-6 left-8 rounded-full pointer-events-none" style={{ width: 120, height: 70, background: `radial-gradient(ellipse, ${accent}26, transparent 72%)`, filter: 'blur(18px)' }} />
       )}
 
-      <div className="relative z-10 p-4 sm:p-5">
-        {/* header: avatar IA + estado/canal + chevron */}
-        <div className="flex items-start gap-3.5">
+      <div className="relative z-10 p-3.5">
+        {/* header compacto */}
+        <div className="flex items-center gap-3">
           <div className="relative shrink-0">
-            <div className="svc-glow-pulse absolute inset-0 rounded-full pointer-events-none" style={{ background: `radial-gradient(circle, ${accent}3a, transparent 70%)`, filter: 'blur(8px)' }} />
-            <div className="relative w-14 h-14 rounded-full overflow-hidden flex items-center justify-center"
+            <div className="svc-glow-pulse absolute inset-0 rounded-full pointer-events-none" style={{ background: `radial-gradient(circle, ${accent}33, transparent 70%)`, filter: 'blur(6px)' }} />
+            <div className="relative w-11 h-11 rounded-full overflow-hidden flex items-center justify-center"
               style={{
                 background: `linear-gradient(155deg, rgba(255,255,255,0.13), rgba(255,255,255,0.02)), rgba(18,15,32,0.7)`,
                 border: `1px solid ${accent}55`,
-                boxShadow: `0 14px 30px -10px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.12)`,
+                boxShadow: `0 10px 22px -8px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.12)`,
               }}>
               <img
                 src="https://i.ibb.co/gxR9G7X/envato-labs-image-edit-73.png"
@@ -690,49 +695,45 @@ function BotCard({ bot, onSelect }: { bot: Bot; onSelect: (bot: Bot) => void }) 
               />
             </div>
             {isActive && (
-              <span className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full border-2 flex items-center justify-center"
-                style={{ background: accent, borderColor: '#0b0c1a', boxShadow: `0 0 8px ${accent}` }}>
-                <Wifi className="w-2 h-2 text-black" />
+              <span className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full border-2 flex items-center justify-center"
+                style={{ background: accent, borderColor: '#0b0c1a', boxShadow: `0 0 7px ${accent}` }}>
+                <Wifi className="w-1.5 h-1.5 text-black" />
               </span>
             )}
           </div>
 
           <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-1">
-              <span className="inline-flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-[0.16em] px-2 py-0.5 rounded-full"
-                style={{ background: `${accent}1c`, color: accent, border: `1px solid ${accent}40` }}>
+            <div className="flex items-center gap-1.5">
+              <span className="font-bold text-white text-sm leading-tight truncate" style={{ letterSpacing: '-0.02em' }}>
+                {bot.name}
+              </span>
+              <ChevronRight className="w-3.5 h-3.5 shrink-0 ml-auto" style={{ color: 'rgba(255,255,255,0.28)' }} />
+            </div>
+            <div className="flex items-center gap-2 mt-1">
+              <span className="inline-flex items-center gap-1 text-[8.5px] font-bold uppercase tracking-[0.14em] px-1.5 py-0.5 rounded-full"
+                style={{ background: `${accent}18`, color: accent, border: `1px solid ${accent}33` }}>
                 {isActive && (
-                  <span className="relative flex h-1.5 w-1.5">
+                  <span className="relative flex h-1 w-1">
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" style={{ background: accent }} />
-                    <span className="relative inline-flex rounded-full h-1.5 w-1.5" style={{ background: accent }} />
+                    <span className="relative inline-flex rounded-full h-1 w-1" style={{ background: accent }} />
                   </span>
                 )}
                 {isActive ? 'En línea' : 'Pausado'}
               </span>
-              <span className="text-[9px] font-medium uppercase tracking-[0.12em]" style={{ color: 'rgba(255,255,255,0.32)' }}>{channel}</span>
+              <span className="text-[8.5px] font-medium uppercase tracking-[0.1em] truncate" style={{ color: 'rgba(255,255,255,0.3)' }}>{channel}</span>
             </div>
-            <div className="font-bold text-white text-[17px] leading-tight truncate" style={{ letterSpacing: '-0.02em', textShadow: '0 1px 14px rgba(0,0,0,0.45)' }}>
-              {bot.name}
-            </div>
-            {bot.secret?.whatsappInstanceNumber && (
-              <div className="text-[11px] mt-0.5 flex items-center gap-1" style={{ color: 'rgba(255,255,255,0.38)' }}>
-                <Smartphone className="w-3 h-3" />
-                {bot.secret.whatsappInstanceNumber}
-              </div>
-            )}
           </div>
-
-          <ChevronRight className="w-4 h-4 shrink-0 mt-1 transition-colors" style={{ color: 'rgba(255,255,255,0.3)' }} />
         </div>
 
-        {/* mini stats premium */}
-        <div className="grid grid-cols-3 gap-2 mt-4">
-          {stats.map(st => (
-            <div key={st.label} className="rounded-xl px-2.5 py-2.5 text-center"
-              style={{ background: 'rgba(255,255,255,0.035)', border: '1px solid rgba(255,255,255,0.07)' }}>
-              <st.icon className="w-3.5 h-3.5 mx-auto mb-1" style={{ color: isActive ? accent : 'rgba(255,255,255,0.3)' }} />
-              <div className="text-base font-bold text-white leading-none" style={{ letterSpacing: '-0.02em' }}>{st.value}</div>
-              <div className="text-[9px] mt-1 uppercase tracking-[0.1em]" style={{ color: 'rgba(255,255,255,0.32)' }}>{st.label}</div>
+        {/* mini stats — strip compacto */}
+        <div className="flex items-stretch mt-3 rounded-lg overflow-hidden"
+          style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
+          {stats.map((st, idx) => (
+            <div key={st.label} className="flex-1 flex items-center justify-center gap-1.5 py-1.5"
+              style={idx < stats.length - 1 ? { borderRight: '1px solid rgba(255,255,255,0.06)' } : undefined}>
+              <st.icon className="w-3 h-3 shrink-0" style={{ color: isActive ? accent : 'rgba(255,255,255,0.28)' }} />
+              <span className="text-xs font-bold text-white leading-none" style={{ letterSpacing: '-0.02em' }}>{st.value}</span>
+              <span className="text-[8px] uppercase tracking-[0.08em]" style={{ color: 'rgba(255,255,255,0.3)' }}>{st.label}</span>
             </div>
           ))}
         </div>
@@ -3390,7 +3391,7 @@ export default function WhatsAppPage() {
               </div>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {bots.map(bot => (
                 <BotCard key={bot.id} bot={bot} onSelect={handleSelectBot} />
               ))}
