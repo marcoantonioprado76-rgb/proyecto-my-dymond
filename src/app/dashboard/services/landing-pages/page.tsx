@@ -17,14 +17,15 @@ interface LandingPage {
     }
 }
 
-// Paleta cinematográfica para los previews — derivada del id de la landing
-const PREVIEW_PALETTES: Array<{ a: string; b: string; c: string }> = [
-    { a: '#22B7FF', b: '#7B5BFF', c: '#A78BFA' },
-    { a: '#7B5BFF', b: '#D203DD', c: '#FF6BD4' },
-    { a: '#00C2FF', b: '#22B7FF', c: '#9B6BFF' },
-    { a: '#D203DD', b: '#7B5BFF', c: '#22B7FF' },
-    { a: '#22D3EE', b: '#22B7FF', c: '#7B5BFF' },
-    { a: '#9B6BFF', b: '#A78BFA', c: '#22B7FF' },
+// Paleta cinematográfica — degradados oscuros suaves estilo Framer/Apple/Stripe
+// (a → b → c son tonos oscuros profundos; "accent" es el highlight suave para CTA/glow)
+const PREVIEW_PALETTES: Array<{ a: string; b: string; c: string; accent: string }> = [
+    { a: '#0B1730', b: '#15264A', c: '#1F3A6E', accent: '#6FA8E0' }, // Deep Ocean
+    { a: '#15102F', b: '#241B4E', c: '#3A2D72', accent: '#9B8DD8' }, // Royal Twilight
+    { a: '#091C28', b: '#0F2E40', c: '#1A4862', accent: '#74C8D8' }, // Petroleum Glow
+    { a: '#0A0D1F', b: '#15183A', c: '#2A2D5E', accent: '#8E9AD8' }, // Cosmic Navy
+    { a: '#0E1230', b: '#1B1F50', c: '#2E3478', accent: '#A5ADD8' }, // Aurora Indigo
+    { a: '#100C24', b: '#1F1A3E', c: '#3A2F62', accent: '#B5A0D8' }, // Smoked Violet
 ]
 function paletteFor(id: string) {
     let h = 0
@@ -219,13 +220,13 @@ export default function LandingPagesPage() {
                             <div key={page.id}
                                 className="relative rounded-2xl overflow-hidden group transition-all duration-300 hover:-translate-y-1"
                                 style={{
-                                    background: `radial-gradient(120% 80% at 50% -10%, ${p.a}1c, rgba(255,255,255,0) 58%), linear-gradient(180deg, rgba(16,18,38,0.92) 0%, rgba(10,11,26,0.88) 100%)`,
+                                    background: `radial-gradient(120% 80% at 50% -10%, ${p.accent}1c, rgba(255,255,255,0) 58%), linear-gradient(180deg, rgba(16,18,38,0.92) 0%, rgba(10,11,26,0.88) 100%)`,
                                     border: '1px solid rgba(255,255,255,0.08)',
                                     boxShadow: '0 20px 44px -22px rgba(0,0,0,0.82), inset 0 1px 0 rgba(255,255,255,0.045)',
                                 }}
                                 onMouseEnter={e => {
-                                    e.currentTarget.style.boxShadow = `0 28px 56px -22px rgba(0,0,0,0.88), 0 0 26px -8px ${p.a}40, inset 0 1px 0 rgba(255,255,255,0.07)`
-                                    e.currentTarget.style.borderColor = `${p.a}4d`
+                                    e.currentTarget.style.boxShadow = `0 28px 56px -22px rgba(0,0,0,0.88), 0 0 26px -8px ${p.accent}40, inset 0 1px 0 rgba(255,255,255,0.07)`
+                                    e.currentTarget.style.borderColor = `${p.accent}4d`
                                 }}
                                 onMouseLeave={e => {
                                     e.currentTarget.style.boxShadow = '0 20px 44px -22px rgba(0,0,0,0.82), inset 0 1px 0 rgba(255,255,255,0.045)'
@@ -254,7 +255,7 @@ export default function LandingPagesPage() {
                                         </span>
                                     </div>
                                     {/* mini landing real (variante por id) */}
-                                    <MiniLanding variant={variantFor(page.id)} accent={p.a} />
+                                    <MiniLanding variant={variantFor(page.id)} accent={p.accent} />
                                     {/* badge ACTIVA */}
                                     <div className="absolute top-2.5 right-2.5 z-10">
                                         <span className="inline-flex items-center gap-1 text-[9px] font-bold uppercase tracking-[0.14em] px-2 py-0.5 rounded-full backdrop-blur-md"
@@ -295,13 +296,13 @@ export default function LandingPagesPage() {
                                     {/* métricas compactas */}
                                     <div className="flex items-center gap-3 mb-4">
                                         <div className="flex items-center gap-1.5 text-[11px]" style={{ color: 'rgba(255,255,255,0.65)' }}>
-                                            <Eye className="w-3.5 h-3.5" style={{ color: p.a }} />
+                                            <Eye className="w-3.5 h-3.5" style={{ color: p.accent }} />
                                             <span className="font-bold text-white">0</span>
                                             <span style={{ color: 'rgba(255,255,255,0.35)' }}>vistas</span>
                                         </div>
                                         <span className="w-px h-3" style={{ background: 'rgba(255,255,255,0.1)' }} />
                                         <div className="flex items-center gap-1.5 text-[11px]" style={{ color: 'rgba(255,255,255,0.65)' }}>
-                                            <Users className="w-3.5 h-3.5" style={{ color: p.b }} />
+                                            <Users className="w-3.5 h-3.5" style={{ color: p.accent, opacity: 0.8 }} />
                                             <span className="font-bold text-white">{page._count.leads}</span>
                                             <span style={{ color: 'rgba(255,255,255,0.35)' }}>leads</span>
                                         </div>
@@ -312,10 +313,10 @@ export default function LandingPagesPage() {
                                         <Link href={`/dashboard/services/landing-pages/${page.id}/edit`}
                                             className="rounded-lg flex items-center justify-center gap-2 py-2 text-xs font-bold transition-all active:scale-[0.98]"
                                             style={{
-                                                background: `linear-gradient(135deg, ${p.a}26, ${p.b}1c)`,
-                                                border: `1px solid ${p.a}40`,
+                                                background: `linear-gradient(135deg, ${p.accent}26, ${p.accent}10)`,
+                                                border: `1px solid ${p.accent}40`,
                                                 color: '#fff',
-                                                boxShadow: `0 6px 18px -8px ${p.a}55, inset 0 1px 0 rgba(255,255,255,0.08)`,
+                                                boxShadow: `0 6px 18px -8px ${p.accent}55, inset 0 1px 0 rgba(255,255,255,0.08)`,
                                             }}>
                                             <Edit3 className="w-3.5 h-3.5" />
                                             Editor
