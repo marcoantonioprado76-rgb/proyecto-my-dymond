@@ -312,7 +312,7 @@ function GlobalBotChart({ bots }: { bots: Bot[] }) {
   const endIdx = days.length - windowEnd
   const startIdx = Math.max(0, endIdx - WINDOW)
   const visibleDays = days.slice(startIdx, endIdx)
-  const W = 620, H = 118, padL = 36, padR = 16, padT = 20, padB = 26
+  const W = 620, H = 94, padL = 34, padR = 16, padT = 14, padB = 20
   const maxVal = Math.max(...visibleDays.map(d => d.conversations), ...visibleDays.map(d => d.sales), 1)
 
   const xOf = (i: number) => padL + (visibleDays.length > 1 ? i / (visibleDays.length - 1) : 0.5) * (W - padL - padR)
@@ -331,7 +331,7 @@ function GlobalBotChart({ bots }: { bots: Bot[] }) {
   return (
     <div className="rounded-2xl" style={{ padding: '14px 16px 10px', background: 'radial-gradient(120% 80% at 50% -10%, rgba(123,91,255,0.12), rgba(255,255,255,0) 58%), linear-gradient(180deg, rgba(17,19,40,0.85) 0%, rgba(10,11,24,0.8) 55%, rgba(14,16,34,0.74) 100%)', border: '1px solid rgba(255,255,255,0.08)', boxShadow: '0 18px 40px -22px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.04)' }}>
       {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 14, flexWrap: 'wrap', gap: 10 }}>
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 8, flexWrap: 'wrap', gap: 8 }}>
         <div>
           <p style={{ fontSize: 13, fontWeight: 700, color: '#fff', margin: 0, letterSpacing: '0.02em' }}>
             {visibleDays.length > 0
@@ -383,7 +383,7 @@ function GlobalBotChart({ bots }: { bots: Bot[] }) {
 
       {/* Chart */}
       {loadingChart ? (
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 88 }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 60 }}>
           <Loader2 className="w-5 h-5 animate-spin text-dark-400" />
         </div>
       ) : (
@@ -3324,25 +3324,25 @@ export default function WhatsAppPage() {
   return (
     <div className="px-4 sm:px-6 pt-6 max-w-screen-2xl mx-auto pb-20 fade-in">
       {/* Page Header */}
-      <div className="flex items-center gap-4 mb-8">
+      <div className="flex items-center gap-3 mb-5">
         <Link
           href="/dashboard/services"
-          className="p-2 hover:bg-white/5 rounded-lg transition-colors group"
+          className="p-1.5 hover:bg-white/5 rounded-lg transition-colors group shrink-0"
         >
-          <ArrowLeft className="w-5 h-5 text-dark-400 group-hover:text-white transition-colors" />
+          <ArrowLeft className="w-4.5 h-4.5 text-dark-400 group-hover:text-white transition-colors" />
         </Link>
-        <div className="flex items-center gap-4 flex-1">
-          <div className="w-12 h-12 rounded-xl bg-neon-green/10 flex items-center justify-center border border-neon-green/20 shadow-[0_0_15px_rgba(0,255,157,0.15)]">
-            <MessageCircle className="w-6 h-6 text-neon-green" />
+        <div className="flex items-center gap-3 flex-1 min-w-0">
+          <div className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style={{ background: 'rgba(34,183,255,0.12)', border: '1px solid rgba(34,183,255,0.28)', boxShadow: '0 0 14px -4px rgba(34,183,255,0.4)' }}>
+            <MessageCircle className="w-4.5 h-4.5" style={{ color: '#22B7FF' }} />
           </div>
-          <div>
-            <h1 className="text-2xl font-bold text-white flex items-center gap-3">
-              WhatsApp Bots
-              <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-1 rounded-md bg-neon-green/10 text-neon-green border border-neon-green/20">
+          <div className="min-w-0">
+            <h1 className="text-lg font-bold text-white flex items-center gap-2 leading-tight" style={{ letterSpacing: '-0.02em' }}>
+              <span className="truncate">WhatsApp Bots</span>
+              <span className="text-[9px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded-md shrink-0" style={{ background: 'rgba(34,183,255,0.12)', color: '#22B7FF', border: '1px solid rgba(34,183,255,0.28)' }}>
                 Multi-Tenant
               </span>
             </h1>
-            <p className="text-sm text-dark-300">Configura y gestiona tus agentes AI de ventas.</p>
+            <p className="text-[11px] text-dark-400 truncate">Configura y gestiona tus agentes AI de ventas.</p>
           </div>
         </div>
         <AIKeySelector compact />
@@ -3356,36 +3356,36 @@ export default function WhatsAppPage() {
           onDeleted={handleBotDeleted}
         />
       ) : (
-        <div className="space-y-6">
+        <div className="space-y-4">
           {/* Stats */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className="glass-panel p-4 rounded-xl flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center shrink-0">
-                <Bot className="w-5 h-5 text-dark-300" />
+          <div className="grid grid-cols-3 gap-2.5">
+            <div className="glass-panel px-3 py-2.5 rounded-xl flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center shrink-0">
+                <Bot className="w-4 h-4 text-dark-300" />
               </div>
-              <div>
-                <div className="text-2xl font-bold text-white">{bots.length}</div>
-                <div className="text-xs text-dark-400">Total agentes</div>
-              </div>
-            </div>
-            <div className="glass-panel p-4 rounded-xl flex items-center gap-3" style={{ border: '1px solid rgba(34,183,255,0.14)' }}>
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style={{ background: 'rgba(34,183,255,0.12)', border: '1px solid rgba(34,183,255,0.28)' }}>
-                <Zap className="w-5 h-5" style={{ color: '#22B7FF' }} />
-              </div>
-              <div>
-                <div className="text-2xl font-bold" style={{ color: '#22B7FF' }}>{activeBots}</div>
-                <div className="text-xs text-dark-400">Activos ahora</div>
+              <div className="min-w-0">
+                <div className="text-lg font-bold text-white leading-none">{bots.length}</div>
+                <div className="text-[10px] text-dark-400 mt-0.5 truncate">Total agentes</div>
               </div>
             </div>
-            <div className="glass-panel p-4 rounded-xl flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-neon-blue/10 border border-neon-blue/20 flex items-center justify-center shrink-0">
-                <ShoppingBag className="w-5 h-5 text-neon-blue" />
+            <div className="glass-panel px-3 py-2.5 rounded-xl flex items-center gap-2.5" style={{ border: '1px solid rgba(34,183,255,0.14)' }}>
+              <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ background: 'rgba(34,183,255,0.12)', border: '1px solid rgba(34,183,255,0.28)' }}>
+                <Zap className="w-4 h-4" style={{ color: '#22B7FF' }} />
               </div>
-              <div>
-                <div className="text-2xl font-bold text-neon-blue">
+              <div className="min-w-0">
+                <div className="text-lg font-bold leading-none" style={{ color: '#22B7FF' }}>{activeBots}</div>
+                <div className="text-[10px] text-dark-400 mt-0.5 truncate">Activos ahora</div>
+              </div>
+            </div>
+            <div className="glass-panel px-3 py-2.5 rounded-xl flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-lg bg-neon-blue/10 border border-neon-blue/20 flex items-center justify-center shrink-0">
+                <ShoppingBag className="w-4 h-4 text-neon-blue" />
+              </div>
+              <div className="min-w-0">
+                <div className="text-lg font-bold text-neon-blue leading-none">
                   {bots.reduce((acc, b) => acc + (b._count?.assignedProducts ?? 0), 0)}
                 </div>
-                <div className="text-xs text-dark-400">Productos totales</div>
+                <div className="text-[10px] text-dark-400 mt-0.5 truncate">Productos totales</div>
               </div>
             </div>
           </div>
