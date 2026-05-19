@@ -720,18 +720,23 @@ function BotCard({ bot, onSelect }: { bot: Bot; onSelect: (bot: Bot) => void }) 
           {bot.name}
         </div>
 
-        {/* badge EN LÍNEA (azul) + canal, centrado */}
+        {/* badge EN LÍNEA (verde) + canal, centrado */}
         <div className="flex items-center justify-center gap-2 mt-2">
-          <span className="inline-flex items-center gap-1 text-[8.5px] font-bold uppercase tracking-[0.14em] px-2 py-0.5 rounded-full"
-            style={{ background: `${accent}1c`, color: accent, border: `1px solid ${accent}40`, boxShadow: isActive ? `0 0 12px -4px ${accent}66` : 'none' }}>
-            {isActive && (
-              <span className="relative flex h-1 w-1">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" style={{ background: accent }} />
-                <span className="relative inline-flex rounded-full h-1 w-1" style={{ background: accent }} />
+          {(() => {
+            const sc = isActive ? '#22C55E' : '#7C82A8'
+            return (
+              <span className="inline-flex items-center gap-1 text-[8.5px] font-bold uppercase tracking-[0.14em] px-2 py-0.5 rounded-full"
+                style={{ background: `${sc}1c`, color: sc, border: `1px solid ${sc}40`, boxShadow: isActive ? `0 0 12px -4px ${sc}66` : 'none' }}>
+                {isActive && (
+                  <span className="relative flex h-1 w-1">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" style={{ background: sc }} />
+                    <span className="relative inline-flex rounded-full h-1 w-1" style={{ background: sc }} />
+                  </span>
+                )}
+                {isActive ? 'En línea' : 'Pausado'}
               </span>
-            )}
-            {isActive ? 'En línea' : 'Pausado'}
-          </span>
+            )
+          })()}
           <span className="text-[8.5px] font-medium uppercase tracking-[0.1em] truncate" style={{ color: 'rgba(255,255,255,0.3)' }}>{channel}</span>
         </div>
 
