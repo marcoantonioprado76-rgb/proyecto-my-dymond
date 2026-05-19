@@ -676,13 +676,18 @@ function BotCard({ bot, onSelect }: { bot: Bot; onSelect: (bot: Bot) => void }) 
         <div className="flex items-start gap-3.5">
           <div className="relative shrink-0">
             <div className="svc-glow-pulse absolute inset-0 rounded-full pointer-events-none" style={{ background: `radial-gradient(circle, ${accent}3a, transparent 70%)`, filter: 'blur(8px)' }} />
-            <div className="relative w-14 h-14 rounded-full flex items-center justify-center"
+            <div className="relative w-14 h-14 rounded-full overflow-hidden flex items-center justify-center"
               style={{
                 background: `linear-gradient(155deg, rgba(255,255,255,0.13), rgba(255,255,255,0.02)), rgba(18,15,32,0.7)`,
                 border: `1px solid ${accent}55`,
                 boxShadow: `0 14px 30px -10px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.12)`,
               }}>
-              <Bot className="w-7 h-7" style={{ color: accent, filter: `drop-shadow(0 0 7px ${accent}66)` }} />
+              <img
+                src="https://i.ibb.co/gxR9G7X/envato-labs-image-edit-73.png"
+                alt={bot.name}
+                className="w-full h-full object-cover"
+                style={{ filter: isActive ? 'none' : 'grayscale(0.7) opacity(0.7)' }}
+              />
             </div>
             {isActive && (
               <span className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full border-2 flex items-center justify-center"
