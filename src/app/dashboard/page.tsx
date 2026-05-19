@@ -23,13 +23,33 @@ const IMAGES = [
   'https://i.ibb.co/cK5Wv5yG/estrategia-metaverso-de-meta-2025.jpg',
 ]
 
-const SERVICES = [
-  { href: '/dashboard/services/ads',           icon: 'fa-solid fa-bullhorn',     label: 'Ads',            desc: 'Campañas en Meta, Google y TikTok.',        from: '#D203DD', to: '#0066FF' },
-  { href: '/dashboard/services/whatsapp',      icon: 'fa-brands fa-whatsapp',    label: 'Agentes de AI',  desc: 'Bots que atienden y venden 24/7.',           from: '#00FF88', to: '#00C2FF' },
-  { href: '/dashboard/services/social',        icon: 'fa-solid fa-share-nodes',  label: 'Social',         desc: 'Publica en todas tus redes desde aquí.',    from: '#FF2DF7', to: '#FF8800' },
-  { href: '/dashboard/services/landing-pages', icon: 'fa-solid fa-file',         label: 'Landing Pages',  desc: 'Páginas de venta generadas con IA.',        from: '#9B00FF', to: '#FF2DF7' },
-  { href: '/dashboard/services/virtual-store', icon: 'fa-solid fa-shop',         label: 'Tienda Virtual', desc: 'Tu tienda online sin comisiones.',           from: '#38bdf8', to: '#0066FF' },
-  { href: '/dashboard/services/clipping',      icon: 'fa-solid fa-newspaper',    label: 'Clipping',       desc: 'Gana por vistas en TikTok y YouTube.',      from: '#FF2D55', to: '#FF6B00' },
+const SERVICE_GROUPS = [
+  {
+    title: 'Atraer clientes',
+    icon: 'fa-solid fa-bullseye',
+    services: [
+      { href: '/dashboard/services/ads',           icon: 'fa-solid fa-bullhorn',    label: 'Ads',           desc: 'Campañas en Meta, Google y TikTok.',     from: '#D203DD', to: '#0066FF', badge: 'Recomendado' },
+      { href: '/dashboard/services/social',        icon: 'fa-solid fa-share-nodes', label: 'Social',        desc: 'Publica en todas tus redes desde aquí.', from: '#FF2DF7', to: '#FF8800', badge: 'Disponible' },
+      { href: '/dashboard/services/landing-pages', icon: 'fa-solid fa-file',        label: 'Landing Pages', desc: 'Páginas de venta generadas con IA.',     from: '#9B00FF', to: '#FF2DF7', badge: 'Disponible' },
+    ],
+  },
+  {
+    title: 'Convertir ventas',
+    icon: 'fa-solid fa-bolt',
+    services: [
+      { href: '/dashboard/services/whatsapp',      icon: 'fa-brands fa-whatsapp', label: 'Agentes de AI', desc: 'Bots que atienden y venden 24/7.', from: '#00FF88', to: '#00C2FF', badge: 'Automatización activa' },
+      { href: '/dashboard/services/virtual-store', icon: 'fa-solid fa-shop',      label: 'Tienda Virtual', desc: 'Tu tienda online sin comisiones.', from: '#38bdf8', to: '#0066FF', badge: 'Disponible' },
+    ],
+  },
+  {
+    title: 'Escalar',
+    icon: 'fa-solid fa-rocket',
+    services: [
+      { href: '/dashboard/crm',               icon: 'fa-solid fa-users-gear',     label: 'CRM Broadcast', desc: 'Mensajes masivos a tus contactos.',    from: '#D203DD', to: '#9B00FF', badge: 'Disponible' },
+      { href: '/dashboard/services/clipping', icon: 'fa-solid fa-newspaper',      label: 'Clipping',      desc: 'Gana por vistas en TikTok y YouTube.', from: '#FF2D55', to: '#FF6B00', badge: 'Disponible' },
+      { href: '/dashboard/academy',           icon: 'fa-solid fa-graduation-cap', label: 'Academy',       desc: 'Cursos y formación para crecer.',      from: '#00C2FF', to: '#9B00FF', badge: 'Disponible' },
+    ],
+  },
 ]
 
 export default function DashboardPage() {
@@ -169,42 +189,56 @@ export default function DashboardPage() {
 
         {/* Services Grid — mobile */}
         <main className="feed" id="feed">
-          <p className="section-label"><i className="fa-solid fa-th-large"></i>Servicios</p>
-          <div className="grid-2">
-            {SERVICES.map(s => (
-              <Link key={s.href} href={s.href} style={{ textDecoration: 'none', display: 'block' }}>
-                <div className="group" style={{
-                  position: 'relative', borderRadius: 18, overflow: 'hidden', padding: '14px 14px 12px',
-                  background: 'linear-gradient(135deg, rgba(154, 203, 255, 0.12) 0%, rgba(255, 125, 224, 0.12) 50%, rgba(162, 102, 255, 0.12) 100%)',
-                  backdropFilter: 'blur(16px)',
-                  WebkitBackdropFilter: 'blur(16px)',
-                  border: '1px solid rgba(255, 255, 255, 0.15)',
-                  boxShadow: 'inset 0 0 10px rgba(255, 255, 255, 0.08)',
-                  display: 'flex', flexDirection: 'column', gap: 8,
-                  transition: 'transform 0.2s, border-color 0.2s',
-                }}>
-                  {/* neon top bar */}
-                  <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 2, background: `linear-gradient(90deg, transparent, ${s.from}, ${s.to}, transparent)` }} />
-                  {/* icon */}
-                  <div style={{
-                    width: 36, height: 36, borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    background: `rgba(255,255,255,0.15)`,
-                    border: `1px solid rgba(255,255,255,0.3)`,
-                    boxShadow: `0 0 12px rgba(255,255,255,0.1)`,
-                    fontSize: 15, color: '#fff',
-                  }}>
-                    <i className={s.icon} />
-                  </div>
-                  <p style={{ fontSize: 12, fontWeight: 800, color: '#fff', margin: 0, lineHeight: 1.2 }}>{s.label}</p>
-                  <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.9)', margin: 0, lineHeight: 1.4 }}>{s.desc}</p>
-                  {/* bottom arrow */}
-                  <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 2 }}>
-                    <span style={{ fontSize: 10, fontWeight: 700, color: '#fff', opacity: 0.9 }}>Abrir →</span>
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
+          <p className="section-label" style={{ marginBottom: 4 }}><i className="fa-solid fa-th-large"></i>Servicios</p>
+          <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', margin: '0 0 18px', lineHeight: 1.5 }}>
+            Elige una herramienta para activar tu sistema de automatización.
+          </p>
+          {SERVICE_GROUPS.map(group => (
+            <div key={group.title} style={{ marginBottom: 22 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+                <i className={group.icon} style={{ fontSize: 10, color: 'rgba(232,85,240,0.85)' }} />
+                <span style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: '0.13em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.72)' }}>{group.title}</span>
+                <div style={{ flex: 1, height: 1, background: 'linear-gradient(90deg, rgba(255,255,255,0.18), transparent)' }} />
+              </div>
+              <div className="grid-2">
+                {group.services.map(s => (
+                  <Link key={s.href} href={s.href} style={{ textDecoration: 'none', display: 'block' }}>
+                    <div style={{
+                      borderRadius: 20, padding: 1.5,
+                      background: `linear-gradient(135deg, ${s.from}, ${s.to})`,
+                      boxShadow: `0 8px 22px rgba(0,0,0,0.35), 0 0 16px ${s.from}26`,
+                    }}>
+                      <div style={{
+                        position: 'relative', borderRadius: 18.5, overflow: 'hidden', padding: '14px 13px 12px',
+                        background: 'linear-gradient(160deg, rgba(28,25,44,0.93), rgba(18,14,34,0.97))',
+                        backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)',
+                        display: 'flex', flexDirection: 'column', gap: 7, minHeight: 142,
+                      }}>
+                        <div style={{ position: 'absolute', top: -28, right: -22, width: 86, height: 86, borderRadius: '50%', background: `radial-gradient(circle, ${s.from}30, transparent 70%)`, pointerEvents: 'none' }} />
+                        <div style={{
+                          width: 38, height: 38, borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          background: `linear-gradient(135deg, ${s.from}, ${s.to})`,
+                          boxShadow: `0 4px 14px ${s.from}55`, fontSize: 15, color: '#fff',
+                        }}>
+                          <i className={s.icon} />
+                        </div>
+                        <span style={{
+                          alignSelf: 'flex-start', fontSize: 8, fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase',
+                          color: '#fff', padding: '3px 7px', borderRadius: 99,
+                          background: `${s.from}2e`, border: `1px solid ${s.from}55`,
+                        }}>{s.badge}</span>
+                        <p style={{ fontSize: 12.5, fontWeight: 800, color: '#fff', margin: 0, lineHeight: 1.2 }}>{s.label}</p>
+                        <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.55)', margin: 0, lineHeight: 1.45, flex: 1 }}>{s.desc}</p>
+                        <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                          <span style={{ fontSize: 10, fontWeight: 700, color: '#fff', opacity: 0.85 }}>Abrir →</span>
+                        </div>
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          ))}
         </main>
       </div>
 
@@ -294,72 +328,78 @@ export default function DashboardPage() {
 
           {/* Services Grid — desktop */}
           <section>
-            <p className="section-label" style={{ marginBottom: 'var(--sp-4)' }}><i className="fa-solid fa-th-large"></i>Servicios</p>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 14 }}>
-              {SERVICES.map(s => (
-                <Link key={s.href} href={s.href} style={{ textDecoration: 'none', display: 'block' }}>
-                  <div style={{
-                    position: 'relative', borderRadius: 20, overflow: 'hidden', padding: '20px 18px 16px',
-                    background: 'linear-gradient(135deg, rgba(154, 203, 255, 0.12) 0%, rgba(255, 125, 224, 0.12) 50%, rgba(162, 102, 255, 0.12) 100%)',
-                    backdropFilter: 'blur(16px)',
-                    WebkitBackdropFilter: 'blur(16px)',
-                    border: '1px solid rgba(255, 255, 255, 0.15)',
-                    boxShadow: 'inset 0 0 12px rgba(255, 255, 255, 0.06), 0 4px 16px rgba(0,0,0,0.2)',
-                    display: 'flex', flexDirection: 'column', gap: 10,
-                    transition: 'transform 0.25s, border-color 0.25s, box-shadow 0.25s',
-                    cursor: 'pointer',
-                  }}
-                  onMouseEnter={e => {
-                    const el = e.currentTarget as HTMLElement
-                    el.style.transform = 'translateY(-4px)'
-                    el.style.borderColor = `rgba(255, 255, 255, 0.7)`
-                    el.style.boxShadow = `inset 0 0 16px rgba(255, 255, 255, 0.5), 0 16px 40px rgba(0,0,0,0.4), 0 0 30px rgba(255, 125, 224, 0.4)`
-                  }}
-                  onMouseLeave={e => {
-                    const el = e.currentTarget as HTMLElement
-                    el.style.transform = 'translateY(0)'
-                    el.style.borderColor = `rgba(255, 255, 255, 0.4)`
-                    el.style.boxShadow = 'inset 0 0 12px rgba(255, 255, 255, 0.3), 0 4px 16px rgba(0,0,0,0.1)'
-                  }}>
-                    {/* neon top bar */}
-                    <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 2, background: `linear-gradient(90deg, transparent, ${s.from}, ${s.to}, transparent)` }} />
-                    {/* background number watermark */}
-                    <div style={{ position: 'absolute', bottom: -8, right: 6, fontSize: 72, fontWeight: 900, color: s.from + '07', lineHeight: 1, pointerEvents: 'none', userSelect: 'none' }}>
-                      {SERVICES.indexOf(s) + 1}
-                    </div>
-                    {/* icon */}
-                    <div style={{ position: 'relative', width: 46, height: 46 }}>
+            <p className="section-label" style={{ marginBottom: 6 }}><i className="fa-solid fa-th-large"></i>Servicios</p>
+            <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.45)', margin: '0 0 26px', lineHeight: 1.5 }}>
+              Elige una herramienta para activar tu sistema de automatización.
+            </p>
+            {SERVICE_GROUPS.map(group => (
+              <div key={group.title} style={{ marginBottom: 30 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
+                  <i className={group.icon} style={{ fontSize: 12, color: 'rgba(232,85,240,0.9)' }} />
+                  <span style={{ fontSize: 12, fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.75)' }}>{group.title}</span>
+                  <div style={{ flex: 1, height: 1, background: 'linear-gradient(90deg, rgba(255,255,255,0.18), transparent)' }} />
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(230px, 1fr))', gap: 16 }}>
+                  {group.services.map(s => (
+                    <Link key={s.href} href={s.href} style={{ textDecoration: 'none', display: 'block' }}>
                       <div style={{
-                        width: 46, height: 46, borderRadius: 13, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        background: `rgba(255,255,255,0.15)`,
-                        border: `1.5px solid rgba(255,255,255,0.3)`,
-                        boxShadow: `0 0 18px rgba(255,255,255,0.1)`,
-                        fontSize: 18, color: '#fff',
+                        borderRadius: 22, padding: 1.5,
+                        background: `linear-gradient(135deg, ${s.from}, ${s.to})`,
+                        boxShadow: `0 10px 30px rgba(0,0,0,0.32), 0 0 22px ${s.from}22`,
+                        transition: 'transform 0.25s ease, box-shadow 0.25s ease',
+                        cursor: 'pointer',
+                      }}
+                      onMouseEnter={e => {
+                        const el = e.currentTarget as HTMLElement
+                        el.style.transform = 'translateY(-6px)'
+                        el.style.boxShadow = `0 22px 48px rgba(0,0,0,0.45), 0 0 40px ${s.from}66`
+                      }}
+                      onMouseLeave={e => {
+                        const el = e.currentTarget as HTMLElement
+                        el.style.transform = 'translateY(0)'
+                        el.style.boxShadow = `0 10px 30px rgba(0,0,0,0.32), 0 0 22px ${s.from}22`
                       }}>
-                        <i className={s.icon} />
+                        <div style={{
+                          position: 'relative', borderRadius: 20.5, overflow: 'hidden', padding: '20px 18px 16px',
+                          background: 'linear-gradient(160deg, rgba(28,25,44,0.92), rgba(18,14,34,0.97))',
+                          backdropFilter: 'blur(18px)', WebkitBackdropFilter: 'blur(18px)',
+                          display: 'flex', flexDirection: 'column', gap: 10, minHeight: 184,
+                        }}>
+                          <div style={{ position: 'absolute', top: -36, right: -28, width: 130, height: 130, borderRadius: '50%', background: `radial-gradient(circle, ${s.from}2b, transparent 70%)`, pointerEvents: 'none' }} />
+                          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+                            <div style={{
+                              width: 48, height: 48, borderRadius: 14, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                              background: `linear-gradient(135deg, ${s.from}, ${s.to})`,
+                              boxShadow: `0 6px 18px ${s.from}55`, fontSize: 19, color: '#fff',
+                            }}>
+                              <i className={s.icon} />
+                            </div>
+                            <span style={{
+                              fontSize: 9, fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase',
+                              color: '#fff', padding: '4px 9px', borderRadius: 99,
+                              background: `${s.from}2e`, border: `1px solid ${s.from}55`, whiteSpace: 'nowrap',
+                            }}>{s.badge}</span>
+                          </div>
+                          <div style={{ flex: 1 }}>
+                            <p style={{ fontSize: 15, fontWeight: 800, color: '#fff', margin: '0 0 5px', letterSpacing: '0.01em' }}>{s.label}</p>
+                            <p style={{ fontSize: 11.5, color: 'rgba(255,255,255,0.55)', margin: 0, lineHeight: 1.55 }}>{s.desc}</p>
+                          </div>
+                          <div style={{
+                            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+                            padding: '9px 0', borderRadius: 13, marginTop: 2,
+                            background: `linear-gradient(135deg, ${s.from}26, ${s.to}26)`,
+                            border: `1px solid ${s.from}45`,
+                            fontSize: 11.5, fontWeight: 800, color: '#fff',
+                          }}>
+                            Abrir <i className="fa-solid fa-arrow-right" style={{ fontSize: 9 }} />
+                          </div>
+                        </div>
                       </div>
-                      <span style={{ position: 'absolute', top: -3, right: -3, width: 10, height: 10, borderRadius: '50%', background: '#fff', border: '2px solid rgba(0,0,0,0.1)', boxShadow: `0 0 6px rgba(255,255,255,0.5)` }} />
-                    </div>
-                    {/* text */}
-                    <div style={{ flex: 1 }}>
-                      <p style={{ fontSize: 14, fontWeight: 800, color: '#fff', margin: '0 0 4px', letterSpacing: '0.01em' }}>{s.label}</p>
-                      <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.9)', margin: 0, lineHeight: 1.5 }}>{s.desc}</p>
-                    </div>
-                    {/* CTA */}
-                    <div style={{
-                      display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-                      padding: '8px 0', borderRadius: 12, marginTop: 4,
-                      background: `rgba(255,255,255,0.2)`,
-                      border: '1px solid rgba(255,255,255,0.3)',
-                      fontSize: 11, fontWeight: 800, color: '#fff',
-                      boxShadow: `0 4px 16px rgba(0,0,0,0.1)`,
-                    }}>
-                      Abrir <i className="fa-solid fa-arrow-right" style={{ fontSize: 9 }} />
-                    </div>
-                  </div>
-                </Link>
-              ))}
-            </div>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            ))}
           </section>
 
         </main>
