@@ -32,6 +32,17 @@ function paletteFor(id: string) {
     for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) >>> 0
     return PREVIEW_PALETTES[h % PREVIEW_PALETTES.length]
 }
+// Etiquetas amigables para el pill de plantilla (evita ver "RAW-HTML" en bruto)
+const TEMPLATE_LABEL: Record<string, string> = {
+    'raw-html': 'HTML',
+    'ndt-elite': 'NDT Elite',
+    'default': 'Estándar',
+}
+function templateLabel(id: string) {
+    if (TEMPLATE_LABEL[id]) return TEMPLATE_LABEL[id]
+    return id.replace(/[-_]+/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
+}
+
 function variantFor(id: string): 0 | 1 | 2 | 3 {
     let h = 0
     for (let i = 0; i < id.length; i++) h = (h * 17 + id.charCodeAt(i)) >>> 0
@@ -288,7 +299,7 @@ export default function LandingPagesPage() {
                                         </h2>
                                         <span className="text-[9px] font-medium uppercase tracking-[0.12em] mt-1 shrink-0 px-2 py-0.5 rounded-full"
                                             style={{ color: 'rgba(255,255,255,0.4)', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)' }}>
-                                            {page.templateId}
+                                            {templateLabel(page.templateId)}
                                         </span>
                                     </div>
                                     <p className="text-[10.5px] font-mono truncate mb-3" style={{ color: 'rgba(255,255,255,0.35)' }}>/lp/{page.slug}</p>
