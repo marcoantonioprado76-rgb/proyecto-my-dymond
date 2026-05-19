@@ -17,15 +17,15 @@ interface LandingPage {
     }
 }
 
-// Paleta cinematográfica — degradados oscuros suaves estilo Framer/Apple/Stripe
-// (a → b → c son tonos oscuros profundos; "accent" es el highlight suave para CTA/glow)
+// Paleta cinematográfica — degradados oscuros vivos estilo Framer/Apple/Stripe
+// (a → b → c con más luz/profundidad; "accent" es el highlight suave para CTA/glow)
 const PREVIEW_PALETTES: Array<{ a: string; b: string; c: string; accent: string }> = [
-    { a: '#0B1730', b: '#15264A', c: '#1F3A6E', accent: '#6FA8E0' }, // Deep Ocean
-    { a: '#15102F', b: '#241B4E', c: '#3A2D72', accent: '#9B8DD8' }, // Royal Twilight
-    { a: '#091C28', b: '#0F2E40', c: '#1A4862', accent: '#74C8D8' }, // Petroleum Glow
-    { a: '#0A0D1F', b: '#15183A', c: '#2A2D5E', accent: '#8E9AD8' }, // Cosmic Navy
-    { a: '#0E1230', b: '#1B1F50', c: '#2E3478', accent: '#A5ADD8' }, // Aurora Indigo
-    { a: '#100C24', b: '#1F1A3E', c: '#3A2F62', accent: '#B5A0D8' }, // Smoked Violet
+    { a: '#0E1A38', b: '#1F3A78', c: '#3F75C4', accent: '#7FBEF0' }, // Deep Ocean — más vivo
+    { a: '#17132F', b: '#2D2070', c: '#5238A8', accent: '#A89BEC' }, // Royal Twilight
+    { a: '#0B2030', b: '#114060', c: '#2575B0', accent: '#86DAEC' }, // Petroleum Glow
+    { a: '#0E1228', b: '#1F2358', c: '#3D448C', accent: '#9DACEC' }, // Cosmic Navy
+    { a: '#101536', b: '#222D78', c: '#4154B8', accent: '#B0BDEC' }, // Aurora Indigo
+    { a: '#130E28', b: '#2A235E', c: '#4F3F94', accent: '#C8AEEC' }, // Smoked Violet
 ]
 function paletteFor(id: string) {
     let h = 0
@@ -231,17 +231,17 @@ export default function LandingPagesPage() {
                             <div key={page.id}
                                 className="relative rounded-2xl overflow-hidden group transition-all duration-300 hover:-translate-y-1"
                                 style={{
-                                    background: `radial-gradient(120% 80% at 50% -10%, ${p.accent}1c, rgba(255,255,255,0) 58%), linear-gradient(180deg, rgba(16,18,38,0.92) 0%, rgba(10,11,26,0.88) 100%)`,
-                                    border: '1px solid rgba(255,255,255,0.08)',
-                                    boxShadow: '0 20px 44px -22px rgba(0,0,0,0.82), inset 0 1px 0 rgba(255,255,255,0.045)',
+                                    background: `radial-gradient(120% 80% at 50% -10%, ${p.accent}26, rgba(255,255,255,0) 58%), radial-gradient(80% 80% at 100% 100%, ${p.accent}16, rgba(255,255,255,0) 60%), radial-gradient(70% 70% at 0% 100%, ${p.accent}10, rgba(255,255,255,0) 60%), linear-gradient(180deg, rgba(22,28,56,0.92) 0%, rgba(16,20,42,0.9) 100%)`,
+                                    border: '1px solid rgba(255,255,255,0.10)',
+                                    boxShadow: `0 22px 48px -22px rgba(0,0,0,0.78), 0 0 0 1px rgba(255,255,255,0.02), inset 0 1px 0 rgba(255,255,255,0.06)`,
                                 }}
                                 onMouseEnter={e => {
-                                    e.currentTarget.style.boxShadow = `0 28px 56px -22px rgba(0,0,0,0.88), 0 0 26px -8px ${p.accent}40, inset 0 1px 0 rgba(255,255,255,0.07)`
-                                    e.currentTarget.style.borderColor = `${p.accent}4d`
+                                    e.currentTarget.style.boxShadow = `0 30px 60px -22px rgba(0,0,0,0.84), 0 0 36px -8px ${p.accent}55, inset 0 1px 0 rgba(255,255,255,0.09)`
+                                    e.currentTarget.style.borderColor = `${p.accent}5a`
                                 }}
                                 onMouseLeave={e => {
-                                    e.currentTarget.style.boxShadow = '0 20px 44px -22px rgba(0,0,0,0.82), inset 0 1px 0 rgba(255,255,255,0.045)'
-                                    e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'
+                                    e.currentTarget.style.boxShadow = '0 22px 48px -22px rgba(0,0,0,0.78), 0 0 0 1px rgba(255,255,255,0.02), inset 0 1px 0 rgba(255,255,255,0.06)'
+                                    e.currentTarget.style.borderColor = 'rgba(255,255,255,0.10)'
                                 }}>
 
                                 {/* preview cinematográfico — mini landing real con variantes */}
@@ -250,9 +250,15 @@ export default function LandingPagesPage() {
                                     style={{
                                         background: `linear-gradient(160deg, ${p.a} 0%, ${p.b} 55%, ${p.c} 100%)`,
                                     }}>
-                                    {/* viñeta oscura sutil */}
+                                    {/* viñeta sutil + luz superior */}
                                     <div className="absolute inset-0 pointer-events-none" style={{
-                                        background: 'linear-gradient(180deg, rgba(0,0,0,0.10) 0%, rgba(0,0,0,0) 30%, rgba(0,0,0,0.35) 100%)',
+                                        background: 'linear-gradient(180deg, rgba(0,0,0,0.08) 0%, rgba(0,0,0,0) 35%, rgba(0,0,0,0.22) 100%)',
+                                    }} />
+                                    {/* halo de luz top-left cinematográfico */}
+                                    <div className="absolute pointer-events-none" style={{
+                                        top: -30, left: -30, width: 160, height: 110, borderRadius: '50%',
+                                        background: 'radial-gradient(ellipse, rgba(255,255,255,0.18), transparent 70%)',
+                                        filter: 'blur(8px)',
                                     }} />
                                     {/* mini browser chrome */}
                                     <div className="absolute top-0 left-0 right-0 px-3 py-2 flex items-center gap-1.5 pointer-events-none z-10"
@@ -291,8 +297,14 @@ export default function LandingPagesPage() {
                                     </div>
                                 </a>
 
+                                {/* divisor cinematográfico entre preview y contenido */}
+                                <div className="relative">
+                                    <div className="absolute inset-x-4 -top-px h-px pointer-events-none"
+                                        style={{ background: `linear-gradient(90deg, transparent, ${p.accent}55, transparent)` }} />
+                                </div>
+
                                 {/* contenido inferior */}
-                                <div className="p-4">
+                                <div className="p-4 relative">
                                     <div className="flex items-start justify-between gap-2 mb-1">
                                         <h2 className="text-base font-bold text-white truncate" style={{ letterSpacing: '-0.02em' }}>
                                             {page.name}
