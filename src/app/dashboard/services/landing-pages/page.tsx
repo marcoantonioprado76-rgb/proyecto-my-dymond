@@ -31,6 +31,95 @@ function paletteFor(id: string) {
     for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) >>> 0
     return PREVIEW_PALETTES[h % PREVIEW_PALETTES.length]
 }
+function variantFor(id: string): 0 | 1 | 2 | 3 {
+    let h = 0
+    for (let i = 0; i < id.length; i++) h = (h * 17 + id.charCodeAt(i)) >>> 0
+    return (h % 4) as 0 | 1 | 2 | 3
+}
+
+// Mini "screenshot" interno — diferentes composiciones tipo Framer/Webflow/Apple
+function MiniLanding({ variant, accent }: { variant: 0 | 1 | 2 | 3; accent: string }) {
+    const bar = (w: string, op = 0.7, h = 6) =>
+        <div style={{ width: w, height: h, borderRadius: 3, background: `rgba(255,255,255,${op})` }} />
+    const subBar = (w: string, h = 4) => bar(w, 0.35, h)
+
+    // Variant 0 — Hero clásico + 3 cards
+    if (variant === 0) return (
+        <div className="absolute inset-0 flex flex-col px-4 pt-7 pb-3 gap-2 pointer-events-none">
+            <div className="flex-1 flex flex-col items-start justify-center gap-1.5">
+                {bar('60%', 0.85, 7)}
+                {subBar('42%', 4)}
+                <div className="mt-1.5 flex gap-1.5">
+                    <div style={{ width: 30, height: 9, borderRadius: 4, background: accent, opacity: 0.95 }} />
+                    <div style={{ width: 24, height: 9, borderRadius: 4, background: 'rgba(255,255,255,0.18)', border: '1px solid rgba(255,255,255,0.35)' }} />
+                </div>
+            </div>
+            <div className="flex gap-1.5">
+                {[0, 1, 2].map(i => (
+                    <div key={i} className="flex-1 h-6 rounded-md" style={{ background: 'rgba(255,255,255,0.10)', border: '1px solid rgba(255,255,255,0.14)' }} />
+                ))}
+            </div>
+        </div>
+    )
+
+    // Variant 1 — Side hero (texto izquierda + imagen derecha)
+    if (variant === 1) return (
+        <div className="absolute inset-0 flex items-center px-4 pt-7 pb-3 gap-2.5 pointer-events-none">
+            <div className="flex-1 flex flex-col gap-1.5">
+                {bar('80%', 0.85, 6)}
+                {bar('55%', 0.85, 6)}
+                {subBar('70%', 4)}
+                {subBar('50%', 4)}
+                <div className="mt-1 flex gap-1.5">
+                    <div style={{ width: 28, height: 8, borderRadius: 4, background: accent }} />
+                </div>
+            </div>
+            <div className="w-[42%] h-[72%] rounded-lg relative overflow-hidden"
+                style={{ background: `linear-gradient(135deg, ${accent}80, rgba(255,255,255,0.18))`, border: '1px solid rgba(255,255,255,0.16)' }}>
+                <div className="absolute inset-0" style={{ background: 'radial-gradient(circle at 30% 30%, rgba(255,255,255,0.25), transparent 60%)' }} />
+            </div>
+        </div>
+    )
+
+    // Variant 2 — Centered hero (Apple-style)
+    if (variant === 2) return (
+        <div className="absolute inset-0 flex flex-col items-center justify-center px-4 pt-7 pb-3 gap-1.5 pointer-events-none">
+            <div style={{ width: 28, height: 6, borderRadius: 99, background: 'rgba(255,255,255,0.15)', border: `1px solid ${accent}55` }} />
+            {bar('64%', 0.9, 7)}
+            {bar('48%', 0.9, 7)}
+            <div className="h-1" />
+            {subBar('56%', 4)}
+            {subBar('40%', 4)}
+        </div>
+    )
+
+    // Variant 3 — Editorial (texto + galería abajo)
+    return (
+        <div className="absolute inset-0 flex flex-col px-4 pt-7 pb-3 gap-2 pointer-events-none">
+            <div className="flex-1 flex flex-col justify-center gap-1.5">
+                <div style={{ width: 22, height: 2, borderRadius: 2, background: accent }} />
+                {bar('72%', 0.9, 7)}
+                <div className="flex gap-2 mt-1">
+                    <div className="flex-1 flex flex-col gap-1">
+                        {subBar('100%', 3)}
+                        {subBar('90%', 3)}
+                        {subBar('80%', 3)}
+                    </div>
+                    <div className="flex-1 flex flex-col gap-1">
+                        {subBar('100%', 3)}
+                        {subBar('85%', 3)}
+                        {subBar('70%', 3)}
+                    </div>
+                </div>
+            </div>
+            <div className="flex gap-2">
+                {[0, 1, 2, 3].map(i => (
+                    <div key={i} className="flex-1 h-3 rounded" style={{ background: 'rgba(255,255,255,0.10)' }} />
+                ))}
+            </div>
+        </div>
+    )
+}
 
 export default function LandingPagesPage() {
     usePlanGuard()
@@ -143,48 +232,34 @@ export default function LandingPagesPage() {
                                     e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'
                                 }}>
 
-                                {/* preview cinematográfico — mini browser mock con gradiente único por landing */}
+                                {/* preview cinematográfico — mini landing real con variantes */}
                                 <a href={`/lp/${page.slug}`} target="_blank" rel="noopener noreferrer"
                                     className="block relative aspect-[16/10] overflow-hidden"
                                     style={{
-                                        background: `linear-gradient(135deg, ${p.a} 0%, ${p.b} 55%, ${p.c} 100%)`,
+                                        background: `linear-gradient(160deg, ${p.a} 0%, ${p.b} 55%, ${p.c} 100%)`,
                                     }}>
-                                    {/* grid técnico */}
+                                    {/* viñeta oscura sutil */}
                                     <div className="absolute inset-0 pointer-events-none" style={{
-                                        backgroundImage: 'linear-gradient(rgba(255,255,255,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.06) 1px, transparent 1px)',
-                                        backgroundSize: '24px 24px',
-                                        maskImage: 'radial-gradient(ellipse at 50% 40%, #000 50%, transparent 90%)',
-                                        WebkitMaskImage: 'radial-gradient(ellipse at 50% 40%, #000 50%, transparent 90%)',
-                                    }} />
-                                    {/* viñeta oscura */}
-                                    <div className="absolute inset-0 pointer-events-none" style={{
-                                        background: 'radial-gradient(ellipse at 50% 30%, rgba(0,0,0,0) 30%, rgba(0,0,0,0.55) 100%)',
+                                        background: 'linear-gradient(180deg, rgba(0,0,0,0.10) 0%, rgba(0,0,0,0) 30%, rgba(0,0,0,0.35) 100%)',
                                     }} />
                                     {/* mini browser chrome */}
-                                    <div className="absolute top-0 left-0 right-0 px-3 py-2 flex items-center gap-1.5 pointer-events-none"
-                                        style={{ background: 'linear-gradient(180deg, rgba(0,0,0,0.42), rgba(0,0,0,0))' }}>
-                                        <span className="w-2 h-2 rounded-full" style={{ background: 'rgba(255,255,255,0.35)' }} />
-                                        <span className="w-2 h-2 rounded-full" style={{ background: 'rgba(255,255,255,0.25)' }} />
-                                        <span className="w-2 h-2 rounded-full" style={{ background: 'rgba(255,255,255,0.18)' }} />
-                                        <span className="ml-2 text-[9px] font-mono px-2 py-0.5 rounded-md truncate max-w-[60%]"
-                                            style={{ color: 'rgba(255,255,255,0.75)', background: 'rgba(0,0,0,0.28)', border: '1px solid rgba(255,255,255,0.10)' }}>
+                                    <div className="absolute top-0 left-0 right-0 px-3 py-2 flex items-center gap-1.5 pointer-events-none z-10"
+                                        style={{ background: 'linear-gradient(180deg, rgba(0,0,0,0.38), rgba(0,0,0,0))' }}>
+                                        <span className="w-1.5 h-1.5 rounded-full" style={{ background: 'rgba(255,255,255,0.45)' }} />
+                                        <span className="w-1.5 h-1.5 rounded-full" style={{ background: 'rgba(255,255,255,0.32)' }} />
+                                        <span className="w-1.5 h-1.5 rounded-full" style={{ background: 'rgba(255,255,255,0.22)' }} />
+                                        <span className="ml-2 text-[9px] font-mono px-2 py-0.5 rounded-md truncate max-w-[58%]"
+                                            style={{ color: 'rgba(255,255,255,0.78)', background: 'rgba(0,0,0,0.32)', border: '1px solid rgba(255,255,255,0.10)' }}>
                                             /lp/{page.slug}
                                         </span>
                                     </div>
-                                    {/* hero wireframe */}
-                                    <div className="absolute inset-0 flex flex-col items-center justify-center px-6 pointer-events-none">
-                                        <div className="w-2/3 h-2 rounded-full mb-2" style={{ background: 'rgba(255,255,255,0.7)' }} />
-                                        <div className="w-1/2 h-1.5 rounded-full mb-4" style={{ background: 'rgba(255,255,255,0.35)' }} />
-                                        <div className="px-3.5 py-1.5 rounded-md text-[10px] font-bold"
-                                            style={{ background: 'rgba(0,0,0,0.32)', color: '#fff', border: '1px solid rgba(255,255,255,0.25)' }}>
-                                            CTA
-                                        </div>
-                                    </div>
+                                    {/* mini landing real (variante por id) */}
+                                    <MiniLanding variant={variantFor(page.id)} accent={p.a} />
                                     {/* badge ACTIVA */}
-                                    <div className="absolute top-2.5 right-2.5">
+                                    <div className="absolute top-2.5 right-2.5 z-10">
                                         <span className="inline-flex items-center gap-1 text-[9px] font-bold uppercase tracking-[0.14em] px-2 py-0.5 rounded-full backdrop-blur-md"
                                             style={page.active
-                                                ? { background: 'rgba(34,197,94,0.18)', color: '#86EFAC', border: '1px solid rgba(34,197,94,0.45)' }
+                                                ? { background: 'rgba(34,197,94,0.20)', color: '#86EFAC', border: '1px solid rgba(34,197,94,0.45)' }
                                                 : { background: 'rgba(255,255,255,0.10)', color: 'rgba(255,255,255,0.65)', border: '1px solid rgba(255,255,255,0.15)' }}>
                                             {page.active && (
                                                 <span className="relative flex h-1 w-1">
@@ -196,9 +271,9 @@ export default function LandingPagesPage() {
                                         </span>
                                     </div>
                                     {/* icono "abrir" hover */}
-                                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
-                                        <div className="w-11 h-11 rounded-full flex items-center justify-center backdrop-blur-md"
-                                            style={{ background: 'rgba(0,0,0,0.45)', border: '1px solid rgba(255,255,255,0.25)' }}>
+                                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-20">
+                                        <div className="w-10 h-10 rounded-full flex items-center justify-center backdrop-blur-md"
+                                            style={{ background: 'rgba(0,0,0,0.5)', border: '1px solid rgba(255,255,255,0.28)' }}>
                                             <ExternalLink className="w-4 h-4 text-white" />
                                         </div>
                                     </div>
