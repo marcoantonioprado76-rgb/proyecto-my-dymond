@@ -185,44 +185,48 @@ export default function DashboardPage() {
                   style={{
                     position: 'relative', borderRadius: 18,
                     padding: '36px 14px 18px',
-                    background: `radial-gradient(120% 80% at 50% 0%, ${s.accent}14, rgba(255,255,255,0) 60%), linear-gradient(180deg, rgba(13,16,34,0.55), rgba(255,255,255,0.025))`,
-                    border: '1px solid rgba(255,255,255,0.08)',
-                    boxShadow: '0 12px 26px -16px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.04)',
+                    background: `radial-gradient(122% 76% at 50% -4%, ${s.accent}24, rgba(255,255,255,0) 58%), linear-gradient(180deg, rgba(17,19,40,0.78) 0%, rgba(10,11,24,0.66) 52%, rgba(14,16,34,0.55) 100%)`,
+                    border: '1px solid rgba(255,255,255,0.10)',
+                    boxShadow: '0 18px 40px -20px rgba(0,0,0,0.78), 0 4px 14px -8px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05)',
                     display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 5,
                   }}
                 >
+                  {/* reflejo glass diagonal tenue */}
+                  <div style={{ position: 'absolute', inset: 0, borderRadius: 18, background: 'linear-gradient(152deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0) 36%)', pointerEvents: 'none' }} />
                   {/* línea de reflejo superior */}
-                  <div style={{ position: 'absolute', top: 0, left: 14, right: 14, height: 1, background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.09), transparent)', pointerEvents: 'none' }} />
-                  {/* figura geométrica flotante (rombo sutil) */}
-                  <div className="svc-shape" style={{ position: 'absolute', top: 16, right: 12, width: 30, height: 30, borderRadius: 7, border: `1px solid ${s.accent}24`, transform: 'rotate(45deg)', pointerEvents: 'none', opacity: 0.5 }} />
-                  {/* iluminación ambiental detrás del icono */}
-                  <div className="svc-glow-pulse" style={{ position: 'absolute', top: -12, left: '50%', transform: 'translateX(-50%)', width: 78, height: 50, borderRadius: '50%', background: `radial-gradient(ellipse, ${s.accent}26, transparent 70%)`, filter: 'blur(7px)', pointerEvents: 'none' }} />
+                  <div style={{ position: 'absolute', top: 0, left: 14, right: 14, height: 1, background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.13), transparent)', pointerEvents: 'none' }} />
+                  {/* halo ambiental cinematográfico detrás del icono */}
+                  <div className="svc-glow-pulse" style={{ position: 'absolute', top: -18, left: '50%', transform: 'translateX(-50%)', width: 110, height: 74, borderRadius: '50%', background: `radial-gradient(ellipse, ${s.accent}3a, transparent 72%)`, filter: 'blur(13px)', pointerEvents: 'none' }} />
                   {/* icono sobresaliendo desde arriba */}
                   <div className="svc-float" style={{
                     position: 'absolute', top: -20, left: '50%', transform: 'translateX(-50%)',
                     width: 44, height: 44, borderRadius: 14,
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    background: `linear-gradient(155deg, rgba(255,255,255,0.10), rgba(255,255,255,0.015)), rgba(20,16,34,0.6)`,
-                    border: `1px solid ${s.accent}40`,
-                    boxShadow: `0 10px 22px -6px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.10)`,
+                    background: `linear-gradient(155deg, rgba(255,255,255,0.13), rgba(255,255,255,0.02)), rgba(18,15,32,0.72)`,
+                    border: `1px solid ${s.accent}55`,
+                    boxShadow: `0 12px 26px -8px rgba(0,0,0,0.65), 0 0 14px -2px ${s.accent}3a, inset 0 1px 0 rgba(255,255,255,0.14)`,
                     fontSize: 17, color: s.accent,
                     WebkitFontSmoothing: 'antialiased',
                   }}>
-                    <i className={s.icon} style={{ filter: `drop-shadow(0 0 5px ${s.accent}40)` }} />
+                    <i className={s.icon} style={{ filter: `drop-shadow(0 0 6px ${s.accent}55)` }} />
                   </div>
-                  <p style={{ fontSize: 13, fontWeight: 700, color: '#fff', margin: 0, lineHeight: 1.18, textAlign: 'center', letterSpacing: '-0.02em' }}>{s.label}</p>
-                  <p style={{ fontSize: 9.5, fontWeight: 300, color: 'rgba(255,255,255,0.36)', margin: 0, lineHeight: 1.3, textAlign: 'center', letterSpacing: '0.03em' }}>{s.desc}</p>
-                  {/* wave glow inferior, fina a gruesa */}
-                  <svg width="100%" height="18" viewBox="0 0 200 18" preserveAspectRatio="none" className="svc-wave"
+                  <p style={{ fontSize: 13, fontWeight: 700, color: '#fff', margin: 0, lineHeight: 1.18, textAlign: 'center', letterSpacing: '-0.02em', textShadow: '0 1px 12px rgba(0,0,0,0.45)' }}>{s.label}</p>
+                  <p style={{ fontSize: 9.5, fontWeight: 400, color: 'rgba(255,255,255,0.5)', margin: 0, lineHeight: 1.3, textAlign: 'center', letterSpacing: '0.02em' }}>{s.desc}</p>
+                  {/* wave glow inferior — energía elegante difuminada */}
+                  <svg width="100%" height="26" viewBox="0 0 200 26" preserveAspectRatio="none" className="svc-wave"
                     style={{ position: 'absolute', bottom: 0, left: 0, right: 0, pointerEvents: 'none' }}>
                     <defs>
                       <linearGradient id={`svcw-m-${i}`} x1="0" y1="0" x2="1" y2="0">
                         <stop offset="0" stopColor={s.accent} stopOpacity="0" />
-                        <stop offset="0.55" stopColor={s.accent} stopOpacity="0.5" />
+                        <stop offset="0.5" stopColor={s.accent} stopOpacity="0.8" />
                         <stop offset="1" stopColor={s.accent} stopOpacity="0" />
                       </linearGradient>
+                      <filter id={`svcwb-m-${i}`} x="-20%" y="-60%" width="140%" height="240%">
+                        <feGaussianBlur stdDeviation="2" />
+                      </filter>
                     </defs>
-                    <path d="M0 11 Q 100 2 200 13 L 200 15 Q 100 6 0 15 Z" fill={`url(#svcw-m-${i})`} />
+                    <path d="M0 15 Q 100 3 200 17 L 200 21 Q 100 8 0 20 Z" fill={`url(#svcw-m-${i})`} opacity="0.55" filter={`url(#svcwb-m-${i})`} />
+                    <path d="M0 16 Q 100 5 200 18" stroke={`url(#svcw-m-${i})`} strokeWidth="1.3" fill="none" strokeLinecap="round" />
                   </svg>
                 </div>
               </Link>
@@ -328,60 +332,64 @@ export default function DashboardPage() {
                     style={{
                       position: 'relative', borderRadius: 20,
                       padding: '44px 20px 24px',
-                      background: `radial-gradient(115% 78% at 50% 0%, ${s.accent}14, rgba(255,255,255,0) 60%), linear-gradient(180deg, rgba(13,16,34,0.55), rgba(255,255,255,0.022))`,
-                      border: '1px solid rgba(255,255,255,0.08)',
-                      boxShadow: '0 16px 36px -18px rgba(0,0,0,0.65), inset 0 1px 0 rgba(255,255,255,0.045)',
+                      background: `radial-gradient(120% 72% at 50% -4%, ${s.accent}24, rgba(255,255,255,0) 58%), linear-gradient(180deg, rgba(17,19,40,0.78) 0%, rgba(10,11,24,0.66) 52%, rgba(14,16,34,0.55) 100%)`,
+                      border: '1px solid rgba(255,255,255,0.10)',
+                      boxShadow: '0 26px 54px -24px rgba(0,0,0,0.82), 0 6px 18px -10px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.06)',
                       display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 7,
-                      transition: 'transform 0.3s cubic-bezier(0.22,1,0.36,1), border-color 0.3s ease, box-shadow 0.3s ease, background 0.3s ease',
+                      transition: 'transform 0.32s cubic-bezier(0.22,1,0.36,1), border-color 0.32s ease, box-shadow 0.32s ease, background 0.32s ease',
                       cursor: 'pointer',
                     }}
                     onMouseEnter={e => {
                       const el = e.currentTarget as HTMLElement
-                      el.style.transform = 'translateY(-4px)'
-                      el.style.borderColor = `${s.accent}4d`
-                      el.style.boxShadow = `0 22px 46px -18px rgba(0,0,0,0.7), 0 0 24px -6px ${s.accent}33, inset 0 1px 0 rgba(255,255,255,0.07)`
-                      el.style.background = `radial-gradient(115% 78% at 50% 0%, ${s.accent}1f, rgba(255,255,255,0) 62%), linear-gradient(180deg, rgba(13,16,34,0.6), rgba(255,255,255,0.035))`
+                      el.style.transform = 'translateY(-5px)'
+                      el.style.borderColor = `${s.accent}55`
+                      el.style.boxShadow = `0 34px 64px -24px rgba(0,0,0,0.88), 0 0 30px -8px ${s.accent}40, inset 0 1px 0 rgba(255,255,255,0.09)`
+                      el.style.background = `radial-gradient(120% 72% at 50% -4%, ${s.accent}33, rgba(255,255,255,0) 60%), linear-gradient(180deg, rgba(20,22,46,0.82) 0%, rgba(11,12,26,0.7) 52%, rgba(16,18,38,0.58) 100%)`
                     }}
                     onMouseLeave={e => {
                       const el = e.currentTarget as HTMLElement
                       el.style.transform = 'translateY(0)'
-                      el.style.borderColor = 'rgba(255,255,255,0.08)'
-                      el.style.boxShadow = '0 16px 36px -18px rgba(0,0,0,0.65), inset 0 1px 0 rgba(255,255,255,0.045)'
-                      el.style.background = `radial-gradient(115% 78% at 50% 0%, ${s.accent}14, rgba(255,255,255,0) 60%), linear-gradient(180deg, rgba(13,16,34,0.55), rgba(255,255,255,0.022))`
+                      el.style.borderColor = 'rgba(255,255,255,0.10)'
+                      el.style.boxShadow = '0 26px 54px -24px rgba(0,0,0,0.82), 0 6px 18px -10px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.06)'
+                      el.style.background = `radial-gradient(120% 72% at 50% -4%, ${s.accent}24, rgba(255,255,255,0) 58%), linear-gradient(180deg, rgba(17,19,40,0.78) 0%, rgba(10,11,24,0.66) 52%, rgba(14,16,34,0.55) 100%)`
                     }}
                   >
+                    {/* reflejo glass diagonal tenue */}
+                    <div style={{ position: 'absolute', inset: 0, borderRadius: 20, background: 'linear-gradient(152deg, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0) 36%)', pointerEvents: 'none' }} />
                     {/* línea de reflejo superior */}
-                    <div style={{ position: 'absolute', top: 0, left: 16, right: 16, height: 1, background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.10), transparent)', pointerEvents: 'none' }} />
-                    {/* figura geométrica flotante (rombo sutil) */}
-                    <div className="svc-shape" style={{ position: 'absolute', top: 20, right: 16, width: 40, height: 40, borderRadius: 9, border: `1px solid ${s.accent}26`, transform: 'rotate(45deg)', pointerEvents: 'none', opacity: 0.5 }} />
-                    {/* iluminación ambiental detrás del icono */}
-                    <div className="svc-glow-pulse" style={{ position: 'absolute', top: -14, left: '50%', transform: 'translateX(-50%)', width: 96, height: 60, borderRadius: '50%', background: `radial-gradient(ellipse, ${s.accent}26, transparent 70%)`, filter: 'blur(8px)', pointerEvents: 'none' }} />
+                    <div style={{ position: 'absolute', top: 0, left: 16, right: 16, height: 1, background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.14), transparent)', pointerEvents: 'none' }} />
+                    {/* halo ambiental cinematográfico detrás del icono */}
+                    <div className="svc-glow-pulse" style={{ position: 'absolute', top: -22, left: '50%', transform: 'translateX(-50%)', width: 140, height: 92, borderRadius: '50%', background: `radial-gradient(ellipse, ${s.accent}3a, transparent 72%)`, filter: 'blur(15px)', pointerEvents: 'none' }} />
                     {/* icono premium sobresaliendo desde arriba */}
                     <div className="svc-float" style={{
                       position: 'absolute', top: -26, left: '50%', transform: 'translateX(-50%)',
                       width: 56, height: 56, borderRadius: 18,
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      background: `linear-gradient(155deg, rgba(255,255,255,0.10), rgba(255,255,255,0.015)), rgba(20,16,34,0.6)`,
-                      border: `1px solid ${s.accent}40`,
-                      boxShadow: `0 14px 30px -8px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.10)`,
+                      background: `linear-gradient(155deg, rgba(255,255,255,0.13), rgba(255,255,255,0.02)), rgba(18,15,32,0.72)`,
+                      border: `1px solid ${s.accent}55`,
+                      boxShadow: `0 16px 34px -10px rgba(0,0,0,0.7), 0 0 16px -2px ${s.accent}3a, inset 0 1px 0 rgba(255,255,255,0.14)`,
                       fontSize: 22, color: s.accent,
                       WebkitFontSmoothing: 'antialiased',
                     }}>
-                      <i className={s.icon} style={{ filter: `drop-shadow(0 0 6px ${s.accent}40)` }} />
+                      <i className={s.icon} style={{ filter: `drop-shadow(0 0 7px ${s.accent}55)` }} />
                     </div>
-                    <p style={{ fontSize: 15, fontWeight: 700, color: '#fff', margin: 0, lineHeight: 1.22, textAlign: 'center', letterSpacing: '-0.02em' }}>{s.label}</p>
-                    <p style={{ fontSize: 10.5, fontWeight: 300, color: 'rgba(255,255,255,0.34)', margin: 0, lineHeight: 1.4, textAlign: 'center', letterSpacing: '0.03em' }}>{s.desc}</p>
-                    {/* wave glow inferior, fina a gruesa */}
-                    <svg width="100%" height="22" viewBox="0 0 200 22" preserveAspectRatio="none" className="svc-wave"
+                    <p style={{ fontSize: 15, fontWeight: 700, color: '#fff', margin: 0, lineHeight: 1.22, textAlign: 'center', letterSpacing: '-0.02em', textShadow: '0 1px 14px rgba(0,0,0,0.45)' }}>{s.label}</p>
+                    <p style={{ fontSize: 10.5, fontWeight: 400, color: 'rgba(255,255,255,0.52)', margin: 0, lineHeight: 1.4, textAlign: 'center', letterSpacing: '0.02em' }}>{s.desc}</p>
+                    {/* wave glow inferior — energía elegante difuminada */}
+                    <svg width="100%" height="34" viewBox="0 0 200 34" preserveAspectRatio="none" className="svc-wave"
                       style={{ position: 'absolute', bottom: 0, left: 0, right: 0, pointerEvents: 'none' }}>
                       <defs>
                         <linearGradient id={`svcw-d-${i}`} x1="0" y1="0" x2="1" y2="0">
                           <stop offset="0" stopColor={s.accent} stopOpacity="0" />
-                          <stop offset="0.55" stopColor={s.accent} stopOpacity="0.55" />
+                          <stop offset="0.5" stopColor={s.accent} stopOpacity="0.85" />
                           <stop offset="1" stopColor={s.accent} stopOpacity="0" />
                         </linearGradient>
+                        <filter id={`svcwb-d-${i}`} x="-20%" y="-60%" width="140%" height="240%">
+                          <feGaussianBlur stdDeviation="2.4" />
+                        </filter>
                       </defs>
-                      <path d="M0 14 Q 100 2 200 16 L 200 19 Q 100 8 0 18 Z" fill={`url(#svcw-d-${i})`} />
+                      <path d="M0 20 Q 100 4 200 22 L 200 27 Q 100 11 0 26 Z" fill={`url(#svcw-d-${i})`} opacity="0.55" filter={`url(#svcwb-d-${i})`} />
+                      <path d="M0 21 Q 100 6 200 23" stroke={`url(#svcw-d-${i})`} strokeWidth="1.4" fill="none" strokeLinecap="round" />
                     </svg>
                   </div>
                 </Link>
