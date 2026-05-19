@@ -177,34 +177,39 @@ export default function DashboardPage() {
           <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.38)', margin: '0 0 30px', lineHeight: 1.5 }}>
             Activa tu sistema de automatización.
           </p>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, columnGap: 14, rowGap: 30 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', columnGap: 14, rowGap: 32 }}>
             {SERVICES.filter(s => !s.hidden).map(s => (
               <Link key={s.href} href={s.href} style={{ textDecoration: 'none', display: 'block' }}>
                 <div
                   className="svc-card"
                   style={{
                     position: 'relative', borderRadius: 18,
-                    padding: '34px 14px 16px',
-                    background: 'rgba(255,255,255,0.025)',
-                    border: '1px solid rgba(255,255,255,0.07)',
+                    padding: '36px 14px 16px',
+                    background: `radial-gradient(120% 80% at 50% 0%, ${s.accent}14, rgba(255,255,255,0) 60%), rgba(255,255,255,0.025)`,
+                    border: '1px solid rgba(255,255,255,0.08)',
+                    boxShadow: '0 12px 26px -16px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.04)',
                     display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 5,
-                    transition: 'border-color 0.25s ease, background 0.25s ease',
                   }}
                 >
+                  {/* línea de reflejo superior */}
+                  <div style={{ position: 'absolute', top: 0, left: 14, right: 14, height: 1, background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.09), transparent)', pointerEvents: 'none' }} />
+                  {/* iluminación ambiental detrás del icono */}
+                  <div style={{ position: 'absolute', top: -12, left: '50%', transform: 'translateX(-50%)', width: 78, height: 50, borderRadius: '50%', background: `radial-gradient(ellipse, ${s.accent}26, transparent 70%)`, filter: 'blur(7px)', pointerEvents: 'none' }} />
                   {/* icono sobresaliendo desde arriba */}
                   <div style={{
                     position: 'absolute', top: -20, left: '50%', transform: 'translateX(-50%)',
                     width: 44, height: 44, borderRadius: 14,
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    background: 'linear-gradient(150deg, rgba(255,255,255,0.07), rgba(255,255,255,0.02))',
+                    background: `linear-gradient(155deg, rgba(255,255,255,0.10), rgba(255,255,255,0.015)), rgba(20,16,34,0.6)`,
                     border: `1px solid ${s.accent}40`,
-                    boxShadow: `0 8px 20px rgba(0,0,0,0.45), 0 0 14px ${s.accent}22`,
+                    boxShadow: `0 10px 22px -6px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.10)`,
                     fontSize: 17, color: s.accent,
+                    WebkitFontSmoothing: 'antialiased',
                   }}>
-                    <i className={s.icon} />
+                    <i className={s.icon} style={{ filter: `drop-shadow(0 0 5px ${s.accent}40)` }} />
                   </div>
-                  <p style={{ fontSize: 12.5, fontWeight: 700, color: '#fff', margin: 0, lineHeight: 1.2, textAlign: 'center' }}>{s.label}</p>
-                  <p style={{ fontSize: 9.5, color: 'rgba(255,255,255,0.4)', margin: 0, lineHeight: 1.3, textAlign: 'center' }}>{s.desc}</p>
+                  <p style={{ fontSize: 12.5, fontWeight: 600, color: '#fff', margin: 0, lineHeight: 1.2, textAlign: 'center', letterSpacing: '-0.015em' }}>{s.label}</p>
+                  <p style={{ fontSize: 9.5, color: 'rgba(255,255,255,0.38)', margin: 0, lineHeight: 1.3, textAlign: 'center', letterSpacing: '0.02em' }}>{s.desc}</p>
                 </div>
               </Link>
             ))}
@@ -302,46 +307,54 @@ export default function DashboardPage() {
             <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.35)', margin: '0 0 44px', lineHeight: 1.5 }}>
               Activa tu sistema de automatización.
             </p>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(190px, 1fr))', columnGap: 18, rowGap: 40 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', columnGap: 18, rowGap: 44 }}>
               {SERVICES.filter(s => !s.hidden).map(s => (
                 <Link key={s.href} href={s.href} style={{ textDecoration: 'none', display: 'block' }}>
                   <div
                     style={{
                       position: 'relative', borderRadius: 20,
-                      padding: '42px 20px 22px',
-                      background: 'rgba(255,255,255,0.022)',
-                      border: '1px solid rgba(255,255,255,0.07)',
+                      padding: '44px 20px 22px',
+                      background: `radial-gradient(115% 78% at 50% 0%, ${s.accent}14, rgba(255,255,255,0) 60%), rgba(255,255,255,0.022)`,
+                      border: '1px solid rgba(255,255,255,0.08)',
+                      boxShadow: '0 16px 36px -18px rgba(0,0,0,0.65), inset 0 1px 0 rgba(255,255,255,0.045)',
                       display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 7,
-                      transition: 'transform 0.28s ease, border-color 0.28s ease, background 0.28s ease',
+                      transition: 'transform 0.3s cubic-bezier(0.22,1,0.36,1), border-color 0.3s ease, box-shadow 0.3s ease, background 0.3s ease',
                       cursor: 'pointer',
                     }}
                     onMouseEnter={e => {
                       const el = e.currentTarget as HTMLElement
-                      el.style.transform = 'translateY(-5px)'
-                      el.style.borderColor = `${s.accent}55`
-                      el.style.background = 'rgba(255,255,255,0.04)'
+                      el.style.transform = 'translateY(-4px)'
+                      el.style.borderColor = `${s.accent}4d`
+                      el.style.boxShadow = `0 22px 46px -18px rgba(0,0,0,0.7), 0 0 24px -6px ${s.accent}33, inset 0 1px 0 rgba(255,255,255,0.07)`
+                      el.style.background = `radial-gradient(115% 78% at 50% 0%, ${s.accent}1f, rgba(255,255,255,0) 62%), rgba(255,255,255,0.035)`
                     }}
                     onMouseLeave={e => {
                       const el = e.currentTarget as HTMLElement
                       el.style.transform = 'translateY(0)'
-                      el.style.borderColor = 'rgba(255,255,255,0.07)'
-                      el.style.background = 'rgba(255,255,255,0.022)'
+                      el.style.borderColor = 'rgba(255,255,255,0.08)'
+                      el.style.boxShadow = '0 16px 36px -18px rgba(0,0,0,0.65), inset 0 1px 0 rgba(255,255,255,0.045)'
+                      el.style.background = `radial-gradient(115% 78% at 50% 0%, ${s.accent}14, rgba(255,255,255,0) 60%), rgba(255,255,255,0.022)`
                     }}
                   >
+                    {/* línea de reflejo superior */}
+                    <div style={{ position: 'absolute', top: 0, left: 16, right: 16, height: 1, background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.10), transparent)', pointerEvents: 'none' }} />
+                    {/* iluminación ambiental detrás del icono */}
+                    <div style={{ position: 'absolute', top: -14, left: '50%', transform: 'translateX(-50%)', width: 96, height: 60, borderRadius: '50%', background: `radial-gradient(ellipse, ${s.accent}26, transparent 70%)`, filter: 'blur(8px)', pointerEvents: 'none' }} />
                     {/* icono premium sobresaliendo desde arriba */}
                     <div style={{
                       position: 'absolute', top: -26, left: '50%', transform: 'translateX(-50%)',
                       width: 56, height: 56, borderRadius: 18,
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      background: 'linear-gradient(150deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02))',
-                      border: `1px solid ${s.accent}45`,
-                      boxShadow: `0 12px 28px rgba(0,0,0,0.5), 0 0 18px ${s.accent}26`,
+                      background: `linear-gradient(155deg, rgba(255,255,255,0.10), rgba(255,255,255,0.015)), rgba(20,16,34,0.6)`,
+                      border: `1px solid ${s.accent}40`,
+                      boxShadow: `0 14px 30px -8px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.10)`,
                       fontSize: 22, color: s.accent,
+                      WebkitFontSmoothing: 'antialiased',
                     }}>
-                      <i className={s.icon} />
+                      <i className={s.icon} style={{ filter: `drop-shadow(0 0 6px ${s.accent}40)` }} />
                     </div>
-                    <p style={{ fontSize: 14.5, fontWeight: 700, color: '#fff', margin: 0, lineHeight: 1.25, textAlign: 'center', letterSpacing: '0.01em' }}>{s.label}</p>
-                    <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.38)', margin: 0, lineHeight: 1.4, textAlign: 'center' }}>{s.desc}</p>
+                    <p style={{ fontSize: 14.5, fontWeight: 600, color: '#fff', margin: 0, lineHeight: 1.25, textAlign: 'center', letterSpacing: '-0.015em' }}>{s.label}</p>
+                    <p style={{ fontSize: 10.5, color: 'rgba(255,255,255,0.36)', margin: 0, lineHeight: 1.4, textAlign: 'center', letterSpacing: '0.02em' }}>{s.desc}</p>
                   </div>
                 </Link>
               ))}
