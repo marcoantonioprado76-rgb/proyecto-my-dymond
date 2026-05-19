@@ -215,9 +215,9 @@ function CreateBotForm({ onCreated }: { onCreated: (bot: Bot, webhookUrl: string
           disabled={loading || !name.trim()}
           className="w-full sm:w-auto px-5 py-2.5 font-bold rounded-xl text-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition-all duration-200 active:scale-[0.98]"
           style={{
-            background: 'linear-gradient(135deg, #22B7FF, #7B5BFF)',
-            color: '#ffffff',
-            boxShadow: '0 10px 24px -10px rgba(34,183,255,0.6), inset 0 1px 0 rgba(255,255,255,0.25)',
+            background: 'linear-gradient(135deg, #00E58A, #16A34A)',
+            color: '#04231a',
+            boxShadow: '0 10px 24px -10px rgba(0,229,138,0.55), inset 0 1px 0 rgba(255,255,255,0.28)',
           }}
         >
           {loading ? <Spinner /> : <Plus className="w-4 h-4" />}
@@ -634,98 +634,108 @@ function BotCard({ bot, onSelect }: { bot: Bot; onSelect: (bot: Bot) => void }) 
   return (
     <button
       onClick={() => onSelect(bot)}
-      className="relative w-full text-left rounded-xl overflow-hidden group transition-all duration-300 hover:-translate-y-0.5"
+      className="relative w-full text-left group transition-all duration-300 hover:-translate-y-0.5"
       style={{
+        marginTop: 30,
+        borderRadius: 18,
         background: isActive
-          ? `radial-gradient(120% 85% at 50% -12%, ${accent}1f, rgba(255,255,255,0) 56%), radial-gradient(90% 70% at 100% 110%, rgba(123,91,255,0.14), rgba(255,255,255,0) 60%), linear-gradient(180deg, rgba(16,18,38,0.92) 0%, rgba(10,11,26,0.88) 100%)`
+          ? `radial-gradient(120% 80% at 50% -6%, ${accent}1f, rgba(255,255,255,0) 56%), radial-gradient(95% 75% at 100% 108%, rgba(123,91,255,0.16), rgba(255,255,255,0) 60%), linear-gradient(180deg, rgba(16,18,38,0.92) 0%, rgba(10,11,26,0.88) 100%)`
           : 'linear-gradient(180deg, rgba(20,20,32,0.85), rgba(14,14,24,0.85))',
         border: `1px solid ${isActive ? 'rgba(255,255,255,0.09)' : 'rgba(255,255,255,0.05)'}`,
-        boxShadow: isActive ? '0 16px 34px -20px rgba(0,0,0,0.78), inset 0 1px 0 rgba(255,255,255,0.045)' : 'none',
+        boxShadow: isActive ? '0 18px 38px -22px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.045)' : 'none',
         opacity: isActive ? 1 : 0.62,
       }}
       onMouseEnter={e => {
         if (!isActive) return
-        e.currentTarget.style.boxShadow = `0 22px 44px -20px rgba(0,0,0,0.85), 0 0 22px -8px ${accent}3a, inset 0 1px 0 rgba(255,255,255,0.07)`
+        e.currentTarget.style.boxShadow = `0 24px 48px -22px rgba(0,0,0,0.86), 0 0 24px -8px ${accent}3a, inset 0 1px 0 rgba(255,255,255,0.07)`
         e.currentTarget.style.borderColor = `${accent}4d`
       }}
       onMouseLeave={e => {
         if (!isActive) return
-        e.currentTarget.style.boxShadow = '0 16px 34px -20px rgba(0,0,0,0.78), inset 0 1px 0 rgba(255,255,255,0.045)'
+        e.currentTarget.style.boxShadow = '0 18px 38px -22px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.045)'
         e.currentTarget.style.borderColor = 'rgba(255,255,255,0.09)'
       }}
     >
-      {/* avatar IA gigante integrado como presencia holográfica */}
-      <img
-        src="https://i.ibb.co/gxR9G7X/envato-labs-image-edit-73.png"
-        alt=""
-        aria-hidden
-        className="absolute -bottom-6 -right-5 w-28 h-28 object-cover pointer-events-none select-none"
-        style={{ opacity: isActive ? 0.10 : 0.04, filter: 'blur(2px) saturate(1.1)', maskImage: 'radial-gradient(circle at 60% 60%, #000 40%, transparent 75%)', WebkitMaskImage: 'radial-gradient(circle at 60% 60%, #000 40%, transparent 75%)' }}
-      />
-      {/* grid tecnológico fino */}
-      <div className="absolute inset-0 pointer-events-none" style={{
-        backgroundImage: 'linear-gradient(rgba(255,255,255,0.018) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.018) 1px, transparent 1px)',
-        backgroundSize: '30px 30px', maskImage: 'radial-gradient(ellipse at 50% 0%, #000 25%, transparent 72%)', WebkitMaskImage: 'radial-gradient(ellipse at 50% 0%, #000 25%, transparent 72%)',
-      }} />
-      {/* reflejo glass diagonal */}
-      <div className="absolute inset-0 pointer-events-none" style={{ background: 'linear-gradient(152deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0) 34%)' }} />
-      {/* línea superior premium */}
-      <div className="absolute top-0 left-4 right-4 h-px pointer-events-none" style={{ background: `linear-gradient(90deg, transparent, ${isActive ? accent + '99' : 'rgba(255,255,255,0.10)'}, transparent)` }} />
-      {/* halo ambiental */}
+      {/* capa decorativa recortada a la card (presencia IA holográfica grande + grid + reflejo) */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none" style={{ borderRadius: 18 }}>
+        <img
+          src="https://i.ibb.co/gxR9G7X/envato-labs-image-edit-73.png"
+          alt=""
+          aria-hidden
+          className="absolute object-cover select-none"
+          style={{
+            right: -40, bottom: -50, width: 220, height: 220,
+            opacity: isActive ? 0.13 : 0.05,
+            filter: 'blur(2px) saturate(1.15)',
+            maskImage: 'radial-gradient(circle at 55% 55%, #000 38%, transparent 74%)',
+            WebkitMaskImage: 'radial-gradient(circle at 55% 55%, #000 38%, transparent 74%)',
+          }}
+        />
+        {/* grid tecnológico fino */}
+        <div className="absolute inset-0" style={{
+          backgroundImage: 'linear-gradient(rgba(255,255,255,0.018) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.018) 1px, transparent 1px)',
+          backgroundSize: '30px 30px', maskImage: 'radial-gradient(ellipse at 50% 0%, #000 28%, transparent 74%)', WebkitMaskImage: 'radial-gradient(ellipse at 50% 0%, #000 28%, transparent 74%)',
+        }} />
+        {/* reflejo glass diagonal */}
+        <div className="absolute inset-0" style={{ background: 'linear-gradient(152deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0) 34%)' }} />
+        {/* línea superior premium */}
+        <div className="absolute top-0 left-5 right-5 h-px" style={{ background: `linear-gradient(90deg, transparent, ${isActive ? accent + '99' : 'rgba(255,255,255,0.10)'}, transparent)` }} />
+      </div>
+
+      {/* halo ambiental detrás del avatar */}
       {isActive && (
-        <div className="svc-glow-pulse absolute -top-6 left-8 rounded-full pointer-events-none" style={{ width: 120, height: 70, background: `radial-gradient(ellipse, ${accent}26, transparent 72%)`, filter: 'blur(18px)' }} />
+        <div className="svc-glow-pulse absolute left-1/2 -translate-x-1/2 rounded-full pointer-events-none" style={{ top: -34, width: 130, height: 80, background: `radial-gradient(ellipse, ${accent}33, transparent 72%)`, filter: 'blur(16px)' }} />
       )}
 
-      <div className="relative z-10 p-5">
-        {/* header compacto */}
-        <div className="flex items-center gap-3.5">
-          <div className="relative shrink-0">
-            <div className="svc-glow-pulse absolute inset-0 rounded-full pointer-events-none" style={{ background: `radial-gradient(circle, ${accent}3a, transparent 70%)`, filter: 'blur(7px)' }} />
-            <div className="relative w-12 h-12 rounded-full overflow-hidden flex items-center justify-center"
-              style={{
-                background: `linear-gradient(155deg, rgba(255,255,255,0.13), rgba(255,255,255,0.02)), rgba(18,15,32,0.7)`,
-                border: `1px solid ${accent}55`,
-                boxShadow: `0 10px 22px -8px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.12)`,
-              }}>
-              <img
-                src="https://i.ibb.co/gxR9G7X/envato-labs-image-edit-73.png"
-                alt={bot.name}
-                className="w-full h-full object-cover"
-                style={{ filter: isActive ? 'none' : 'grayscale(0.7) opacity(0.7)' }}
-              />
-            </div>
-            {isActive && (
-              <span className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full border-2 flex items-center justify-center"
-                style={{ background: accent, borderColor: '#0b0c1a', boxShadow: `0 0 7px ${accent}` }}>
-                <Wifi className="w-1.5 h-1.5 text-black" />
-              </span>
-            )}
+      {/* avatar IA protagonista, sobresaliendo desde el centro superior */}
+      <div className="absolute left-1/2 -translate-x-1/2 z-20" style={{ top: -30 }}>
+        <div className="relative">
+          <div className="svc-glow-pulse absolute inset-0 rounded-full pointer-events-none" style={{ background: `radial-gradient(circle, ${accent}40, transparent 70%)`, filter: 'blur(9px)' }} />
+          <div className="relative w-[60px] h-[60px] rounded-full overflow-hidden flex items-center justify-center"
+            style={{
+              background: `linear-gradient(155deg, rgba(255,255,255,0.14), rgba(255,255,255,0.02)), rgba(18,15,32,0.72)`,
+              border: `1px solid ${accent}66`,
+              boxShadow: `0 16px 32px -10px rgba(0,0,0,0.75), 0 0 18px -3px ${accent}55, inset 0 1px 0 rgba(255,255,255,0.14)`,
+            }}>
+            <img
+              src="https://i.ibb.co/gxR9G7X/envato-labs-image-edit-73.png"
+              alt={bot.name}
+              className="w-full h-full object-cover"
+              style={{ filter: isActive ? 'none' : 'grayscale(0.7) opacity(0.7)' }}
+            />
           </div>
+          {isActive && (
+            <span className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full border-2 flex items-center justify-center"
+              style={{ background: '#22C55E', borderColor: '#0b0c1a', boxShadow: '0 0 8px #22C55E' }}>
+              <Wifi className="w-2 h-2 text-black" />
+            </span>
+          )}
+        </div>
+      </div>
 
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-1.5">
-              <span className="font-bold text-white text-sm leading-tight truncate" style={{ letterSpacing: '-0.02em' }}>
-                {bot.name}
-              </span>
-              <ChevronRight className="w-3.5 h-3.5 shrink-0 ml-auto" style={{ color: 'rgba(255,255,255,0.28)' }} />
-            </div>
-            <div className="flex items-center gap-2 mt-1">
-              <span className="inline-flex items-center gap-1 text-[8.5px] font-bold uppercase tracking-[0.14em] px-1.5 py-0.5 rounded-full"
-                style={{ background: `${accent}18`, color: accent, border: `1px solid ${accent}33` }}>
-                {isActive && (
-                  <span className="relative flex h-1 w-1">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" style={{ background: accent }} />
-                    <span className="relative inline-flex rounded-full h-1 w-1" style={{ background: accent }} />
-                  </span>
-                )}
-                {isActive ? 'En línea' : 'Pausado'}
-              </span>
-              <span className="text-[8.5px] font-medium uppercase tracking-[0.1em] truncate" style={{ color: 'rgba(255,255,255,0.3)' }}>{channel}</span>
-            </div>
-          </div>
+      <div className="relative z-10 px-5 pb-5" style={{ paddingTop: 42 }}>
+        {/* nombre centrado */}
+        <div className="text-center font-bold text-white text-[15px] leading-tight truncate px-2"
+          style={{ letterSpacing: '-0.02em', textShadow: '0 1px 14px rgba(0,0,0,0.45)' }}>
+          {bot.name}
         </div>
 
-        {/* mini stats — strip compacto con aire */}
+        {/* badge EN LÍNEA (azul) + canal, centrado */}
+        <div className="flex items-center justify-center gap-2 mt-2">
+          <span className="inline-flex items-center gap-1 text-[8.5px] font-bold uppercase tracking-[0.14em] px-2 py-0.5 rounded-full"
+            style={{ background: `${accent}1c`, color: accent, border: `1px solid ${accent}40`, boxShadow: isActive ? `0 0 12px -4px ${accent}66` : 'none' }}>
+            {isActive && (
+              <span className="relative flex h-1 w-1">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" style={{ background: accent }} />
+                <span className="relative inline-flex rounded-full h-1 w-1" style={{ background: accent }} />
+              </span>
+            )}
+            {isActive ? 'En línea' : 'Pausado'}
+          </span>
+          <span className="text-[8.5px] font-medium uppercase tracking-[0.1em] truncate" style={{ color: 'rgba(255,255,255,0.3)' }}>{channel}</span>
+        </div>
+
+        {/* mini stats — strip alineado abajo */}
         <div className="flex items-stretch mt-4 rounded-xl overflow-hidden"
           style={{
             background: isActive ? `linear-gradient(180deg, ${accent}0f, rgba(255,255,255,0.025))` : 'rgba(255,255,255,0.03)',
