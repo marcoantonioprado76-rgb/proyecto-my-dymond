@@ -165,68 +165,63 @@ function CreateBotForm({ onCreated }: { onCreated: (bot: Bot, webhookUrl: string
   }
 
   return (
-    <form onSubmit={handleSubmit} className="glass-panel p-6 rounded-2xl border border-neon-green/20">
-      <h3 className="text-base font-bold text-white mb-4 flex items-center gap-2">
-        <Plus className="w-4 h-4 text-neon-green" />
-        Crear nuevo bot
-      </h3>
+    <form onSubmit={handleSubmit} className="rounded-2xl p-4"
+      style={{ background: 'radial-gradient(120% 80% at 50% -10%, rgba(0,229,138,0.10), rgba(255,255,255,0) 58%), linear-gradient(180deg, rgba(17,19,40,0.82), rgba(12,13,26,0.8))', border: '1px solid rgba(255,255,255,0.08)', boxShadow: '0 16px 36px -22px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.04)' }}>
+      <div className="flex items-center gap-2 mb-3">
+        <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: 'rgba(0,229,138,0.12)', border: '1px solid rgba(0,229,138,0.3)' }}>
+          <Plus className="w-3.5 h-3.5 text-neon-green" />
+        </div>
+        <h3 className="text-sm font-bold text-white" style={{ letterSpacing: '-0.01em' }}>Crear nuevo agente</h3>
+      </div>
 
-      {/* Tipo de bot */}
-      <div className="grid grid-cols-3 gap-2 mb-4">
-        <button
-          type="button"
-          onClick={() => setType('YCLOUD')}
-          className={`p-3 rounded-xl border text-left transition-all ${type === 'YCLOUD'
-            ? 'border-neon-blue/50 bg-neon-blue/10 text-white'
-            : 'border-white/10 text-dark-400 hover:border-white/20'
-            }`}
-        >
-          <Webhook className="w-4 h-4 mb-1.5" />
-          <div className="text-xs font-bold">YCloud</div>
-          <div className="text-[10px] text-dark-500 mt-0.5">WhatsApp API</div>
-        </button>
-        <button
-          type="button"
-          onClick={() => setType('BAILEYS')}
-          className={`p-3 rounded-xl border text-left transition-all ${type === 'BAILEYS'
-            ? 'border-neon-green/50 bg-neon-green/10 text-white'
-            : 'border-white/10 text-dark-400 hover:border-white/20'
-            }`}
-        >
-          <Smartphone className="w-4 h-4 mb-1.5" />
-          <div className="text-xs font-bold">WA Web</div>
-          <div className="text-[10px] text-dark-500 mt-0.5">Escanear QR</div>
-        </button>
-        <button
-          type="button"
-          onClick={() => setType('META')}
-          className={`p-3 rounded-xl border text-left transition-all ${type === 'META'
-            ? 'border-purple-400/50 bg-purple-400/10 text-white'
-            : 'border-white/10 text-dark-400 hover:border-white/20'
-            }`}
-        >
-          <MessageSquare className="w-4 h-4 mb-1.5" />
-          <div className="text-xs font-bold">Messenger</div>
-          <div className="text-[10px] text-dark-500 mt-0.5">Facebook/Instagram</div>
-        </button>
+      {/* Tipo de bot — selector compacto */}
+      <div className="grid grid-cols-3 gap-2 mb-3">
+        {([
+          { t: 'YCLOUD', icon: Webhook, label: 'YCloud', sub: 'WhatsApp API', c: '#38bdf8' },
+          { t: 'BAILEYS', icon: Smartphone, label: 'WA Web', sub: 'Escanear QR', c: '#00E58A' },
+          { t: 'META', icon: MessageSquare, label: 'Messenger', sub: 'FB / IG', c: '#9B6BFF' },
+        ] as const).map(o => {
+          const sel = type === o.t
+          return (
+            <button key={o.t} type="button" onClick={() => setType(o.t)}
+              className="rounded-xl px-2.5 py-2 flex items-center gap-2 transition-all duration-200"
+              style={{
+                background: sel ? `${o.c}1c` : 'rgba(255,255,255,0.03)',
+                border: `1px solid ${sel ? o.c + '66' : 'rgba(255,255,255,0.07)'}`,
+                boxShadow: sel ? `0 0 14px -4px ${o.c}66` : 'none',
+              }}>
+              <o.icon className="w-4 h-4 shrink-0" style={{ color: sel ? o.c : 'rgba(255,255,255,0.4)' }} />
+              <div className="min-w-0 text-left">
+                <div className="text-[11px] font-bold leading-tight" style={{ color: sel ? '#fff' : 'rgba(255,255,255,0.6)' }}>{o.label}</div>
+                <div className="text-[9px] truncate" style={{ color: 'rgba(255,255,255,0.3)' }}>{o.sub}</div>
+              </div>
+            </button>
+          )
+        })}
       </div>
 
       {error && <Alert type="error" msg={error} />}
-      <div className="flex flex-col sm:flex-row gap-3 mt-4">
+      <div className="flex flex-col sm:flex-row gap-2 mt-3">
         <input
           value={name}
           onChange={e => setName(e.target.value)}
           placeholder="Nombre del agente (ej: Agente Ventas Bolivia)"
-          className="flex-1 bg-dark-900/50 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white placeholder-dark-400 focus:outline-none focus:border-neon-green/40"
+          className="flex-1 rounded-xl px-4 py-2.5 text-sm text-white placeholder-dark-400 focus:outline-none transition-colors"
+          style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}
           required
         />
         <button
           type="submit"
           disabled={loading || !name.trim()}
-          className="w-full sm:w-auto px-5 py-2.5 bg-neon-green text-dark-950 font-bold rounded-xl text-sm hover:bg-neon-green/90 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition-colors"
+          className="w-full sm:w-auto px-5 py-2.5 font-bold rounded-xl text-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition-all duration-200 active:scale-[0.98]"
+          style={{
+            background: 'linear-gradient(135deg, #00E58A, #00C2FF)',
+            color: '#06231a',
+            boxShadow: '0 10px 24px -10px rgba(0,229,138,0.6), inset 0 1px 0 rgba(255,255,255,0.25)',
+          }}
         >
           {loading ? <Spinner /> : <Plus className="w-4 h-4" />}
-          Crear Bot
+          Crear
         </button>
       </div>
     </form>
@@ -317,7 +312,7 @@ function GlobalBotChart({ bots }: { bots: Bot[] }) {
   const endIdx = days.length - windowEnd
   const startIdx = Math.max(0, endIdx - WINDOW)
   const visibleDays = days.slice(startIdx, endIdx)
-  const W = 620, H = 180, padL = 36, padR = 16, padT = 28, padB = 36
+  const W = 620, H = 118, padL = 36, padR = 16, padT = 20, padB = 26
   const maxVal = Math.max(...visibleDays.map(d => d.conversations), ...visibleDays.map(d => d.sales), 1)
 
   const xOf = (i: number) => padL + (visibleDays.length > 1 ? i / (visibleDays.length - 1) : 0.5) * (W - padL - padR)
@@ -334,7 +329,7 @@ function GlobalBotChart({ bots }: { bots: Bot[] }) {
   const yVals = [0, Math.round(maxVal / 2), maxVal]
 
   return (
-    <div className="glass-panel rounded-2xl" style={{ padding: '20px 20px 16px', background: 'linear-gradient(135deg, rgba(154,203,255,0.12) 0%, rgba(255,125,224,0.12) 50%, rgba(162,102,255,0.12) 100%)', border: '1px solid rgba(255,255,255,0.15)' }}>
+    <div className="rounded-2xl" style={{ padding: '14px 16px 10px', background: 'radial-gradient(120% 80% at 50% -10%, rgba(123,91,255,0.12), rgba(255,255,255,0) 58%), linear-gradient(180deg, rgba(17,19,40,0.85) 0%, rgba(10,11,24,0.8) 55%, rgba(14,16,34,0.74) 100%)', border: '1px solid rgba(255,255,255,0.08)', boxShadow: '0 18px 40px -22px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.04)' }}>
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 14, flexWrap: 'wrap', gap: 10 }}>
         <div>
@@ -388,7 +383,7 @@ function GlobalBotChart({ bots }: { bots: Bot[] }) {
 
       {/* Chart */}
       {loadingChart ? (
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 140 }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 88 }}>
           <Loader2 className="w-5 h-5 animate-spin text-dark-400" />
         </div>
       ) : (
@@ -629,56 +624,115 @@ function GlobalBotChart({ bots }: { bots: Bot[] }) {
 
 function BotCard({ bot, onSelect }: { bot: Bot; onSelect: (bot: Bot) => void }) {
   const isActive = bot.status === 'ACTIVE'
+  const accent = isActive ? '#00E58A' : '#7C82A8'
+  const channel = bot.type === 'YCLOUD' ? 'YCloud' : bot.type === 'BAILEYS' ? 'WhatsApp Web' : 'Messenger'
+  const stats = [
+    { icon: ShoppingBag, label: 'Productos', value: bot._count?.assignedProducts ?? 0 },
+    { icon: MessageCircle, label: 'Chats', value: bot._count?.conversations ?? 0 },
+    { icon: Zap, label: 'Ventas', value: bot.salesCount ?? 0 },
+  ]
   return (
-    <div className={`glass-panel p-3 sm:p-5 rounded-2xl border relative overflow-hidden transition-all hover:border-white/15 ${isActive ? 'border-white/5' : 'border-white/5 opacity-80'}`}>
-      {/* Active left border glow */}
+    <button
+      onClick={() => onSelect(bot)}
+      className="relative w-full text-left rounded-2xl overflow-hidden group transition-all duration-300 hover:-translate-y-1"
+      style={{
+        background: isActive
+          ? `radial-gradient(120% 78% at 50% -10%, ${accent}1c, rgba(255,255,255,0) 58%), linear-gradient(180deg, rgba(17,19,40,0.9) 0%, rgba(10,11,24,0.85) 55%, rgba(14,16,34,0.78) 100%)`
+          : 'linear-gradient(180deg, rgba(20,20,32,0.85), rgba(14,14,24,0.85))',
+        border: `1px solid ${isActive ? 'rgba(255,255,255,0.10)' : 'rgba(255,255,255,0.05)'}`,
+        boxShadow: isActive ? '0 24px 50px -24px rgba(0,0,0,0.82), inset 0 1px 0 rgba(255,255,255,0.05)' : 'none',
+        opacity: isActive ? 1 : 0.62,
+      }}
+      onMouseEnter={e => {
+        if (!isActive) return
+        e.currentTarget.style.boxShadow = `0 32px 60px -24px rgba(0,0,0,0.88), 0 0 30px -8px ${accent}40, inset 0 1px 0 rgba(255,255,255,0.08)`
+        e.currentTarget.style.borderColor = `${accent}55`
+      }}
+      onMouseLeave={e => {
+        if (!isActive) return
+        e.currentTarget.style.boxShadow = '0 24px 50px -24px rgba(0,0,0,0.82), inset 0 1px 0 rgba(255,255,255,0.05)'
+        e.currentTarget.style.borderColor = 'rgba(255,255,255,0.10)'
+      }}
+    >
+      {/* figura IA gigante integrada en el fondo */}
+      <Bot className="absolute -bottom-5 -right-4 pointer-events-none select-none"
+        style={{ width: 132, height: 132, color: accent, opacity: isActive ? 0.06 : 0.03, filter: 'blur(1.5px)', transform: 'rotate(-8deg)' }} />
+      {/* grid tecnológico sutil */}
+      <div className="absolute inset-0 pointer-events-none" style={{
+        backgroundImage: 'linear-gradient(rgba(255,255,255,0.022) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.022) 1px, transparent 1px)',
+        backgroundSize: '34px 34px', maskImage: 'radial-gradient(ellipse at 50% 0%, #000 30%, transparent 75%)', WebkitMaskImage: 'radial-gradient(ellipse at 50% 0%, #000 30%, transparent 75%)',
+      }} />
+      {/* reflejo glass diagonal */}
+      <div className="absolute inset-0 pointer-events-none" style={{ background: 'linear-gradient(152deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0) 36%)' }} />
+      {/* línea superior premium */}
+      <div className="absolute top-0 left-5 right-5 h-px pointer-events-none" style={{ background: `linear-gradient(90deg, transparent, ${isActive ? accent + 'aa' : 'rgba(255,255,255,0.12)'}, transparent)` }} />
+      {/* halo ambiental */}
       {isActive && (
-        <div className="absolute left-0 top-3 bottom-3 w-0.5 bg-neon-green/70 rounded-full" />
+        <div className="svc-glow-pulse absolute -top-8 left-10 rounded-full pointer-events-none" style={{ width: 150, height: 90, background: `radial-gradient(ellipse, ${accent}2e, transparent 72%)`, filter: 'blur(20px)' }} />
       )}
-      <div className={`absolute inset-0 bg-gradient-to-br to-transparent opacity-0 hover:opacity-100 transition-opacity ${isActive ? 'from-neon-green/5' : 'from-white/3'}`} />
-      <button
-        onClick={() => onSelect(bot)}
-        className="relative z-10 w-full text-left group"
-      >
-        <div className="flex items-start justify-between mb-3">
-          <div className="flex items-center gap-3">
-            <div className={`w-10 h-10 rounded-xl flex items-center justify-center border ${isActive ? 'bg-neon-green/10 border-neon-green/20' : 'bg-white/5 border-white/10'}`}>
-              <Bot className={`w-5 h-5 ${isActive ? 'text-neon-green' : 'text-dark-400'}`} />
+
+      <div className="relative z-10 p-4 sm:p-5">
+        {/* header: avatar IA + estado/canal + chevron */}
+        <div className="flex items-start gap-3.5">
+          <div className="relative shrink-0">
+            <div className="svc-glow-pulse absolute inset-0 rounded-full pointer-events-none" style={{ background: `radial-gradient(circle, ${accent}3a, transparent 70%)`, filter: 'blur(8px)' }} />
+            <div className="relative w-14 h-14 rounded-full flex items-center justify-center"
+              style={{
+                background: `linear-gradient(155deg, rgba(255,255,255,0.13), rgba(255,255,255,0.02)), rgba(18,15,32,0.7)`,
+                border: `1px solid ${accent}55`,
+                boxShadow: `0 14px 30px -10px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.12)`,
+              }}>
+              <Bot className="w-7 h-7" style={{ color: accent, filter: `drop-shadow(0 0 7px ${accent}66)` }} />
             </div>
-            <div>
-              <div className="font-bold text-white text-sm">{bot.name}</div>
-              <div className="text-xs text-dark-400 mt-0.5">
-                <span className="inline-flex items-center gap-1">
-                  <ShoppingBag className="w-3 h-3" /> {bot._count?.assignedProducts ?? 0}
-                </span>
-                <span className="mx-1.5 text-dark-600">·</span>
-                <span className="inline-flex items-center gap-1">
-                  <MessageCircle className="w-3 h-3" /> {bot._count?.conversations ?? 0}
-                </span>
+            {isActive && (
+              <span className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full border-2 flex items-center justify-center"
+                style={{ background: accent, borderColor: '#0b0c1a', boxShadow: `0 0 8px ${accent}` }}>
+                <Wifi className="w-2 h-2 text-black" />
+              </span>
+            )}
+          </div>
+
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 mb-1">
+              <span className="inline-flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-[0.16em] px-2 py-0.5 rounded-full"
+                style={{ background: `${accent}1c`, color: accent, border: `1px solid ${accent}40` }}>
+                {isActive && (
+                  <span className="relative flex h-1.5 w-1.5">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" style={{ background: accent }} />
+                    <span className="relative inline-flex rounded-full h-1.5 w-1.5" style={{ background: accent }} />
+                  </span>
+                )}
+                {isActive ? 'En línea' : 'Pausado'}
+              </span>
+              <span className="text-[9px] font-medium uppercase tracking-[0.12em]" style={{ color: 'rgba(255,255,255,0.32)' }}>{channel}</span>
+            </div>
+            <div className="font-bold text-white text-[17px] leading-tight truncate" style={{ letterSpacing: '-0.02em', textShadow: '0 1px 14px rgba(0,0,0,0.45)' }}>
+              {bot.name}
+            </div>
+            {bot.secret?.whatsappInstanceNumber && (
+              <div className="text-[11px] mt-0.5 flex items-center gap-1" style={{ color: 'rgba(255,255,255,0.38)' }}>
+                <Smartphone className="w-3 h-3" />
+                {bot.secret.whatsappInstanceNumber}
               </div>
-            </div>
+            )}
           </div>
-          <div className="flex items-center gap-2">
-            <span className={`flex items-center gap-1.5 text-[10px] font-bold px-2 py-1 rounded-full border ${isActive ? 'bg-neon-green/10 text-neon-green border-neon-green/20' : 'bg-dark-700/50 text-dark-400 border-dark-600'}`}>
-              {isActive && (
-                <span className="relative flex h-1.5 w-1.5">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-neon-green opacity-75" />
-                  <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-neon-green" />
-                </span>
-              )}
-              {isActive ? 'ACTIVO' : 'PAUSADO'}
-            </span>
-            <ChevronRight className="w-4 h-4 text-dark-500 group-hover:text-white transition-colors" />
-          </div>
+
+          <ChevronRight className="w-4 h-4 shrink-0 mt-1 transition-colors" style={{ color: 'rgba(255,255,255,0.3)' }} />
         </div>
-        {bot.secret?.whatsappInstanceNumber && (
-          <div className="text-xs text-dark-400 flex items-center gap-1">
-            <Smartphone className="w-3 h-3" />
-            {bot.secret.whatsappInstanceNumber}
-          </div>
-        )}
-      </button>
-    </div>
+
+        {/* mini stats premium */}
+        <div className="grid grid-cols-3 gap-2 mt-4">
+          {stats.map(st => (
+            <div key={st.label} className="rounded-xl px-2.5 py-2.5 text-center"
+              style={{ background: 'rgba(255,255,255,0.035)', border: '1px solid rgba(255,255,255,0.07)' }}>
+              <st.icon className="w-3.5 h-3.5 mx-auto mb-1" style={{ color: isActive ? accent : 'rgba(255,255,255,0.3)' }} />
+              <div className="text-base font-bold text-white leading-none" style={{ letterSpacing: '-0.02em' }}>{st.value}</div>
+              <div className="text-[9px] mt-1 uppercase tracking-[0.1em]" style={{ color: 'rgba(255,255,255,0.32)' }}>{st.label}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </button>
   )
 }
 
