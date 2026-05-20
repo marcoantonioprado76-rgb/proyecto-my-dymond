@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { ShoppingCart, MessageCircle, Layout, ArrowRight, Megaphone, Play, Lock, AlertTriangle, Send, Zap, Users } from 'lucide-react'
+import { ShoppingCart, MessageCircle, Layout, ArrowRight, Megaphone, Play, Lock, AlertTriangle, Send, Zap, Users, Music2, Search } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 
@@ -43,12 +43,32 @@ const services = [
   },
   {
     id: 4,
-    title: 'Anuncios con IA',
-    description: 'Campañas en Meta, Google y TikTok. Copy, creativos y estrategia generados por IA.',
+    title: 'Meta Ads',
+    description: 'Campañas en Facebook & Instagram con copy, creativos y estrategia generados por IA.',
     icon: Megaphone,
-    from: '#FF8800', to: '#FFCC00',
-    features: ['Meta · Google · TikTok', 'Creativos con IA', 'Métricas en tiempo real'],
-    link: '/dashboard/services/ads',
+    from: '#0081FB', to: '#3B82F6',
+    features: ['Facebook · Instagram', 'Creativos con IA', 'Métricas en tiempo real'],
+    link: '/dashboard/services/ads/meta',
+    requiredPlan: 'BASIC' as UserPlan,
+  },
+  {
+    id: 41,
+    title: 'TikTok Ads',
+    description: 'Próximamente: campañas en TikTok for Business con creativos generados por IA.',
+    icon: Music2,
+    from: '#EE1D52', to: '#69C9D0',
+    features: ['TikTok for Business', 'Creativos con IA', 'Próximamente'],
+    link: '/dashboard/services/ads/tiktok',
+    requiredPlan: 'BASIC' as UserPlan,
+  },
+  {
+    id: 42,
+    title: 'Google Ads',
+    description: 'Próximamente: Search, Display y YouTube. Copy y bidding inteligente con IA.',
+    icon: Search,
+    from: '#4285F4', to: '#FBBC04',
+    features: ['Search · Display · YouTube', 'Copy con IA', 'Próximamente'],
+    link: '/dashboard/services/ads/google',
     requiredPlan: 'BASIC' as UserPlan,
   },
   // {

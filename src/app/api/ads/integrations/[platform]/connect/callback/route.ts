@@ -23,9 +23,13 @@ export async function GET(
 
     const cookieHeader = req.headers.get('cookie') || ''
     const stateFromCookie = cookieHeader.match(/ads_oauth_state=([^;]+)/)?.[1]
+    // platform-aware redirect base (cada plataforma vuelve a SU dashboard)
+    const platformSlug = params.platform.toLowerCase()
+    const dashboardPath = `/dashboard/services/ads/${platformSlug}`
+
     if (stateFromUrl !== stateFromCookie) {
         const appUrl = process.env.NEXT_PUBLIC_APP_URL || `https://${new URL(req.url).host}`
-        return NextResponse.redirect(new URL('/dashboard/services/ads?error=state_mismatch', appUrl))
+        return NextResponse.redirect(new URL(`${dashboardPath}?error=state_mismatch`, appUrl))
     }
 
     const platform = params.platform.toUpperCase() as AdPlatform
@@ -66,9 +70,9 @@ export async function GET(
             }
         })
 
-        // Redirect to dashboard with success
+        // Redirect to platform-specific dashboard with success
         const appUrl = process.env.NEXT_PUBLIC_APP_URL || `https://${new URL(req.url).host}`
-        return NextResponse.redirect(new URL('/dashboard/services/ads?connected=' + platform, appUrl))
+        return NextResponse.redirect(new URL(`${dashboardPath}?connected=` + platform, appUrl))
     } catch (error: any) {
         console.error('[Ads] OAuth Callback Fatal Error:', error)
         // If it's a Meta configuration issue, log specifically
@@ -81,6 +85,6 @@ export async function GET(
             })
         }
         const appUrl = process.env.NEXT_PUBLIC_APP_URL || `https://${new URL(req.url).host}`
-        return NextResponse.redirect(new URL('/dashboard/services/ads?error=' + encodeURIComponent(error.message), appUrl))
+        return NextResponse.redirect(new URL(`${dashboardPath}?error=` + encodeURIComponent(error.message), appUrl))
     }
 }
