@@ -676,7 +676,7 @@ export default function VirtualStorePage() {
     }
 
     return (
-        <div className="px-4 sm:px-6 pt-6 max-w-6xl mx-auto pb-20 font-inter text-white">
+        <div className="px-4 sm:px-6 pt-6 max-w-4xl mx-auto pb-20 font-inter text-white">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
                 <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
@@ -728,7 +728,7 @@ export default function VirtualStorePage() {
                     </button>
                 </div>
             ) : (
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-7 xl:gap-8">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 lg:gap-7">
                     {stores.map(store => {
                         const p = paletteForStore(store.id)
                         const productCount = store._count?.products || 0
@@ -737,51 +737,51 @@ export default function VirtualStorePage() {
                             <div key={store.id}
                                 className="relative rounded-2xl overflow-hidden group transition-all duration-300 hover:-translate-y-1"
                                 style={{
-                                    background: `radial-gradient(120% 80% at 50% -10%, ${p.accent}26, rgba(255,255,255,0) 58%), radial-gradient(80% 80% at 100% 100%, ${p.accent}16, rgba(255,255,255,0) 60%), radial-gradient(70% 70% at 0% 100%, ${p.accent}10, rgba(255,255,255,0) 60%), linear-gradient(180deg, rgba(22,28,56,0.92) 0%, rgba(16,20,42,0.9) 100%)`,
-                                    border: '1px solid rgba(255,255,255,0.10)',
-                                    boxShadow: `0 28px 56px -24px rgba(0,0,0,0.82), 0 0 0 1px rgba(255,255,255,0.02), 0 0 32px -14px ${p.accent}38, inset 0 1px 0 rgba(255,255,255,0.06)`,
+                                    background: `radial-gradient(120% 80% at 50% -10%, ${p.accent}1c, rgba(255,255,255,0) 60%), radial-gradient(80% 80% at 100% 100%, ${p.accent}10, rgba(255,255,255,0) 62%), linear-gradient(180deg, rgba(20,24,48,0.94) 0%, rgba(14,16,34,0.94) 100%)`,
+                                    border: '1px solid rgba(255,255,255,0.08)',
+                                    boxShadow: `0 22px 44px -22px rgba(0,0,0,0.78), 0 0 24px -14px ${p.accent}30, inset 0 1px 0 rgba(255,255,255,0.05)`,
                                 }}
                                 onMouseEnter={e => {
-                                    e.currentTarget.style.boxShadow = `0 36px 68px -22px rgba(0,0,0,0.86), 0 0 44px -8px ${p.accent}66, 0 0 18px -6px rgba(123,91,255,0.42), inset 0 1px 0 rgba(255,255,255,0.10)`
-                                    e.currentTarget.style.borderColor = `${p.accent}66`
+                                    e.currentTarget.style.boxShadow = `0 30px 56px -22px rgba(0,0,0,0.84), 0 0 36px -10px ${p.accent}55, 0 0 16px -8px rgba(123,91,255,0.35), inset 0 1px 0 rgba(255,255,255,0.09)`
+                                    e.currentTarget.style.borderColor = `${p.accent}55`
                                 }}
                                 onMouseLeave={e => {
-                                    e.currentTarget.style.boxShadow = `0 28px 56px -24px rgba(0,0,0,0.82), 0 0 0 1px rgba(255,255,255,0.02), 0 0 32px -14px ${p.accent}38, inset 0 1px 0 rgba(255,255,255,0.06)`
-                                    e.currentTarget.style.borderColor = 'rgba(255,255,255,0.10)'
+                                    e.currentTarget.style.boxShadow = `0 22px 44px -22px rgba(0,0,0,0.78), 0 0 24px -14px ${p.accent}30, inset 0 1px 0 rgba(255,255,255,0.05)`
+                                    e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'
                                 }}>
 
                                 {/* Mini storefront preview panorámico */}
                                 <a href={`/sh/${store.slug}`} target="_blank" rel="noopener noreferrer"
-                                    className="block relative aspect-[16/9] overflow-hidden"
+                                    className="block relative aspect-[5/2] overflow-hidden"
                                     style={{
                                         background: store.bannerUrl
-                                            ? `linear-gradient(180deg, rgba(8,10,24,0.22) 0%, rgba(8,10,24,0.78) 100%), url("${store.bannerUrl}") center/cover no-repeat`
-                                            : `linear-gradient(160deg, ${p.a} 0%, ${p.b} 55%, ${p.c} 100%)`,
+                                            ? `linear-gradient(180deg, rgba(8,10,24,0.32) 0%, rgba(8,10,24,0.82) 100%), url("${store.bannerUrl}") center/cover no-repeat`
+                                            : `linear-gradient(155deg, ${p.a} 0%, ${p.b} 60%, ${p.c} 100%)`,
                                     }}>
-                                    {/* viñeta */}
+                                    {/* overlay oscuro suave */}
                                     <div className="absolute inset-0 pointer-events-none" style={{
-                                        background: 'linear-gradient(180deg, rgba(0,0,0,0.08) 0%, rgba(0,0,0,0) 35%, rgba(0,0,0,0.4) 100%)',
+                                        background: 'linear-gradient(180deg, rgba(0,0,0,0.12) 0%, rgba(0,0,0,0) 40%, rgba(0,0,0,0.48) 100%)',
                                     }} />
-                                    {/* halo cinematográfico top-left */}
+                                    {/* halo top-left más sutil */}
                                     <div className="absolute pointer-events-none" style={{
-                                        top: -30, left: -30, width: 180, height: 110, borderRadius: '50%',
-                                        background: 'radial-gradient(ellipse, rgba(255,255,255,0.18), transparent 70%)',
-                                        filter: 'blur(8px)',
+                                        top: -28, left: -28, width: 150, height: 90, borderRadius: '50%',
+                                        background: 'radial-gradient(ellipse, rgba(255,255,255,0.12), transparent 70%)',
+                                        filter: 'blur(10px)',
                                     }} />
-                                    {/* browser chrome con URL + carrito + visibilidad */}
-                                    <div className="absolute top-0 left-0 right-0 px-3 py-2 flex items-center gap-1.5 pointer-events-none z-10"
-                                        style={{ background: 'linear-gradient(180deg, rgba(0,0,0,0.45), rgba(0,0,0,0))' }}>
-                                        <span className="w-1.5 h-1.5 rounded-full" style={{ background: 'rgba(255,255,255,0.45)' }} />
-                                        <span className="w-1.5 h-1.5 rounded-full" style={{ background: 'rgba(255,255,255,0.32)' }} />
-                                        <span className="w-1.5 h-1.5 rounded-full" style={{ background: 'rgba(255,255,255,0.22)' }} />
-                                        <span className="ml-2 text-[9px] font-mono px-2 py-0.5 rounded-md truncate max-w-[40%]"
-                                            style={{ color: 'rgba(255,255,255,0.78)', background: 'rgba(0,0,0,0.32)', border: '1px solid rgba(255,255,255,0.10)' }}>
+                                    {/* browser chrome compacto */}
+                                    <div className="absolute top-0 left-0 right-0 px-2.5 py-1.5 flex items-center gap-1.5 pointer-events-none z-10"
+                                        style={{ background: 'linear-gradient(180deg, rgba(0,0,0,0.5), rgba(0,0,0,0))' }}>
+                                        <span className="w-1 h-1 rounded-full" style={{ background: 'rgba(255,255,255,0.42)' }} />
+                                        <span className="w-1 h-1 rounded-full" style={{ background: 'rgba(255,255,255,0.30)' }} />
+                                        <span className="w-1 h-1 rounded-full" style={{ background: 'rgba(255,255,255,0.20)' }} />
+                                        <span className="ml-1.5 text-[8px] font-mono px-1.5 py-px rounded truncate max-w-[42%]"
+                                            style={{ color: 'rgba(255,255,255,0.72)', background: 'rgba(0,0,0,0.32)', border: '1px solid rgba(255,255,255,0.08)' }}>
                                             /sh/{store.slug}
                                         </span>
-                                        <span className="ml-auto inline-flex items-center gap-1 text-[9px] font-bold uppercase tracking-[0.14em] px-2 py-0.5 rounded-full backdrop-blur-md"
+                                        <span className="ml-auto inline-flex items-center gap-1 text-[8px] font-bold uppercase tracking-[0.14em] px-1.5 py-px rounded-full backdrop-blur-md"
                                             style={store.active
-                                                ? { background: 'rgba(34,197,94,0.20)', color: '#86EFAC', border: '1px solid rgba(34,197,94,0.45)' }
-                                                : { background: 'rgba(234,179,8,0.14)', color: '#FBBF24', border: '1px solid rgba(234,179,8,0.36)' }}>
+                                                ? { background: 'rgba(34,197,94,0.18)', color: '#86EFAC', border: '1px solid rgba(34,197,94,0.40)' }
+                                                : { background: 'rgba(234,179,8,0.14)', color: '#FBBF24', border: '1px solid rgba(234,179,8,0.34)' }}>
                                             {store.active && (
                                                 <span className="relative flex h-1 w-1">
                                                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
@@ -792,17 +792,17 @@ export default function VirtualStorePage() {
                                         </span>
                                     </div>
                                     {/* mini storefront: top bar + (hero | tiles en fila) */}
-                                    <div className="absolute inset-x-0 top-6 bottom-0 px-3.5 pb-2.5 flex flex-col pointer-events-none">
+                                    <div className="absolute inset-x-0 top-5 bottom-0 px-3 pb-2 flex flex-col pointer-events-none">
                                         {/* top bar: marca + nav + carrito */}
-                                        <div className="flex items-center gap-1.5 mb-1.5 opacity-90">
-                                            <span className="w-3 h-3 rounded-full" style={{ background: 'rgba(255,255,255,0.85)' }} />
-                                            <span className="text-[9px] font-bold text-white truncate max-w-[38%]" style={{ letterSpacing: '-0.01em' }}>{store.name}</span>
-                                            <span className="ml-auto flex items-center gap-2">
-                                                <span className="text-[7.5px] font-medium uppercase tracking-[0.14em] text-white/55">Catálogo</span>
+                                        <div className="flex items-center gap-1 mb-1 opacity-90">
+                                            <span className="w-2.5 h-2.5 rounded-full" style={{ background: 'rgba(255,255,255,0.85)' }} />
+                                            <span className="text-[8px] font-bold text-white truncate max-w-[40%]" style={{ letterSpacing: '-0.01em' }}>{store.name}</span>
+                                            <span className="ml-auto flex items-center gap-1.5">
+                                                <span className="text-[6.5px] font-medium uppercase tracking-[0.14em] text-white/50">Shop</span>
                                                 <span className="relative">
-                                                    <ShoppingCart className="w-3 h-3 text-white/80" />
+                                                    <ShoppingCart className="w-2.5 h-2.5 text-white/80" />
                                                     {productCount > 0 && (
-                                                        <span className="absolute -top-1 -right-1.5 min-w-[10px] h-[10px] px-1 rounded-full flex items-center justify-center text-[7px] font-bold text-black"
+                                                        <span className="absolute -top-1 -right-1.5 min-w-[9px] h-[9px] px-1 rounded-full flex items-center justify-center text-[6px] font-bold text-black"
                                                             style={{ background: p.accent }}>
                                                             {productCount > 9 ? '9+' : productCount}
                                                         </span>
@@ -812,45 +812,39 @@ export default function VirtualStorePage() {
                                         </div>
 
                                         {/* layout panorámico: hero (izq) + product tiles (der) */}
-                                        <div className="flex-1 flex items-center gap-3 min-h-0">
+                                        <div className="flex-1 flex items-center gap-2 min-h-0">
                                             {/* hero izquierda */}
                                             <div className="flex-1 min-w-0 flex flex-col gap-0.5">
-                                                <div className="text-[14px] font-bold text-white leading-tight truncate" style={{ letterSpacing: '-0.02em', textShadow: '0 2px 14px rgba(0,0,0,0.6)' }}>
+                                                <div className="text-[11px] font-bold text-white leading-tight truncate" style={{ letterSpacing: '-0.02em', textShadow: '0 2px 12px rgba(0,0,0,0.6)' }}>
                                                     {store.name}
                                                 </div>
-                                                <div className="text-[8.5px] uppercase tracking-[0.18em] font-bold truncate" style={{ color: p.accent }}>
-                                                    {storeTypeLabel(store.type)} · {productCount} productos
+                                                <div className="text-[7.5px] uppercase tracking-[0.18em] font-bold truncate" style={{ color: p.accent }}>
+                                                    {productCount} productos
                                                 </div>
                                             </div>
 
-                                            {/* mini product thumbnails — diferentes formas que simulan productos reales */}
-                                            <div className="flex gap-1.5 shrink-0">
+                                            {/* mini product thumbnails — silueta minimalista */}
+                                            <div className="flex gap-1 shrink-0">
                                                 {Array.from({ length: tilesCount }).map((_, i) => {
                                                     const shape = i % 3 // 0 = bottle, 1 = circle, 2 = box
                                                     return (
-                                                        <div key={i} className="relative w-9 h-9 rounded-md overflow-hidden"
+                                                        <div key={i} className="relative w-6 h-6 rounded overflow-hidden"
                                                             style={{
-                                                                background: `linear-gradient(155deg, ${p.accent}26 0%, rgba(255,255,255,0.04) 100%)`,
-                                                                border: '1px solid rgba(255,255,255,0.14)',
-                                                                boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.08)',
+                                                                background: `linear-gradient(155deg, ${p.accent}22 0%, rgba(255,255,255,0.03) 100%)`,
+                                                                border: '1px solid rgba(255,255,255,0.12)',
+                                                                boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.07)',
                                                             }}>
-                                                            {/* "producto" silueta */}
                                                             <div className="absolute inset-0 flex items-center justify-center">
                                                                 {shape === 0 && (
-                                                                    <div className="w-2 h-5 rounded-sm" style={{ background: `linear-gradient(180deg, rgba(255,255,255,0.85), rgba(255,255,255,0.45))` }} />
+                                                                    <div className="w-1 h-3 rounded-sm" style={{ background: `linear-gradient(180deg, rgba(255,255,255,0.82), rgba(255,255,255,0.42))` }} />
                                                                 )}
                                                                 {shape === 1 && (
-                                                                    <div className="w-4 h-4 rounded-full" style={{ background: `radial-gradient(circle at 35% 35%, rgba(255,255,255,0.85), rgba(255,255,255,0.35) 70%)` }} />
+                                                                    <div className="w-2.5 h-2.5 rounded-full" style={{ background: `radial-gradient(circle at 35% 35%, rgba(255,255,255,0.82), rgba(255,255,255,0.32) 70%)` }} />
                                                                 )}
                                                                 {shape === 2 && (
-                                                                    <div className="w-4 h-3.5 rounded-sm" style={{ background: `linear-gradient(150deg, rgba(255,255,255,0.8), rgba(255,255,255,0.35))` }} />
+                                                                    <div className="w-2.5 h-2 rounded-sm" style={{ background: `linear-gradient(150deg, rgba(255,255,255,0.78), rgba(255,255,255,0.32))` }} />
                                                                 )}
                                                             </div>
-                                                            {/* price tag chip */}
-                                                            <span className="absolute bottom-0.5 right-0.5 px-1 rounded text-[6.5px] font-bold leading-none"
-                                                                style={{ background: 'rgba(0,0,0,0.55)', color: '#fff', border: '1px solid rgba(255,255,255,0.15)' }}>
-                                                                $
-                                                            </span>
                                                         </div>
                                                     )
                                                 })}
@@ -860,9 +854,9 @@ export default function VirtualStorePage() {
 
                                     {/* hover overlay open */}
                                     <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-20">
-                                        <div className="w-10 h-10 rounded-full flex items-center justify-center backdrop-blur-md"
-                                            style={{ background: 'rgba(0,0,0,0.5)', border: '1px solid rgba(255,255,255,0.28)' }}>
-                                            <ExternalLink className="w-4 h-4 text-white" />
+                                        <div className="w-8 h-8 rounded-full flex items-center justify-center backdrop-blur-md"
+                                            style={{ background: 'rgba(0,0,0,0.55)', border: '1px solid rgba(255,255,255,0.28)' }}>
+                                            <ExternalLink className="w-3.5 h-3.5 text-white" />
                                         </div>
                                     </div>
                                 </a>
@@ -874,33 +868,33 @@ export default function VirtualStorePage() {
                                 </div>
 
                                 {/* contenido inferior */}
-                                <div className="px-5 pt-3.5 pb-4 relative">
+                                <div className="px-3.5 pt-3 pb-3.5 relative">
                                     {store.sharedByUsername && (
-                                        <div className="flex items-center gap-1.5 mb-2 text-[10px]" style={{ color: p.accent }}>
-                                            <Share2 size={11} />
+                                        <div className="flex items-center gap-1.5 mb-1.5 text-[9.5px]" style={{ color: p.accent }}>
+                                            <Share2 size={10} />
                                             <span>de @{store.sharedByUsername}</span>
                                         </div>
                                     )}
 
                                     {/* row: icono + nombre/tipo + acciones */}
-                                    <div className="flex items-center gap-2.5 mb-3.5">
-                                        <div className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
-                                            style={{ background: `${p.accent}1c`, border: `1px solid ${p.accent}40`, boxShadow: `0 0 14px -4px ${p.accent}55` }}>
-                                            {store.type === 'NETWORK_MARKETING' ? <Globe className="w-4 h-4" style={{ color: p.accent }} /> :
-                                                store.type === 'GENERAL_BUSINESS' ? <Store className="w-4 h-4" style={{ color: p.accent }} /> :
-                                                    <LayoutIcon className="w-4 h-4" style={{ color: p.accent }} />}
+                                    <div className="flex items-center gap-2 mb-2.5">
+                                        <div className="w-7 h-7 rounded-md flex items-center justify-center shrink-0"
+                                            style={{ background: `${p.accent}1c`, border: `1px solid ${p.accent}3a`, boxShadow: `0 0 10px -4px ${p.accent}50` }}>
+                                            {store.type === 'NETWORK_MARKETING' ? <Globe className="w-3 h-3" style={{ color: p.accent }} /> :
+                                                store.type === 'GENERAL_BUSINESS' ? <Store className="w-3 h-3" style={{ color: p.accent }} /> :
+                                                    <LayoutIcon className="w-3 h-3" style={{ color: p.accent }} />}
                                         </div>
                                         <div className="flex-1 min-w-0">
-                                            <div className="text-[14px] font-bold text-white truncate leading-tight" style={{ letterSpacing: '-0.01em' }}>{store.name}</div>
-                                            <div className="text-[10.5px] mt-0.5 truncate" style={{ color: 'rgba(255,255,255,0.46)' }}>
+                                            <div className="text-[12.5px] font-bold text-white truncate leading-tight" style={{ letterSpacing: '-0.01em' }}>{store.name}</div>
+                                            <div className="text-[9.5px] mt-0.5 truncate" style={{ color: 'rgba(255,255,255,0.46)' }}>
                                                 {storeTypeLabel(store.type)} · {productCount} {productCount === 1 ? 'producto' : 'productos'}
                                             </div>
                                         </div>
-                                        <div className="flex items-center gap-0.5 shrink-0 -mr-1">
+                                        <div className="flex items-center gap-0 shrink-0 -mr-1">
                                             <button onClick={() => setSharingStore(store)}
-                                                className="p-1.5 rounded-lg transition-colors hover:bg-white/5"
+                                                className="p-1 rounded-md transition-colors hover:bg-white/5"
                                                 title="Compartir tienda">
-                                                <Share2 className="w-3.5 h-3.5 text-dark-400 hover:text-white transition-colors" />
+                                                <Share2 className="w-3 h-3 text-dark-400 hover:text-white transition-colors" />
                                             </button>
                                             <button
                                                 onClick={() => {
@@ -914,52 +908,52 @@ export default function VirtualStorePage() {
                                                     setStoreBanner2(store.themeConfig?.bannerUrl2 || '');
                                                     setShowStoreModal(true);
                                                 }}
-                                                className="p-1.5 rounded-lg transition-colors hover:bg-white/5"
+                                                className="p-1 rounded-md transition-colors hover:bg-white/5"
                                                 title="Editar">
-                                                <Edit3 className="w-3.5 h-3.5 text-dark-400 hover:text-white transition-colors" />
+                                                <Edit3 className="w-3 h-3 text-dark-400 hover:text-white transition-colors" />
                                             </button>
                                             <button onClick={() => deleteStore(store.id)}
-                                                className="p-1.5 rounded-lg transition-colors hover:bg-white/5"
+                                                className="p-1 rounded-md transition-colors hover:bg-white/5"
                                                 title="Eliminar">
-                                                <Trash2 className="w-3.5 h-3.5 text-dark-500 hover:text-red-400 transition-colors" />
+                                                <Trash2 className="w-3 h-3 text-dark-500 hover:text-red-400 transition-colors" />
                                             </button>
                                         </div>
                                     </div>
 
                                     {/* botones premium */}
-                                    <div className="flex items-stretch gap-2">
+                                    <div className="flex items-stretch gap-1.5">
                                         <button
                                             onClick={() => openStoreProducts(store)}
-                                            className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-[13px] font-bold transition-all active:scale-[0.98] hover:brightness-110"
+                                            className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-[11.5px] font-bold transition-all active:scale-[0.98] hover:brightness-110"
                                             style={{
                                                 background: `linear-gradient(135deg, ${p.accent}2e, ${p.accent}10)`,
                                                 border: `1px solid ${p.accent}45`,
                                                 color: '#fff',
-                                                boxShadow: `0 8px 22px -10px ${p.accent}66, inset 0 1px 0 rgba(255,255,255,0.10)`,
+                                                boxShadow: `0 6px 18px -10px ${p.accent}60, inset 0 1px 0 rgba(255,255,255,0.10)`,
                                                 letterSpacing: '-0.01em',
                                             }}>
-                                            <Package className="w-3.5 h-3.5" />
+                                            <Package className="w-3 h-3" />
                                             Gestionar Productos
                                         </button>
                                         <Link
                                             href={`/sh/${store.slug}`}
                                             target="_blank"
-                                            className="px-3.5 rounded-xl flex items-center justify-center transition-all active:scale-[0.98] hover:bg-white/8"
+                                            className="px-2.5 rounded-lg flex items-center justify-center transition-all active:scale-[0.98] hover:bg-white/8"
                                             style={{
                                                 background: 'rgba(255,255,255,0.05)',
                                                 border: '1px solid rgba(255,255,255,0.10)',
                                                 color: 'rgba(255,255,255,0.88)',
                                             }}
                                             title="Abrir tienda pública">
-                                            <ExternalLink className="w-3.5 h-3.5" />
+                                            <ExternalLink className="w-3 h-3" />
                                         </Link>
                                     </div>
 
                                     {(store.type === 'NETWORK_MARKETING' || store.type === 'GENERAL_BUSINESS') && (
                                         <button
                                             onClick={() => convertStoreType(store)}
-                                            className="mt-2.5 w-full flex items-center justify-center gap-1.5 text-[10px] font-medium py-1.5 rounded-lg transition-colors hover:text-white"
-                                            style={{ color: 'rgba(255,255,255,0.36)' }}>
+                                            className="mt-2 w-full flex items-center justify-center gap-1.5 text-[9.5px] font-medium py-1.5 rounded-md transition-colors hover:text-white"
+                                            style={{ color: 'rgba(255,255,255,0.34)' }}>
                                             Convertir a {store.type === 'NETWORK_MARKETING' ? 'Mi Negocio (General)' : 'Network Marketing (PV)'}
                                         </button>
                                     )}
