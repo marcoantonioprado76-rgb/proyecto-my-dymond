@@ -54,6 +54,27 @@ interface StoreRecord {
     _count?: { products: number }
 }
 
+// Paleta cinematográfica para los previews de tienda (deep navy/blue/purple)
+const STORE_PALETTES: Array<{ a: string; b: string; c: string; accent: string }> = [
+    { a: '#0E1A38', b: '#1F3A78', c: '#3F75C4', accent: '#7FBEF0' }, // Deep Ocean
+    { a: '#0B2030', b: '#114060', c: '#2575B0', accent: '#86DAEC' }, // Petroleum Glow
+    { a: '#0E1228', b: '#1F2358', c: '#3D448C', accent: '#9DACEC' }, // Cosmic Navy
+    { a: '#17132F', b: '#2D2070', c: '#5238A8', accent: '#A89BEC' }, // Royal Twilight
+    { a: '#101536', b: '#222D78', c: '#4154B8', accent: '#B0BDEC' }, // Aurora Indigo
+    { a: '#130E28', b: '#2A235E', c: '#4F3F94', accent: '#C8AEEC' }, // Smoked Violet
+]
+function paletteForStore(id: string) {
+    let h = 0
+    for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) >>> 0
+    return STORE_PALETTES[h % STORE_PALETTES.length]
+}
+function storeTypeLabel(t: StoreRecord['type']) {
+    if (t === 'NETWORK_MARKETING') return 'Network Marketing'
+    if (t === 'GENERAL_BUSINESS') return 'Mi Negocio'
+    if (t === 'LANDING') return 'Landing Pro'
+    return 'Catálogo'
+}
+
 function ShareStoreModal({ store, onClose }: { store: StoreRecord; onClose: () => void }) {
     const [identifier, setIdentifier] = useState('')
     const [loading, setLoading] = useState(false)
@@ -656,132 +677,272 @@ export default function VirtualStorePage() {
 
     return (
         <div className="px-4 sm:px-6 pt-6 max-w-screen-xl mx-auto pb-20 font-inter text-white">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10">
-                <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-2xl bg-neon-blue/10 flex items-center justify-center border border-neon-blue/20 shadow-[0_0_20px_rgba(var(--neon-blue-rgb),0.2)]">
-                        <Store className="w-6 h-6 text-neon-blue" />
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
+                        style={{ background: 'rgba(34,183,255,0.14)', border: '1px solid rgba(34,183,255,0.32)', boxShadow: '0 0 18px -4px rgba(34,183,255,0.45)' }}>
+                        <Store className="w-5 h-5" style={{ color: '#7FBEF0' }} />
                     </div>
-                    <div>
-                        <h1 className="text-3xl font-bold tracking-tight">Mis Tiendas Virtuales</h1>
-                        <p className="text-dark-400 text-sm mt-1">Crea escaparates digitales independientes de tus bots</p>
+                    <div className="min-w-0">
+                        <h1 className="text-xl font-bold text-white leading-tight" style={{ letterSpacing: '-0.02em' }}>Mis Tiendas Virtuales</h1>
+                        <p className="text-[11px] text-dark-400 mt-0.5">Tu galería de escaparates digitales · {stores.length} {stores.length === 1 ? 'tienda' : 'tiendas'}</p>
                     </div>
                 </div>
 
                 <button
                     onClick={() => { resetStoreForm(); setShowStoreModal(true); }}
-                    className="flex items-center gap-2 bg-neon-blue hover:bg-neon-blue/90 text-dark-950 px-6 py-3 rounded-xl font-bold transition-all shadow-lg active:scale-95"
+                    className="rounded-xl px-4 py-2.5 font-bold flex items-center gap-2 text-sm transition-all active:scale-[0.98]"
+                    style={{
+                        background: 'linear-gradient(135deg, #22B7FF, #7B5BFF)',
+                        color: '#fff',
+                        boxShadow: '0 10px 26px -10px rgba(34,183,255,0.6), inset 0 1px 0 rgba(255,255,255,0.18)',
+                    }}
                 >
-                    <Plus size={20} /> Nueva Tienda
+                    <Plus className="w-4 h-4" /> Nueva Tienda
                 </button>
             </div>
 
             {loading ? (
-                <div className="py-20 flex justify-center"><Loader2 className="animate-spin text-neon-blue" /></div>
+                <div className="py-20 flex justify-center"><Loader2 className="animate-spin" style={{ color: '#7FBEF0' }} /></div>
             ) : stores.length === 0 ? (
-                <div className="bg-dark-900/40 border border-purple-500/15 rounded-3xl p-12 text-center max-w-2xl mx-auto">
-                    <ShoppingBag className="w-16 h-16 text-dark-600 mx-auto mb-4" />
-                    <h2 className="text-2xl font-bold mb-3">Tu escaparate está vacío</h2>
-                    <p className="text-dark-400 mb-8">Crea una tienda para empezar a vender tus propios productos por la web.</p>
-                    <button onClick={() => setShowStoreModal(true)} className="bg-neon-blue text-dark-950 px-8 py-3 rounded-xl font-bold transition-all">Crear Tienda</button>
+                <div className="rounded-3xl p-16 text-center max-w-2xl mx-auto"
+                    style={{
+                        background: 'radial-gradient(120% 75% at 50% -10%, rgba(34,183,255,0.12), rgba(255,255,255,0) 60%), linear-gradient(180deg, rgba(17,19,40,0.82), rgba(11,12,26,0.8))',
+                        border: '1px solid rgba(255,255,255,0.07)',
+                        boxShadow: '0 22px 50px -22px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.04)',
+                    }}>
+                    <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-5"
+                        style={{ background: 'rgba(34,183,255,0.12)', border: '1px solid rgba(34,183,255,0.32)', boxShadow: '0 0 28px -6px rgba(34,183,255,0.55)' }}>
+                        <ShoppingBag className="w-8 h-8" style={{ color: '#7FBEF0' }} />
+                    </div>
+                    <h2 className="text-xl font-bold text-white mb-2" style={{ letterSpacing: '-0.02em' }}>Tu escaparate está vacío</h2>
+                    <p className="text-dark-400 text-sm mb-6 max-w-sm mx-auto leading-relaxed">Crea una tienda para empezar a vender tus productos en una vitrina digital premium.</p>
+                    <button onClick={() => setShowStoreModal(true)}
+                        className="inline-flex items-center gap-2 rounded-xl px-5 py-2.5 font-bold text-sm transition-all active:scale-[0.98]"
+                        style={{
+                            background: 'linear-gradient(135deg, #22B7FF, #7B5BFF)',
+                            color: '#fff',
+                            boxShadow: '0 10px 26px -10px rgba(34,183,255,0.6)',
+                        }}>
+                        <Plus className="w-4 h-4" /> Crear Tienda
+                    </button>
                 </div>
             ) : (
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    {stores.map(store => (
-                        <div key={store.id} className="group relative bg-white/5 border border-white/15 rounded-3xl p-6 transition-all hover:border-white/25 overflow-hidden">
-                            <div className="absolute -top-24 -right-24 w-48 h-48 bg-neon-blue/5 blur-[100px] pointer-events-none" />
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+                    {stores.map(store => {
+                        const p = paletteForStore(store.id)
+                        const productCount = store._count?.products || 0
+                        const tilesCount = Math.min(4, Math.max(3, productCount || 3))
+                        return (
+                            <div key={store.id}
+                                className="relative rounded-2xl overflow-hidden group transition-all duration-300 hover:-translate-y-1"
+                                style={{
+                                    background: `radial-gradient(120% 80% at 50% -10%, ${p.accent}26, rgba(255,255,255,0) 58%), radial-gradient(80% 80% at 100% 100%, ${p.accent}16, rgba(255,255,255,0) 60%), radial-gradient(70% 70% at 0% 100%, ${p.accent}10, rgba(255,255,255,0) 60%), linear-gradient(180deg, rgba(22,28,56,0.92) 0%, rgba(16,20,42,0.9) 100%)`,
+                                    border: '1px solid rgba(255,255,255,0.10)',
+                                    boxShadow: '0 22px 48px -22px rgba(0,0,0,0.78), inset 0 1px 0 rgba(255,255,255,0.06)',
+                                }}
+                                onMouseEnter={e => {
+                                    e.currentTarget.style.boxShadow = `0 30px 60px -22px rgba(0,0,0,0.84), 0 0 36px -8px ${p.accent}55, inset 0 1px 0 rgba(255,255,255,0.09)`
+                                    e.currentTarget.style.borderColor = `${p.accent}5a`
+                                }}
+                                onMouseLeave={e => {
+                                    e.currentTarget.style.boxShadow = '0 22px 48px -22px rgba(0,0,0,0.78), inset 0 1px 0 rgba(255,255,255,0.06)'
+                                    e.currentTarget.style.borderColor = 'rgba(255,255,255,0.10)'
+                                }}>
 
-                            <div className="flex items-start justify-between mb-6">
-                                <div className="flex items-center gap-4">
-                                    <div className={`w-14 h-14 rounded-2xl flex items-center justify-center border ${store.type === 'NETWORK_MARKETING' ? 'bg-neon-blue/10 border-neon-blue/20' :
-                                        store.type === 'GENERAL_BUSINESS' ? 'bg-neon-purple/10 border-neon-purple/20' :
-                                            'bg-neon-green/10 border-neon-green/20'
-                                        }`}>
-                                        {store.type === 'NETWORK_MARKETING' ? <Globe className="text-neon-blue" /> :
-                                            store.type === 'GENERAL_BUSINESS' ? <Store className="text-neon-purple" /> :
-                                                <LayoutIcon className="text-neon-green" />}
+                                {/* Mini storefront preview cinematográfico */}
+                                <a href={`/sh/${store.slug}`} target="_blank" rel="noopener noreferrer"
+                                    className="block relative aspect-[16/9] overflow-hidden"
+                                    style={{
+                                        background: store.bannerUrl
+                                            ? `linear-gradient(180deg, rgba(8,10,24,0.18) 0%, rgba(8,10,24,0.78) 100%), url("${store.bannerUrl}") center/cover no-repeat`
+                                            : `linear-gradient(160deg, ${p.a} 0%, ${p.b} 55%, ${p.c} 100%)`,
+                                    }}>
+                                    {/* viñeta */}
+                                    <div className="absolute inset-0 pointer-events-none" style={{
+                                        background: 'linear-gradient(180deg, rgba(0,0,0,0.08) 0%, rgba(0,0,0,0) 35%, rgba(0,0,0,0.4) 100%)',
+                                    }} />
+                                    {/* halo cinematográfico top-left */}
+                                    <div className="absolute pointer-events-none" style={{
+                                        top: -30, left: -30, width: 180, height: 110, borderRadius: '50%',
+                                        background: 'radial-gradient(ellipse, rgba(255,255,255,0.18), transparent 70%)',
+                                        filter: 'blur(8px)',
+                                    }} />
+                                    {/* browser chrome con URL + carrito + visibilidad */}
+                                    <div className="absolute top-0 left-0 right-0 px-3 py-2 flex items-center gap-1.5 pointer-events-none z-10"
+                                        style={{ background: 'linear-gradient(180deg, rgba(0,0,0,0.45), rgba(0,0,0,0))' }}>
+                                        <span className="w-1.5 h-1.5 rounded-full" style={{ background: 'rgba(255,255,255,0.45)' }} />
+                                        <span className="w-1.5 h-1.5 rounded-full" style={{ background: 'rgba(255,255,255,0.32)' }} />
+                                        <span className="w-1.5 h-1.5 rounded-full" style={{ background: 'rgba(255,255,255,0.22)' }} />
+                                        <span className="ml-2 text-[9px] font-mono px-2 py-0.5 rounded-md truncate max-w-[40%]"
+                                            style={{ color: 'rgba(255,255,255,0.78)', background: 'rgba(0,0,0,0.32)', border: '1px solid rgba(255,255,255,0.10)' }}>
+                                            /sh/{store.slug}
+                                        </span>
+                                        <span className="ml-auto inline-flex items-center gap-1 text-[9px] font-bold uppercase tracking-[0.14em] px-2 py-0.5 rounded-full backdrop-blur-md"
+                                            style={store.active
+                                                ? { background: 'rgba(34,197,94,0.20)', color: '#86EFAC', border: '1px solid rgba(34,197,94,0.45)' }
+                                                : { background: 'rgba(234,179,8,0.14)', color: '#FBBF24', border: '1px solid rgba(234,179,8,0.36)' }}>
+                                            {store.active && (
+                                                <span className="relative flex h-1 w-1">
+                                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                                                    <span className="relative inline-flex rounded-full h-1 w-1 bg-emerald-400" />
+                                                </span>
+                                            )}
+                                            {store.active ? 'Pública' : 'Borrador'}
+                                        </span>
                                     </div>
-                                    <div>
-                                        <p className="font-bold text-sm text-white">{store.name}</p>
-                                        <p className={`text-[10px] font-semibold mt-0.5 ${store.type === 'NETWORK_MARKETING' ? 'text-neon-blue/70' : store.type === 'LANDING' ? 'text-neon-green/70' : 'text-neon-purple/70'}`}>
-                                            {store.type === 'NETWORK_MARKETING' ? 'Network Marketing' : store.type === 'LANDING' ? 'Landing Pro' : 'Mi Negocio'}
-                                        </p>
+                                    {/* mini storefront: top bar + hero + producto tiles */}
+                                    <div className="absolute inset-x-0 top-7 bottom-0 px-3.5 pb-3 flex flex-col pointer-events-none">
+                                        {/* top bar: marca + nav + carrito */}
+                                        <div className="flex items-center gap-1.5 mb-2 opacity-90">
+                                            <span className="w-3.5 h-3.5 rounded-full" style={{ background: 'rgba(255,255,255,0.85)' }} />
+                                            <span className="text-[9.5px] font-bold text-white truncate max-w-[40%]" style={{ letterSpacing: '-0.01em' }}>{store.name}</span>
+                                            <span className="ml-auto flex items-center gap-2">
+                                                <span className="text-[8px] font-medium uppercase tracking-[0.14em] text-white/55">Catálogo</span>
+                                                <span className="relative">
+                                                    <ShoppingCart className="w-3.5 h-3.5 text-white/85" />
+                                                    {productCount > 0 && (
+                                                        <span className="absolute -top-1 -right-1.5 min-w-[10px] h-[10px] px-1 rounded-full flex items-center justify-center text-[7px] font-bold text-black"
+                                                            style={{ background: p.accent }}>
+                                                            {productCount > 9 ? '9+' : productCount}
+                                                        </span>
+                                                    )}
+                                                </span>
+                                            </span>
+                                        </div>
+
+                                        {/* hero compacto */}
+                                        <div className="flex-1 flex flex-col justify-center gap-1 min-h-0">
+                                            <div className="text-[15px] font-bold text-white leading-tight truncate" style={{ letterSpacing: '-0.02em', textShadow: '0 2px 14px rgba(0,0,0,0.6)' }}>
+                                                {store.name}
+                                            </div>
+                                            <div className="text-[9.5px] uppercase tracking-[0.18em] font-bold truncate" style={{ color: p.accent }}>
+                                                {storeTypeLabel(store.type)} · {productCount} productos
+                                            </div>
+                                        </div>
+
+                                        {/* mini product tiles */}
+                                        <div className="flex gap-1.5">
+                                            {Array.from({ length: tilesCount }).map((_, i) => (
+                                                <div key={i} className="flex-1 aspect-square rounded-md relative overflow-hidden"
+                                                    style={{
+                                                        background: `linear-gradient(140deg, rgba(255,255,255,0.16), rgba(255,255,255,0.04))`,
+                                                        border: '1px solid rgba(255,255,255,0.12)',
+                                                    }}>
+                                                    <span className="absolute bottom-0.5 right-1 text-[7px] font-bold text-white/65">$</span>
+                                                </div>
+                                            ))}
+                                        </div>
                                     </div>
+
+                                    {/* hover overlay open */}
+                                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-20">
+                                        <div className="w-10 h-10 rounded-full flex items-center justify-center backdrop-blur-md"
+                                            style={{ background: 'rgba(0,0,0,0.5)', border: '1px solid rgba(255,255,255,0.28)' }}>
+                                            <ExternalLink className="w-4 h-4 text-white" />
+                                        </div>
+                                    </div>
+                                </a>
+
+                                {/* divisor cinematográfico */}
+                                <div className="relative">
+                                    <div className="absolute inset-x-4 -top-px h-px pointer-events-none"
+                                        style={{ background: `linear-gradient(90deg, transparent, ${p.accent}55, transparent)` }} />
                                 </div>
-                                <div className="flex gap-2">
-                                    <button
-                                        onClick={() => setSharingStore(store)}
-                                        className="p-2 text-dark-500 hover:text-neon-blue transition-colors"
-                                        title="Compartir tienda"
-                                    >
-                                        <Share2 size={18} />
-                                    </button>
-                                    <button
-                                        onClick={() => {
-                                            setEditStore(store);
-                                            setStoreName(store.name);
-                                            setStoreSlug(store.slug);
-                                            setStoreType(store.type);
-                                            setStoreWhatsapp(store.whatsappNumber || '');
-                                            setStoreQr(store.paymentQrUrl || '');
-                                            setStoreBanner1(store.bannerUrl || '');
-                                            setStoreBanner2(store.themeConfig?.bannerUrl2 || '');
-                                            setShowStoreModal(true);
-                                        }}
-                                        className="p-2 text-dark-500 hover:text-neon-blue transition-colors"
-                                    >
-                                        <Edit3 size={18} />
-                                    </button>
-                                    <button onClick={() => deleteStore(store.id)} className="p-2 text-dark-500 hover:text-red-500 transition-colors">
-                                        <Trash2 size={18} />
-                                    </button>
+
+                                {/* contenido inferior */}
+                                <div className="p-4 relative">
+                                    {store.sharedByUsername && (
+                                        <div className="flex items-center gap-1.5 mb-2 text-[10px]" style={{ color: p.accent }}>
+                                            <Share2 size={11} />
+                                            <span>de @{store.sharedByUsername}</span>
+                                        </div>
+                                    )}
+
+                                    {/* row: icono + nombre/tipo + acciones */}
+                                    <div className="flex items-start gap-3 mb-3">
+                                        <div className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
+                                            style={{ background: `${p.accent}1a`, border: `1px solid ${p.accent}40`, boxShadow: `0 0 14px -4px ${p.accent}55` }}>
+                                            {store.type === 'NETWORK_MARKETING' ? <Globe className="w-4 h-4" style={{ color: p.accent }} /> :
+                                                store.type === 'GENERAL_BUSINESS' ? <Store className="w-4 h-4" style={{ color: p.accent }} /> :
+                                                    <LayoutIcon className="w-4 h-4" style={{ color: p.accent }} />}
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                            <div className="text-sm font-bold text-white truncate" style={{ letterSpacing: '-0.01em' }}>{store.name}</div>
+                                            <div className="text-[10px] mt-0.5 truncate" style={{ color: 'rgba(255,255,255,0.42)' }}>
+                                                {storeTypeLabel(store.type)} · {productCount} {productCount === 1 ? 'producto' : 'productos'}
+                                            </div>
+                                        </div>
+                                        <div className="flex gap-0.5 shrink-0">
+                                            <button onClick={() => setSharingStore(store)}
+                                                className="p-1.5 rounded-lg transition-colors"
+                                                title="Compartir tienda">
+                                                <Share2 className="w-3.5 h-3.5 text-dark-400 hover:text-white transition-colors" />
+                                            </button>
+                                            <button
+                                                onClick={() => {
+                                                    setEditStore(store);
+                                                    setStoreName(store.name);
+                                                    setStoreSlug(store.slug);
+                                                    setStoreType(store.type);
+                                                    setStoreWhatsapp(store.whatsappNumber || '');
+                                                    setStoreQr(store.paymentQrUrl || '');
+                                                    setStoreBanner1(store.bannerUrl || '');
+                                                    setStoreBanner2(store.themeConfig?.bannerUrl2 || '');
+                                                    setShowStoreModal(true);
+                                                }}
+                                                className="p-1.5 rounded-lg transition-colors"
+                                                title="Editar">
+                                                <Edit3 className="w-3.5 h-3.5 text-dark-400 hover:text-white transition-colors" />
+                                            </button>
+                                            <button onClick={() => deleteStore(store.id)}
+                                                className="p-1.5 rounded-lg transition-colors"
+                                                title="Eliminar">
+                                                <Trash2 className="w-3.5 h-3.5 text-dark-500 hover:text-red-400 transition-colors" />
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    {/* botones premium */}
+                                    <div className="flex items-center gap-2">
+                                        <button
+                                            onClick={() => openStoreProducts(store)}
+                                            className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-bold transition-all active:scale-[0.98]"
+                                            style={{
+                                                background: `linear-gradient(135deg, ${p.accent}2c, ${p.accent}12)`,
+                                                border: `1px solid ${p.accent}45`,
+                                                color: '#fff',
+                                                boxShadow: `0 8px 22px -10px ${p.accent}66, inset 0 1px 0 rgba(255,255,255,0.10)`,
+                                            }}>
+                                            <Package className="w-4 h-4" />
+                                            Gestionar Productos
+                                        </button>
+                                        <Link
+                                            href={`/sh/${store.slug}`}
+                                            target="_blank"
+                                            className="px-3.5 py-2.5 rounded-xl flex items-center justify-center transition-all active:scale-[0.98]"
+                                            style={{
+                                                background: 'rgba(255,255,255,0.04)',
+                                                border: '1px solid rgba(255,255,255,0.08)',
+                                                color: 'rgba(255,255,255,0.85)',
+                                            }}
+                                            title="Abrir tienda pública">
+                                            <ExternalLink className="w-4 h-4" />
+                                        </Link>
+                                    </div>
+
+                                    {(store.type === 'NETWORK_MARKETING' || store.type === 'GENERAL_BUSINESS') && (
+                                        <button
+                                            onClick={() => convertStoreType(store)}
+                                            className="mt-2 w-full flex items-center justify-center gap-1.5 text-[10px] font-medium py-1.5 rounded-lg transition-colors hover:text-white"
+                                            style={{ color: 'rgba(255,255,255,0.34)' }}>
+                                            Convertir a {store.type === 'NETWORK_MARKETING' ? 'Mi Negocio (General)' : 'Network Marketing (PV)'}
+                                        </button>
+                                    )}
                                 </div>
                             </div>
-
-                            {store.sharedByUsername && (
-                                <div className="flex items-center gap-1.5 mb-3 text-xs text-neon-blue/70">
-                                    <Share2 size={11} />
-                                    <span>de @{store.sharedByUsername}</span>
-                                </div>
-                            )}
-
-                            <div className="grid grid-cols-2 gap-4 mb-8">
-                                <div className="bg-white/5 p-4 rounded-2xl border border-purple-500/15">
-                                    <span className="text-[10px] text-dark-500 uppercase font-black block mb-1">Productos</span>
-                                    <span className="text-xl font-bold">{store._count?.products || 0}</span>
-                                </div>
-                                <div className="bg-white/5 p-4 rounded-2xl border border-purple-500/15">
-                                    <span className="text-[10px] text-dark-500 uppercase font-black block mb-1">Visibilidad</span>
-                                    <span className={`text-sm font-bold ${store.active ? 'text-neon-green' : 'text-dark-500'}`}>
-                                        {store.active ? 'Pública' : 'Borrador'}
-                                    </span>
-                                </div>
-                            </div>
-
-                            <div className="flex items-center gap-3">
-                                <button
-                                    onClick={() => openStoreProducts(store)}
-                                    className="flex-1 flex items-center justify-center gap-2 bg-neon-blue text-dark-950 rounded-xl py-3 text-sm font-bold transition-all shadow-md shadow-neon-blue/10 active:scale-95"
-                                >
-                                    <Package size={16} /> Gestionar Productos
-                                </button>
-                                <Link
-                                    href={`/sh/${store.slug}`}
-                                    target="_blank"
-                                    className="p-3 bg-white/5 hover:bg-white/10 border border-purple-500/25 rounded-xl transition-all"
-                                >
-                                    <ExternalLink size={18} />
-                                </Link>
-                            </div>
-                            {(store.type === 'NETWORK_MARKETING' || store.type === 'GENERAL_BUSINESS') && (
-                                <button
-                                    onClick={() => convertStoreType(store)}
-                                    className="mt-3 w-full flex items-center justify-center gap-2 text-xs font-bold text-dark-400 hover:text-white py-2 px-3 rounded-xl border border-purple-500/15 hover:border-white/15 bg-white/3 hover:bg-white/5 transition-all"
-                                >
-                                    Convertir a {store.type === 'NETWORK_MARKETING' ? 'Mi Negocio (General)' : 'Network Marketing (PV)'}
-                                </button>
-                            )}
-                        </div>
-                    ))}
+                        )
+                    })}
                 </div>
             )}
 
