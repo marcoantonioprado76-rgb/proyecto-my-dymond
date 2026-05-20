@@ -750,12 +750,12 @@ export default function VirtualStorePage() {
                                     e.currentTarget.style.borderColor = 'rgba(255,255,255,0.10)'
                                 }}>
 
-                                {/* Mini storefront preview cinematográfico */}
+                                {/* Mini storefront preview panorámico */}
                                 <a href={`/sh/${store.slug}`} target="_blank" rel="noopener noreferrer"
-                                    className="block relative aspect-[16/9] overflow-hidden"
+                                    className="block relative aspect-[21/9] overflow-hidden"
                                     style={{
                                         background: store.bannerUrl
-                                            ? `linear-gradient(180deg, rgba(8,10,24,0.18) 0%, rgba(8,10,24,0.78) 100%), url("${store.bannerUrl}") center/cover no-repeat`
+                                            ? `linear-gradient(180deg, rgba(8,10,24,0.22) 0%, rgba(8,10,24,0.78) 100%), url("${store.bannerUrl}") center/cover no-repeat`
                                             : `linear-gradient(160deg, ${p.a} 0%, ${p.b} 55%, ${p.c} 100%)`,
                                     }}>
                                     {/* viñeta */}
@@ -791,16 +791,16 @@ export default function VirtualStorePage() {
                                             {store.active ? 'Pública' : 'Borrador'}
                                         </span>
                                     </div>
-                                    {/* mini storefront: top bar + hero + producto tiles */}
-                                    <div className="absolute inset-x-0 top-7 bottom-0 px-3.5 pb-3 flex flex-col pointer-events-none">
+                                    {/* mini storefront: top bar + (hero | tiles en fila) */}
+                                    <div className="absolute inset-x-0 top-6 bottom-0 px-3.5 pb-2.5 flex flex-col pointer-events-none">
                                         {/* top bar: marca + nav + carrito */}
-                                        <div className="flex items-center gap-1.5 mb-2 opacity-90">
-                                            <span className="w-3.5 h-3.5 rounded-full" style={{ background: 'rgba(255,255,255,0.85)' }} />
-                                            <span className="text-[9.5px] font-bold text-white truncate max-w-[40%]" style={{ letterSpacing: '-0.01em' }}>{store.name}</span>
+                                        <div className="flex items-center gap-1.5 mb-1.5 opacity-90">
+                                            <span className="w-3 h-3 rounded-full" style={{ background: 'rgba(255,255,255,0.85)' }} />
+                                            <span className="text-[9px] font-bold text-white truncate max-w-[38%]" style={{ letterSpacing: '-0.01em' }}>{store.name}</span>
                                             <span className="ml-auto flex items-center gap-2">
-                                                <span className="text-[8px] font-medium uppercase tracking-[0.14em] text-white/55">Catálogo</span>
+                                                <span className="text-[7.5px] font-medium uppercase tracking-[0.14em] text-white/55">Catálogo</span>
                                                 <span className="relative">
-                                                    <ShoppingCart className="w-3.5 h-3.5 text-white/85" />
+                                                    <ShoppingCart className="w-3 h-3 text-white/80" />
                                                     {productCount > 0 && (
                                                         <span className="absolute -top-1 -right-1.5 min-w-[10px] h-[10px] px-1 rounded-full flex items-center justify-center text-[7px] font-bold text-black"
                                                             style={{ background: p.accent }}>
@@ -811,27 +811,50 @@ export default function VirtualStorePage() {
                                             </span>
                                         </div>
 
-                                        {/* hero compacto */}
-                                        <div className="flex-1 flex flex-col justify-center gap-1 min-h-0">
-                                            <div className="text-[15px] font-bold text-white leading-tight truncate" style={{ letterSpacing: '-0.02em', textShadow: '0 2px 14px rgba(0,0,0,0.6)' }}>
-                                                {store.name}
-                                            </div>
-                                            <div className="text-[9.5px] uppercase tracking-[0.18em] font-bold truncate" style={{ color: p.accent }}>
-                                                {storeTypeLabel(store.type)} · {productCount} productos
-                                            </div>
-                                        </div>
-
-                                        {/* mini product tiles */}
-                                        <div className="flex gap-1.5">
-                                            {Array.from({ length: tilesCount }).map((_, i) => (
-                                                <div key={i} className="flex-1 aspect-square rounded-md relative overflow-hidden"
-                                                    style={{
-                                                        background: `linear-gradient(140deg, rgba(255,255,255,0.16), rgba(255,255,255,0.04))`,
-                                                        border: '1px solid rgba(255,255,255,0.12)',
-                                                    }}>
-                                                    <span className="absolute bottom-0.5 right-1 text-[7px] font-bold text-white/65">$</span>
+                                        {/* layout panorámico: hero (izq) + product tiles (der) */}
+                                        <div className="flex-1 flex items-center gap-3 min-h-0">
+                                            {/* hero izquierda */}
+                                            <div className="flex-1 min-w-0 flex flex-col gap-0.5">
+                                                <div className="text-[14px] font-bold text-white leading-tight truncate" style={{ letterSpacing: '-0.02em', textShadow: '0 2px 14px rgba(0,0,0,0.6)' }}>
+                                                    {store.name}
                                                 </div>
-                                            ))}
+                                                <div className="text-[8.5px] uppercase tracking-[0.18em] font-bold truncate" style={{ color: p.accent }}>
+                                                    {storeTypeLabel(store.type)} · {productCount} productos
+                                                </div>
+                                            </div>
+
+                                            {/* mini product thumbnails — diferentes formas que simulan productos reales */}
+                                            <div className="flex gap-1.5 shrink-0">
+                                                {Array.from({ length: tilesCount }).map((_, i) => {
+                                                    const shape = i % 3 // 0 = bottle, 1 = circle, 2 = box
+                                                    return (
+                                                        <div key={i} className="relative w-9 h-9 rounded-md overflow-hidden"
+                                                            style={{
+                                                                background: `linear-gradient(155deg, ${p.accent}26 0%, rgba(255,255,255,0.04) 100%)`,
+                                                                border: '1px solid rgba(255,255,255,0.14)',
+                                                                boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.08)',
+                                                            }}>
+                                                            {/* "producto" silueta */}
+                                                            <div className="absolute inset-0 flex items-center justify-center">
+                                                                {shape === 0 && (
+                                                                    <div className="w-2 h-5 rounded-sm" style={{ background: `linear-gradient(180deg, rgba(255,255,255,0.85), rgba(255,255,255,0.45))` }} />
+                                                                )}
+                                                                {shape === 1 && (
+                                                                    <div className="w-4 h-4 rounded-full" style={{ background: `radial-gradient(circle at 35% 35%, rgba(255,255,255,0.85), rgba(255,255,255,0.35) 70%)` }} />
+                                                                )}
+                                                                {shape === 2 && (
+                                                                    <div className="w-4 h-3.5 rounded-sm" style={{ background: `linear-gradient(150deg, rgba(255,255,255,0.8), rgba(255,255,255,0.35))` }} />
+                                                                )}
+                                                            </div>
+                                                            {/* price tag chip */}
+                                                            <span className="absolute bottom-0.5 right-0.5 px-1 rounded text-[6.5px] font-bold leading-none"
+                                                                style={{ background: 'rgba(0,0,0,0.55)', color: '#fff', border: '1px solid rgba(255,255,255,0.15)' }}>
+                                                                $
+                                                            </span>
+                                                        </div>
+                                                    )
+                                                })}
+                                            </div>
                                         </div>
                                     </div>
 
@@ -851,21 +874,21 @@ export default function VirtualStorePage() {
                                 </div>
 
                                 {/* contenido inferior */}
-                                <div className="p-4 relative">
+                                <div className="px-4 py-3 relative">
                                     {store.sharedByUsername && (
-                                        <div className="flex items-center gap-1.5 mb-2 text-[10px]" style={{ color: p.accent }}>
+                                        <div className="flex items-center gap-1.5 mb-1.5 text-[10px]" style={{ color: p.accent }}>
                                             <Share2 size={11} />
                                             <span>de @{store.sharedByUsername}</span>
                                         </div>
                                     )}
 
                                     {/* row: icono + nombre/tipo + acciones */}
-                                    <div className="flex items-start gap-3 mb-3">
-                                        <div className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
-                                            style={{ background: `${p.accent}1a`, border: `1px solid ${p.accent}40`, boxShadow: `0 0 14px -4px ${p.accent}55` }}>
-                                            {store.type === 'NETWORK_MARKETING' ? <Globe className="w-4 h-4" style={{ color: p.accent }} /> :
-                                                store.type === 'GENERAL_BUSINESS' ? <Store className="w-4 h-4" style={{ color: p.accent }} /> :
-                                                    <LayoutIcon className="w-4 h-4" style={{ color: p.accent }} />}
+                                    <div className="flex items-center gap-2.5 mb-3">
+                                        <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
+                                            style={{ background: `${p.accent}18`, border: `1px solid ${p.accent}38`, boxShadow: `0 0 12px -4px ${p.accent}40` }}>
+                                            {store.type === 'NETWORK_MARKETING' ? <Globe className="w-3.5 h-3.5" style={{ color: p.accent }} /> :
+                                                store.type === 'GENERAL_BUSINESS' ? <Store className="w-3.5 h-3.5" style={{ color: p.accent }} /> :
+                                                    <LayoutIcon className="w-3.5 h-3.5" style={{ color: p.accent }} />}
                                         </div>
                                         <div className="flex-1 min-w-0">
                                             <div className="text-sm font-bold text-white truncate" style={{ letterSpacing: '-0.01em' }}>{store.name}</div>
@@ -904,30 +927,30 @@ export default function VirtualStorePage() {
                                     </div>
 
                                     {/* botones premium */}
-                                    <div className="flex items-center gap-2">
+                                    <div className="flex items-stretch gap-2">
                                         <button
                                             onClick={() => openStoreProducts(store)}
-                                            className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-bold transition-all active:scale-[0.98]"
+                                            className="flex-1 flex items-center justify-center gap-2 py-2 rounded-xl text-[13px] font-bold transition-all active:scale-[0.98]"
                                             style={{
-                                                background: `linear-gradient(135deg, ${p.accent}2c, ${p.accent}12)`,
-                                                border: `1px solid ${p.accent}45`,
+                                                background: `linear-gradient(135deg, ${p.accent}26, ${p.accent}0d)`,
+                                                border: `1px solid ${p.accent}3d`,
                                                 color: '#fff',
-                                                boxShadow: `0 8px 22px -10px ${p.accent}66, inset 0 1px 0 rgba(255,255,255,0.10)`,
+                                                boxShadow: `0 6px 18px -10px ${p.accent}55, inset 0 1px 0 rgba(255,255,255,0.08)`,
                                             }}>
-                                            <Package className="w-4 h-4" />
+                                            <Package className="w-3.5 h-3.5" />
                                             Gestionar Productos
                                         </button>
                                         <Link
                                             href={`/sh/${store.slug}`}
                                             target="_blank"
-                                            className="px-3.5 py-2.5 rounded-xl flex items-center justify-center transition-all active:scale-[0.98]"
+                                            className="px-3 rounded-xl flex items-center justify-center transition-all active:scale-[0.98]"
                                             style={{
                                                 background: 'rgba(255,255,255,0.04)',
                                                 border: '1px solid rgba(255,255,255,0.08)',
                                                 color: 'rgba(255,255,255,0.85)',
                                             }}
                                             title="Abrir tienda pública">
-                                            <ExternalLink className="w-4 h-4" />
+                                            <ExternalLink className="w-3.5 h-3.5" />
                                         </Link>
                                     </div>
 
