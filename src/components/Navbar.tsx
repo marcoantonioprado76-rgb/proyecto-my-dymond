@@ -153,12 +153,16 @@ export default function Navbar() {
         </nav>
 
         <div className="sidebar__user">
-          <NotificationBell />
           <div className="sidebar__user-av" id="dAvatar"><i className="fa-solid fa-user"></i></div>
-          <div>
+          <div className="sidebar__user-info">
             <p className="sidebar__user-name">Usuario</p>
-            <p className="sidebar__user-role">@user · <span style={{ color: 'var(--clr-accent-lt)' }}>Activo</span></p>
+            <p className="sidebar__user-role">
+              <span className="sidebar__user-handle">@user</span>
+              <span className="sidebar__user-dot" aria-hidden></span>
+              <span className="sidebar__user-status">Activo</span>
+            </p>
           </div>
+          <NotificationBell />
         </div>
       </aside>
 
