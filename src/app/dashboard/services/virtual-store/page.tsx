@@ -676,7 +676,7 @@ export default function VirtualStorePage() {
     }
 
     return (
-        <div className="px-4 sm:px-6 pt-6 max-w-screen-xl mx-auto pb-20 font-inter text-white">
+        <div className="px-4 sm:px-6 pt-6 max-w-6xl mx-auto pb-20 font-inter text-white">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
                 <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
@@ -728,7 +728,7 @@ export default function VirtualStorePage() {
                     </button>
                 </div>
             ) : (
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-7 xl:gap-8">
                     {stores.map(store => {
                         const p = paletteForStore(store.id)
                         const productCount = store._count?.products || 0
@@ -739,20 +739,20 @@ export default function VirtualStorePage() {
                                 style={{
                                     background: `radial-gradient(120% 80% at 50% -10%, ${p.accent}26, rgba(255,255,255,0) 58%), radial-gradient(80% 80% at 100% 100%, ${p.accent}16, rgba(255,255,255,0) 60%), radial-gradient(70% 70% at 0% 100%, ${p.accent}10, rgba(255,255,255,0) 60%), linear-gradient(180deg, rgba(22,28,56,0.92) 0%, rgba(16,20,42,0.9) 100%)`,
                                     border: '1px solid rgba(255,255,255,0.10)',
-                                    boxShadow: '0 22px 48px -22px rgba(0,0,0,0.78), inset 0 1px 0 rgba(255,255,255,0.06)',
+                                    boxShadow: `0 28px 56px -24px rgba(0,0,0,0.82), 0 0 0 1px rgba(255,255,255,0.02), 0 0 32px -14px ${p.accent}38, inset 0 1px 0 rgba(255,255,255,0.06)`,
                                 }}
                                 onMouseEnter={e => {
-                                    e.currentTarget.style.boxShadow = `0 30px 60px -22px rgba(0,0,0,0.84), 0 0 36px -8px ${p.accent}55, inset 0 1px 0 rgba(255,255,255,0.09)`
-                                    e.currentTarget.style.borderColor = `${p.accent}5a`
+                                    e.currentTarget.style.boxShadow = `0 36px 68px -22px rgba(0,0,0,0.86), 0 0 44px -8px ${p.accent}66, 0 0 18px -6px rgba(123,91,255,0.42), inset 0 1px 0 rgba(255,255,255,0.10)`
+                                    e.currentTarget.style.borderColor = `${p.accent}66`
                                 }}
                                 onMouseLeave={e => {
-                                    e.currentTarget.style.boxShadow = '0 22px 48px -22px rgba(0,0,0,0.78), inset 0 1px 0 rgba(255,255,255,0.06)'
+                                    e.currentTarget.style.boxShadow = `0 28px 56px -24px rgba(0,0,0,0.82), 0 0 0 1px rgba(255,255,255,0.02), 0 0 32px -14px ${p.accent}38, inset 0 1px 0 rgba(255,255,255,0.06)`
                                     e.currentTarget.style.borderColor = 'rgba(255,255,255,0.10)'
                                 }}>
 
                                 {/* Mini storefront preview panorámico */}
                                 <a href={`/sh/${store.slug}`} target="_blank" rel="noopener noreferrer"
-                                    className="block relative aspect-[21/9] overflow-hidden"
+                                    className="block relative aspect-[16/9] overflow-hidden"
                                     style={{
                                         background: store.bannerUrl
                                             ? `linear-gradient(180deg, rgba(8,10,24,0.22) 0%, rgba(8,10,24,0.78) 100%), url("${store.bannerUrl}") center/cover no-repeat`
@@ -874,31 +874,31 @@ export default function VirtualStorePage() {
                                 </div>
 
                                 {/* contenido inferior */}
-                                <div className="px-4 py-3 relative">
+                                <div className="px-5 pt-3.5 pb-4 relative">
                                     {store.sharedByUsername && (
-                                        <div className="flex items-center gap-1.5 mb-1.5 text-[10px]" style={{ color: p.accent }}>
+                                        <div className="flex items-center gap-1.5 mb-2 text-[10px]" style={{ color: p.accent }}>
                                             <Share2 size={11} />
                                             <span>de @{store.sharedByUsername}</span>
                                         </div>
                                     )}
 
                                     {/* row: icono + nombre/tipo + acciones */}
-                                    <div className="flex items-center gap-2.5 mb-3">
-                                        <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
-                                            style={{ background: `${p.accent}18`, border: `1px solid ${p.accent}38`, boxShadow: `0 0 12px -4px ${p.accent}40` }}>
-                                            {store.type === 'NETWORK_MARKETING' ? <Globe className="w-3.5 h-3.5" style={{ color: p.accent }} /> :
-                                                store.type === 'GENERAL_BUSINESS' ? <Store className="w-3.5 h-3.5" style={{ color: p.accent }} /> :
-                                                    <LayoutIcon className="w-3.5 h-3.5" style={{ color: p.accent }} />}
+                                    <div className="flex items-center gap-2.5 mb-3.5">
+                                        <div className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
+                                            style={{ background: `${p.accent}1c`, border: `1px solid ${p.accent}40`, boxShadow: `0 0 14px -4px ${p.accent}55` }}>
+                                            {store.type === 'NETWORK_MARKETING' ? <Globe className="w-4 h-4" style={{ color: p.accent }} /> :
+                                                store.type === 'GENERAL_BUSINESS' ? <Store className="w-4 h-4" style={{ color: p.accent }} /> :
+                                                    <LayoutIcon className="w-4 h-4" style={{ color: p.accent }} />}
                                         </div>
                                         <div className="flex-1 min-w-0">
-                                            <div className="text-sm font-bold text-white truncate" style={{ letterSpacing: '-0.01em' }}>{store.name}</div>
-                                            <div className="text-[10px] mt-0.5 truncate" style={{ color: 'rgba(255,255,255,0.42)' }}>
+                                            <div className="text-[14px] font-bold text-white truncate leading-tight" style={{ letterSpacing: '-0.01em' }}>{store.name}</div>
+                                            <div className="text-[10.5px] mt-0.5 truncate" style={{ color: 'rgba(255,255,255,0.46)' }}>
                                                 {storeTypeLabel(store.type)} · {productCount} {productCount === 1 ? 'producto' : 'productos'}
                                             </div>
                                         </div>
-                                        <div className="flex gap-0.5 shrink-0">
+                                        <div className="flex items-center gap-0.5 shrink-0 -mr-1">
                                             <button onClick={() => setSharingStore(store)}
-                                                className="p-1.5 rounded-lg transition-colors"
+                                                className="p-1.5 rounded-lg transition-colors hover:bg-white/5"
                                                 title="Compartir tienda">
                                                 <Share2 className="w-3.5 h-3.5 text-dark-400 hover:text-white transition-colors" />
                                             </button>
@@ -914,12 +914,12 @@ export default function VirtualStorePage() {
                                                     setStoreBanner2(store.themeConfig?.bannerUrl2 || '');
                                                     setShowStoreModal(true);
                                                 }}
-                                                className="p-1.5 rounded-lg transition-colors"
+                                                className="p-1.5 rounded-lg transition-colors hover:bg-white/5"
                                                 title="Editar">
                                                 <Edit3 className="w-3.5 h-3.5 text-dark-400 hover:text-white transition-colors" />
                                             </button>
                                             <button onClick={() => deleteStore(store.id)}
-                                                className="p-1.5 rounded-lg transition-colors"
+                                                className="p-1.5 rounded-lg transition-colors hover:bg-white/5"
                                                 title="Eliminar">
                                                 <Trash2 className="w-3.5 h-3.5 text-dark-500 hover:text-red-400 transition-colors" />
                                             </button>
@@ -930,12 +930,13 @@ export default function VirtualStorePage() {
                                     <div className="flex items-stretch gap-2">
                                         <button
                                             onClick={() => openStoreProducts(store)}
-                                            className="flex-1 flex items-center justify-center gap-2 py-2 rounded-xl text-[13px] font-bold transition-all active:scale-[0.98]"
+                                            className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-[13px] font-bold transition-all active:scale-[0.98] hover:brightness-110"
                                             style={{
-                                                background: `linear-gradient(135deg, ${p.accent}26, ${p.accent}0d)`,
-                                                border: `1px solid ${p.accent}3d`,
+                                                background: `linear-gradient(135deg, ${p.accent}2e, ${p.accent}10)`,
+                                                border: `1px solid ${p.accent}45`,
                                                 color: '#fff',
-                                                boxShadow: `0 6px 18px -10px ${p.accent}55, inset 0 1px 0 rgba(255,255,255,0.08)`,
+                                                boxShadow: `0 8px 22px -10px ${p.accent}66, inset 0 1px 0 rgba(255,255,255,0.10)`,
+                                                letterSpacing: '-0.01em',
                                             }}>
                                             <Package className="w-3.5 h-3.5" />
                                             Gestionar Productos
@@ -943,11 +944,11 @@ export default function VirtualStorePage() {
                                         <Link
                                             href={`/sh/${store.slug}`}
                                             target="_blank"
-                                            className="px-3 rounded-xl flex items-center justify-center transition-all active:scale-[0.98]"
+                                            className="px-3.5 rounded-xl flex items-center justify-center transition-all active:scale-[0.98] hover:bg-white/8"
                                             style={{
-                                                background: 'rgba(255,255,255,0.04)',
-                                                border: '1px solid rgba(255,255,255,0.08)',
-                                                color: 'rgba(255,255,255,0.85)',
+                                                background: 'rgba(255,255,255,0.05)',
+                                                border: '1px solid rgba(255,255,255,0.10)',
+                                                color: 'rgba(255,255,255,0.88)',
                                             }}
                                             title="Abrir tienda pública">
                                             <ExternalLink className="w-3.5 h-3.5" />
@@ -957,8 +958,8 @@ export default function VirtualStorePage() {
                                     {(store.type === 'NETWORK_MARKETING' || store.type === 'GENERAL_BUSINESS') && (
                                         <button
                                             onClick={() => convertStoreType(store)}
-                                            className="mt-2 w-full flex items-center justify-center gap-1.5 text-[10px] font-medium py-1.5 rounded-lg transition-colors hover:text-white"
-                                            style={{ color: 'rgba(255,255,255,0.34)' }}>
+                                            className="mt-2.5 w-full flex items-center justify-center gap-1.5 text-[10px] font-medium py-1.5 rounded-lg transition-colors hover:text-white"
+                                            style={{ color: 'rgba(255,255,255,0.36)' }}>
                                             Convertir a {store.type === 'NETWORK_MARKETING' ? 'Mi Negocio (General)' : 'Network Marketing (PV)'}
                                         </button>
                                     )}
