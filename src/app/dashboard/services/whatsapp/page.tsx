@@ -1524,7 +1524,7 @@ function parseProductTestimonials(p: Product): {
   let pi = 0
   let vi = 0
 
-  for (const item of p.testimonialsVideoUrls) {
+  for (const item of (Array.isArray(p.testimonialsVideoUrls) ? p.testimonialsVideoUrls : [])) {
     if (typeof item === 'object' && item !== null && (item as { url?: string }).url) {
       const obj = item as { url: string; label?: string; type?: string }
       if (obj.type === 'video') {
@@ -1542,7 +1542,7 @@ function parseProductTestimonials(p: Product): {
 
 function productToForm(p: Product): ProductFormState {
   const { photos, videos } = parseProductTestimonials(p)
-  const imgs = [...p.imageMainUrls, '', '', '', '', '', '', '', ''].slice(0, 8)
+  const imgs = [...(Array.isArray(p.imageMainUrls) ? p.imageMainUrls : []), '', '', '', '', '', '', '', ''].slice(0, 8)
   return {
     name: p.name,
     category: p.category ?? '',
@@ -1554,7 +1554,7 @@ function productToForm(p: Product): ProductFormState {
     currency: p.currency ?? 'USD',
     welcomeMessage: p.welcomeMessage ?? '',
     firstMessage: p.firstMessage ?? '',
-    hooks: p.hooks.join('\n'),
+    hooks: Array.isArray(p.hooks) ? p.hooks.join('\n') : '',
     img1: imgs[0], img2: imgs[1], img3: imgs[2], img4: imgs[3], img5: imgs[4], img6: imgs[5], img7: imgs[6], img8: imgs[7],
     vid1: ((p as any).productVideoUrls?.[0] as string) || '', vid2: ((p as any).productVideoUrls?.[1] as string) || '',
     test1Label: photos[0].label, test1Url: photos[0].url,
@@ -2215,7 +2215,7 @@ function ProductsTab({ bot }: { bot: Bot }) {
                         {product.category && <span>{product.category}</span>}
                         {product.priceUnit && <span>{product.currency ?? 'USD'} {product.priceUnit}</span>}
                         {product.pricePromo2 && <span className="text-orange-400">{product.currency ?? 'USD'} {product.pricePromo2} <span className="text-[10px] text-orange-400/60">oferta</span></span>}
-                        {product.imageMainUrls.length > 0 && <span>{product.imageMainUrls.length} img</span>}
+                        {Array.isArray(product.imageMainUrls) && product.imageMainUrls.length > 0 && <span>{product.imageMainUrls.length} img</span>}
                         {!product.active && <span className="text-dark-600 italic">inactivo</span>}
                         {product.sharedByUsername && (
                           <span className="flex items-center gap-1 text-neon-blue/70">
