@@ -64,6 +64,11 @@ function WizardContent() {
     const router = useRouter()
     const searchParams = useSearchParams()
     const initialBriefId = searchParams.get('briefId')
+    // Si entran desde un dashboard de plataforma específica (Meta/TikTok/Google),
+    // saltamos el picker de plataforma. Sólo se respeta META por ahora (TikTok/Google
+    // están en construcción y el wizard quedaría sin estrategias).
+    const platformFromUrl = searchParams.get('platform')
+    const forcedPlatform = platformFromUrl === 'META' ? 'META' : null
 
     const [step, setStep] = useState<1 | 2>(initialBriefId ? 2 : 1)
     const [briefs, setBriefs] = useState<Brief[]>([])
@@ -108,12 +113,20 @@ function WizardContent() {
 
     function enterPlatformPicker() {
         setStep(2)
-        setShowPlatformPicker(true)
-        setShowAdTypePicker(false)
+        // Si viene plataforma forzada por URL, saltamos el picker de plataforma
+        // y vamos directo al picker de tipo de anuncio
+        if (forcedPlatform) {
+            setShowPlatformPicker(false)
+            setShowAdTypePicker(true)
+            setSelectedPlatform(forcedPlatform)
+        } else {
+            setShowPlatformPicker(true)
+            setShowAdTypePicker(false)
+            setSelectedPlatform(null)
+        }
         setAiStrategies([])
         setSavedStrategies([])
         setSelectedStrategy(null)
-        setSelectedPlatform(null)
         setSelectedObjective(null)
         setSelectedDestination(null)
         setSelectedMediaPref(null)
@@ -389,7 +402,7 @@ function WizardContent() {
                             </div>
                             {selectedBrief && <p className="text-xs text-white/30 mt-0.5">Para: <span className="text-purple-400">{selectedBrief.name}</span></p>}
                         </div>
-                        {!showPlatformPicker && !showAdTypePicker && (
+                        {!showPlatformPicker && !showAdTypePicker && !forcedPlatform && (
                             <button onClick={() => { setShowPlatformPicker(true); setSelectedStrategy(null) }}
                                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 text-xs text-white/40 hover:text-white/70 hover:bg-white/10 transition-all">
                                 <RefreshCw size={12} /> Cambiar
