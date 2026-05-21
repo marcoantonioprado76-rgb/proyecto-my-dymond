@@ -102,14 +102,16 @@ export async function PUT(
     : existingMetaToken ?? null
 
   // OpenAI key: si el usuario no pone una propia, permitimos guardar vacío
-  // siempre que exista la key global del admin O el usuario tenga saldo USD
-  // (el bot-engine usa chargeUserForAI() como fallback automático).
+  // siempre que exista la key global del admin (en cualquiera de los 2 lugares
+  // legacy: AppSetting o AdminConfig). El bot-engine ya usa chargeUserForAI()
+  // como fallback automático con cobro de saldo USD.
   if (!openaiEnc) {
-    const [globalKey, userRow] = await Promise.all([
+    const [globalKey, adminCfg, userRow] = await Promise.all([
       (prisma as any).appSetting.findUnique({ where: { key: 'openai_global_key' } }),
+      (prisma as any).adminConfig.findUnique({ where: { id: 'global' } }),
       prisma.user.findUnique({ where: { id: auth.userId }, select: { aiBalanceUsd: true, preferOwnKey: true } }),
     ])
-    const hasAdminFallback = !!globalKey?.value
+    const hasAdminFallback = !!(globalKey?.value) || !!(adminCfg?.openaiKeyEnc)
     const userBalance = userRow?.aiBalanceUsd ? Number(userRow.aiBalanceUsd) : 0
 
     // Sólo bloqueamos si NO hay forma de procesar IA: ni key propia, ni key admin disponible.
@@ -120,7 +122,6 @@ export async function PUT(
       )
     }
     // Si hay key admin pero el usuario tampoco tiene saldo, avisamos pero NO bloqueamos
-    // (puede comprar saldo después y el bot ya estará configurado).
     if (userBalance <= 0) {
       console.log(`[bot/credentials] Bot ${params.botId} se crea sin key propia. Saldo USD del usuario: ${userBalance}. Necesitará comprar saldo o configurar su key antes de que el bot responda.`)
     }

@@ -121,8 +121,12 @@ export async function chargeUserForAI(
     metadata?: Record<string, any>,
 ): Promise<AIChargeOk | AIChargeError> {
     try {
-        // 1) Leer config del usuario y key global SIN transacción (lectura barata)
-        const [userRow, ownConfig, globalSetting] = await Promise.all([
+        // 1) Leer config del usuario y key global SIN transacción (lectura barata).
+        //    La key admin puede estar en 2 lugares por compatibilidad histórica:
+        //      - AppSetting('openai_global_key')  (forma nueva)
+        //      - AdminConfig(id='global').openaiKeyEnc  (legacy del panel admin actual)
+        //    Leemos ambos y usamos el primero que tenga valor.
+        const [userRow, ownConfig, globalSetting, adminConfig] = await Promise.all([
             prisma.user.findUnique({
                 where: { id: userId },
                 select: { preferOwnKey: true },
@@ -134,6 +138,10 @@ export async function chargeUserForAI(
             (prisma as any).appSetting.findUnique({
                 where: { key: 'openai_global_key' },
                 select: { value: true },
+            }),
+            (prisma as any).adminConfig.findUnique({
+                where: { id: 'global' },
+                select: { openaiKeyEnc: true },
             }),
         ])
 
@@ -149,11 +157,12 @@ export async function chargeUserForAI(
             }
         }
 
-        // 3) Resolver key global del admin
-        if (!globalSetting?.value) return { ok: false, error: 'NO_KEY' }
-        let adminKey: string
+        // 3) Resolver key global del admin: primero AppSetting (nueva), después AdminConfig (legacy)
+        let adminKey: string | null = null
+        const adminKeyEnc = globalSetting?.value || adminConfig?.openaiKeyEnc
+        if (!adminKeyEnc) return { ok: false, error: 'NO_KEY' }
         try {
-            adminKey = decrypt(globalSetting.value, ENC_KEY)
+            adminKey = decrypt(adminKeyEnc, ENC_KEY)
         } catch {
             return { ok: false, error: 'NO_KEY' }
         }

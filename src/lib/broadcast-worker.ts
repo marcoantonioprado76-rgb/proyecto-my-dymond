@@ -66,10 +66,15 @@ async function getOpenAIKey(userId: string): Promise<string> {
     if (oaiConfig?.isValid && oaiConfig.apiKeyEnc) {
         try { return decryptAds(oaiConfig.apiKeyEnc, ADS_ENC_KEY) } catch {}
     }
-    // Fallback: global key from AppSetting
+    // Fallback 1: global key from AppSetting
     const setting = await (prisma as any).appSetting.findUnique({ where: { key: 'openai_global_key' } })
     if (setting?.value) {
         try { return decryptAds(setting.value, ADS_ENC_KEY) } catch {}
+    }
+    // Fallback 2: AdminConfig.openaiKeyEnc (legacy del panel /admin/ai-credits)
+    const adminCfg = await (prisma as any).adminConfig.findUnique({ where: { id: 'global' } })
+    if (adminCfg?.openaiKeyEnc) {
+        try { return decryptAds(adminCfg.openaiKeyEnc, ADS_ENC_KEY) } catch {}
     }
     return ''
 }
