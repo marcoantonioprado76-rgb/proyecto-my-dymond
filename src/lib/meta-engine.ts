@@ -91,7 +91,19 @@ export class MetaBotEngine {
       console.warn(`[META] Bot ${botId} sin Page Access Token configurado`)
       return
     }
-    const openaiKey  = bot.secret.openaiApiKeyEnc ? decrypt(bot.secret.openaiApiKeyEnc) : ''
+    let openaiKey = bot.secret.openaiApiKeyEnc ? decrypt(bot.secret.openaiApiKeyEnc) : ''
+    // Si el bot no tiene key propia, cobrar saldo del propietario y usar key del admin
+    if (!openaiKey && bot.userId) {
+      const { chargeUserForAI } = await import('./ai-credits')
+      const model = (bot as any).aiModel || 'gpt-4o'
+      const charge = await chargeUserForAI(bot.userId, model, 'meta-bot.message', { botId: bot.id })
+      if (charge.ok) {
+        openaiKey = charge.key
+      } else {
+        console.warn(`[META] Bot ${botId} sin key propia y sin saldo IA (${charge.error})`)
+        return
+      }
+    }
     if (!openaiKey) {
       console.warn(`[META] Bot ${botId} sin API key de OpenAI configurada`)
       return

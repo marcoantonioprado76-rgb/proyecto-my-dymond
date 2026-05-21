@@ -15,6 +15,7 @@
 import { prisma } from './prisma'
 import { decrypt } from './crypto'
 import { transcribeAudio, analyzeImage, chat, ChatMessage } from './openai'
+import { chargeUserForAI } from './ai-credits'
 import { markAsRead, sendText, sendImage, sendVideo } from './ycloud'
 import { createNotification } from './notifications'
 import { sendBotSaleReportEmail } from './email'
@@ -673,7 +674,20 @@ export class BotEngine {
     }
 
     const apiKey = decrypt(bot.secret.ycloudApiKeyEnc)
-    const openaiKey = bot.secret.openaiApiKeyEnc ? decrypt(bot.secret.openaiApiKeyEnc) : ''
+    let openaiKey = bot.secret.openaiApiKeyEnc ? decrypt(bot.secret.openaiApiKeyEnc) : ''
+    // Si el bot no tiene key propia configurada, intentamos cobrar el saldo del propietario
+    // y usar la key del admin global. El cobro principal es por la llamada chat() del final;
+    // transcripción de audio y análisis de imagen usan la misma key (auxiliares).
+    if (!openaiKey && bot.userId) {
+      const model = (bot as any).aiModel || 'gpt-4o'
+      const charge = await chargeUserForAI(bot.userId, model, 'bot.message', { botId: bot.id })
+      if (charge.ok) {
+        openaiKey = charge.key
+      } else {
+        console.warn(`[BOT] Bot ${bot.id} sin key propia y sin saldo IA del propietario (${charge.error})`)
+        return
+      }
+    }
     if (!openaiKey) {
       console.warn(`[BOT] Bot ${bot.id} sin API key de OpenAI configurada`)
       return

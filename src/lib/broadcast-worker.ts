@@ -7,6 +7,7 @@
 import { prisma } from '@/lib/prisma'
 import { BaileysManager } from '@/lib/baileys-manager'
 import { decrypt as decryptAds } from '@/lib/ads/encryption'
+import { chargeUserForAI, refundUserForAI } from '@/lib/ai-credits'
 
 const ADS_ENC_KEY = process.env.ADS_ENCRYPTION_KEY || ''
 
@@ -95,16 +96,14 @@ export async function executeBroadcast(campaignId: string) {
         data: { status: 'RUNNING', startedAt: new Date() },
     })
 
-    const openaiKey = await getOpenAIKey(campaign.userId)
-    const useAI = !!openaiKey
-    if (!useAI) {
-        console.warn(`[BROADCAST] Sin OpenAI API Key — campaña ${campaignId} enviará el prompt como mensaje fijo`)
-    }
+    // Key inicial (sin cobro) sólo para reconectar Baileys si hace falta.
+    // El cobro real ocurre antes de cada generateUniqueMessage dentro del loop.
+    const reconnectKey = await getOpenAIKey(campaign.userId)
 
     // Auto-reconnect Baileys si hay sesión en disco pero no en memoria
     const currentStatus = BaileysManager.getStatus(campaign.botId)
     if (currentStatus.status !== 'connected') {
-        await BaileysManager.connect(campaign.botId, campaign.name, openaiKey, '')
+        await BaileysManager.connect(campaign.botId, campaign.name, reconnectKey, '')
         for (let i = 0; i < 20; i++) {
             await new Promise(r => setTimeout(r, 1000))
             if (BaileysManager.getStatus(campaign.botId).status === 'connected') break
@@ -149,13 +148,33 @@ export async function executeBroadcast(campaignId: string) {
                 continue
             }
 
-            const generated = useAI
-                ? await generateUniqueMessage(
-                    campaign.prompt, openaiKey,
-                    campaign.bot?.systemPromptTemplate,
-                    campaign.messageExample,
-                )
-                : (campaign.prompt?.trim() || campaign.messageExample?.trim() || '')
+            // Cobrar saldo por este mensaje (o usar key propia sin cobrar)
+            const charge = await chargeUserForAI(campaign.userId, 'gpt-4o', 'broadcast.message', { campaignId, contactId: contact.id })
+
+            let generated: string
+            if (charge.ok) {
+                try {
+                    generated = await generateUniqueMessage(
+                        campaign.prompt, charge.key,
+                        campaign.bot?.systemPromptTemplate,
+                        campaign.messageExample,
+                    )
+                } catch (e) {
+                    // Si falló la llamada después de cobrar, devolver el saldo
+                    if (charge.source === 'admin' && charge.chargedUsd) {
+                        await refundUserForAI(campaign.userId, charge.chargedUsd, 'broadcast.message.failed')
+                    }
+                    // Fallback al prompt fijo si la llamada falla
+                    console.warn(`[BROADCAST] AI falló para ${contact.phone}, usando prompt fijo:`, (e as any)?.message)
+                    generated = campaign.prompt?.trim() || campaign.messageExample?.trim() || ''
+                }
+            } else {
+                // Sin saldo o sin key → enviar el prompt fijo en lugar de IA personalizada
+                if (charge.error === 'NO_CREDITS') {
+                    console.warn(`[BROADCAST] Sin saldo IA para usuario ${campaign.userId} — enviando prompt fijo`)
+                }
+                generated = campaign.prompt?.trim() || campaign.messageExample?.trim() || ''
+            }
 
             const nextIndex = images.length > 0 ? (imageIndex + 1) % images.length : 0
             let logImageUrl: string | null = null

@@ -144,11 +144,24 @@ export async function POST(req: Request, { params }: { params: { id: string } })
             let audienceError = 'No se pudieron generar intereses de audiencia. Verifica tu API Key de OpenAI en Configuración → IA.'
             try {
                 const oaiConfig = await (prisma as any).openAIConfig.findUnique({ where: { userId: user.id } })
-                if (!oaiConfig?.isValid || !oaiConfig.apiKeyEnc) {
-                    audienceError = 'Configura tu API Key de OpenAI en Configuración → IA para publicar campañas de Meta con segmentación de audiencia.'
+                const audienceModel = oaiConfig?.model || 'gpt-4o'
+                const { chargeUserForAI, refundUserForAI } = await import('@/lib/ai-credits')
+                const charge = await chargeUserForAI(user.id, audienceModel, 'ads.publish.audience', { campaignId: params.id })
+                if (!charge.ok) {
+                    audienceError = charge.error === 'NO_CREDITS'
+                        ? 'Sin saldo de IA para generar intereses de audiencia. Comprá saldo o configurá tu propia API Key.'
+                        : 'Configura tu API Key de OpenAI o pedile al admin que active la global.'
                 } else {
-                    const oaiKey = decrypt(oaiConfig.apiKeyEnc, ENC_KEY!)
-                    const keywords = await generateAudienceInterests(campaign.brief, oaiKey, oaiConfig.model || 'gpt-4o')
+                    const oaiKey = charge.key
+                    let keywords
+                    try {
+                        keywords = await generateAudienceInterests(campaign.brief, oaiKey, audienceModel)
+                    } catch (e) {
+                        if (charge.source === 'admin' && charge.chargedUsd) {
+                            await refundUserForAI(user.id, charge.chargedUsd, 'ads.publish.audience.failed')
+                        }
+                        throw e
+                    }
                     console.log(`[Publish] AI generated ${keywords.length} interest keywords:`, keywords.join(', '))
 
                     const metaAdapter = adapter as MetaAdapter
@@ -171,7 +184,7 @@ export async function POST(req: Request, { params }: { params: { id: string } })
                     console.log(`[Publish] Resolved ${audienceInterests.length} raw Meta interest candidates`)
 
                     // AI filtering step — remove irrelevant results (e.g. "Acne Studios" for skincare)
-                    audienceInterests = await filterAudienceInterests(campaign.brief, audienceInterests, oaiKey, oaiConfig.model || 'gpt-4o-mini')
+                    audienceInterests = await filterAudienceInterests(campaign.brief, audienceInterests, oaiKey, oaiConfig?.model || 'gpt-4o-mini')
                     audienceInterests = audienceInterests.slice(0, 15)
                     console.log(`[Publish] After AI filter: ${audienceInterests.length} Meta interests:`, audienceInterests.map(i => i.name).join(', '))
                     if (audienceInterests.length === 0) {

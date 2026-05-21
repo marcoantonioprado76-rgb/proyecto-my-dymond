@@ -4,6 +4,7 @@ import { sendText } from './ycloud'
 import { decrypt } from './crypto'
 import { BaileysManager } from './baileys-manager'
 import { notifyCreditsExhausted } from './notify-credits'
+import { chargeUserForAI, refundUserForAI } from './ai-credits'
 
 const sleep = (ms: number) => new Promise<void>(resolve => setTimeout(resolve, ms))
 
@@ -76,7 +77,23 @@ async function executeFollowUp(conv: any, type: 1 | 2) {
             console.warn(`[WORKER] Bot ${bot.id} sin credenciales, omitiendo seguimiento`)
             return
         }
-        const openaiKey = decrypt(bot.secret.openaiApiKeyEnc)
+        // Si el bot tiene key propia configurada en BotSecret, la usamos (sin tocar saldo USD).
+        // Si no, intentamos cobrar el saldo del propietario y usar la key del admin global.
+        let openaiKey: string | null = null
+        let charge: Awaited<ReturnType<typeof chargeUserForAI>> | null = null
+        try {
+            openaiKey = decrypt(bot.secret.openaiApiKeyEnc)
+        } catch {
+            openaiKey = null
+        }
+        if (!openaiKey && bot.userId) {
+            charge = await chargeUserForAI(bot.userId, FOLLOWUP_MODEL, 'bot.followup', { botId: bot.id, type })
+            if (charge.ok) {
+                openaiKey = charge.key
+            } else {
+                console.warn(`[WORKER] Sin saldo IA para bot ${bot.id} (followup ${type}). Usando fallback.`)
+            }
+        }
         // ✅ FIX 1: Decodificar JSON de los mensajes del asistente antes de pasar al prompt
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const history = messages.reverse().map((m: any) => {
@@ -133,22 +150,27 @@ IMPORTANTE: Responde únicamente en formato JSON con este schema exacto:
         const fallbackPool = type === 1 ? FALLBACKS_1 : FALLBACKS_2
         const fallback = fallbackPool[Math.floor(Math.random() * fallbackPool.length)]
 
-        let messageText: string
-        try {
-            const aiResponse = await chat(prompt, [], openaiKey, FOLLOWUP_MODEL)
-            messageText = aiResponse.mensaje1 || fallback
-        } catch (aiErr) {
-            const errMsg = (aiErr as Error).message || ''
-            console.warn(`[WORKER] OpenAI falló para seguimiento ${type} de ${userPhone}, usando mensaje predeterminado:`, errMsg.slice(0, 120))
-            messageText = fallback
-            // Solo avisar si es saldo realmente agotado, NO por rate-limit transitorio.
-            // OpenAI usa 429 para ambos: insufficient_quota = sin saldo, Rate limit = velocidad.
-            const isQuotaExhausted =
-                errMsg.includes('insufficient_quota') ||
-                errMsg.includes('exceeded your current quota') ||
-                errMsg.includes('billing_hard_limit_reached')
-            if (isQuotaExhausted && bot.userId) {
-                notifyCreditsExhausted(bot.userId, bot.name).catch(() => {})
+        let messageText: string = fallback
+        if (openaiKey) {
+            try {
+                const aiResponse = await chat(prompt, [], openaiKey, FOLLOWUP_MODEL)
+                messageText = aiResponse.mensaje1 || fallback
+            } catch (aiErr) {
+                const errMsg = (aiErr as Error).message || ''
+                console.warn(`[WORKER] OpenAI falló para seguimiento ${type} de ${userPhone}, usando mensaje predeterminado:`, errMsg.slice(0, 120))
+                // Si cobramos saldo del usuario y la llamada falló, devolverlo
+                if (charge?.ok && charge.source === 'admin' && charge.chargedUsd) {
+                    await refundUserForAI(bot.userId, charge.chargedUsd, 'bot.followup.failed')
+                }
+                // Solo avisar si es saldo realmente agotado de la cuenta OpenAI del bot,
+                // NO por rate-limit transitorio.
+                const isQuotaExhausted =
+                    errMsg.includes('insufficient_quota') ||
+                    errMsg.includes('exceeded your current quota') ||
+                    errMsg.includes('billing_hard_limit_reached')
+                if (isQuotaExhausted && bot.userId) {
+                    notifyCreditsExhausted(bot.userId, bot.name).catch(() => {})
+                }
             }
         }
 

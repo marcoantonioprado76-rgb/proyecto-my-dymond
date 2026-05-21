@@ -18,11 +18,12 @@ import { decrypt } from '@/lib/ads/encryption'
 const ENC_KEY = process.env.ADS_ENCRYPTION_KEY || ''
 
 /**
- * Costo por llamada/uso de cada modelo, en USD.
+ * Costo por llamada/uso de cada modelo, en USD (defaults).
  * Valores con markup razonable sobre el costo real de OpenAI.
- * Se pueden mover a AppSetting si querés que el admin los edite en runtime.
+ * El admin puede sobrescribir estos valores vía AppSetting con key
+ * "ai_model_cost_usd" (JSON: { "gpt-4o": 0.05, "gpt-4o-mini": 0.01, ... }).
  */
-export const MODEL_COST_USD: Record<string, number> = {
+export const DEFAULT_MODEL_COST_USD: Record<string, number> = {
     // Chat models
     'gpt-4o':         0.05,
     'gpt-4o-mini':    0.01,
@@ -39,9 +40,50 @@ export const MODEL_COST_USD: Record<string, number> = {
     'text-embedding-3-large': 0.005,
 }
 
-export function costForModel(model: string): number {
-    // Si el modelo no está mapeado, asumir el costo de gpt-4o-mini como default seguro
-    return MODEL_COST_USD[model] ?? MODEL_COST_USD['gpt-4o-mini']
+// Backwards-compat: algunos lugares aún pueden importar MODEL_COST_USD
+export const MODEL_COST_USD = DEFAULT_MODEL_COST_USD
+
+// Cache en memoria de los costos custom (se refresca cada 60s)
+let cachedCosts: Record<string, number> | null = null
+let cachedAt = 0
+const CACHE_TTL_MS = 60_000
+
+async function getEffectiveCosts(): Promise<Record<string, number>> {
+    const now = Date.now()
+    if (cachedCosts && now - cachedAt < CACHE_TTL_MS) return cachedCosts
+    try {
+        const setting = await (prisma as any).appSetting.findUnique({
+            where: { key: 'ai_model_cost_usd' },
+            select: { value: true },
+        })
+        if (setting?.value) {
+            const parsed = JSON.parse(setting.value)
+            if (parsed && typeof parsed === 'object') {
+                // Merge: defaults + overrides del admin
+                const merged: Record<string, number> = { ...DEFAULT_MODEL_COST_USD, ...parsed }
+                cachedCosts = merged
+                cachedAt = now
+                return merged
+            }
+        }
+    } catch {
+        // Si falla la lectura, caemos a defaults
+    }
+    const merged: Record<string, number> = { ...DEFAULT_MODEL_COST_USD }
+    cachedCosts = merged
+    cachedAt = now
+    return merged
+}
+
+/** Invalida el cache de costos (llamar después de que el admin edite los valores). */
+export function invalidateCostCache() {
+    cachedCosts = null
+    cachedAt = 0
+}
+
+export async function costForModel(model: string): Promise<number> {
+    const costs = await getEffectiveCosts()
+    return costs[model] ?? costs['gpt-4o-mini'] ?? 0.01
 }
 
 export type AIChargeOk = {
@@ -118,7 +160,7 @@ export async function chargeUserForAI(
         if (!adminKey) return { ok: false, error: 'NO_KEY' }
 
         // 4) Cobrar al balance USD del usuario en transacción con FOR UPDATE
-        const cost = costForModel(model)
+        const cost = await costForModel(model)
 
         const result = await prisma.$transaction(async (tx) => {
             // Lock row del usuario para evitar race conditions
