@@ -35,12 +35,16 @@ const nextConfig = {
                 value: [
                     "default-src 'self'",
                     "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://challenges.cloudflare.com https://player.vimeo.com",
-                    "style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com",
+                    // style-src: incluir cdnjs (FA), fonts (Google), Reown/WalletConnect, y secure.walletconnect.org
+                    "style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com https://secure.walletconnect.org https://*.walletconnect.com https://*.walletconnect.org https://*.reown.com",
                     "img-src 'self' data: blob: https:",
                     "media-src 'self' https:",
-                    "connect-src 'self' https:",
-                    "frame-src https://challenges.cloudflare.com https://www.youtube.com https://www.youtube-nocookie.com https://player.vimeo.com",
-                    "font-src 'self' data: https://cdnjs.cloudflare.com",
+                    // connect-src: 'self' + https: + wss: para WalletConnect WebSocket relay
+                    "connect-src 'self' https: wss: data:",
+                    // frame-src: iframes de Reown/WalletConnect (verify) + Cloudflare/YouTube/Vimeo existentes
+                    "frame-src 'self' https://challenges.cloudflare.com https://www.youtube.com https://www.youtube-nocookie.com https://player.vimeo.com https://verify.walletconnect.org https://verify.walletconnect.com https://secure.walletconnect.org https://*.walletconnect.com https://*.walletconnect.org https://*.reown.com",
+                    // font-src: data + cdnjs + fonts (Google) + Reown/WalletConnect
+                    "font-src 'self' data: https://cdnjs.cloudflare.com https://fonts.gstatic.com https://*.walletconnect.com https://*.walletconnect.org https://*.reown.com",
                 ].join('; '),
             },
         ]
