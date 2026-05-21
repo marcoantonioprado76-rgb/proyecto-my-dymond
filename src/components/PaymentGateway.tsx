@@ -16,9 +16,18 @@ const USDT_ABI = [
 type Step = 'connect' | 'pay' | 'processing' | 'success' | 'error'
 
 interface PaymentGatewayProps {
+  /** Identificador del producto (BASIC/PRO/ELITE para planes, o cualquier string para otros productos). */
   plan: string
+  /** Precio en USD (== USDT en la verificación on-chain). */
   price: number
+  /** Etiqueta legible mostrada al usuario. Si se omite, se usa el mapeo BASIC/PRO/ELITE; sino el propio `plan`. */
+  productLabel?: string
   receiverAddress?: string
+  /**
+   * Callback que se ejecuta cuando el usuario confirma el pago en su wallet y se obtiene un txHash.
+   * Si se omite, el componente llama directamente a POST /api/pack-requests (flujo de planes).
+   * Para otros productos (créditos IA, cursos, etc.) pasá esta prop con tu propio endpoint.
+   */
   onSubmitPayment?: (txHash: string) => Promise<'approved' | 'pending_verification'>
   onSuccess?: (status: 'approved' | 'pending_verification') => void
   onCancel?: () => void
@@ -38,6 +47,7 @@ function formatBalance(balance: number): string {
 export function PaymentGateway({
   plan,
   price,
+  productLabel,
   receiverAddress: receiverProp,
   onSubmitPayment,
   onSuccess,
@@ -131,7 +141,7 @@ export function PaymentGateway({
     }
   }
 
-  const planLabel = { BASIC: 'Pack Básico', PRO: 'Pack Pro', ELITE: 'Pack Elite' }[plan] ?? plan
+  const planLabel = productLabel ?? ({ BASIC: 'Pack Básico', PRO: 'Pack Pro', ELITE: 'Pack Elite' }[plan] ?? plan)
   const hasEnough = !loadingBalance && (usdtBalance === null || usdtBalance >= price)
 
   return (

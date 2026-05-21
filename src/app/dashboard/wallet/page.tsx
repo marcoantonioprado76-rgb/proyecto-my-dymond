@@ -24,6 +24,7 @@ import {
   ArrowUpRight,
   ExternalLink,
 } from 'lucide-react'
+import { PaymentGateway } from '@/components/PaymentGateway'
 
 interface UsageEntry {
   id: string
@@ -79,14 +80,11 @@ export default function CreditsPage() {
   const [buyAmount, setBuyAmount] = useState<string>('10')
   const [buyMethod, setBuyMethod] = useState<'MANUAL' | 'CRYPTO'>('CRYPTO')
   const [buyProofUrl, setBuyProofUrl] = useState('')
-  const [buyTxHash, setBuyTxHash] = useState('')
   const [buyNotes, setBuyNotes] = useState('')
   const [uploadingProof, setUploadingProof] = useState(false)
   const [submittingPurchase, setSubmittingPurchase] = useState(false)
   const [buyMsg, setBuyMsg] = useState<{ type: 'ok' | 'err'; text: string } | null>(null)
   const [paymentQrUrl, setPaymentQrUrl] = useState<string | null>(null)
-  const [usdtAddress, setUsdtAddress] = useState<string>('')
-  const [usdtCopied, setUsdtCopied] = useState(false)
 
   async function load() {
     setLoading(true)
@@ -101,18 +99,7 @@ export default function CreditsPage() {
     setData(d)
     setPurchases(p.purchases ?? [])
     setPaymentQrUrl(s.settings?.PAYMENT_QR_URL || null)
-    // Dirección USDT (la pública, no la admin del .env server) — se lee de la env NEXT_PUBLIC_*
-    setUsdtAddress(process.env.NEXT_PUBLIC_PAYMENT_RECEIVER || '')
     setLoading(false)
-  }
-
-  async function copyUsdtAddress() {
-    if (!usdtAddress) return
-    try {
-      await navigator.clipboard.writeText(usdtAddress)
-      setUsdtCopied(true)
-      setTimeout(() => setUsdtCopied(false), 2000)
-    } catch { /* fallback silencioso */ }
   }
 
   useEffect(() => { load() }, [])
@@ -137,53 +124,42 @@ export default function CreditsPage() {
     }
   }
 
+  /**
+   * Submit del flujo MANUAL únicamente. Para CRYPTO, el componente <PaymentGateway>
+   * maneja la transacción y llama directamente al endpoint a través de onSubmitPayment.
+   */
   async function submitPurchase() {
     const amountUsd = parseFloat(buyAmount)
     if (!Number.isFinite(amountUsd) || amountUsd < 1) {
       setBuyMsg({ type: 'err', text: 'Monto inválido. Mínimo $1 USD.' })
       return
     }
-    if (buyMethod === 'MANUAL' && !buyProofUrl) {
+    if (!buyProofUrl) {
       setBuyMsg({ type: 'err', text: 'Subí el comprobante de la transferencia.' })
       return
     }
-    if (buyMethod === 'CRYPTO') {
-      const t = buyTxHash.trim()
-      if (!/^0x[a-fA-F0-9]{64}$/.test(t)) {
-        setBuyMsg({ type: 'err', text: 'TX hash inválido. Debe empezar con 0x y tener 64 caracteres.' })
-        return
-      }
-    }
     setSubmittingPurchase(true)
     try {
-      const body: any = { amountUsd, paymentMethod: buyMethod, notes: buyNotes.trim() || null }
-      if (buyMethod === 'MANUAL') body.paymentProofUrl = buyProofUrl
-      if (buyMethod === 'CRYPTO') body.txHash = buyTxHash.trim()
-
       const res = await fetch('/api/credits/purchase', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
+        body: JSON.stringify({
+          amountUsd,
+          paymentMethod: 'MANUAL',
+          paymentProofUrl: buyProofUrl,
+          notes: buyNotes.trim() || null,
+        }),
       })
       const j = await res.json()
       if (!res.ok) {
         setBuyMsg({ type: 'err', text: j.error ?? 'Error al enviar solicitud' })
         return
       }
-      // Mensaje según resultado
-      if (j.status === 'approved') {
-        setBuyMsg({ type: 'ok', text: '¡Saldo acreditado! La transacción se verificó on-chain.' })
-      } else if (j.status === 'pending_verification') {
-        setBuyMsg({ type: 'ok', text: 'Transacción recibida. Esperando confirmaciones on-chain (~1-2 min).' })
-      } else {
-        setBuyMsg({ type: 'ok', text: '¡Solicitud enviada! El admin la revisará pronto.' })
-      }
+      setBuyMsg({ type: 'ok', text: '¡Solicitud enviada! El admin la revisará pronto.' })
       setBuyProofUrl('')
-      setBuyTxHash('')
       setBuyNotes('')
       setBuyAmount('10')
       await load()
-      // Cerramos modal después de 2s para que vean el mensaje
       setTimeout(() => { setShowBuyModal(false); setBuyMsg(null) }, 2000)
     } catch (e: any) {
       setBuyMsg({ type: 'err', text: e?.message ?? 'Error de conexión' })
@@ -733,102 +709,49 @@ export default function CreditsPage() {
               </div>
             )}
 
-            {/* ═══ FLUJO USDT (CRYPTO) ═══ */}
-            {buyMethod === 'CRYPTO' && (
-              <>
-                {/* Resumen del pago USDT */}
-                <div className="rounded-xl p-4"
-                  style={{ background: 'linear-gradient(135deg, rgba(251,191,36,0.10), rgba(251,146,60,0.05))', border: '1px solid rgba(251,191,36,0.30)' }}>
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full flex items-center justify-center text-xl"
-                      style={{ background: 'rgba(251,191,36,0.20)' }}>₮</div>
-                    <div className="flex-1">
-                      <p className="text-white font-bold text-sm">Saldo IA</p>
-                      <p className="text-yellow-400 font-black text-xl tabular-nums">
-                        {parseFloat(buyAmount || '0').toFixed(2)} USDT
-                      </p>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-[10px]" style={{ color: 'rgba(255,255,255,0.40)' }}>Red</p>
-                      <p className="text-[10px] font-bold text-yellow-500">BEP-20</p>
-                    </div>
-                  </div>
-                  <div className="mt-3 pt-3 border-t border-yellow-500/10 flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-                    <p className="text-[10px]" style={{ color: 'rgba(255,255,255,0.45)' }}>
-                      BNB Smart Chain · USDT-BEP20 · verificación automática on-chain
-                    </p>
-                  </div>
-                </div>
-
-                {/* Step 1: enviar USDT a la dirección */}
-                <div className="space-y-2.5">
-                  <div className="flex items-center gap-2">
-                    <span className="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black"
-                      style={{ background: 'linear-gradient(135deg, #fbbf24, #fb923c)', color: '#0D0F1E' }}>1</span>
-                    <label className="text-[10px] font-black uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.4)' }}>
-                      Enviá USDT a esta dirección
-                    </label>
-                  </div>
-
-                  {usdtAddress ? (
-                    <div className="rounded-xl p-3.5 space-y-2"
-                      style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.10)' }}>
-                      <p className="text-[10px]" style={{ color: 'rgba(255,255,255,0.40)' }}>
-                        Dirección USDT-BEP20 (BSC):
-                      </p>
-                      <div className="flex items-center gap-2 p-2.5 rounded-lg"
-                        style={{ background: 'rgba(0,0,0,0.30)', border: '1px solid rgba(255,255,255,0.08)' }}>
-                        <p className="flex-1 text-[11px] font-mono break-all" style={{ color: 'rgba(255,255,255,0.85)' }}>
-                          {usdtAddress}
-                        </p>
-                        <button onClick={copyUsdtAddress}
-                          className="shrink-0 px-2.5 py-1.5 rounded-lg text-[10px] font-black transition-all"
-                          style={{
-                            background: usdtCopied ? 'rgba(52,211,153,0.20)' : 'rgba(251,191,36,0.18)',
-                            border: `1px solid ${usdtCopied ? 'rgba(52,211,153,0.40)' : 'rgba(251,191,36,0.35)'}`,
-                            color: usdtCopied ? '#86efac' : '#fbbf24',
-                          }}>
-                          {usdtCopied ? '✓ Copiado' : 'Copiar'}
-                        </button>
-                      </div>
-                      <p className="text-[10px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.45)' }}>
-                        Abrí tu wallet (Binance, Trust Wallet, MetaMask, Bitget...) → seleccioná red <strong>BSC / BEP-20</strong> → enviá <strong className="text-yellow-400">{parseFloat(buyAmount || '0').toFixed(2)} USDT</strong> a esta dirección.
-                      </p>
-                    </div>
-                  ) : (
-                    <div className="flex items-start gap-3 p-3.5 rounded-xl"
-                      style={{ background: 'rgba(248,113,113,0.08)', border: '1px solid rgba(248,113,113,0.25)' }}>
-                      <Info className="w-3.5 h-3.5 mt-0.5 shrink-0" style={{ color: '#f87171' }} />
-                      <p className="text-[11px]" style={{ color: 'rgba(248,113,113,0.85)' }}>
-                        Dirección USDT no configurada. Contactá al administrador.
-                      </p>
-                    </div>
-                  )}
-                </div>
-
-                {/* Step 2: pegar TX hash */}
-                <div className="space-y-2.5">
-                  <div className="flex items-center gap-2">
-                    <span className="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black"
-                      style={{ background: 'linear-gradient(135deg, #fbbf24, #fb923c)', color: '#0D0F1E' }}>2</span>
-                    <label className="text-[10px] font-black uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.4)' }}>
-                      Pegá el TX hash de la transacción
-                    </label>
-                  </div>
-                  <input
-                    type="text"
-                    value={buyTxHash}
-                    onChange={e => setBuyTxHash(e.target.value)}
-                    placeholder="0x..."
-                    className="w-full px-3.5 py-3 rounded-xl text-[11px] font-mono text-white outline-none"
-                    style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.12)' }}
-                  />
-                  <p className="text-[10px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.30)' }}>
-                    Después de enviar el USDT, copiá el <strong>hash de transacción</strong> desde tu wallet (también lo ves en BSCScan). Empieza con <code>0x</code> y tiene 64 caracteres. La verificación es automática on-chain — el saldo se acredita en ~1-2 min sin esperar al admin.
-                  </p>
-                </div>
-              </>
+            {/* ═══ FLUJO USDT (CRYPTO) ═══ Componente compartido con checkout de planes */}
+            {buyMethod === 'CRYPTO' && parseFloat(buyAmount || '0') >= 1 && (
+              <div className="rounded-xl p-3"
+                style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)' }}>
+                <PaymentGateway
+                  plan="CREDITS"
+                  productLabel="Saldo IA"
+                  price={parseFloat(buyAmount || '0')}
+                  onSubmitPayment={async (txHash: string) => {
+                    const res = await fetch('/api/credits/purchase', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({
+                        amountUsd: parseFloat(buyAmount || '0'),
+                        paymentMethod: 'CRYPTO',
+                        txHash,
+                      }),
+                    })
+                    const d = await res.json()
+                    if (!res.ok) throw new Error(d.error || 'Error al registrar el pago')
+                    return d.status === 'approved' ? 'approved' : 'pending_verification'
+                  }}
+                  onSuccess={(status) => {
+                    setBuyMsg({
+                      type: 'ok',
+                      text: status === 'approved'
+                        ? '¡Saldo acreditado! La transacción se verificó on-chain.'
+                        : 'Transacción recibida. Esperando confirmaciones on-chain (~1-2 min).',
+                    })
+                    load()
+                    setTimeout(() => { setShowBuyModal(false); setBuyMsg(null) }, 2500)
+                  }}
+                />
+              </div>
+            )}
+            {buyMethod === 'CRYPTO' && parseFloat(buyAmount || '0') < 1 && (
+              <div className="flex items-start gap-3 p-3.5 rounded-xl"
+                style={{ background: 'rgba(251,146,60,0.08)', border: '1px solid rgba(251,146,60,0.22)' }}>
+                <Info className="w-3.5 h-3.5 mt-0.5 shrink-0" style={{ color: '#fb923c' }} />
+                <p className="text-[11px]" style={{ color: 'rgba(251,191,36,0.80)' }}>
+                  Elegí un monto de al menos $1 para conectar tu wallet.
+                </p>
+              </div>
             )}
 
             {/* ═══ FLUJO MANUAL (transferencia) ═══ */}
@@ -944,36 +867,27 @@ export default function CreditsPage() {
               </div>
             )}
 
-            {/* Submit */}
-            <button
-              onClick={submitPurchase}
-              disabled={
-                submittingPurchase || uploadingProof ||
-                (buyMethod === 'MANUAL' && !buyProofUrl) ||
-                (buyMethod === 'CRYPTO' && !/^0x[a-fA-F0-9]{64}$/.test(buyTxHash.trim()))
-              }
-              className="w-full py-3 rounded-xl font-black text-sm transition-all active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed"
-              style={{
-                background: buyMethod === 'CRYPTO'
-                  ? 'linear-gradient(135deg, #fbbf24, #fb923c)'
-                  : 'linear-gradient(135deg, #a78bfa, #60a5fa)',
-                color: buyMethod === 'CRYPTO' ? '#0D0F1E' : '#fff',
-                boxShadow: buyMethod === 'CRYPTO'
-                  ? '0 10px 26px -10px rgba(251,191,36,0.55), inset 0 1px 0 rgba(255,255,255,0.20)'
-                  : '0 10px 26px -10px rgba(162,102,255,0.55), inset 0 1px 0 rgba(255,255,255,0.15)',
-                letterSpacing: '-0.01em',
-              }}>
-              {submittingPurchase ? (
-                <span className="flex items-center justify-center gap-2">
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  {buyMethod === 'CRYPTO' ? 'Verificando on-chain...' : 'Enviando solicitud...'}
-                </span>
-              ) : buyMethod === 'CRYPTO' ? (
-                `Verificar pago de ${parseFloat(buyAmount || '0').toFixed(2)} USDT`
-              ) : (
-                `Enviar solicitud por $${parseFloat(buyAmount || '0').toFixed(2)} USD`
-              )}
-            </button>
+            {/* Submit — sólo en MANUAL. En CRYPTO, <PaymentGateway> tiene su propio botón */}
+            {buyMethod === 'MANUAL' && (
+              <button
+                onClick={submitPurchase}
+                disabled={submittingPurchase || uploadingProof || !buyProofUrl}
+                className="w-full py-3 rounded-xl font-black text-sm transition-all active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed"
+                style={{
+                  background: 'linear-gradient(135deg, #a78bfa, #60a5fa)',
+                  color: '#fff',
+                  boxShadow: '0 10px 26px -10px rgba(162,102,255,0.55), inset 0 1px 0 rgba(255,255,255,0.15)',
+                  letterSpacing: '-0.01em',
+                }}>
+                {submittingPurchase ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <Loader2 className="w-4 h-4 animate-spin" /> Enviando solicitud...
+                  </span>
+                ) : (
+                  `Enviar solicitud por $${parseFloat(buyAmount || '0').toFixed(2)} USD`
+                )}
+              </button>
+            )}
 
             {/* Info de proceso */}
             <div className="flex items-start gap-2 p-3 rounded-xl"
