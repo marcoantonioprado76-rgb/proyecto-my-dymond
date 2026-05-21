@@ -275,5 +275,140 @@ export async function GET(request: NextRequest) {
     }
   }
 
-  return NextResponse.json({ success: true, ...results, enrollments: enrollResults, storeOrders: storeResults })
+  // ── Credit purchase (saldo IA) crypto verification ─────────────────────────
+  let pendingCredits: any[]
+  try {
+    pendingCredits = await (prisma as any).creditPurchaseRequest.findMany({
+      where: { status: 'PENDING_VERIFICATION', paymentMethod: 'CRYPTO', txHash: { not: null } },
+      include: { user: { select: { id: true, fullName: true, email: true, username: true, country: true, city: true } } },
+      orderBy: { createdAt: 'asc' },
+      take: 20,
+    })
+  } catch (err) {
+    console.error('[cron/verify] Error fetching pending credit purchases:', err)
+    return NextResponse.json({
+      success: true, ...results,
+      enrollments: enrollResults, storeOrders: storeResults,
+      credits: { verified: 0, failed: 0 },
+    })
+  }
+
+  const creditResults = { verified: 0, failed: 0 }
+
+  for (const cpr of pendingCredits) {
+    const amountUsd = Number(cpr.amountUsd)
+    const verification = await verifyBscTransaction(cpr.txHash!, amountUsd)
+
+    if (!verification.success) {
+      const ageMinutes = (Date.now() - cpr.createdAt.getTime()) / 60000
+      if (ageMinutes > 30) {
+        await (prisma as any).creditPurchaseRequest.update({
+          where: { id: cpr.id },
+          data: { status: 'REJECTED', notes: `Timeout verificación: ${verification.error}` },
+        })
+        creditResults.failed++
+      }
+      continue
+    }
+
+    // Verificado on-chain → aprobar + acreditar saldo en transacción
+    try {
+      const fresh = await prisma.$transaction(async (tx) => {
+        // Re-lock para evitar doble aprobación si dos crons corren en paralelo
+        const locked = await tx.$queryRaw<Array<{ status: string }>>`
+          SELECT status FROM credit_purchase_requests WHERE id = ${cpr.id}::uuid FOR UPDATE
+        `
+        if (locked[0]?.status !== 'PENDING_VERIFICATION') return null
+
+        await (tx as any).creditPurchaseRequest.update({
+          where: { id: cpr.id },
+          data: {
+            status: 'APPROVED',
+            blockNumber: verification.blockNumber ?? null,
+            reviewedAt: new Date(),
+            notes: `Auto-aprobado por cron. USDT: ${verification.amountUsdt?.toFixed(2)}`,
+          },
+        })
+
+        await tx.$queryRaw`SELECT id FROM users WHERE id = ${cpr.userId}::uuid FOR UPDATE`
+
+        await tx.$executeRaw`
+          UPDATE users
+          SET ai_balance_usd = ai_balance_usd + ${amountUsd}::numeric
+          WHERE id = ${cpr.userId}::uuid
+        `
+
+        await (tx as any).aIUsageLog.create({
+          data: {
+            userId: cpr.userId,
+            model: 'credit_purchase',
+            reason: 'credit_purchase',
+            costUsd: -amountUsd,
+            metadata: { purchaseId: cpr.id, txHash: cpr.txHash, amountUsdt: verification.amountUsdt, trigger: 'cron-verify' },
+          },
+        })
+
+        await tx.auditLog.create({
+          data: {
+            userId: cpr.userId,
+            actorUserId: cpr.userId,
+            action: 'CREDIT_PURCHASE_CRYPTO_CRON_APPROVED',
+            entityType: 'CreditPurchaseRequest',
+            entityId: cpr.id,
+            payload: { amountUsd, txHash: cpr.txHash, amountUsdt: verification.amountUsdt, blockNumber: verification.blockNumber?.toString() },
+          },
+        })
+
+        return tx.user.findUnique({
+          where: { id: cpr.userId },
+          select: { aiBalanceUsd: true },
+        })
+      })
+
+      if (fresh) {
+        // Email al usuario fire-and-forget
+        const { sendUserCreditPurchaseApprovedEmail, sendAdminCreditAutoActivatedEmail } = await import('@/lib/email')
+        sendUserCreditPurchaseApprovedEmail({
+          email: cpr.user.email,
+          fullName: cpr.user.fullName,
+          requestId: cpr.id,
+          amountUsd,
+          newBalanceUsd: Number(fresh.aiBalanceUsd ?? 0),
+          paymentMethod: 'CRYPTO',
+          reviewedAt: new Date(),
+        }).catch(e => console.error('[email] cron credit user approved:', e))
+
+        // Email al admin fire-and-forget
+        sendAdminCreditAutoActivatedEmail({
+          requestId: cpr.id,
+          amountUsd,
+          txHash: cpr.txHash!,
+          amountUsdt: verification.amountUsdt ?? null,
+          blockNumber: verification.blockNumber?.toString() ?? null,
+          trigger: 'cron-verify',
+          user: {
+            fullName: cpr.user.fullName,
+            email: cpr.user.email,
+            username: cpr.user.username,
+            country: cpr.user.country,
+            city: cpr.user.city,
+            newBalanceUsd: Number(fresh.aiBalanceUsd ?? 0),
+          },
+          approvedAt: new Date(),
+        }).catch(e => console.error('[email] cron credit admin notify:', e))
+      }
+
+      creditResults.verified++
+    } catch (err) {
+      console.error('[cron/verify] Error aprobando credit purchase:', cpr.id, err)
+      creditResults.failed++
+    }
+  }
+
+  return NextResponse.json({
+    success: true, ...results,
+    enrollments: enrollResults,
+    storeOrders: storeResults,
+    credits: creditResults,
+  })
 }

@@ -1,13 +1,14 @@
 'use client'
 
 import { useEffect, useState, useCallback } from 'react'
-import { Wallet, Check, X, Loader2, RefreshCw, ExternalLink } from 'lucide-react'
+import { Wallet, Check, X, Loader2, RefreshCw, ExternalLink, Hash } from 'lucide-react'
 
 interface CreditPurchaseRequest {
     id: string
     amountUsd: number
     paymentMethod: string
     paymentProofUrl: string | null
+    txHash: string | null
     status: string
     notes: string | null
     createdAt: string
@@ -21,15 +22,17 @@ interface CreditPurchaseRequest {
     }
 }
 
-const STATUS_TABS = ['PENDING', 'APPROVED', 'REJECTED', 'ALL']
+const STATUS_TABS = ['PENDING', 'PENDING_VERIFICATION', 'APPROVED', 'REJECTED', 'ALL']
 
 const STATUS_BADGE: Record<string, string> = {
     PENDING: 'text-orange-400 bg-orange-500/10 border-orange-500/25',
+    PENDING_VERIFICATION: 'text-blue-400 bg-blue-500/10 border-blue-500/25',
     APPROVED: 'text-green-400 bg-green-500/10 border-green-500/25',
     REJECTED: 'text-red-400 bg-red-500/10 border-red-500/25',
 }
 const STATUS_LABEL: Record<string, string> = {
     PENDING: 'Pendiente',
+    PENDING_VERIFICATION: 'Verificando on-chain',
     APPROVED: 'Aprobada',
     REJECTED: 'Rechazada',
     ALL: 'Todas',
@@ -67,6 +70,26 @@ export default function AdminCreditPurchasesPage() {
         setProcessing(null)
         setRejectModal(null)
         setRejectNotes('')
+        fetchRequests()
+    }
+
+    /** Re-verifica on-chain una compra CRYPTO PENDING_VERIFICATION sin esperar al cron. */
+    async function handleReverify(id: string) {
+        setProcessing(id)
+        try {
+            const res = await fetch(`/api/admin/credit-purchases/${id}/reverify`, { method: 'POST' })
+            const data = await res.json()
+            if (!res.ok) {
+                alert(data.error ?? 'Error al re-verificar')
+            } else if (data.verified) {
+                alert(`✓ Transacción verificada on-chain. ${data.amountUsdt?.toFixed(2)} USDT recibidos. Saldo acreditado.\nNuevo balance: $${Number(data.newBalanceUsd ?? 0).toFixed(2)} USD.`)
+            } else {
+                alert(`Aún no verifica on-chain:\n\n${data.error ?? 'Sin detalle'}\n\nEs normal si el pago es reciente — esperá 1-2 min más.`)
+            }
+        } catch (e: any) {
+            alert(e?.message ?? 'Error de conexión')
+        }
+        setProcessing(null)
         fetchRequests()
     }
 
@@ -131,6 +154,20 @@ export default function AdminCreditPurchasesPage() {
                                     <span>·</span>
                                     <span>{new Date(r.createdAt).toLocaleString()}</span>
                                 </div>
+                                {r.txHash && (
+                                    <div className="flex items-center gap-2 flex-wrap">
+                                        <a href={`https://bscscan.com/tx/${r.txHash}`} target="_blank" rel="noopener noreferrer"
+                                            className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-yellow-500/10 border border-yellow-500/25 hover:bg-yellow-500/15 transition-colors"
+                                            title="Ver transacción en BSCScan">
+                                            <Hash className="w-3 h-3 text-yellow-400" />
+                                            <span className="text-[10px] font-mono font-bold text-yellow-400">
+                                                {r.txHash.slice(0, 8)}...{r.txHash.slice(-6)}
+                                            </span>
+                                            <ExternalLink className="w-2.5 h-2.5 text-yellow-400/60" />
+                                        </a>
+                                        <span className="text-[9px] text-white/30">BSC · USDT-BEP20</span>
+                                    </div>
+                                )}
                                 {r.notes && (
                                     <p className="text-[11px] italic text-white/40">Nota: {r.notes}</p>
                                 )}
@@ -150,6 +187,28 @@ export default function AdminCreditPurchasesPage() {
                                         title="Ver comprobante">
                                         <ExternalLink className="w-3.5 h-3.5 text-white/50" />
                                     </button>
+                                )}
+
+                                {r.status === 'PENDING_VERIFICATION' && (
+                                    <div className="flex flex-col items-end gap-1.5">
+                                        {processing === r.id ? (
+                                            <Loader2 className="w-4 h-4 animate-spin text-blue-400" />
+                                        ) : (
+                                            <>
+                                                <button
+                                                    onClick={() => handleReverify(r.id)}
+                                                    className="flex items-center gap-1.5 text-xs font-bold px-3 py-2 rounded-xl bg-blue-600/15 border border-blue-500/30 text-blue-300 hover:bg-blue-600/25 transition-colors"
+                                                    title="Re-verifica la transacción on-chain. Si ya tiene 3 confirmaciones, acredita el saldo.">
+                                                    <RefreshCw className="w-3.5 h-3.5" /> Verificar on-chain
+                                                </button>
+                                                <button
+                                                    onClick={() => { setRejectModal({ id: r.id }); setRejectNotes('Pago crypto rechazado manualmente.') }}
+                                                    className="flex items-center gap-1.5 text-[10px] font-bold px-3 py-1.5 rounded-lg bg-red-600/10 border border-red-500/20 text-red-400/80 hover:bg-red-600/20 transition-colors">
+                                                    <X className="w-3 h-3" /> Rechazar
+                                                </button>
+                                            </>
+                                        )}
+                                    </div>
                                 )}
 
                                 {r.status === 'PENDING' && (

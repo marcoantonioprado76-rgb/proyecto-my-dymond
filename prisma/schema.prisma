@@ -758,9 +758,11 @@ model CreditPurchaseRequest {
   /// Monto en USD que el usuario solicita cargar a su balance de IA (ej: 5, 10, 20, 50).
   amountUsd       Decimal       @db.Decimal(10, 2) @map("amount_usd")
   paymentProofUrl String?       @map("payment_proof_url")
-  /// Sólo MANUAL por ahora (transferencia con comprobante). El enum se mantiene compartido por flexibilidad futura.
+  /// MANUAL (transferencia con comprobante) o CRYPTO (USDT-BEP20 verificado on-chain).
   paymentMethod   PaymentMethod @default(MANUAL) @map("payment_method")
   txHash          String?       @unique @map("tx_hash")
+  /// Número de bloque en BSC cuando el pago CRYPTO fue verificado on-chain.
+  blockNumber     BigInt?       @map("block_number")
   status          RequestStatus @default(PENDING)
   notes           String?
   reviewedBy      String?       @map("reviewed_by") @db.Uuid

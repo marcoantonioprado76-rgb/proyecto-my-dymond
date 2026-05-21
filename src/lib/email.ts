@@ -731,6 +731,153 @@ export async function sendAdminPlanAutoActivatedEmail(payload: {
   }
 }
 
+/**
+ * Aviso al admin cuando un saldo IA se ACREDITÓ automáticamente sin intervención
+ * (CRYPTO verificado on-chain). El saldo ya está activo en el balance del usuario.
+ *
+ * Se dispara en:
+ *  - POST /api/credits/purchase cuando la TX USDT verifica en el primer intento.
+ *  - GET /api/purchases/verify (cron) cuando aprueba una CreditPurchaseRequest PENDING_VERIFICATION.
+ *  - POST /api/admin/credit-purchases/[id]/reverify cuando el admin fuerza re-verificación.
+ */
+export async function sendAdminCreditAutoActivatedEmail(payload: {
+  requestId: string
+  amountUsd: number
+  txHash: string
+  amountUsdt?: number | null
+  blockNumber?: string | null
+  trigger: 'auto-onchain' | 'cron-verify' | 'admin-reverify'
+  user: { fullName: string; email: string; username: string; country?: string | null; city?: string | null; newBalanceUsd: number }
+  approvedAt: Date
+}): Promise<boolean> {
+  const shortId = payload.requestId.slice(0, 8).toUpperCase()
+  const dateStr = new Date(payload.approvedAt).toLocaleString('es-BO', {
+    day: '2-digit', month: 'long', year: 'numeric',
+    hour: '2-digit', minute: '2-digit',
+    timeZone: 'America/La_Paz',
+  })
+
+  const triggerLabel: Record<string, string> = {
+    'auto-onchain': '⚡ Verificado on-chain al instante',
+    'cron-verify': '🤖 Auto-verificado por cron periódico',
+    'admin-reverify': '👤 Re-verificado por admin manualmente',
+  }
+  const triggerText = triggerLabel[payload.trigger] ?? 'Verificado on-chain'
+
+  const content = `
+    <p style="color:#a78bfa;font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;margin:0 0 16px;">✓ Saldo IA acreditado · USDT verificado</p>
+
+    <h1 style="color:#ffffff;font-size:22px;font-weight:800;margin:0 0 6px;letter-spacing:-0.3px;line-height:1.3;">
+      ${payload.user.fullName} cargó +$${payload.amountUsd.toFixed(2)} USD
+    </h1>
+    <p style="color:rgba(255,255,255,0.4);font-size:13px;margin:0 0 24px;line-height:1.7;">
+      Una compra de saldo IA con USDT fue verificada on-chain y el saldo ya está disponible en el balance del usuario. No requiere tu acción.
+    </p>
+
+    <!-- request meta -->
+    <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:20px;">
+      <tr>
+        <td style="background:rgba(162,102,255,0.08);border:1px solid rgba(162,102,255,0.25);border-radius:12px;padding:16px 20px;">
+          <p style="color:rgba(255,255,255,0.25);font-size:9px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;margin:0 0 4px;">Solicitud</p>
+          <p style="color:#a78bfa;font-size:20px;font-weight:900;letter-spacing:5px;margin:0 0 6px;font-family:'Courier New',monospace;">#${shortId}</p>
+          <p style="color:rgba(255,255,255,0.45);font-size:11px;margin:0;">${dateStr}</p>
+        </td>
+      </tr>
+    </table>
+
+    <!-- balance card -->
+    <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:20px;">
+      <tr>
+        <td style="background:rgba(52,211,153,0.06);border:1px solid rgba(52,211,153,0.20);border-radius:12px;padding:14px 18px;text-align:center;">
+          <p style="color:rgba(255,255,255,0.25);font-size:9px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;margin:0 0 4px;">Nuevo saldo del usuario</p>
+          <p style="color:#86efac;font-size:24px;font-weight:900;margin:0;font-family:'Courier New',monospace;">$${payload.user.newBalanceUsd.toFixed(2)} USD</p>
+        </td>
+      </tr>
+    </table>
+
+    <!-- payment details -->
+    <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:24px;">
+      <tr><td colspan="2" style="padding:0 0 8px;border-bottom:1px solid rgba(255,255,255,0.06);"><p style="color:rgba(255,255,255,0.25);font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin:0;">Detalle del pago</p></td></tr>
+      <tr>
+        <td style="padding:10px 0;color:rgba(255,255,255,0.30);font-size:11px;width:140px;">Monto acreditado</td>
+        <td style="padding:10px 0;text-align:right;color:#86efac;font-size:18px;font-weight:900;">+$${payload.amountUsd.toFixed(2)} USD</td>
+      </tr>
+      ${typeof payload.amountUsdt === 'number' ? `
+      <tr>
+        <td style="padding:8px 0;color:rgba(255,255,255,0.30);font-size:11px;">USDT recibido</td>
+        <td style="padding:8px 0;text-align:right;color:rgba(255,255,255,0.85);font-size:12px;font-weight:600;font-family:'Courier New',monospace;">${payload.amountUsdt.toFixed(2)} USDT</td>
+      </tr>` : ''}
+      <tr>
+        <td style="padding:8px 0;color:rgba(255,255,255,0.30);font-size:11px;">Método</td>
+        <td style="padding:8px 0;text-align:right;color:rgba(255,255,255,0.85);font-size:12px;font-weight:600;">🪙 Crypto · USDT-BEP20</td>
+      </tr>
+      <tr>
+        <td style="padding:8px 0;color:rgba(255,255,255,0.30);font-size:11px;">Verificación</td>
+        <td style="padding:8px 0;text-align:right;color:rgba(255,255,255,0.65);font-size:11px;">${triggerText}</td>
+      </tr>
+      <tr>
+        <td style="padding:8px 0;color:rgba(255,255,255,0.30);font-size:11px;">TX Hash</td>
+        <td style="padding:8px 0;text-align:right;">
+          <a href="https://bscscan.com/tx/${payload.txHash}" target="_blank" style="color:#60a5fa;text-decoration:none;font-size:11px;font-weight:600;font-family:'Courier New',monospace;">${payload.txHash.slice(0, 10)}...${payload.txHash.slice(-8)} ↗</a>
+        </td>
+      </tr>
+      ${payload.blockNumber ? `
+      <tr>
+        <td style="padding:8px 0;color:rgba(255,255,255,0.30);font-size:11px;">Block</td>
+        <td style="padding:8px 0;text-align:right;color:rgba(255,255,255,0.55);font-size:11px;font-family:'Courier New',monospace;">#${payload.blockNumber}</td>
+      </tr>` : ''}
+    </table>
+
+    <!-- user info -->
+    <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:24px;">
+      <tr><td colspan="2" style="padding:0 0 8px;border-bottom:1px solid rgba(255,255,255,0.06);"><p style="color:rgba(255,255,255,0.25);font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin:0;">Usuario</p></td></tr>
+      <tr>
+        <td style="padding:10px 0;color:rgba(255,255,255,0.30);font-size:11px;width:140px;">Nombre</td>
+        <td style="padding:10px 0;text-align:right;color:#ffffff;font-size:13px;font-weight:700;">${payload.user.fullName}</td>
+      </tr>
+      <tr>
+        <td style="padding:8px 0;color:rgba(255,255,255,0.30);font-size:11px;">Usuario</td>
+        <td style="padding:8px 0;text-align:right;color:rgba(255,255,255,0.65);font-size:12px;">@${payload.user.username}</td>
+      </tr>
+      <tr>
+        <td style="padding:8px 0;color:rgba(255,255,255,0.30);font-size:11px;">Email</td>
+        <td style="padding:8px 0;text-align:right;color:rgba(255,255,255,0.65);font-size:12px;">${payload.user.email}</td>
+      </tr>
+      ${payload.user.country || payload.user.city ? `
+      <tr>
+        <td style="padding:8px 0;color:rgba(255,255,255,0.30);font-size:11px;">Ubicación</td>
+        <td style="padding:8px 0;text-align:right;color:rgba(255,255,255,0.55);font-size:12px;">${[payload.user.city, payload.user.country].filter(Boolean).join(', ')}</td>
+      </tr>` : ''}
+    </table>
+
+    <!-- CTA -->
+    <table cellpadding="0" cellspacing="0">
+      <tr>
+        <td style="border-radius:10px;background:linear-gradient(135deg,#a78bfa 0%,#7b5bff 100%);">
+          <a href="${APP_URL}/admin/credit-purchases?status=APPROVED"
+             style="display:inline-block;color:#ffffff;text-decoration:none;font-weight:800;font-size:13px;padding:14px 32px;border-radius:10px;letter-spacing:0.5px;">
+            Ver en panel admin →
+          </a>
+        </td>
+      </tr>
+    </table>
+  `
+
+  try {
+    await transporter.sendMail({
+      from: `"MY DIAMOND · Admin" <${process.env.GMAIL_USER}>`,
+      to: ADMIN_NOTIFICATION_EMAIL,
+      subject: `✓ Saldo IA acreditado · +$${payload.amountUsd.toFixed(2)} USD · ${payload.user.fullName}`,
+      html: emailWrapper(content, '#a78bfa'),
+    })
+    console.log(`[EMAIL] Admin credit auto-activated notif sent (${payload.trigger}) for ${payload.user.email} → ${ADMIN_NOTIFICATION_EMAIL}`)
+    return true
+  } catch (err) {
+    console.error('[EMAIL] Admin credit auto-activated notif error:', err)
+    return false
+  }
+}
+
 export async function sendAdminNewCreditPurchaseEmail(payload: {
   requestId: string
   amountUsd: number

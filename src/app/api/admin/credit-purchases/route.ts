@@ -13,7 +13,7 @@ export async function GET(req: NextRequest) {
     const search = searchParams.get('q') ?? ''
 
     const where: any = {}
-    if (status && ['PENDING', 'APPROVED', 'REJECTED'].includes(status)) where.status = status
+    if (status && ['PENDING', 'PENDING_VERIFICATION', 'APPROVED', 'REJECTED'].includes(status)) where.status = status
     if (search) {
         where.user = {
             OR: [
