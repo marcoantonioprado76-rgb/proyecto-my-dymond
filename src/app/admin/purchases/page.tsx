@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState, useCallback } from 'react'
-import { ShoppingBag, Check, X, Loader2, Clock, RefreshCw, ExternalLink, FileImage } from 'lucide-react'
+import { ShoppingBag, Check, X, Loader2, Clock, RefreshCw, ExternalLink, FileImage, Hash } from 'lucide-react'
 
 interface PurchaseRequest {
   id: string
@@ -9,6 +9,7 @@ interface PurchaseRequest {
   price: number
   paymentMethod: string
   paymentProofUrl: string | null
+  txHash: string | null
   faseGlobalCode: string | null
   faseGlobalNote: string | null
   status: string
@@ -17,16 +18,18 @@ interface PurchaseRequest {
   user: { username: string; fullName: string; email: string; country: string }
 }
 
-const STATUS_TABS = ['ALL', 'PENDING', 'APPROVED', 'REJECTED']
+const STATUS_TABS = ['ALL', 'PENDING', 'PENDING_VERIFICATION', 'APPROVED', 'REJECTED']
 
 const STATUS_BADGE: Record<string, string> = {
   PENDING: 'text-orange-400 bg-orange-500/10 border-orange-500/25',
+  PENDING_VERIFICATION: 'text-blue-400 bg-blue-500/10 border-blue-500/25',
   APPROVED: 'text-green-400 bg-green-500/10 border-green-500/25',
   REJECTED: 'text-red-400 bg-red-500/10 border-red-500/25',
 }
 
 const STATUS_LABEL: Record<string, string> = {
   PENDING: 'Pendiente',
+  PENDING_VERIFICATION: 'Verificando on-chain',
   APPROVED: 'Aprobada',
   REJECTED: 'Rechazada',
   ALL: 'Todas',
@@ -78,6 +81,26 @@ export default function AdminPurchasesPage() {
     setProcessing(null)
     setRejectModal(null)
     setRejectNotes('')
+    fetchRequests()
+  }
+
+  /** Re-verifica on-chain una compra CRYPTO PENDING_VERIFICATION sin esperar al cron. */
+  async function handleReverify(id: string) {
+    setProcessing(id)
+    try {
+      const res = await fetch(`/api/admin/purchases/${id}/reverify`, { method: 'POST' })
+      const data = await res.json()
+      if (!res.ok) {
+        alert(data.error ?? 'Error al re-verificar')
+      } else if (data.verified) {
+        alert(`✓ Transacción verificada on-chain. ${data.amountUsdt?.toFixed(2)} USDT recibidos. Plan activado.`)
+      } else {
+        alert(`Aún no verifica on-chain:\n\n${data.error ?? 'Sin detalle'}\n\nEs normal si tu pago es reciente — esperá 1-2 min más y volvé a intentar.`)
+      }
+    } catch (e: any) {
+      alert(e?.message ?? 'Error de conexión')
+    }
+    setProcessing(null)
     fetchRequests()
   }
 
@@ -161,8 +184,25 @@ export default function AdminPurchasesPage() {
                       </span>
                     )}
 
-                    {/* Payment proof */}
-                    {r.paymentProofUrl ? (
+                    {/* Payment proof / TX hash */}
+                    {r.txHash ? (
+                      <div className="flex items-center gap-2 mb-2 flex-wrap">
+                        <a
+                          href={`https://bscscan.com/tx/${r.txHash}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-2 px-3 py-2 bg-yellow-500/8 border border-yellow-500/25 rounded-xl hover:bg-yellow-500/15 transition-colors"
+                          title="Ver transacción en BSCScan"
+                        >
+                          <Hash size={13} className="text-yellow-400" />
+                          <span className="text-xs font-bold text-yellow-400 font-mono">
+                            {r.txHash.slice(0, 8)}...{r.txHash.slice(-6)}
+                          </span>
+                          <ExternalLink size={11} className="text-yellow-400/60" />
+                        </a>
+                        <span className="text-[10px] text-white/30">BSC · USDT-BEP20</span>
+                      </div>
+                    ) : r.paymentProofUrl ? (
                       <div className="flex items-center gap-2 mb-2">
                         <div
                           onClick={() => setProofPreview(r.paymentProofUrl)}
@@ -215,6 +255,31 @@ export default function AdminPurchasesPage() {
                             className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-red-600/15 border border-red-500/25 text-red-400 text-xs font-bold hover:bg-red-600/25 transition-colors"
                           >
                             <X size={12} /> Rechazar
+                          </button>
+                        </>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Actions — PENDING_VERIFICATION (CRYPTO esperando confirmaciones) */}
+                  {r.status === 'PENDING_VERIFICATION' && (
+                    <div className="flex flex-col items-end gap-2 shrink-0">
+                      {processing === r.id ? (
+                        <Loader2 size={16} className="animate-spin text-blue-400" />
+                      ) : (
+                        <>
+                          <button
+                            onClick={() => handleReverify(r.id)}
+                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-600/15 border border-blue-500/30 text-blue-300 text-xs font-bold hover:bg-blue-600/25 transition-colors"
+                            title="Re-verifica la transacción on-chain. Si ya tiene 3 confirmaciones, aprueba la compra."
+                          >
+                            <RefreshCw size={12} /> Verificar on-chain
+                          </button>
+                          <button
+                            onClick={() => { setRejectModal({ id: r.id }); setRejectNotes('Pago crypto rechazado manualmente.') }}
+                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-red-600/10 border border-red-500/20 text-red-400/80 text-[10px] font-bold hover:bg-red-600/20 transition-colors"
+                          >
+                            <X size={11} /> Rechazar
                           </button>
                         </>
                       )}

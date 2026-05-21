@@ -22,6 +22,11 @@ export async function GET(request: NextRequest) {
   })
 
   return NextResponse.json({
-    requests: requests.map(r => ({ ...r, price: Number(r.price) })),
+    // price: Decimal → number, blockNumber: BigInt → string (no serializable nativamente a JSON)
+    requests: requests.map(r => ({
+      ...r,
+      price: Number(r.price),
+      blockNumber: r.blockNumber?.toString() ?? null,
+    })),
   })
 }
