@@ -48,19 +48,30 @@ export async function PATCH(
           WHERE id = ${purchaseRequest.userId}::uuid
           FOR UPDATE
         `
-        const currentRank = PLAN_RANK[currentUserData[0]?.plan ?? 'NONE'] ?? 0
+        const currentPlan = currentUserData[0]?.plan ?? 'NONE'
+        const currentRank = PLAN_RANK[currentPlan] ?? 0
 
-        // Fase Global siempre activa BASIC sin importar el plan actual
         const isFaseGlobal = (purchaseRequest.paymentMethod as string) === 'FASE_GLOBAL'
-        const newRank = isFaseGlobal ? 1 : (PLAN_RANK[purchaseRequest.plan] ?? 0)
-        const isRenewal = !isFaseGlobal && newRank === currentRank && currentRank > 0
 
-        // Nunca permitir degradar el plan (incluye Fase Global si el usuario ya tiene PRO/ELITE)
-        if (newRank < currentRank || newRank === 0) {
-          throw new Error('PLAN_NOT_UPGRADE')
+        // Reglas:
+        // - Fase Global SIEMPRE fuerza BASIC sin importar el plan actual.
+        //     · Si el usuario ya tiene BASIC → renovación (extiende +30 días sobre el mayor entre expiración actual y NOW).
+        //     · Si tiene NONE/PRO/ELITE → fuerza BASIC con expiración NOW+30 (degradación intencional para PRO/ELITE).
+        // - Pagos regulares (no Fase Global): no permitir degradar; renovar si es el mismo plan.
+        let newPlan: string
+        let isRenewal: boolean
+
+        if (isFaseGlobal) {
+          newPlan = 'BASIC'
+          isRenewal = currentPlan === 'BASIC'
+        } else {
+          const newRank = PLAN_RANK[purchaseRequest.plan] ?? 0
+          if (newRank < currentRank || newRank === 0) {
+            throw new Error('PLAN_NOT_UPGRADE')
+          }
+          newPlan = purchaseRequest.plan as string
+          isRenewal = newRank === currentRank && currentRank > 0
         }
-
-        const newPlan = isFaseGlobal ? 'BASIC' : (purchaseRequest.plan as string)
 
         // 3. Marcar solicitud como aprobada
         await tx.packPurchaseRequest.update({
@@ -75,6 +86,7 @@ export async function PATCH(
 
         // 4. Activar o renovar plan
         if (isRenewal) {
+          // Mantiene el plan, solo extiende +30 días sobre la fecha más reciente
           await tx.$executeRaw`
             UPDATE users
             SET is_active = true,
@@ -82,6 +94,7 @@ export async function PATCH(
             WHERE id = ${purchaseRequest.userId}::uuid
           `
         } else {
+          // Cambia o fuerza el plan con expiración NOW+30
           await tx.$executeRaw`
             UPDATE users
             SET plan = ${newPlan}::"UserPlan",
