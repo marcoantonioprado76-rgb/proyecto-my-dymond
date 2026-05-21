@@ -22,6 +22,7 @@ import {
   Receipt,
   ArrowDownLeft,
   ArrowUpRight,
+  ExternalLink,
 } from 'lucide-react'
 
 interface UsageEntry {
@@ -81,17 +82,21 @@ export default function CreditsPage() {
   const [uploadingProof, setUploadingProof] = useState(false)
   const [submittingPurchase, setSubmittingPurchase] = useState(false)
   const [buyMsg, setBuyMsg] = useState<{ type: 'ok' | 'err'; text: string } | null>(null)
+  const [paymentQrUrl, setPaymentQrUrl] = useState<string | null>(null)
 
   async function load() {
     setLoading(true)
-    const [credRes, purRes] = await Promise.all([
+    const [credRes, purRes, settingsRes] = await Promise.all([
       fetch('/api/credits'),
       fetch('/api/credits/purchase'),
+      fetch('/api/settings'),
     ])
     const d = await credRes.json()
     const p = await purRes.json()
+    const s = await settingsRes.json().catch(() => ({ settings: {} }))
     setData(d)
     setPurchases(p.purchases ?? [])
+    setPaymentQrUrl(s.settings?.PAYMENT_QR_URL || null)
     setLoading(false)
   }
 
@@ -653,11 +658,60 @@ export default function CreditsPage() {
               </p>
             </div>
 
-            {/* Upload comprobante */}
+            {/* Step 1: QR de pago del admin */}
             <div className="space-y-2.5">
-              <label className="text-[10px] font-black uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.4)' }}>
-                Comprobante de transferencia
-              </label>
+              <div className="flex items-center gap-2">
+                <span className="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black"
+                  style={{ background: 'linear-gradient(135deg, #a78bfa, #60a5fa)', color: '#fff' }}>1</span>
+                <label className="text-[10px] font-black uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.4)' }}>
+                  Escanea el QR y paga
+                </label>
+              </div>
+
+              {paymentQrUrl ? (
+                <div className="flex flex-col sm:flex-row items-center gap-4 p-4 rounded-xl"
+                  style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.10)' }}>
+                  <div className="w-36 h-36 rounded-xl bg-white flex items-center justify-center shrink-0 overflow-hidden"
+                    style={{ border: '1px solid rgba(255,255,255,0.20)' }}>
+                    <img src={paymentQrUrl} alt="QR de pago" className="w-full h-full object-contain p-2" />
+                  </div>
+                  <div className="text-center sm:text-left space-y-1.5 flex-1 min-w-0">
+                    <p className="text-[11px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.55)' }}>
+                      Escaneá con tu billetera (Binance, Trust Wallet, MetaMask, etc.) y transferí exactamente:
+                    </p>
+                    <p className="text-2xl font-black tabular-nums"
+                      style={{ background: 'linear-gradient(135deg, #fbbf24, #fb923c)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+                      ${parseFloat(buyAmount || '0').toFixed(2)} USD
+                    </p>
+                    <a href={paymentQrUrl} target="_blank" rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-[10px] font-bold text-sky-400 hover:text-sky-300">
+                      <ExternalLink className="w-3 h-3" /> Ver QR en pantalla completa
+                    </a>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex items-start gap-3 p-3.5 rounded-xl"
+                  style={{ background: 'rgba(251,146,60,0.08)', border: '1px solid rgba(251,146,60,0.25)' }}>
+                  <Info className="w-3.5 h-3.5 mt-0.5 shrink-0" style={{ color: '#fb923c' }} />
+                  <div>
+                    <p className="text-xs font-bold text-orange-400">QR de pago no configurado</p>
+                    <p className="text-[10px] mt-0.5" style={{ color: 'rgba(251,146,60,0.65)' }}>
+                      El administrador aún no subió el QR de pago. Contactalo por WhatsApp o esperá a que lo configure.
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Step 2: Upload comprobante */}
+            <div className="space-y-2.5">
+              <div className="flex items-center gap-2">
+                <span className="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black"
+                  style={{ background: 'linear-gradient(135deg, #a78bfa, #60a5fa)', color: '#fff' }}>2</span>
+                <label className="text-[10px] font-black uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.4)' }}>
+                  Subí el comprobante
+                </label>
+              </div>
               <label className="w-full flex items-center gap-3 p-3.5 rounded-xl cursor-pointer transition-all"
                 style={{
                   background: buyProofUrl ? 'rgba(52,211,153,0.06)' : 'rgba(255,255,255,0.04)',
