@@ -260,7 +260,12 @@ export async function POST(request: NextRequest) {
           success: true,
           status: 'approved',
           message: '¡Plan activado correctamente! La transacción fue verificada on-chain.',
-          request: { ...req, price: Number(req.price) },
+          request: {
+            ...req,
+            price: Number(req.price),
+            // blockNumber es BigInt en DB → NextResponse.json no lo serializa, hay que convertir
+            blockNumber: req.blockNumber?.toString() ?? null,
+          },
         })
       }
 
@@ -283,7 +288,11 @@ export async function POST(request: NextRequest) {
         success: true,
         status: 'pending_verification',
         message: 'Transacción recibida. Verificando en la blockchain, puede tardar unos minutos.',
-        request: { ...req, price: Number(req.price) },
+        request: {
+          ...req,
+          price: Number(req.price),
+          blockNumber: req.blockNumber?.toString() ?? null,
+        },
       })
     }
 
@@ -313,7 +322,11 @@ export async function POST(request: NextRequest) {
         })
         // Notificar al admin en background
         notifyAdminNewPlanRequest(req, user.id).catch(() => {})
-        return NextResponse.json({ success: true, status: 'pending', request: { ...req, price: Number(req.price) } })
+        return NextResponse.json({
+          success: true,
+          status: 'pending',
+          request: { ...req, price: Number(req.price), blockNumber: req.blockNumber?.toString() ?? null },
+        })
       } catch (err: any) {
         if (err?.message === 'DUPLICATE_REQUEST') {
           return NextResponse.json({ error: 'Ya tienes una solicitud pendiente. Espera que sea procesada.' }, { status: 400 })
@@ -337,7 +350,11 @@ export async function POST(request: NextRequest) {
     // Notificar al admin en background
     notifyAdminNewPlanRequest(req, user.id).catch(() => {})
 
-    return NextResponse.json({ success: true, status: 'pending', request: { ...req, price: Number(req.price) } })
+    return NextResponse.json({
+      success: true,
+      status: 'pending',
+      request: { ...req, price: Number(req.price), blockNumber: req.blockNumber?.toString() ?? null },
+    })
   } catch (err) {
     console.error('[POST /api/pack-requests]', err)
     return NextResponse.json({ error: 'Error interno' }, { status: 500 })
