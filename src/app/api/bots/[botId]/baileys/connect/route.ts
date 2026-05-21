@@ -12,31 +12,82 @@ function getAuth() {
     return verifyToken(token)
 }
 
-/** POST /api/bots/[botId]/baileys/connect — inicia la conexión y genera QR */
+/**
+ * POST /api/bots/[botId]/baileys/connect — inicia la conexión Baileys y genera QR.
+ *
+ * Soporta dos modos para la API key de OpenAI:
+ *  1. Bot con key propia configurada (BotSecret.openaiApiKeyEnc): se usa la suya.
+ *  2. Bot sin key propia: usa la key admin global (con cobro de saldo USD por
+ *     mensaje vía chargeUserForAI desde baileys-manager).
+ *
+ * Todo el cuerpo va en try/catch para garantizar que SIEMPRE se devuelva JSON
+ * (sin esto, una excepción al hacer decrypt('') lanzaba HTML 500 y el frontend
+ * crasheaba con 'Failed to execute json on Response: Unexpected end of JSON input').
+ */
 export async function POST(
     _req: NextRequest,
     { params }: { params: { botId: string } },
 ) {
-    const auth = getAuth()
-    if (!auth) return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
+    try {
+        const auth = getAuth()
+        if (!auth) return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
 
-    const bot = await prisma.bot.findFirst({
-        where: { id: params.botId, userId: auth.userId, type: 'BAILEYS' },
-        include: { secret: true },
-    })
-    if (!bot) return NextResponse.json({ error: 'Bot no encontrado' }, { status: 404 })
-    if (!bot.secret) return NextResponse.json({ error: 'Configura las credenciales primero' }, { status: 400 })
+        const bot = await prisma.bot.findFirst({
+            where: { id: params.botId, userId: auth.userId, type: 'BAILEYS' },
+            include: { secret: true },
+        })
+        if (!bot) return NextResponse.json({ error: 'Bot no encontrado' }, { status: 404 })
+        if (!bot.secret) return NextResponse.json({ error: 'Configurá las credenciales primero (al menos el teléfono de reporte).' }, { status: 400 })
 
-    const openaiKey = decrypt(bot.secret.openaiApiKeyEnc)
-    if (!openaiKey) return NextResponse.json({ error: 'OpenAI API Key no configurada' }, { status: 400 })
+        // Resolver la key de OpenAI: si el bot tiene su propia, la usamos;
+        // si no, verificamos que el sistema tenga key admin disponible.
+        let openaiKey = ''
+        if (bot.secret.openaiApiKeyEnc) {
+            try {
+                openaiKey = decrypt(bot.secret.openaiApiKeyEnc)
+            } catch {
+                openaiKey = ''
+            }
+        }
 
-    // Iniciar conexión en background (no esperar)
-    BaileysManager.connect(
-        bot.id,
-        bot.name,
-        openaiKey,
-        bot.secret.reportPhone ?? '',
-    ).catch(err => console.error('[BAILEYS] connect error:', err))
+        // Si el bot no tiene su key propia, validamos que el admin tenga una
+        // global configurada. No cobramos saldo acá — el cobro se hace por
+        // cada mensaje entrante en baileys-manager con chargeUserForAI.
+        if (!openaiKey) {
+            const [globalKey, adminCfg] = await Promise.all([
+                (prisma as any).appSetting.findUnique({ where: { key: 'openai_global_key' } }),
+                (prisma as any).adminConfig.findUnique({ where: { id: 'global' } }),
+            ])
+            const hasAdminFallback = !!(globalKey?.value) || !!(adminCfg?.openaiKeyEnc)
+            if (!hasAdminFallback) {
+                return NextResponse.json({
+                    error: 'No hay API Key de OpenAI disponible. Configurá la tuya en la tab Credenciales o pedile al admin que active la key global del sistema.',
+                }, { status: 400 })
+            }
+            // Si el usuario está usando la key admin, validamos saldo > 0 (informativo)
+            const u = await prisma.user.findUnique({
+                where: { id: auth.userId },
+                select: { aiBalanceUsd: true },
+            })
+            const balance = u?.aiBalanceUsd ? Number(u.aiBalanceUsd) : 0
+            if (balance <= 0) {
+                console.warn(`[BAILEYS connect] Bot ${bot.id} se conecta sin key propia y sin saldo USD (${balance}). Los mensajes entrantes no se procesarán hasta que el usuario recargue saldo.`)
+            }
+        }
 
-    return NextResponse.json({ ok: true })
+        // Iniciar conexión en background (no bloquea el response)
+        BaileysManager.connect(
+            bot.id,
+            bot.name,
+            openaiKey,                       // puede ser '' — baileys-manager hará fallback dinámico
+            bot.secret.reportPhone ?? '',
+        ).catch(err => console.error('[BAILEYS] connect error:', err))
+
+        return NextResponse.json({ ok: true })
+    } catch (err: any) {
+        console.error('[POST /api/bots/[botId]/baileys/connect]', err)
+        return NextResponse.json({
+            error: err?.message || 'Error interno al iniciar la conexión Baileys',
+        }, { status: 500 })
+    }
 }

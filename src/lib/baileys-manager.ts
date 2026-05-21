@@ -100,7 +100,7 @@ async function handleMessage(
     // Verificar que el bot siga ACTIVE en BD (puede haberse pausado mientras el socket sigue conectado)
     const botStatus = await prisma.bot.findUnique({
         where: { id: conn.botId },
-        select: { status: true },
+        select: { status: true, userId: true, aiModel: true },
     })
     if (!botStatus || botStatus.status !== 'ACTIVE') {
         // Bot pausado o eliminado — NO leer ni procesar nada (invisible para el cliente)
@@ -119,11 +119,29 @@ async function handleMessage(
 
     // Leer credenciales frescas de BD en cada mensaje (nunca desde memoria)
     const freshSecret = await prisma.botSecret.findUnique({ where: { botId: conn.botId } })
-    if (!freshSecret?.openaiApiKeyEnc) {
-        console.warn(`[BAILEYS] Bot ${conn.botId} sin API key de OpenAI`)
+
+    // Resolver openaiKey con el mismo patrón que bot-engine.ts:
+    //   1. Si el bot tiene key propia → usarla (sin cobrar saldo).
+    //   2. Si no → cobrar saldo USD del propietario y usar la key admin global.
+    let openaiKey = ''
+    if (freshSecret?.openaiApiKeyEnc) {
+        try { openaiKey = decrypt(freshSecret.openaiApiKeyEnc) } catch { openaiKey = '' }
+    }
+    if (!openaiKey && botStatus.userId) {
+        const { chargeUserForAI } = await import('./ai-credits')
+        const model = botStatus.aiModel || 'gpt-4o'
+        const charge = await chargeUserForAI(botStatus.userId, model, 'baileys.message', { botId: conn.botId })
+        if (charge.ok) {
+            openaiKey = charge.key
+        } else {
+            console.warn(`[BAILEYS] Bot ${conn.botId} sin key propia y sin saldo IA del propietario (${charge.error})`)
+            return
+        }
+    }
+    if (!openaiKey) {
+        console.warn(`[BAILEYS] Bot ${conn.botId} sin API key de OpenAI configurada`)
         return
     }
-    const openaiKey = decrypt(freshSecret.openaiApiKeyEnc)
 
     const userPhone = jid.replace('@s.whatsapp.net', '')
     let userName = msg.pushName || ''
