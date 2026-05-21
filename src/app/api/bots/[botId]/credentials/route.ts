@@ -101,11 +101,29 @@ export async function PUT(
     ? encrypt(metaPageToken.trim())
     : existingMetaToken ?? null
 
+  // OpenAI key: si el usuario no pone una propia, permitimos guardar vacío
+  // siempre que exista la key global del admin O el usuario tenga saldo USD
+  // (el bot-engine usa chargeUserForAI() como fallback automático).
   if (!openaiEnc) {
-    return NextResponse.json(
-      { error: 'La API key de OpenAI es requerida la primera vez' },
-      { status: 400 },
-    )
+    const [globalKey, userRow] = await Promise.all([
+      (prisma as any).appSetting.findUnique({ where: { key: 'openai_global_key' } }),
+      prisma.user.findUnique({ where: { id: auth.userId }, select: { aiBalanceUsd: true, preferOwnKey: true } }),
+    ])
+    const hasAdminFallback = !!globalKey?.value
+    const userBalance = userRow?.aiBalanceUsd ? Number(userRow.aiBalanceUsd) : 0
+
+    // Sólo bloqueamos si NO hay forma de procesar IA: ni key propia, ni key admin disponible.
+    if (!hasAdminFallback) {
+      return NextResponse.json(
+        { error: 'Configurá tu API key de OpenAI o pedile al admin que active la key global del sistema.' },
+        { status: 400 },
+      )
+    }
+    // Si hay key admin pero el usuario tampoco tiene saldo, avisamos pero NO bloqueamos
+    // (puede comprar saldo después y el bot ya estará configurado).
+    if (userBalance <= 0) {
+      console.log(`[bot/credentials] Bot ${params.botId} se crea sin key propia. Saldo USD del usuario: ${userBalance}. Necesitará comprar saldo o configurar su key antes de que el bot responda.`)
+    }
   }
   if (!isBaileys && !isMeta && !ycloudEnc) {
     return NextResponse.json(
