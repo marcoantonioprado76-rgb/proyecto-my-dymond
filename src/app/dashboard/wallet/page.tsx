@@ -658,6 +658,22 @@ export default function CreditsPage() {
               </p>
             </div>
 
+            {/* Aviso tipo de cambio */}
+            {paymentQrUrl && (
+              <div className="flex items-start gap-3 p-3.5 rounded-xl"
+                style={{ background: 'rgba(251,146,60,0.08)', border: '1px solid rgba(251,146,60,0.22)' }}>
+                <span className="text-base shrink-0" aria-hidden>⚠️</span>
+                <div>
+                  <p className="text-[11px] font-black" style={{ color: '#fbbf24', letterSpacing: '0.02em' }}>
+                    Tipo de cambio: Dólar paralelo Binance
+                  </p>
+                  <p className="text-[10.5px] mt-1 leading-relaxed" style={{ color: 'rgba(251,191,36,0.72)' }}>
+                    Si pagás por transferencia bancaria o QR local, el monto en bolivianos se calcula según el <strong>dólar paralelo publicado en Binance P2P</strong> al momento del pago. Te recomendamos pagar con <strong>USDT</strong> para evitar diferencias de cambio.
+                  </p>
+                </div>
+              </div>
+            )}
+
             {/* Step 1: QR de pago del admin */}
             <div className="space-y-2.5">
               <div className="flex items-center gap-2">
