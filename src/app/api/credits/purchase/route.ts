@@ -2,6 +2,7 @@ export const dynamic = 'force-dynamic'
 import { NextRequest, NextResponse } from 'next/server'
 import { getAuthUser } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { sendAdminNewCreditPurchaseEmail } from '@/lib/email'
 
 /**
  * Endpoints de COMPRA de créditos AI (saldo USD).
@@ -67,6 +68,38 @@ export async function POST(req: NextRequest) {
             createdAt: true,
         },
     })
+
+    // Notificar al admin (fire-and-forget — no bloquea la respuesta al usuario)
+    ;(async () => {
+        try {
+            const userInfo = await prisma.user.findUnique({
+                where: { id: user.id },
+                select: {
+                    fullName: true, email: true, username: true,
+                    country: true, city: true, aiBalanceUsd: true,
+                },
+            })
+            if (!userInfo) return
+            await sendAdminNewCreditPurchaseEmail({
+                requestId: created.id,
+                amountUsd,
+                paymentMethod: 'MANUAL',
+                paymentProofUrl,
+                notes,
+                user: {
+                    fullName: userInfo.fullName,
+                    email: userInfo.email,
+                    username: userInfo.username,
+                    country: userInfo.country,
+                    city: userInfo.city,
+                    aiBalanceUsd: Number(userInfo.aiBalanceUsd ?? 0),
+                },
+                createdAt: created.createdAt,
+            })
+        } catch (e) {
+            console.error('[credits/purchase] admin notify error:', e)
+        }
+    })()
 
     return NextResponse.json({
         success: true,

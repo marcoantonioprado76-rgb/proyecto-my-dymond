@@ -3,6 +3,45 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getAuthUser } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { verifyBscTransaction } from '@/lib/blockchain'
+import { sendAdminNewPlanRequestEmail } from '@/lib/email'
+
+/**
+ * Dispara la notificación al admin (fire-and-forget) cuando se crea una solicitud PENDING.
+ * No usar para auto-aprobados (CRYPTO on-chain verificado).
+ */
+async function notifyAdminNewPlanRequest(req: {
+    id: string
+    plan: string
+    price: any
+    paymentMethod: string
+    paymentProofUrl?: string | null
+    txHash?: string | null
+    faseGlobalCode?: string | null
+    faseGlobalNote?: string | null
+    createdAt: Date
+}, userId: string) {
+    try {
+        const u = await prisma.user.findUnique({
+            where: { id: userId },
+            select: { fullName: true, email: true, username: true, country: true, city: true },
+        })
+        if (!u) return
+        await sendAdminNewPlanRequestEmail({
+            requestId: req.id,
+            plan: req.plan,
+            price: Number(req.price),
+            paymentMethod: req.paymentMethod,
+            paymentProofUrl: req.paymentProofUrl,
+            txHash: req.txHash,
+            faseGlobalCode: req.faseGlobalCode,
+            faseGlobalNote: req.faseGlobalNote,
+            user: u,
+            createdAt: req.createdAt,
+        })
+    } catch (e) {
+        console.error('[pack-requests] admin notify error:', e)
+    }
+}
 
 const DEFAULT_PRICES: Record<string, number> = {
   BASIC: 49,
@@ -237,6 +276,9 @@ export async function POST(request: NextRequest) {
         },
       })
 
+      // Notificar al admin en background
+      notifyAdminNewPlanRequest(req, user.id).catch(() => {})
+
       return NextResponse.json({
         success: true,
         status: 'pending_verification',
@@ -269,6 +311,8 @@ export async function POST(request: NextRequest) {
             } as any,
           })
         })
+        // Notificar al admin en background
+        notifyAdminNewPlanRequest(req, user.id).catch(() => {})
         return NextResponse.json({ success: true, status: 'pending', request: { ...req, price: Number(req.price) } })
       } catch (err: any) {
         if (err?.message === 'DUPLICATE_REQUEST') {
@@ -289,6 +333,9 @@ export async function POST(request: NextRequest) {
         status: 'PENDING',
       },
     })
+
+    // Notificar al admin en background
+    notifyAdminNewPlanRequest(req, user.id).catch(() => {})
 
     return NextResponse.json({ success: true, status: 'pending', request: { ...req, price: Number(req.price) } })
   } catch (err) {
