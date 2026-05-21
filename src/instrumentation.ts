@@ -46,12 +46,25 @@ export async function register() {
                 })
 
                 for (const bot of bots) {
-                    if (!bot.secret) continue
-                    const openaiKey = decrypt(bot.secret.openaiApiKeyEnc)
-                    if (!openaiKey) continue
-                    console.log(`[STARTUP] Reconectando bot Baileys: ${bot.name}`)
-                    BaileysManager.connect(bot.id, bot.name, openaiKey, bot.secret.reportPhone ?? '')
-                        .catch(err => console.error(`[STARTUP] Error reconectando bot ${bot.id}:`, err))
+                    // CADA bot se reconecta en su propio try/catch para que UN bot roto
+                    // no impida que los demás se reconecten.
+                    try {
+                        if (!bot.secret) continue
+
+                        // decrypt seguro: si la key está vacía o corrupta, pasamos '' y
+                        // baileys-manager hace fallback dinámico al saldo USD admin
+                        // (chargeUserForAI) en cada mensaje entrante.
+                        let openaiKey = ''
+                        if (bot.secret.openaiApiKeyEnc) {
+                            try { openaiKey = decrypt(bot.secret.openaiApiKeyEnc) } catch { openaiKey = '' }
+                        }
+
+                        console.log(`[STARTUP] Reconectando bot Baileys: ${bot.name}${openaiKey ? '' : ' (sin key propia, usará admin key)'}`)
+                        BaileysManager.connect(bot.id, bot.name, openaiKey, bot.secret.reportPhone ?? '')
+                            .catch(err => console.error(`[STARTUP] Error reconectando bot ${bot.id}:`, err))
+                    } catch (botErr) {
+                        console.error(`[STARTUP] Error procesando bot ${bot.id} (${bot.name}):`, botErr)
+                    }
                 }
             } catch (err) {
                 console.error('[STARTUP] Error al inicializar bots Baileys:', err)
