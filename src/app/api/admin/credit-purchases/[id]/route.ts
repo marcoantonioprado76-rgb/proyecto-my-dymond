@@ -2,6 +2,7 @@ export const dynamic = 'force-dynamic'
 import { NextRequest, NextResponse } from 'next/server'
 import { getAdminUser, unauthorizedAdmin } from '@/lib/admin-auth'
 import { prisma } from '@/lib/prisma'
+import { sendUserCreditPurchaseApprovedEmail, sendUserCreditPurchaseRejectedEmail } from '@/lib/email'
 
 /**
  * PATCH /api/admin/credit-purchases/[id]
@@ -107,6 +108,27 @@ export async function PATCH(
                 return { amountUsd }
             })
 
+            // Notificar al usuario fire-and-forget — no bloquea la respuesta
+            ;(async () => {
+                try {
+                    const fresh = await prisma.user.findUnique({
+                        where: { id: purchaseRequest.userId },
+                        select: { aiBalanceUsd: true },
+                    })
+                    await sendUserCreditPurchaseApprovedEmail({
+                        email: purchaseRequest.user.email,
+                        fullName: purchaseRequest.user.fullName,
+                        requestId: params.id,
+                        amountUsd: Number(result.amountUsd),
+                        newBalanceUsd: fresh ? Number(fresh.aiBalanceUsd) : Number(result.amountUsd),
+                        paymentMethod: purchaseRequest.paymentMethod,
+                        reviewedAt: new Date(),
+                    })
+                } catch (e) {
+                    console.error('[credit-purchases approve] user notify error:', e)
+                }
+            })()
+
             return NextResponse.json({ success: true, action: 'approved', amountUsd: Number(result.amountUsd) })
         } catch (err: any) {
             if (err.message === 'ALREADY_PROCESSED') {
@@ -139,6 +161,22 @@ export async function PATCH(
             },
         })
     })
+
+    // Notificar al usuario fire-and-forget
+    ;(async () => {
+        try {
+            await sendUserCreditPurchaseRejectedEmail({
+                email: purchaseRequest.user.email,
+                fullName: purchaseRequest.user.fullName,
+                requestId: params.id,
+                amountUsd: Number(purchaseRequest.amountUsd),
+                notes,
+                reviewedAt: new Date(),
+            })
+        } catch (e) {
+            console.error('[credit-purchases reject] user notify error:', e)
+        }
+    })()
 
     return NextResponse.json({ success: true, action: 'rejected' })
 }

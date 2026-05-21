@@ -738,6 +738,210 @@ export async function sendAdminNewCreditPurchaseEmail(payload: {
   }
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// User notifications — aprobación/rechazo de compra de saldo IA
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Email al usuario cuando el admin APROBÓ su compra de saldo IA.
+ * Le confirma que el saldo ya está disponible.
+ */
+export async function sendUserCreditPurchaseApprovedEmail(payload: {
+  email: string
+  fullName: string
+  requestId: string
+  amountUsd: number
+  newBalanceUsd: number
+  paymentMethod: string
+  reviewedAt: Date
+}): Promise<boolean> {
+  const shortId = payload.requestId.slice(0, 8).toUpperCase()
+  const paymentLabel = PAYMENT_LABEL_FOR_EMAIL[payload.paymentMethod] ?? payload.paymentMethod
+  const dateStr = new Date(payload.reviewedAt).toLocaleString('es-BO', {
+    day: '2-digit', month: 'long', year: 'numeric',
+    hour: '2-digit', minute: '2-digit',
+    timeZone: 'America/La_Paz',
+  })
+
+  const content = `
+    <p style="color:#00FF88;font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;margin:0 0 16px;">✓ Saldo Acreditado</p>
+
+    <h1 style="color:#ffffff;font-size:22px;font-weight:800;margin:0 0 6px;letter-spacing:-0.3px;line-height:1.3;">
+      ¡Tu saldo de IA ya está disponible!
+    </h1>
+    <p style="color:rgba(255,255,255,0.4);font-size:13px;margin:0 0 28px;line-height:1.7;">
+      Hola <strong style="color:rgba(255,255,255,0.7);">${payload.fullName}</strong>, aprobamos tu compra y acreditamos tu saldo en MY DIAMOND.
+    </p>
+
+    <!-- amount card -->
+    <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:20px;">
+      <tr>
+        <td style="background:rgba(0,255,136,0.06);border:1px solid rgba(0,255,136,0.20);border-radius:14px;padding:22px 24px;text-align:center;">
+          <p style="color:rgba(255,255,255,0.25);font-size:9px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;margin:0 0 6px;">Saldo agregado</p>
+          <p style="color:#00FF88;font-size:32px;font-weight:900;margin:0 0 8px;font-family:'Courier New',monospace;">+$${payload.amountUsd.toFixed(2)} USD</p>
+          <p style="color:rgba(255,255,255,0.45);font-size:12px;margin:0;">Nuevo saldo total: <strong style="color:#86efac;">$${payload.newBalanceUsd.toFixed(2)} USD</strong></p>
+        </td>
+      </tr>
+    </table>
+
+    <!-- details -->
+    <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:24px;">
+      <tr><td colspan="2" style="padding:0 0 8px;border-bottom:1px solid rgba(255,255,255,0.06);"><p style="color:rgba(255,255,255,0.25);font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin:0;">Detalle</p></td></tr>
+      <tr>
+        <td style="padding:10px 0;color:rgba(255,255,255,0.30);font-size:11px;width:140px;">Solicitud</td>
+        <td style="padding:10px 0;text-align:right;color:#ffffff;font-size:13px;font-weight:700;font-family:'Courier New',monospace;">#${shortId}</td>
+      </tr>
+      <tr>
+        <td style="padding:8px 0;color:rgba(255,255,255,0.30);font-size:11px;">Método</td>
+        <td style="padding:8px 0;text-align:right;color:rgba(255,255,255,0.85);font-size:12px;font-weight:600;">${paymentLabel}</td>
+      </tr>
+      <tr>
+        <td style="padding:8px 0;color:rgba(255,255,255,0.30);font-size:11px;">Aprobado</td>
+        <td style="padding:8px 0;text-align:right;color:rgba(255,255,255,0.65);font-size:12px;">${dateStr}</td>
+      </tr>
+    </table>
+
+    <!-- info -->
+    <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:24px;">
+      <tr>
+        <td style="background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:14px 18px;">
+          <p style="color:rgba(255,255,255,0.55);font-size:12px;margin:0;line-height:1.7;">
+            Ya podés usar tu saldo en cualquier servicio con IA: <strong style="color:rgba(255,255,255,0.85);">Ads, Agentes WhatsApp, Broadcast, Landing Pages</strong>. Cada uso descuenta del saldo según el modelo.
+          </p>
+        </td>
+      </tr>
+    </table>
+
+    <!-- CTA -->
+    <table cellpadding="0" cellspacing="0">
+      <tr>
+        <td style="border-radius:10px;background:linear-gradient(135deg,#00FF88 0%,#00C2FF 100%);">
+          <a href="${APP_URL}/dashboard/wallet"
+             style="display:inline-block;color:#0D0F1E;text-decoration:none;font-weight:800;font-size:13px;padding:14px 32px;border-radius:10px;letter-spacing:0.5px;">
+            Ver mi saldo →
+          </a>
+        </td>
+      </tr>
+    </table>
+  `
+
+  try {
+    await transporter.sendMail({
+      from: `"MY DIAMOND" <${process.env.GMAIL_USER}>`,
+      to: payload.email,
+      subject: `✓ Tu saldo IA fue acreditado · +$${payload.amountUsd.toFixed(2)} USD`,
+      html: emailWrapper(content, '#00FF88'),
+    })
+    console.log(`[EMAIL] Credit approved notif sent to ${payload.email}`)
+    return true
+  } catch (err) {
+    console.error('[EMAIL] Credit approved notif error:', err)
+    return false
+  }
+}
+
+/**
+ * Email al usuario cuando el admin RECHAZÓ su compra de saldo IA.
+ * Le explica el motivo (si lo hay) y le sugiere reintentar.
+ */
+export async function sendUserCreditPurchaseRejectedEmail(payload: {
+  email: string
+  fullName: string
+  requestId: string
+  amountUsd: number
+  notes?: string | null
+  reviewedAt: Date
+}): Promise<boolean> {
+  const shortId = payload.requestId.slice(0, 8).toUpperCase()
+  const dateStr = new Date(payload.reviewedAt).toLocaleString('es-BO', {
+    day: '2-digit', month: 'long', year: 'numeric',
+    hour: '2-digit', minute: '2-digit',
+    timeZone: 'America/La_Paz',
+  })
+
+  const reasonBlock = payload.notes
+    ? `
+    <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:20px;">
+      <tr>
+        <td style="background:rgba(239,68,68,0.05);border:1px solid rgba(239,68,68,0.18);border-radius:12px;padding:14px 18px;">
+          <p style="color:rgba(255,255,255,0.25);font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin:0 0 6px;">Motivo del rechazo</p>
+          <p style="color:rgba(255,255,255,0.78);font-size:13px;margin:0;line-height:1.6;font-style:italic;">"${payload.notes}"</p>
+        </td>
+      </tr>
+    </table>`
+    : ''
+
+  const content = `
+    <p style="color:#f87171;font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;margin:0 0 16px;">⚠ Solicitud Rechazada</p>
+
+    <h1 style="color:#ffffff;font-size:22px;font-weight:800;margin:0 0 6px;letter-spacing:-0.3px;line-height:1.3;">
+      Tu compra de saldo no fue aprobada
+    </h1>
+    <p style="color:rgba(255,255,255,0.4);font-size:13px;margin:0 0 24px;line-height:1.7;">
+      Hola <strong style="color:rgba(255,255,255,0.7);">${payload.fullName}</strong>, lamentablemente tu solicitud de <strong style="color:rgba(255,255,255,0.85);">$${payload.amountUsd.toFixed(2)} USD</strong> fue rechazada.
+    </p>
+
+    <!-- details -->
+    <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:20px;">
+      <tr>
+        <td style="background:rgba(239,68,68,0.05);border:1px solid rgba(239,68,68,0.15);border-radius:12px;padding:16px 20px;">
+          <table width="100%" cellpadding="0" cellspacing="0">
+            <tr>
+              <td>
+                <p style="color:rgba(255,255,255,0.25);font-size:9px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;margin:0 0 4px;">Solicitud</p>
+                <p style="color:#f87171;font-size:18px;font-weight:900;letter-spacing:4px;margin:0;font-family:'Courier New',monospace;">#${shortId}</p>
+              </td>
+              <td style="text-align:right;vertical-align:top;">
+                <p style="color:rgba(255,255,255,0.25);font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin:0 0 4px;">Fecha</p>
+                <p style="color:rgba(255,255,255,0.55);font-size:12px;margin:0;">${dateStr}</p>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+
+    ${reasonBlock}
+
+    <!-- info -->
+    <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:24px;">
+      <tr>
+        <td style="background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:14px 18px;">
+          <p style="color:rgba(255,255,255,0.55);font-size:12px;margin:0;line-height:1.7;">
+            Si creés que hay un error o querés reintentar, podés crear una nueva solicitud desde tu panel asegurándote de subir un comprobante claro de la transferencia.
+          </p>
+        </td>
+      </tr>
+    </table>
+
+    <!-- CTA -->
+    <table cellpadding="0" cellspacing="0">
+      <tr>
+        <td style="border-radius:10px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);">
+          <a href="${APP_URL}/dashboard/wallet"
+             style="display:inline-block;color:#ffffff;text-decoration:none;font-weight:700;font-size:13px;padding:14px 32px;border-radius:10px;letter-spacing:0.5px;">
+            Volver a intentar →
+          </a>
+        </td>
+      </tr>
+    </table>
+  `
+
+  try {
+    await transporter.sendMail({
+      from: `"MY DIAMOND" <${process.env.GMAIL_USER}>`,
+      to: payload.email,
+      subject: `Solicitud de saldo IA rechazada · #${shortId}`,
+      html: emailWrapper(content, '#f87171'),
+    })
+    console.log(`[EMAIL] Credit rejected notif sent to ${payload.email}`)
+    return true
+  } catch (err) {
+    console.error('[EMAIL] Credit rejected notif error:', err)
+    return false
+  }
+}
+
 export async function sendCreditsExhaustedEmail(
   email: string,
   fullName: string,
