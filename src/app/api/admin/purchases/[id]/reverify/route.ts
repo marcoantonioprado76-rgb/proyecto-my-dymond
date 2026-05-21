@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getAdminUser, unauthorizedAdmin } from '@/lib/admin-auth'
 import { prisma } from '@/lib/prisma'
 import { verifyBscTransaction } from '@/lib/blockchain'
-import { sendPlanPurchaseConfirmedEmail } from '@/lib/email'
+import { sendPlanPurchaseConfirmedEmail, sendAdminPlanAutoActivatedEmail } from '@/lib/email'
 
 const PLAN_RANK: Record<string, number> = { NONE: 0, BASIC: 1, PRO: 2, ELITE: 3 }
 
@@ -111,7 +111,7 @@ export async function POST(
             })
         })
 
-        // Email de confirmación fire-and-forget
+        // Email de confirmación al usuario fire-and-forget
         sendPlanPurchaseConfirmedEmail(
             req.user.email,
             req.user.fullName,
@@ -124,6 +124,30 @@ export async function POST(
                 createdAt: new Date(),
             }
         ).catch(e => console.error('[email] reverify confirmed:', e))
+
+        // Notificar al admin que la solicitud se aprobó vía reverify manual (fire-and-forget)
+        ;(async () => {
+            try {
+                const u = await prisma.user.findUnique({
+                    where: { id: req.userId },
+                    select: { fullName: true, email: true, username: true, country: true, city: true },
+                })
+                if (!u) return
+                await sendAdminPlanAutoActivatedEmail({
+                    requestId: req.id,
+                    plan: newPlan,
+                    price: Number(req.price),
+                    txHash: req.txHash!,
+                    amountUsdt: verification.amountUsdt ?? null,
+                    blockNumber: verification.blockNumber?.toString() ?? null,
+                    trigger: 'admin-reverify',
+                    user: u,
+                    approvedAt: new Date(),
+                })
+            } catch (e) {
+                console.error('[admin reverify] admin notify error:', e)
+            }
+        })()
 
         return NextResponse.json({
             success: true,

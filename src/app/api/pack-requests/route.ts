@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getAuthUser } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { verifyBscTransaction } from '@/lib/blockchain'
-import { sendAdminNewPlanRequestEmail } from '@/lib/email'
+import { sendAdminNewPlanRequestEmail, sendAdminPlanAutoActivatedEmail } from '@/lib/email'
 
 /**
  * Dispara la notificación al admin (fire-and-forget) cuando se crea una solicitud PENDING.
@@ -255,6 +255,30 @@ export async function POST(request: NextRequest) {
 
           return newReq
         })
+
+        // Notificar al admin en background (no bloquea el response)
+        ;(async () => {
+          try {
+            const u = await prisma.user.findUnique({
+              where: { id: user.id },
+              select: { fullName: true, email: true, username: true, country: true, city: true },
+            })
+            if (!u) return
+            await sendAdminPlanAutoActivatedEmail({
+              requestId: req.id,
+              plan: req.plan as string,
+              price: Number(req.price),
+              txHash: req.txHash!,
+              amountUsdt: verification.amountUsdt ?? null,
+              blockNumber: req.blockNumber?.toString() ?? null,
+              trigger: 'auto-onchain',
+              user: u,
+              approvedAt: new Date(),
+            })
+          } catch (e) {
+            console.error('[pack-requests] admin auto-activated notify error:', e)
+          }
+        })()
 
         return NextResponse.json({
           success: true,

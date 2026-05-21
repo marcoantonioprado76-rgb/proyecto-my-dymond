@@ -2,7 +2,7 @@ export const dynamic = 'force-dynamic'
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { verifyBscTransaction } from '@/lib/blockchain'
-import { sendOrderConfirmedEmail, sendPlanPurchaseConfirmedEmail } from '@/lib/email'
+import { sendOrderConfirmedEmail, sendPlanPurchaseConfirmedEmail, sendAdminPlanAutoActivatedEmail } from '@/lib/email'
 
 const PLAN_RANK: Record<string, number> = { NONE: 0, BASIC: 1, PRO: 2, ELITE: 3 }
 
@@ -97,7 +97,7 @@ export async function GET(request: NextRequest) {
         })
       })
 
-      // Enviar email de confirmación (fire-and-forget)
+      // Enviar email de confirmación al usuario (fire-and-forget)
       sendPlanPurchaseConfirmedEmail(
         req.user.email,
         req.user.fullName,
@@ -110,6 +110,30 @@ export async function GET(request: NextRequest) {
           createdAt: new Date(),
         }
       ).catch(e => console.error('[email] cron plan confirmed:', e))
+
+      // Notificar al admin que el cron auto-aprobó esta compra (fire-and-forget)
+      ;(async () => {
+        try {
+          const u = await prisma.user.findUnique({
+            where: { id: req.userId },
+            select: { fullName: true, email: true, username: true, country: true, city: true },
+          })
+          if (!u) return
+          await sendAdminPlanAutoActivatedEmail({
+            requestId: req.id,
+            plan: newPlan,
+            price: Number(req.price),
+            txHash: req.txHash!,
+            amountUsdt: verification.amountUsdt ?? null,
+            blockNumber: verification.blockNumber?.toString() ?? null,
+            trigger: 'cron-verify',
+            user: u,
+            approvedAt: new Date(),
+          })
+        } catch (e) {
+          console.error('[cron/verify] admin notify error:', e)
+        }
+      })()
 
       results.verified++
     } catch (err) {
