@@ -6,6 +6,7 @@ import Link from 'next/link'
 
 interface AIConfig {
   aiCredits: number
+  aiBalanceUsd: number
   preferOwnKey: boolean
   adminHasKey: boolean
   ownKey: { model: string; isValid: boolean; apiKeyMasked: string } | null
@@ -49,13 +50,15 @@ export default function AIKeySelector({ onChange, compact = false }: Props) {
   const usingAdmin = !usingOwn && config.adminHasKey
   const noSource = !usingOwn && !usingAdmin
 
+  const lowBalance = usingAdmin && config.aiBalanceUsd < 0.10
+
   const label = usingOwn
     ? `Mi Key · ${config.ownKey?.model}`
     : usingAdmin
-    ? `Admin AI · ${config.aiCredits} créditos`
+    ? `Admin AI · $${config.aiBalanceUsd.toFixed(2)}`
     : 'Sin key configurada'
 
-  const dotColor = usingOwn ? '#60a5fa' : usingAdmin ? '#a78bfa' : '#ef4444'
+  const dotColor = usingOwn ? '#60a5fa' : lowBalance ? '#f59e0b' : usingAdmin ? '#a78bfa' : '#ef4444'
 
   return (
     <div className="relative inline-block">
@@ -117,12 +120,32 @@ export default function AIKeySelector({ onChange, compact = false }: Props) {
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-xs font-bold text-white">Key del Admin</p>
-                <p className="text-[10px]" style={{ color: 'rgba(255,255,255,0.35)' }}>
-                  {config.adminHasKey ? `${config.aiCredits} créditos` : 'No configurada'}
+                <p className="text-[10px]" style={{ color: lowBalance ? '#fbbf24' : 'rgba(255,255,255,0.35)' }}>
+                  {config.adminHasKey
+                    ? lowBalance
+                      ? `$${config.aiBalanceUsd.toFixed(2)} USD · saldo bajo`
+                      : `$${config.aiBalanceUsd.toFixed(2)} USD disponibles`
+                    : 'No configurada'}
                 </p>
               </div>
               {usingAdmin && <div className="w-3 h-3 rounded-full bg-violet-400" />}
             </button>
+
+            {/* CTA de compra cuando saldo bajo y usa key del admin */}
+            {usingAdmin && lowBalance && (
+              <div className="px-3 py-2 border-t" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
+                <Link href="/dashboard/wallet"
+                  onClick={() => setOpen(false)}
+                  className="flex items-center justify-center gap-1.5 w-full py-2 rounded-xl text-[11px] font-black"
+                  style={{
+                    background: 'linear-gradient(135deg, rgba(251,191,36,0.20), rgba(251,146,60,0.15))',
+                    border: '1px solid rgba(251,191,36,0.40)',
+                    color: '#fbbf24',
+                  }}>
+                  + Comprar saldo
+                </Link>
+              </div>
+            )}
 
             {/* Own key option */}
             <button

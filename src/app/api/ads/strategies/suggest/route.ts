@@ -2,10 +2,7 @@ export const dynamic = 'force-dynamic'
 import { NextRequest, NextResponse } from 'next/server'
 import { getAuthUser } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
-import { decrypt } from '@/lib/ads/encryption'
-
-const ENC_KEY = process.env.ADS_ENCRYPTION_KEY
-if (!ENC_KEY) throw new Error('ADS_ENCRYPTION_KEY env var is not set')
+import { chargeUserForAI, refundUserForAI } from '@/lib/ai-credits'
 
 import { generateStrategySuggestions } from '@/lib/ads/openai-ads'
 
@@ -24,24 +21,41 @@ export async function POST(req: NextRequest) {
         })
         if (!brief) return NextResponse.json({ error: 'Brief no encontrado' }, { status: 404 })
 
-        // Fetch user's OpenAI key
+        // Modelo: si el usuario tiene una key propia configurada, respetamos su modelo elegido;
+        // si no, usamos gpt-4o por defecto.
         const openaiConfig = await (prisma as any).openAIConfig.findUnique({ where: { userId: user.id } })
-        if (!openaiConfig?.apiKeyEnc) {
-            return NextResponse.json({ error: 'Configura tu API key de OpenAI en Configuración → IA para usar esta función.' }, { status: 400 })
-        }
-        if (!openaiConfig.isValid) {
-            return NextResponse.json({ error: 'Tu API key de OpenAI no es válida. Verifícala en Configuración → IA.' }, { status: 400 })
+        const model = openaiConfig?.model || 'gpt-4o'
+
+        // Resolver key + cobrar saldo si aplica (admin key); si usa la suya, no cobra
+        const charge = await chargeUserForAI(user.id, model, 'ads.strategies.suggest', { briefId })
+        if (!charge.ok) {
+            if (charge.error === 'NO_CREDITS') {
+                return NextResponse.json({
+                    error: 'Sin saldo de IA. Comprá saldo o configurá tu propia API Key.',
+                    code: 'NO_CREDITS',
+                    balanceUsd: charge.balanceUsd,
+                    requiredUsd: charge.requiredUsd,
+                }, { status: 402 })
+            }
+            return NextResponse.json({
+                error: 'No hay API Key disponible para esta función. Configurá tu propia key o pedile al admin que active la global.',
+                code: charge.error,
+            }, { status: 400 })
         }
 
-        let apiKey: string
+        const apiKey = charge.key
+
+        // Generate AI suggestions
+        let suggestions
         try {
-            apiKey = decrypt(openaiConfig.apiKeyEnc, ENC_KEY!)
-        } catch {
-            return NextResponse.json({ error: 'Error al leer tu API key de OpenAI. Reconecta tu cuenta en Configuración → IA.' }, { status: 500 })
+            suggestions = await generateStrategySuggestions(brief, apiKey, model, platform, objective, destination, mediaType)
+        } catch (e) {
+            // Si falló la llamada externa después de cobrar, devolvemos el saldo
+            if (charge.source === 'admin' && charge.chargedUsd) {
+                await refundUserForAI(user.id, charge.chargedUsd, 'ads.strategies.suggest.failed')
+            }
+            throw e
         }
-
-        // Generate AI suggestions using user's configured model
-        const suggestions = await generateStrategySuggestions(brief, apiKey, openaiConfig.model || 'gpt-5.1', platform, objective, destination, mediaType)
 
         // Delete old AI suggestions that are NOT referenced by any campaign AND not saved by user
         const usedStrategyIds = (await (prisma as any).adCampaignV2.findMany({

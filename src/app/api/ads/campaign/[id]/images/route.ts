@@ -3,11 +3,10 @@ export const maxDuration = 120 // vision (20s) + creative direction (15s) + text
 import { NextResponse } from 'next/server'
 import { getAuthUser } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
-import { decrypt } from '@/lib/ads/encryption'
 import { generateAdImage, editAdImageWithReference, analyzeProductImageForAd, generateCreativeDirection, generateTextOverlay, type ImageQuality, type ImageSize } from '@/lib/ads/openai-ads'
 import { supabaseAdmin } from '@/lib/supabase'
+import { chargeUserForAI, refundUserForAI } from '@/lib/ai-credits'
 
-const ENC_KEY = process.env.ADS_ENCRYPTION_KEY || ''
 const BUCKET = 'ad-creatives'
 
 const VALID_SIZES: ImageSize[] = ['1024x1024', '1024x1792', '1792x1024']
@@ -24,17 +23,24 @@ export async function POST(req: Request, { params }: { params: { id: string } })
     const user = await getAuthUser()
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-    const oaiConfig = await (prisma as any).openAIConfig.findUnique({ where: { userId: user.id } })
-    if (!oaiConfig?.isValid) {
-        return NextResponse.json({ error: 'Configura tu OpenAI API Key primero' }, { status: 400 })
-    }
-    const apiKey = decrypt(oaiConfig.apiKeyEnc, ENC_KEY)
-
     const campaign = await (prisma as any).adCampaignV2.findFirst({
         where: { id: params.id, userId: user.id },
         include: { brief: true, strategy: true }
     })
     if (!campaign) return NextResponse.json({ error: 'Campaña no encontrada' }, { status: 404 })
+
+    // Cobrar saldo: imagen = dall-e-3 ($0.10 USD por imagen). Si el usuario prefiere su propia key, se usa la suya sin cobrar.
+    const charge = await chargeUserForAI(user.id, 'dall-e-3', 'ads.images.generate', { campaignId: params.id })
+    if (!charge.ok) {
+        if (charge.error === 'NO_CREDITS') {
+            return NextResponse.json({
+                error: 'Sin saldo de IA. Generar una imagen requiere ~$0.10 USD. Comprá saldo o configurá tu propia API Key.',
+                code: 'NO_CREDITS', balanceUsd: charge.balanceUsd, requiredUsd: charge.requiredUsd,
+            }, { status: 402 })
+        }
+        return NextResponse.json({ error: 'No hay API Key disponible.', code: charge.error }, { status: 400 })
+    }
+    const apiKey = charge.key
 
     const body = await req.json()
     const {
@@ -168,6 +174,9 @@ export async function POST(req: Request, { params }: { params: { id: string } })
 
         return NextResponse.json({ imageUrl })
     } catch (err: any) {
+        if (charge.source === 'admin' && charge.chargedUsd) {
+            await refundUserForAI(user.id, charge.chargedUsd, 'ads.images.generate.failed')
+        }
         console.error('[GenerateImage]', err)
         return NextResponse.json({ error: err.message || 'Error al generar la imagen' }, { status: 500 })
     }

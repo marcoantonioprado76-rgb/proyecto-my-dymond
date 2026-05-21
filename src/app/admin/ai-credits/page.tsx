@@ -30,6 +30,7 @@ interface UserRow {
   username: string
   email: string
   aiCredits: number
+  aiBalanceUsd: number
   preferOwnKey: boolean
   plan: string
   isActive: boolean
@@ -104,13 +105,13 @@ export default function AdminAICreditsPage() {
   }
 
   async function assignCredits(userId: string) {
-    const credits = parseInt(creditInput)
-    if (isNaN(credits) || credits < 0) return
+    const usd = parseFloat(creditInput)
+    if (!Number.isFinite(usd) || usd < 0) return
     setSavingCredits(true)
     const res = await fetch('/api/admin/credits', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ userId, credits, mode: creditMode }),
+      body: JSON.stringify({ userId, usd, mode: creditMode }),
     })
     setSavingCredits(false)
     if (res.ok) {
@@ -267,19 +268,19 @@ export default function AdminAICreditsPage() {
                     )}
                   </div>
 
-                  {/* Credits badge */}
+                  {/* Balance USD badge */}
                   <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl shrink-0"
                     style={{ background: 'rgba(162,102,255,0.12)', border: '1px solid rgba(162,102,255,0.25)' }}>
                     <Cpu className="w-3 h-3 text-violet-400" />
-                    <span className="text-sm font-black text-white">{u.aiCredits}</span>
-                    <span className="text-[10px] text-white/30">cred.</span>
+                    <span className="text-sm font-black text-white tabular-nums">${u.aiBalanceUsd.toFixed(2)}</span>
+                    <span className="text-[10px] text-white/30">USD</span>
                   </div>
 
                   {/* Edit button */}
                   <button
                     onClick={() => {
                       setEditingUser(editingUser === u.id ? null : u.id)
-                      setCreditInput(String(u.aiCredits))
+                      setCreditInput(u.aiBalanceUsd.toFixed(2))
                       setCreditMode('set')
                     }}
                     className="text-xs font-bold px-3 py-1.5 rounded-xl transition-all"
@@ -314,15 +315,19 @@ export default function AdminAICreditsPage() {
                     </div>
 
                     <div className="flex gap-2">
-                      <input
-                        type="number"
-                        min="0"
-                        placeholder="Cantidad de créditos"
-                        value={creditInput}
-                        onChange={e => setCreditInput(e.target.value)}
-                        className="flex-1 rounded-xl px-3 py-2 text-sm text-white placeholder-white/20 outline-none"
-                        style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)' }}
-                      />
+                      <div className="relative flex-1">
+                        <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm font-bold pointer-events-none" style={{ color: 'rgba(255,255,255,0.4)' }}>$</span>
+                        <input
+                          type="number"
+                          min="0"
+                          step="0.01"
+                          placeholder="Monto en USD"
+                          value={creditInput}
+                          onChange={e => setCreditInput(e.target.value)}
+                          className="w-full rounded-xl pl-7 pr-3 py-2 text-sm text-white placeholder-white/20 outline-none tabular-nums"
+                          style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)' }}
+                        />
+                      </div>
                       <button onClick={() => assignCredits(u.id)} disabled={savingCredits || !creditInput}
                         className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold disabled:opacity-40"
                         style={{ background: 'rgba(162,102,255,0.2)', border: '1px solid rgba(162,102,255,0.4)', color: '#a78bfa' }}>
@@ -337,9 +342,9 @@ export default function AdminAICreditsPage() {
                     </div>
 
                     <p className="text-[10px] text-white/25">
-                      {creditMode === 'set' && `Fijar exactamente ${creditInput || '?'} créditos`}
-                      {creditMode === 'add' && `${u.aiCredits} + ${creditInput || '?'} = ${u.aiCredits + (parseInt(creditInput) || 0)} créditos`}
-                      {creditMode === 'subtract' && `${u.aiCredits} − ${creditInput || '?'} = ${Math.max(0, u.aiCredits - (parseInt(creditInput) || 0))} créditos`}
+                      {creditMode === 'set' && `Fijar saldo en exactamente $${parseFloat(creditInput || '0').toFixed(2)} USD`}
+                      {creditMode === 'add' && `$${u.aiBalanceUsd.toFixed(2)} + $${parseFloat(creditInput || '0').toFixed(2)} = $${(u.aiBalanceUsd + (parseFloat(creditInput) || 0)).toFixed(2)} USD`}
+                      {creditMode === 'subtract' && `$${u.aiBalanceUsd.toFixed(2)} − $${parseFloat(creditInput || '0').toFixed(2)} = $${Math.max(0, u.aiBalanceUsd - (parseFloat(creditInput) || 0)).toFixed(2)} USD`}
                     </p>
                   </div>
                 )}

@@ -2,20 +2,15 @@ export const dynamic = 'force-dynamic'
 import { NextResponse } from 'next/server'
 import { getAuthUser } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
-import { decrypt } from '@/lib/ads/encryption'
 import { generateFieldSuggestions } from '@/lib/ads/openai-ads'
-
-const ENC_KEY = process.env.ADS_ENCRYPTION_KEY || ''
+import { chargeUserForAI, refundUserForAI } from '@/lib/ai-credits'
 
 export async function POST(req: Request, { params }: { params: { id: string } }) {
     const user = await getAuthUser()
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
     const oaiConfig = await (prisma as any).openAIConfig.findUnique({ where: { userId: user.id } })
-    if (!oaiConfig?.isValid || !oaiConfig?.apiKeyEnc) {
-        return NextResponse.json({ error: 'Configura tu OpenAI API Key en Configuración → IA primero' }, { status: 400 })
-    }
-    const apiKey = decrypt(oaiConfig.apiKeyEnc, ENC_KEY)
+    const model = oaiConfig?.model || 'gpt-4o'
 
     const campaign = await (prisma as any).adCampaignV2.findFirst({
         where: { id: params.id, userId: user.id },
@@ -29,6 +24,19 @@ export async function POST(req: Request, { params }: { params: { id: string } })
     if (!['primaryText', 'headline', 'description'].includes(field)) {
         return NextResponse.json({ error: 'Campo inválido' }, { status: 400 })
     }
+
+    // Cobrar saldo (o usar key propia)
+    const charge = await chargeUserForAI(user.id, model, 'ads.field.suggest', { campaignId: params.id, field })
+    if (!charge.ok) {
+        if (charge.error === 'NO_CREDITS') {
+            return NextResponse.json({
+                error: 'Sin saldo de IA. Comprá saldo o configurá tu propia API Key.',
+                code: 'NO_CREDITS', balanceUsd: charge.balanceUsd, requiredUsd: charge.requiredUsd,
+            }, { status: 402 })
+        }
+        return NextResponse.json({ error: 'No hay API Key disponible.', code: charge.error }, { status: 400 })
+    }
+    const apiKey = charge.key
 
     try {
         const suggestions = await generateFieldSuggestions({
@@ -61,6 +69,9 @@ export async function POST(req: Request, { params }: { params: { id: string } })
 
         return NextResponse.json({ suggestions })
     } catch (err: any) {
+        if (charge.source === 'admin' && charge.chargedUsd) {
+            await refundUserForAI(user.id, charge.chargedUsd, 'ads.field.suggest.failed')
+        }
         console.error('[SuggestField]', err)
         return NextResponse.json({ error: err.message || 'Error al generar sugerencias' }, { status: 500 })
     }

@@ -12,19 +12,28 @@ export async function GET() {
   const user = await getAuthUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const [dbUser, openaiConfig, adminConfig] = await Promise.all([
+  const [dbUser, openaiConfig, adminConfig, globalKeySetting, recentUsage] = await Promise.all([
     prisma.user.findUnique({
       where: { id: user.id },
-      select: { aiCredits: true, preferOwnKey: true },
+      select: { aiCredits: true, aiBalanceUsd: true, preferOwnKey: true },
     }),
     (prisma as any).openAIConfig.findUnique({ where: { userId: user.id } }),
     (prisma as any).adminConfig.findUnique({ where: { id: 'global' } }),
+    (prisma as any).appSetting.findUnique({ where: { key: 'openai_global_key' } }),
+    (prisma as any).aIUsageLog.findMany({
+      where: { userId: user.id },
+      orderBy: { createdAt: 'desc' },
+      take: 20,
+      select: { id: true, model: true, reason: true, costUsd: true, createdAt: true },
+    }),
   ])
 
   return NextResponse.json({
     aiCredits: dbUser?.aiCredits ?? 0,
+    aiBalanceUsd: dbUser?.aiBalanceUsd ? Number(dbUser.aiBalanceUsd) : 0,
     preferOwnKey: dbUser?.preferOwnKey ?? false,
-    adminHasKey: !!(adminConfig?.openaiKeyEnc),
+    // Hay key admin global si está en AppSetting (nueva forma) o en AdminConfig (legacy)
+    adminHasKey: !!(globalKeySetting?.value) || !!(adminConfig?.openaiKeyEnc),
     ownKey: openaiConfig
       ? {
           model: openaiConfig.model,
@@ -33,6 +42,10 @@ export async function GET() {
           apiKeyMasked: '••••••••••••' + decrypt(openaiConfig.apiKeyEnc, ENC_KEY).slice(-4),
         }
       : null,
+    recentUsage: recentUsage.map((u: any) => ({
+      ...u,
+      costUsd: Number(u.costUsd),
+    })),
   })
 }
 

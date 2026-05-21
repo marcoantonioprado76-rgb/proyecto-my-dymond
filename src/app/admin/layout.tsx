@@ -32,6 +32,7 @@ const NAV = [
   { href: '/admin/withdrawals', label: 'Retiros', icon: Wallet },
   { href: '/admin/bonuses', label: 'Bonos Extra', icon: Gift },
   { href: '/admin/ai-credits', label: 'Créditos AI', icon: Cpu },
+  { href: '/admin/credit-purchases', label: 'Compras Saldo IA', icon: Wallet },
   { href: '/admin/products', label: 'Productos Bots', icon: Package },
   { href: '/admin/bot-templates', label: 'Plantillas AI', icon: BrainCircuit },
   { href: '/admin/clipping', label: 'Clipping', icon: Play },

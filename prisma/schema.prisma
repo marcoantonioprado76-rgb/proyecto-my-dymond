@@ -25,6 +25,8 @@ model User {
   planExpiresAt       DateTime?            @map("plan_expires_at")
   extraBots           Int                  @default(0) @map("extra_bots")
   aiCredits           Int                  @default(0) @map("ai_credits")
+  /// Balance de IA en USD con 4 decimales (ej: 12.3456). Reemplaza progresivamente a aiCredits.
+  aiBalanceUsd        Decimal              @default(0) @db.Decimal(10, 4) @map("ai_balance_usd")
   preferOwnKey        Boolean              @default(false) @map("prefer_own_key")
   createdAt           DateTime             @default(now()) @map("created_at")
   updatedAt           DateTime             @updatedAt @map("updated_at")
@@ -59,6 +61,8 @@ model User {
   deviceVerifyCodes    DeviceVerifyCode[]
   adminOtpCodes        AdminOtpCode[]
   broadcastCampaigns   BroadcastCampaign[]
+  creditPurchaseRequests CreditPurchaseRequest[]
+  aiUsageLogs          AIUsageLog[]
 
   @@map("users")
 }
@@ -745,6 +749,45 @@ model PackPurchaseRequest {
   user            User          @relation(fields: [userId], references: [id])
 
   @@map("pack_purchase_requests")
+}
+
+/// Solicitud de compra de créditos AI (saldo USD). El admin la aprueba y suma al balance.
+model CreditPurchaseRequest {
+  id              String        @id @default(uuid()) @db.Uuid
+  userId          String        @map("user_id") @db.Uuid
+  /// Monto en USD que el usuario solicita cargar a su balance de IA (ej: 5, 10, 20, 50).
+  amountUsd       Decimal       @db.Decimal(10, 2) @map("amount_usd")
+  paymentProofUrl String?       @map("payment_proof_url")
+  /// Sólo MANUAL por ahora (transferencia con comprobante). El enum se mantiene compartido por flexibilidad futura.
+  paymentMethod   PaymentMethod @default(MANUAL) @map("payment_method")
+  txHash          String?       @unique @map("tx_hash")
+  status          RequestStatus @default(PENDING)
+  notes           String?
+  reviewedBy      String?       @map("reviewed_by") @db.Uuid
+  reviewedAt      DateTime?     @map("reviewed_at")
+  createdAt       DateTime      @default(now()) @map("created_at")
+  updatedAt       DateTime      @updatedAt @map("updated_at")
+  user            User          @relation(fields: [userId], references: [id])
+
+  @@index([userId, createdAt])
+  @@index([status])
+  @@map("credit_purchase_requests")
+}
+
+/// Log de cada uso de IA con la key del admin (consumo de balance USD).
+/// Si el usuario usa su propia API key, no se crea ningún registro acá.
+model AIUsageLog {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  model     String   /// "gpt-4o", "gpt-4o-mini", "whisper-1", "dall-e-3", etc.
+  reason    String   /// "ads.copies", "ads.images", "whatsapp.chat", etc.
+  costUsd   Decimal  @db.Decimal(10, 4) @map("cost_usd")
+  metadata  Json?
+  createdAt DateTime @default(now()) @map("created_at")
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@index([userId, createdAt])
+  @@map("ai_usage_logs")
 }
 
 model WithdrawalRequest {

@@ -2,27 +2,15 @@ export const dynamic = 'force-dynamic'
 import { NextResponse } from 'next/server'
 import { getAuthUser } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
-import { decrypt } from '@/lib/ads/encryption'
 import { generateAdCopies } from '@/lib/ads/openai-ads'
-
-const ENC_KEY = process.env.ADS_ENCRYPTION_KEY
-if (!ENC_KEY) throw new Error('ADS_ENCRYPTION_KEY env var is not set')
+import { chargeUserForAI, refundUserForAI } from '@/lib/ai-credits'
 
 export async function POST(req: Request, { params }: { params: { id: string } }) {
     const user = await getAuthUser()
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
     const oaiConfig = await (prisma as any).openAIConfig.findUnique({ where: { userId: user.id } })
-    if (!oaiConfig?.isValid || !oaiConfig?.apiKeyEnc) {
-        return NextResponse.json({ error: 'Configura tu OpenAI API Key en Configuración → IA primero' }, { status: 400 })
-    }
-
-    let apiKey: string
-    try {
-        apiKey = decrypt(oaiConfig.apiKeyEnc, ENC_KEY!)
-    } catch {
-        return NextResponse.json({ error: 'Error al leer tu API key de OpenAI. Reconecta tu cuenta en Configuración → IA.' }, { status: 500 })
-    }
+    const model = oaiConfig?.model || 'gpt-4o'
 
     const campaign = await (prisma as any).adCampaignV2.findFirst({
         where: { id: params.id, userId: user.id },
@@ -32,6 +20,19 @@ export async function POST(req: Request, { params }: { params: { id: string } })
         }
     })
     if (!campaign) return NextResponse.json({ error: 'Campaña no encontrada' }, { status: 404 })
+
+    // Cobrar saldo (o usar key propia si el usuario la prefiere)
+    const charge = await chargeUserForAI(user.id, model, 'ads.copies', { campaignId: params.id })
+    if (!charge.ok) {
+        if (charge.error === 'NO_CREDITS') {
+            return NextResponse.json({
+                error: 'Sin saldo de IA. Comprá saldo o configurá tu propia API Key.',
+                code: 'NO_CREDITS', balanceUsd: charge.balanceUsd, requiredUsd: charge.requiredUsd,
+            }, { status: 402 })
+        }
+        return NextResponse.json({ error: 'No hay API Key disponible.', code: charge.error }, { status: 400 })
+    }
+    const apiKey = charge.key
 
     try {
         const copies = await generateAdCopies({
@@ -136,6 +137,10 @@ export async function POST(req: Request, { params }: { params: { id: string } })
 
         return NextResponse.json({ creatives: saved, count: saved.length })
     } catch (err: any) {
+        // Si falló después de cobrar saldo, devolverlo
+        if (charge.source === 'admin' && charge.chargedUsd) {
+            await refundUserForAI(user.id, charge.chargedUsd, 'ads.copies.failed')
+        }
         console.error('[GenerateCopies]', err)
         return NextResponse.json({ error: err.message || 'Error al generar copies' }, { status: 500 })
     }
