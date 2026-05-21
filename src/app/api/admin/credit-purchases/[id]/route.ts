@@ -107,7 +107,7 @@ export async function PATCH(
                 return { amountUsd }
             })
 
-            return NextResponse.json({ success: true, action: 'approved', amountUsd: result.amountUsd })
+            return NextResponse.json({ success: true, action: 'approved', amountUsd: Number(result.amountUsd) })
         } catch (err: any) {
             if (err.message === 'ALREADY_PROCESSED') {
                 return NextResponse.json({ error: 'Esta solicitud ya fue procesada.' }, { status: 409 })

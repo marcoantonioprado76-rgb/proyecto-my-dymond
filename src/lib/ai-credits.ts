@@ -176,10 +176,10 @@ export async function chargeUserForAI(
                 return { type: 'NO_CREDITS' as const, balance: currentBalance, required: cost }
             }
 
-            // Descontar
+            // Descontar — GREATEST(0, ...) por seguridad ante imprecisión Decimal
             await tx.$executeRaw`
                 UPDATE users
-                SET ai_balance_usd = ai_balance_usd - ${cost}::numeric
+                SET ai_balance_usd = GREATEST(0::numeric, ai_balance_usd - ${cost}::numeric)
                 WHERE id = ${userId}::uuid
             `
 
