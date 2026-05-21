@@ -208,7 +208,8 @@ export default function CreditsPage() {
 
   const canUseAdminKey = data?.adminHasKey
   const hasOwnKey = !!data?.ownKey
-  const usingAdmin = !data?.preferOwnKey
+  const usingOwn = !!data?.preferOwnKey && hasOwnKey
+  const usingAdmin = !usingOwn && !!canUseAdminKey
 
   return (
     <div className="px-4 sm:px-6 pt-6 max-w-2xl mx-auto pb-24 space-y-6">
@@ -355,68 +356,99 @@ export default function CreditsPage() {
         </div>
       )}
 
-      {/* Key source preference */}
+      {/* Key source preference — selector usa saldo vs propia key */}
       <div className="relative rounded-2xl p-5 overflow-hidden"
         style={{
           background: 'linear-gradient(135deg, rgba(154,203,255,0.12) 0%, rgba(255,125,224,0.12) 50%, rgba(162,102,255,0.12) 100%)',
           border: '1px solid rgba(255,255,255,0.15)',
           backdropFilter: 'blur(16px)',
         }}>
-        <p className="text-[10px] font-black uppercase tracking-widest mb-4" style={{ color: 'rgba(255,255,255,0.3)' }}>
-          Fuente de IA activa
+        <div className="flex items-center justify-between mb-1">
+          <p className="text-[10px] font-black uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.4)' }}>
+            ¿Cómo querés pagar la IA?
+          </p>
+          <span className="text-[9px] font-black uppercase tracking-[0.18em] px-2 py-0.5 rounded-full"
+            style={{
+              background: usingOwn ? 'rgba(125,211,252,0.15)' : usingAdmin ? 'rgba(167,139,250,0.15)' : 'rgba(248,113,113,0.10)',
+              border: `1px solid ${usingOwn ? 'rgba(125,211,252,0.35)' : usingAdmin ? 'rgba(167,139,250,0.35)' : 'rgba(248,113,113,0.30)'}`,
+              color: usingOwn ? '#7dd3fc' : usingAdmin ? '#a78bfa' : '#fca5a5',
+            }}>
+            {usingOwn ? 'Mi key' : usingAdmin ? 'Saldo USD' : 'Sin fuente'}
+          </span>
+        </div>
+        <p className="text-[11px] mb-4 leading-relaxed" style={{ color: 'rgba(255,255,255,0.40)' }}>
+          Elegí la fuente de IA. Podés cambiar cuando quieras — la opción activa se usará en todos los servicios (Ads, Bots, Broadcast).
         </p>
 
         <div className="space-y-3">
-          {/* Admin key option */}
+          {/* Admin key option — paga con saldo USD */}
           <button
             onClick={() => data?.preferOwnKey && togglePreference()}
             disabled={!canUseAdminKey || togglingPref}
             className="w-full flex items-center gap-4 p-4 rounded-xl transition-all duration-200 text-left"
             style={{
-              background: usingAdmin && canUseAdminKey ? 'rgba(162,102,255,0.15)' : 'rgba(255,255,255,0.04)',
-              border: `1px solid ${usingAdmin && canUseAdminKey ? 'rgba(162,102,255,0.4)' : 'rgba(255,255,255,0.1)'}`,
+              background: usingAdmin && canUseAdminKey ? 'rgba(162,102,255,0.18)' : 'rgba(255,255,255,0.04)',
+              border: `1px solid ${usingAdmin && canUseAdminKey ? 'rgba(162,102,255,0.50)' : 'rgba(255,255,255,0.10)'}`,
               opacity: !canUseAdminKey ? 0.5 : 1,
               cursor: !canUseAdminKey ? 'not-allowed' : 'pointer',
+              boxShadow: usingAdmin && canUseAdminKey ? '0 0 18px -6px rgba(162,102,255,0.45)' : 'none',
             }}>
-            <div className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
-              style={{ background: 'rgba(162,102,255,0.15)', border: '1px solid rgba(162,102,255,0.3)' }}>
+            <div className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0"
+              style={{ background: 'rgba(162,102,255,0.18)', border: '1px solid rgba(162,102,255,0.35)' }}>
               <ShieldCheck className="w-4 h-4 text-violet-400" />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-bold text-white">Key del Administrador</p>
-              <p className="text-xs mt-0.5" style={{ color: 'rgba(255,255,255,0.35)' }}>
+              <div className="flex items-center gap-2 flex-wrap">
+                <p className="text-sm font-black text-white">Key del Administrador</p>
+                <span className="text-[8.5px] font-black uppercase tracking-[0.14em] px-1.5 py-0.5 rounded-full"
+                  style={{ background: 'rgba(162,102,255,0.18)', border: '1px solid rgba(162,102,255,0.30)', color: '#c4b5fd' }}>
+                  Pagás con saldo
+                </span>
+              </div>
+              <p className="text-[11px] mt-1 leading-relaxed" style={{ color: 'rgba(255,255,255,0.50)' }}>
                 {canUseAdminKey
-                  ? `Usa los créditos asignados (${data?.aiCredits ?? 0} disponibles)`
-                  : 'El administrador aún no ha configurado una key'}
+                  ? <>Cada uso descuenta del saldo USD. <b className="text-white/80">Tenés ${(data?.aiBalanceUsd ?? 0).toFixed(2)} disponibles</b>.</>
+                  : 'El administrador aún no configuró una key global.'}
               </p>
             </div>
-            <div className={`w-4 h-4 rounded-full border-2 shrink-0 ${usingAdmin && canUseAdminKey ? 'border-violet-400 bg-violet-400' : 'border-white/20'}`} />
+            <div className={`w-5 h-5 rounded-full border-2 shrink-0 flex items-center justify-center ${usingAdmin && canUseAdminKey ? 'border-violet-400 bg-violet-400' : 'border-white/20'}`}>
+              {usingAdmin && canUseAdminKey && <CheckCircle className="w-3 h-3 text-white" />}
+            </div>
           </button>
 
-          {/* Own key option */}
+          {/* Own key option — OpenAI factura directo */}
           <button
             onClick={() => !data?.preferOwnKey && togglePreference()}
             disabled={!hasOwnKey || togglingPref}
             className="w-full flex items-center gap-4 p-4 rounded-xl transition-all duration-200 text-left"
             style={{
-              background: !usingAdmin && hasOwnKey ? 'rgba(154,203,255,0.12)' : 'rgba(255,255,255,0.04)',
-              border: `1px solid ${!usingAdmin && hasOwnKey ? 'rgba(154,203,255,0.4)' : 'rgba(255,255,255,0.1)'}`,
+              background: !usingAdmin && hasOwnKey ? 'rgba(125,211,252,0.15)' : 'rgba(255,255,255,0.04)',
+              border: `1px solid ${!usingAdmin && hasOwnKey ? 'rgba(125,211,252,0.45)' : 'rgba(255,255,255,0.10)'}`,
               opacity: !hasOwnKey ? 0.5 : 1,
               cursor: !hasOwnKey ? 'not-allowed' : 'pointer',
+              boxShadow: !usingAdmin && hasOwnKey ? '0 0 18px -6px rgba(125,211,252,0.45)' : 'none',
             }}>
-            <div className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
-              style={{ background: 'rgba(154,203,255,0.12)', border: '1px solid rgba(154,203,255,0.3)' }}>
+            <div className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0"
+              style={{ background: 'rgba(125,211,252,0.15)', border: '1px solid rgba(125,211,252,0.35)' }}>
               <Key className="w-4 h-4 text-sky-400" />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-bold text-white">Mi Propia API Key</p>
-              <p className="text-xs mt-0.5" style={{ color: 'rgba(255,255,255,0.35)' }}>
+              <div className="flex items-center gap-2 flex-wrap">
+                <p className="text-sm font-black text-white">Mi Propia API Key</p>
+                <span className="text-[8.5px] font-black uppercase tracking-[0.14em] px-1.5 py-0.5 rounded-full"
+                  style={{ background: 'rgba(125,211,252,0.15)', border: '1px solid rgba(125,211,252,0.30)', color: '#7dd3fc' }}>
+                  No usa saldo
+                </span>
+              </div>
+              <p className="text-[11px] mt-1 leading-relaxed" style={{ color: 'rgba(255,255,255,0.50)' }}>
                 {hasOwnKey
-                  ? `${data?.ownKey?.apiKeyMasked} · ${data?.ownKey?.model}`
-                  : 'Configura tu key de OpenAI abajo'}
+                  ? <>OpenAI te factura directo a tu cuenta. <b className="text-white/80">{data?.ownKey?.apiKeyMasked}</b> · {data?.ownKey?.model}</>
+                  : <>Configurá tu key de OpenAI abajo (cifrada AES-256). Los costos van a tu cuenta de OpenAI, no a tu saldo.</>}
               </p>
             </div>
-            <div className={`w-4 h-4 rounded-full border-2 shrink-0 ${!usingAdmin && hasOwnKey ? 'border-sky-400 bg-sky-400' : 'border-white/20'}`} />
+            <div className={`w-5 h-5 rounded-full border-2 shrink-0 flex items-center justify-center ${!usingAdmin && hasOwnKey ? 'border-sky-400 bg-sky-400' : 'border-white/20'}`}>
+              {!usingAdmin && hasOwnKey && <CheckCircle className="w-3 h-3 text-white" />}
+            </div>
           </button>
         </div>
 
