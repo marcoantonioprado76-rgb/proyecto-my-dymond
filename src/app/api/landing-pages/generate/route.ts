@@ -5,6 +5,7 @@ import { prisma } from '@/lib/prisma'
 import { decrypt } from '@/lib/crypto'
 import { verifyToken } from '@/lib/auth'
 import { getPlanLimits, PLAN_NAMES, type UserPlan } from '@/lib/plan-limits'
+import { chargeUserForAI, refundUserForAI } from '@/lib/ai-credits'
 
 function getAuth() {
   const cookieStore = cookies()
@@ -55,7 +56,13 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'La descripción es requerida' }, { status: 400 })
   }
 
+  // Prioridad de resolución de key OpenAI (no romper lógica existente):
+  //   1. Key explícita del form (bodyKey) → usar tal cual, sin cobrar saldo.
+  //   2. Key de algún bot ACTIVE del usuario → usar, sin cobrar saldo.
+  //   3. Fallback: chargeUserForAI() → usa la propia del usuario (preferOwnKey)
+  //      o la del admin global, descontando saldo USD si corresponde.
   let openaiKey = bodyKey?.trim()
+  let charge: Awaited<ReturnType<typeof chargeUserForAI>> | null = null
 
   if (!openaiKey) {
     const bot = await prisma.bot.findFirst({
@@ -64,14 +71,27 @@ export async function POST(req: NextRequest) {
       orderBy: { createdAt: 'desc' },
     })
     if (bot?.secret?.openaiApiKeyEnc) {
-      openaiKey = decrypt(bot.secret.openaiApiKeyEnc) || ''
+      try { openaiKey = decrypt(bot.secret.openaiApiKeyEnc) || '' } catch { openaiKey = '' }
     }
   }
 
+  // Último recurso: key admin global con cobro de saldo USD
   if (!openaiKey) {
-    return NextResponse.json({
-      error: 'Se requiere una API Key de OpenAI. Ingresa tu key en el formulario o configura una en tu bot de WhatsApp.'
-    }, { status: 400 })
+    charge = await chargeUserForAI(auth.userId, 'gpt-4o', 'landing.generate')
+    if (charge.ok) {
+      openaiKey = charge.key
+    } else if (charge.error === 'NO_CREDITS') {
+      return NextResponse.json({
+        error: 'Sin saldo de IA. Comprá saldo, configurá tu propia API Key o configurá una en tu bot de WhatsApp.',
+        code: 'NO_CREDITS',
+        balanceUsd: charge.balanceUsd,
+        requiredUsd: charge.requiredUsd,
+      }, { status: 402 })
+    } else {
+      return NextResponse.json({
+        error: 'Se requiere una API Key de OpenAI. Ingresa tu key en el formulario, configura una en tu bot de WhatsApp, o pedile al admin que active la key global.'
+      }, { status: 400 })
+    }
   }
 
   const videoId = videoUrl ? extractYouTubeId(videoUrl) : ''
@@ -138,6 +158,10 @@ Genera SOLO el HTML. Nada más.`
 
     if (!res.ok) {
       const err = await res.text()
+      // Si cobramos saldo y la llamada falló, devolver
+      if (charge?.ok && charge.source === 'admin' && charge.chargedUsd) {
+        await refundUserForAI(auth.userId, charge.chargedUsd, 'landing.generate.openai_error')
+      }
       console.error('[LANDING-GEN] OpenAI error:', err)
       return NextResponse.json({ error: `Error OpenAI: ${res.status}` }, { status: 500 })
     }
@@ -150,6 +174,10 @@ Genera SOLO el HTML. Nada más.`
 
     return NextResponse.json({ html })
   } catch (err: unknown) {
+    // Si cobramos saldo y algo crasheó (red, parseo, etc.), devolver
+    if (charge?.ok && charge.source === 'admin' && charge.chargedUsd) {
+      await refundUserForAI(auth.userId, charge.chargedUsd, 'landing.generate.failed')
+    }
     const message = err instanceof Error ? err.message : 'Error generando la landing'
     console.error('[LANDING-GEN] Error:', err)
     return NextResponse.json({ error: message }, { status: 500 })

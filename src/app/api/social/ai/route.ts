@@ -2,9 +2,7 @@ export const dynamic = 'force-dynamic'
 import { NextResponse } from 'next/server'
 import { getAuthUser } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
-import { decrypt } from '@/lib/ads/encryption'
-
-const ENC_KEY = process.env.ADS_ENCRYPTION_KEY || ''
+import { chargeUserForAI, refundUserForAI } from '@/lib/ai-credits'
 
 async function callOpenAI(apiKey: string, model: string, systemPrompt: string, userPrompt: string) {
     const res = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -25,19 +23,36 @@ async function callOpenAI(apiKey: string, model: string, systemPrompt: string, u
 }
 
 export async function POST(req: Request) {
+    let charge: Awaited<ReturnType<typeof chargeUserForAI>> | null = null
+    let userId: string | null = null
     try {
         const user = await getAuthUser()
         if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+        userId = user.id
 
         const { action, content, networks, topic, language = 'es' } = await req.json()
 
+        // Modelo preferido del usuario (si tiene OpenAIConfig); default gpt-4o
         const oaiConfig = await (prisma as any).openAIConfig.findUnique({ where: { userId: user.id } })
-        if (!oaiConfig?.isValid || !oaiConfig.apiKeyEnc) {
-            return NextResponse.json({ error: 'Configura tu API Key de OpenAI en Configuración → IA' }, { status: 400 })
-        }
+        const model = oaiConfig?.model || 'gpt-4o'
 
-        const apiKey = decrypt(oaiConfig.apiKeyEnc, ENC_KEY)
-        const model = oaiConfig.model || 'gpt-4o'
+        // Resolver key + cobrar saldo si aplica (admin key)
+        charge = await chargeUserForAI(user.id, model, `social.ai.${action ?? 'generate'}`)
+        if (!charge.ok) {
+            if (charge.error === 'NO_CREDITS') {
+                return NextResponse.json({
+                    error: 'Sin saldo de IA. Comprá saldo o configurá tu propia API Key.',
+                    code: 'NO_CREDITS',
+                    balanceUsd: charge.balanceUsd,
+                    requiredUsd: charge.requiredUsd,
+                }, { status: 402 })
+            }
+            return NextResponse.json({
+                error: 'No hay API Key disponible. Configurá la tuya en Configuración → IA o pedile al admin que active la global.',
+                code: charge.error,
+            }, { status: 400 })
+        }
+        const apiKey = charge.key
 
         const networkList = (networks || []).join(', ') || 'redes sociales'
 
@@ -69,6 +84,10 @@ export async function POST(req: Request) {
 
         return NextResponse.json({ result })
     } catch (err: any) {
+        // Si llegamos a cobrar saldo y después falló la llamada, devolverlo
+        if (charge?.ok && charge.source === 'admin' && charge.chargedUsd && userId) {
+            await refundUserForAI(userId, charge.chargedUsd, 'social.ai.failed')
+        }
         console.error('[SocialAI]', err)
         return NextResponse.json({ error: err.message || 'Error de IA' }, { status: 500 })
     }
