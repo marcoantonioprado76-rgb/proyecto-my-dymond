@@ -49,6 +49,7 @@ interface CreditsData {
   aiCredits: number
   aiBalanceUsd: number
   preferOwnKey: boolean
+  followupsEnabled: boolean
   adminHasKey: boolean
   ownKey: {
     model: string
@@ -73,6 +74,7 @@ export default function CreditsPage() {
   const [deleting, setDeleting] = useState(false)
   const [msg, setMsg] = useState<{ type: 'ok' | 'err'; text: string } | null>(null)
   const [togglingPref, setTogglingPref] = useState(false)
+  const [togglingFollowups, setTogglingFollowups] = useState(false)
 
   // Compra de créditos
   const [purchases, setPurchases] = useState<PurchaseEntry[]>([])
@@ -205,6 +207,18 @@ export default function CreditsPage() {
       body: JSON.stringify({ preferOwnKey: !data.preferOwnKey }),
     })
     setTogglingPref(false)
+    load()
+  }
+
+  async function toggleFollowups() {
+    if (!data) return
+    setTogglingFollowups(true)
+    await fetch('/api/credits', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ followupsEnabled: !data.followupsEnabled }),
+    })
+    setTogglingFollowups(false)
     load()
   }
 
@@ -468,6 +482,40 @@ export default function CreditsPage() {
             <Loader2 className="w-3 h-3 animate-spin" /> Guardando preferencia...
           </div>
         )}
+      </div>
+
+      {/* Toggle followups automáticos */}
+      <div className="rounded-2xl p-5"
+        style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex-1 min-w-0">
+            <p className="text-[10px] font-black text-white/40 mb-1.5 uppercase tracking-[0.25em]">
+              Seguimientos automáticos
+            </p>
+            <p className="text-sm font-bold text-white leading-snug">
+              {data?.followupsEnabled ? 'Activados' : 'Pausados'}
+            </p>
+            <p className="text-[11px] mt-1 leading-relaxed" style={{ color: 'rgba(255,255,255,0.45)' }}>
+              Cuando un cliente queda sin responder, el bot envía 1 mensaje a los 15 min y otro cada 3 días.
+              {' '}{data?.followupsEnabled
+                ? <b className="text-white/80">Cada seguimiento consume tokens de IA.</b>
+                : <b className="text-white/80">Mientras estén pausados, NO se consume saldo en automático.</b>}
+            </p>
+          </div>
+          <button
+            onClick={toggleFollowups}
+            disabled={togglingFollowups}
+            className="shrink-0 flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-black uppercase tracking-[0.14em] transition-all disabled:opacity-50"
+            style={{
+              background: data?.followupsEnabled ? 'rgba(74,222,128,0.15)' : 'rgba(248,113,113,0.10)',
+              border: `1px solid ${data?.followupsEnabled ? 'rgba(74,222,128,0.40)' : 'rgba(248,113,113,0.30)'}`,
+              color: data?.followupsEnabled ? '#4ade80' : '#fca5a5',
+            }}>
+            {togglingFollowups
+              ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
+              : data?.followupsEnabled ? 'Desactivar' : 'Activar'}
+          </button>
+        </div>
       </div>
 
       {/* My OpenAI API Key */}

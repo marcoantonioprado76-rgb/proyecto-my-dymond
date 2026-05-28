@@ -15,7 +15,7 @@ export async function GET() {
   const [dbUser, openaiConfig, adminConfig, globalKeySetting, recentUsage] = await Promise.all([
     prisma.user.findUnique({
       where: { id: user.id },
-      select: { aiCredits: true, aiBalanceUsd: true, preferOwnKey: true },
+      select: { aiCredits: true, aiBalanceUsd: true, preferOwnKey: true, followupsEnabled: true },
     }),
     (prisma as any).openAIConfig.findUnique({ where: { userId: user.id } }),
     (prisma as any).adminConfig.findUnique({ where: { id: 'global' } }),
@@ -23,15 +23,26 @@ export async function GET() {
     (prisma as any).aIUsageLog.findMany({
       where: { userId: user.id },
       orderBy: { createdAt: 'desc' },
-      take: 20,
-      select: { id: true, model: true, reason: true, costUsd: true, createdAt: true },
+      take: 50,
+      select: { id: true, model: true, reason: true, costUsd: true, createdAt: true, metadata: true },
     }),
   ])
+
+  // Total gastado en los últimos 30 días (solo cargos, no compras)
+  const last30 = await prisma.$queryRaw<Array<{ total: string }>>`
+    SELECT COALESCE(SUM(cost_usd), 0)::text AS total
+    FROM ai_usage_logs
+    WHERE user_id = ${user.id}::uuid
+      AND cost_usd > 0
+      AND created_at >= NOW() - INTERVAL '30 days'
+  `
 
   return NextResponse.json({
     aiCredits: dbUser?.aiCredits ?? 0,
     aiBalanceUsd: dbUser?.aiBalanceUsd ? Number(dbUser.aiBalanceUsd) : 0,
     preferOwnKey: dbUser?.preferOwnKey ?? false,
+    // NULL en DB = activado (default histórico para usuarios viejos sin la columna)
+    followupsEnabled: dbUser?.followupsEnabled ?? true,
     // Hay key admin global si está en AppSetting (nueva forma) o en AdminConfig (legacy)
     adminHasKey: !!(globalKeySetting?.value) || !!(adminConfig?.openaiKeyEnc),
     ownKey: openaiConfig
@@ -46,20 +57,25 @@ export async function GET() {
       ...u,
       costUsd: Number(u.costUsd),
     })),
+    spent30dUsd: Number(last30[0]?.total ?? 0),
   })
 }
 
-// PUT — toggle preferOwnKey
+// PUT — toggle preferOwnKey y/o followupsEnabled
 export async function PUT(req: Request) {
   const user = await getAuthUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const { preferOwnKey } = await req.json()
+  const body = await req.json()
+  const data: Record<string, any> = {}
+  if (typeof body?.preferOwnKey === 'boolean') data.preferOwnKey = body.preferOwnKey
+  if (typeof body?.followupsEnabled === 'boolean') data.followupsEnabled = body.followupsEnabled
 
-  await prisma.user.update({
-    where: { id: user.id },
-    data: { preferOwnKey: Boolean(preferOwnKey) },
-  })
+  if (Object.keys(data).length === 0) {
+    return NextResponse.json({ error: 'Nada que actualizar' }, { status: 400 })
+  }
+
+  await prisma.user.update({ where: { id: user.id }, data })
 
   return NextResponse.json({ success: true })
 }

@@ -30,7 +30,12 @@ export async function processFollowUps() {
             botDisabled: false,
             followUp1At: { lte: now },
             followUp1Sent: false,
-            bot: { status: 'ACTIVE' },
+            bot: {
+                status: 'ACTIVE',
+                // Saltear conversaciones cuyo dueño tiene followups desactivados.
+                // NULL en la columna = activado (default histórico).
+                user: { OR: [{ followupsEnabled: null }, { followupsEnabled: true }] },
+            },
         },
         include: {
             bot: { include: { secret: true } },
@@ -45,7 +50,12 @@ export async function processFollowUps() {
             botDisabled: false,
             followUp2At: { lte: now },
             followUp2Sent: false,
-            bot: { status: 'ACTIVE' },
+            bot: {
+                status: 'ACTIVE',
+                // Saltear conversaciones cuyo dueño tiene followups desactivados.
+                // NULL en la columna = activado (default histórico).
+                user: { OR: [{ followupsEnabled: null }, { followupsEnabled: true }] },
+            },
         },
         include: {
             bot: { include: { secret: true } },

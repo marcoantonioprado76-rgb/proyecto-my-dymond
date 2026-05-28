@@ -28,6 +28,11 @@ model User {
   /// Balance de IA en USD con 4 decimales (ej: 12.3456). Reemplaza progresivamente a aiCredits.
   aiBalanceUsd        Decimal              @default(0) @db.Decimal(10, 4) @map("ai_balance_usd")
   preferOwnKey        Boolean              @default(false) @map("prefer_own_key")
+  /// Última vez que se envió email "saldo bajo". Throttle para no spamear (24h).
+  lowBalanceWarnedAt  DateTime?            @map("low_balance_warned_at")
+  /// Toggle global del usuario: si está en false, NO se procesan followups de ninguno
+  /// de sus bots (evita consumo automático no deseado). NULL = activado (default).
+  followupsEnabled    Boolean?             @map("followups_enabled")
   createdAt           DateTime             @default(now()) @map("created_at")
   updatedAt           DateTime             @updatedAt @map("updated_at")
   bots                Bot[]

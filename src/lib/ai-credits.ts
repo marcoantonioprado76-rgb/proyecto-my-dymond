@@ -34,6 +34,11 @@ import { decrypt } from '@/lib/ads/encryption'
 
 const ENC_KEY = process.env.ADS_ENCRYPTION_KEY || ''
 
+// Umbral de alerta "saldo bajo": cuando queda menos de $1 USD avisamos al usuario
+// UNA vez por ventana de throttle (24h).
+const LOW_BALANCE_THRESHOLD_USD = 1.0
+const LOW_BALANCE_THROTTLE_MS = 24 * 60 * 60 * 1000
+
 // ─── Tarifas oficiales de OpenAI por TOKEN (USD por 1M tokens) ──────────────
 //
 // Markup 1:1 — cobramos exactamente lo que cobra OpenAI.
@@ -312,10 +317,46 @@ async function chargeAtomic(
 
             return { charged: costUsd, remaining: Math.max(0, before - costUsd) }
         })
+
+        // Disparar email de "saldo bajo" si quedamos por debajo del umbral.
+        // Fire-and-forget, throttled a 24h por usuario para no spamear.
+        if (result.remaining > 0 && result.remaining < LOW_BALANCE_THRESHOLD_USD) {
+            maybeSendLowBalanceWarning(userId, result.remaining).catch(() => {})
+        }
+
         return { ok: true, chargedUsd: result.charged, remainingUsd: result.remaining }
     } catch (e: any) {
         console.error('[ai-credits] chargeAtomic error:', e?.message ?? e)
         return { ok: false, error: 'INTERNAL' }
+    }
+}
+
+/**
+ * Envía email "saldo bajo" si:
+ *   - El usuario tiene email registrado.
+ *   - No se envió aviso en las últimas 24h (throttle).
+ * Marca `users.low_balance_warned_at` para evitar el siguiente envío.
+ */
+async function maybeSendLowBalanceWarning(userId: string, remainingUsd: number): Promise<void> {
+    const u = await prisma.user.findUnique({
+        where: { id: userId },
+        select: { email: true, fullName: true, lowBalanceWarnedAt: true },
+    })
+    if (!u?.email) return
+    const lastWarned = u.lowBalanceWarnedAt ? u.lowBalanceWarnedAt.getTime() : 0
+    if (Date.now() - lastWarned < LOW_BALANCE_THROTTLE_MS) return  // throttle 24h
+
+    // Marcar PRIMERO para evitar carrera donde dos cobros concurrentes manden 2 emails
+    await prisma.user.update({
+        where: { id: userId },
+        data: { lowBalanceWarnedAt: new Date() },
+    }).catch(() => {})
+
+    try {
+        const { sendLowBalanceWarningEmail } = await import('./email')
+        await sendLowBalanceWarningEmail(u.email, u.fullName ?? '', remainingUsd)
+    } catch (e) {
+        console.error('[ai-credits] maybeSendLowBalanceWarning email failed:', e)
     }
 }
 

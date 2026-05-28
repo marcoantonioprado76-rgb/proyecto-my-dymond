@@ -1294,6 +1294,67 @@ export async function sendCreditsExhaustedEmail(
   }
 }
 
+/**
+ * Email de alerta cuando el saldo USD del usuario bajó cerca de 0.
+ * Disparado UNA sola vez por throttle (24h) desde chargeAtomic.
+ */
+export async function sendLowBalanceWarningEmail(
+  email: string,
+  fullName: string,
+  balanceUsd: number,
+): Promise<boolean> {
+  const balanceStr = balanceUsd.toFixed(4)
+  const content = `
+    <p style="color:#F59E0B;font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;margin:0 0 16px;">⚠️ Saldo bajo de IA</p>
+
+    <h1 style="color:#ffffff;font-size:22px;font-weight:800;margin:0 0 10px;letter-spacing:-0.3px;line-height:1.3;">
+      Tu saldo está por agotarse
+    </h1>
+    <p style="color:rgba(255,255,255,0.45);font-size:13px;margin:0 0 24px;line-height:1.8;">
+      Hola <strong style="color:rgba(255,255,255,0.7);">${fullName}</strong>, te queda apenas
+      <strong style="color:#F59E0B;">$${balanceStr} USD</strong> de saldo. Cuando llegue a cero,
+      tu bot dejará de responder a los clientes hasta que recargues.
+    </p>
+
+    <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:24px;">
+      <tr>
+        <td style="background:rgba(245,158,11,0.05);border:1px solid rgba(245,158,11,0.2);border-radius:12px;padding:18px 20px;">
+          <p style="color:rgba(255,255,255,0.7);font-size:13px;line-height:1.7;margin:0;">
+            Si tenés tu propia API Key de OpenAI configurada, no hay nada que hacer — tu bot va a seguir
+            funcionando con esa. Si en cambio estás usando el saldo del sistema, te conviene recargar ya
+            para evitar que el bot quede mudo a mitad de una conversación.
+          </p>
+        </td>
+      </tr>
+    </table>
+
+    <table cellpadding="0" cellspacing="0">
+      <tr>
+        <td style="border-radius:10px;background:linear-gradient(135deg,#F59E0B 0%,#D203DD 100%);">
+          <a href="${APP_URL}/dashboard/wallet"
+             style="display:inline-block;color:#000000;text-decoration:none;font-weight:700;font-size:13px;padding:12px 28px;border-radius:10px;letter-spacing:0.5px;">
+            Recargar saldo &rarr;
+          </a>
+        </td>
+      </tr>
+    </table>
+  `
+
+  try {
+    await transporter.sendMail({
+      from: `"MY DIAMOND" <${process.env.GMAIL_USER}>`,
+      to: email,
+      subject: `⚠️ Saldo IA bajo — Quedan $${balanceStr} USD`,
+      html: emailWrapper(content, '#F59E0B'),
+    })
+    console.log(`[EMAIL] Low balance warning sent to ${email} (balance: $${balanceStr})`)
+    return true
+  } catch (err) {
+    console.error('[EMAIL] Low balance warning error:', err)
+    return false
+  }
+}
+
 export async function sendBotSaleReportEmail(
   ownerEmail: string,
   ownerName: string,
