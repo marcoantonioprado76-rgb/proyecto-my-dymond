@@ -135,6 +135,72 @@ Reglas:
   }
 }
 
+/**
+ * Versión de analyzeImage que también retorna los tokens consumidos.
+ * Usar cuando se cobra al balance USD del usuario por la llamada.
+ */
+export async function analyzeImageWithUsage(
+  imageUrl: string,
+  apiKey: string,
+): Promise<{ text: string; promptTokens: number; completionTokens: number }> {
+  const controller = new AbortController()
+  const timeout = setTimeout(() => controller.abort(), 30000)
+  try {
+    const res = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      signal: controller.signal,
+      body: JSON.stringify({
+        model: 'gpt-4o-mini',
+        messages: [
+          {
+            role: 'user',
+            content: [
+              {
+                type: 'text',
+                text: `Analiza esta imagen de forma completa y universal. Tu tarea:
+
+1. Detecta claramente qué aparece en la imagen.
+2. Describe objetos, personas, texto visible, colores y contexto general.
+3. Identifica posibles usos, problemas, detalles importantes o elementos relevantes.
+4. Explica situaciones, acciones, características visuales y cualquier cosa útil para comprender la imagen.
+5. Si contiene texto, transcríbelo con exactitud.
+6. Si es una imagen técnica (código, interfaz, error, pantalla), analízala técnicamente y explica qué significa o qué puede estar fallando.
+7. Si es un documento (factura, recibo, contrato, formulario), extrae los datos clave.
+
+Reglas:
+- Usa lenguaje claro y preciso.
+- No inventes nada que no se vea claramente.
+- Si falta información, indícalo.
+- Analiza la imagen completa, no solo partes.`,
+              },
+              { type: 'image_url', image_url: { url: imageUrl, detail: 'high' } },
+            ],
+          },
+        ],
+        max_tokens: 800,
+      }),
+    })
+
+    if (!res.ok) {
+      const err = await res.text()
+      throw new Error(`Vision error ${res.status}: ${err}`)
+    }
+
+    const data = await res.json()
+    return {
+      text: (data.choices?.[0]?.message?.content as string) || '',
+      promptTokens: (data.usage?.prompt_tokens as number) ?? 0,
+      completionTokens: (data.usage?.completion_tokens as number) ?? 0,
+    }
+  } finally {
+    clearTimeout(timeout)
+  }
+}
+
 // ─── Chat Completion (forces JSON output) ────────────────────────────────────
 
 function normalizeFotos(raw: unknown): string[] {

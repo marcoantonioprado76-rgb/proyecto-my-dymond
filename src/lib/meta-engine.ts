@@ -10,7 +10,12 @@
 
 import { prisma } from './prisma'
 import { decrypt } from './crypto'
-import { transcribeAudio, analyzeImage, chat, ChatMessage } from './openai'
+import { transcribeAudio, analyzeImageWithUsage, chatWithUsage, ChatMessage } from './openai'
+import {
+  resolveOpenAIKey,
+  chargeForChatUsage,
+  chargeForWhisperSeconds,
+} from './ai-credits'
 import { sendMetaText, sendMetaImage, sendMetaVideo, markMetaAsRead } from './meta'
 import { buildSystemPrompt, detectIdentifiedProduct, enforceCharLimits, extractSentUrls } from './bot-engine'
 import { createNotification } from './notifications'
@@ -92,15 +97,16 @@ export class MetaBotEngine {
       return
     }
     let openaiKey = bot.secret.openaiApiKeyEnc ? decrypt(bot.secret.openaiApiKeyEnc) : ''
-    // Si el bot no tiene key propia, cobrar saldo del propietario y usar key del admin
+    // Si el bot no tiene key propia → resolver admin key (sólo si hay saldo USD > 0).
+    // El cobro se hace DESPUÉS de cada llamada, por tokens / segundos reales.
+    let keySource: 'own' | 'admin' = 'own'
     if (!openaiKey && bot.userId) {
-      const { chargeUserForAI } = await import('./ai-credits')
-      const model = (bot as any).aiModel || 'gpt-4o'
-      const charge = await chargeUserForAI(bot.userId, model, 'meta-bot.message', { botId: bot.id })
-      if (charge.ok) {
-        openaiKey = charge.key
+      const resolved = await resolveOpenAIKey(bot.userId)
+      if (resolved.ok) {
+        openaiKey = resolved.key
+        keySource = resolved.source
       } else {
-        console.warn(`[META] Bot ${botId} sin key propia y sin saldo IA (${charge.error})`)
+        console.warn(`[META] Bot ${botId} sin key propia (${resolved.error}). Mensaje ignorado.`)
         return
       }
     }
@@ -148,9 +154,21 @@ export class MetaBotEngine {
       } else if (type === 'audio' && norm.audioUrl) {
         resolvedType = 'audio'
         userText = await transcribeAudio(norm.audioUrl, openaiKey)
+        // Cobrar whisper por segundos si usamos admin key. Sin duración Meta no
+        // expone segundos, así que pasamos 30s por defecto (chargeForWhisperSeconds
+        // aplica un piso mínimo de 1s).
+        if (keySource === 'admin' && bot.userId && userText) {
+          chargeForWhisperSeconds(bot.userId, 30, 'meta-bot.audio', { botId: bot.id })
+            .catch(e => console.error('[META] chargeForWhisperSeconds error:', e))
+        }
       } else if (type === 'image' && norm.imageUrl) {
         resolvedType = 'image'
-        userText = `[Imagen enviada] ${await analyzeImage(norm.imageUrl, openaiKey)}`
+        const imgResult = await analyzeImageWithUsage(norm.imageUrl, openaiKey)
+        userText = `[Imagen enviada] ${imgResult.text}`
+        if (keySource === 'admin' && bot.userId) {
+          chargeForChatUsage(bot.userId, 'gpt-4o-mini', imgResult.promptTokens, imgResult.completionTokens, 'meta-bot.image', { botId: bot.id })
+            .catch(e => console.error('[META] chargeForChatUsage(image) error:', e))
+        }
       }
     } catch (e) {
       console.error('[META] Error procesando contenido:', e)
@@ -301,10 +319,16 @@ export class MetaBotEngine {
     )
 
     // 14. Call OpenAI
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let response: Awaited<ReturnType<typeof chat>>
+    const aiModel = (bot as any).aiModel || 'gpt-4o'
+    let response: Awaited<ReturnType<typeof chatWithUsage>>['response']
     try {
-      response = await chat(systemPrompt, chatHistory, openaiKey, (bot as any).aiModel || 'gpt-4o')
+      const result = await chatWithUsage(systemPrompt, chatHistory, openaiKey, aiModel)
+      response = result.response
+      // Cobrar tokens reales solo si usamos admin key. Fire-and-forget.
+      if (keySource === 'admin' && bot.userId) {
+        chargeForChatUsage(bot.userId, aiModel, result.promptTokens, result.completionTokens, 'meta-bot.message', { botId: bot.id })
+          .catch(e => console.error('[META] chargeForChatUsage error:', e))
+      }
     } catch (aiErr: any) {
       const errMsg: string = aiErr?.message || ''
       console.error(`[META] OpenAI error para ${senderId}:`, errMsg)

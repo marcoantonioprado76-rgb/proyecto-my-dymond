@@ -16,7 +16,7 @@ import { Boom } from '@hapi/boom'
 import path from 'path'
 import fs from 'fs'
 import { prisma } from '@/lib/prisma'
-import { chat } from '@/lib/openai'
+import { chatWithUsage } from '@/lib/openai'
 import { decrypt } from '@/lib/crypto'
 import { toDataURL } from 'qrcode'
 import { processFollowUps } from './follow-up-worker'
@@ -120,21 +120,29 @@ async function handleMessage(
     // Leer credenciales frescas de BD en cada mensaje (nunca desde memoria)
     const freshSecret = await prisma.botSecret.findUnique({ where: { botId: conn.botId } })
 
-    // Resolver openaiKey con el mismo patrón que bot-engine.ts:
+    // Resolver openaiKey:
     //   1. Si el bot tiene key propia → usarla (sin cobrar saldo).
-    //   2. Si no → cobrar saldo USD del propietario y usar la key admin global.
+    //   2. Si no → usar la admin key SOLO si el dueño tiene saldo USD > 0.
+    // El cobro se hace DESPUÉS de cada llamada exitosa por tokens / segundos / imágenes
+    // reales (no flat por llamada).
     let openaiKey = ''
+    let keySource: 'own' | 'admin' = 'own'
     if (freshSecret?.openaiApiKeyEnc) {
         try { openaiKey = decrypt(freshSecret.openaiApiKeyEnc) } catch { openaiKey = '' }
     }
     if (!openaiKey && botStatus.userId) {
-        const { chargeUserForAI } = await import('./ai-credits')
-        const model = botStatus.aiModel || 'gpt-4o'
-        const charge = await chargeUserForAI(botStatus.userId, model, 'baileys.message', { botId: conn.botId })
-        if (charge.ok) {
-            openaiKey = charge.key
+        const { resolveOpenAIKey } = await import('./ai-credits')
+        const resolved = await resolveOpenAIKey(botStatus.userId)
+        if (resolved.ok) {
+            openaiKey = resolved.key
+            keySource = resolved.source
         } else {
-            console.warn(`[BAILEYS] Bot ${conn.botId} sin key propia y sin saldo IA del propietario (${charge.error})`)
+            // Sin saldo o sin key admin → bot queda mudo (no procesa el mensaje).
+            // Notificar UNA vez al dueño que se quedó sin saldo.
+            if (resolved.error === 'NO_CREDITS') {
+                notifyCreditsExhausted(botStatus.userId, conn.botName).catch(() => {})
+            }
+            console.warn(`[BAILEYS] Bot ${conn.botId} sin key propia (${resolved.error}). Mensaje ignorado.`)
             return
         }
     }
@@ -171,6 +179,13 @@ async function handleMessage(
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const blob = new Blob([buffer as any], { type: 'audio/ogg' })
             content = await transcribeAudio(blob, openaiKey)
+            // Cobrar whisper si usamos admin key. Duración de WhatsApp viene en `seconds`.
+            if (keySource === 'admin' && botStatus.userId && content) {
+                const audioSeconds = Number(msgContent.audioMessage.seconds) || 30
+                const { chargeForWhisperSeconds } = await import('./ai-credits')
+                chargeForWhisperSeconds(botStatus.userId, audioSeconds, 'baileys.audio', { botId: conn.botId })
+                    .catch(e => console.error('[BAILEYS] chargeForWhisperSeconds error:', e))
+            }
         } catch {
             content = '[Audio recibido - no se pudo transcribir]'
         }
@@ -179,11 +194,17 @@ async function handleMessage(
         try {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const buffer = await downloadMediaMessage(msg as any, 'buffer', {})
-            const { analyzeImage } = await import('@/lib/openai')
+            const { analyzeImageWithUsage } = await import('@/lib/openai')
             const b64 = (buffer as Buffer).toString('base64')
             const dataUrl = `data:image/jpeg;base64,${b64}`
-            const analysis = await (analyzeImage as any)(dataUrl, openaiKey)
+            const { text: analysis, promptTokens, completionTokens } = await analyzeImageWithUsage(dataUrl, openaiKey)
             content = `[Imagen recibida] ${analysis} ${msgContent.imageMessage.caption ? `| Pie de foto: ${msgContent.imageMessage.caption}` : ''}`
+            // Cobrar gpt-4o-mini (lo que usa analyzeImage) si usamos admin key
+            if (keySource === 'admin' && botStatus.userId) {
+                const { chargeForChatUsage } = await import('./ai-credits')
+                chargeForChatUsage(botStatus.userId, 'gpt-4o-mini', promptTokens, completionTokens, 'baileys.image', { botId: conn.botId })
+                    .catch(e => console.error('[BAILEYS] chargeForChatUsage(image) error:', e))
+            }
         } catch {
             content = msgContent.imageMessage.caption || '[Imagen recibida - error al analizar]'
         }
@@ -324,9 +345,18 @@ async function handleMessage(
         identifiedProductIds,
     )
 
-    let response: Awaited<ReturnType<typeof chat>>
+    const aiModel = (bot as any).aiModel || 'gpt-4o'
+    let response: Awaited<ReturnType<typeof chatWithUsage>>['response']
     try {
-        response = await chat(systemPrompt, chatHistory, openaiKey, (bot as any).aiModel || 'gpt-4o')
+        const result = await chatWithUsage(systemPrompt, chatHistory, openaiKey, aiModel)
+        response = result.response
+        // Cobrar tokens reales SOLO si usamos admin key. Fire-and-forget: si falla el cobro,
+        // se loguea pero NO bloquea la respuesta al cliente.
+        if (keySource === 'admin' && botStatus.userId) {
+            const { chargeForChatUsage } = await import('./ai-credits')
+            chargeForChatUsage(botStatus.userId, aiModel, result.promptTokens, result.completionTokens, 'baileys.message', { botId: conn.botId })
+                .catch(e => console.error('[BAILEYS] chargeForChatUsage error:', e))
+        }
     } catch (aiErr: any) {
         const errMsg: string = aiErr?.message || ''
         console.error(`[BAILEYS] OpenAI error para ${userPhone}:`, errMsg)

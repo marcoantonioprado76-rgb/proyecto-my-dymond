@@ -1,15 +1,32 @@
 /**
  * AI Credits — gestión del balance USD para el uso de OpenAI con la key del admin.
  *
- * Reglas:
- *  - Si el usuario tiene preferOwnKey=true y tiene una key propia válida, se usa su key
- *    y NO se descuenta nada del balance USD.
- *  - Si no, se usa la key global del admin (AppSetting 'openai_global_key') y se descuenta
- *    el costo del modelo del balance USD del usuario.
- *  - Si el balance es insuficiente, se bloquea la llamada y se devuelve NO_CREDITS.
+ * Filosofía: el saldo USD del usuario funciona como una API key prepagada de OpenAI.
+ * Se cobra DESPUÉS de la llamada, por tokens reales usados, con tarifas oficiales.
  *
- * El descuento se hace en una transacción con FOR UPDATE para evitar race conditions
- * cuando hay múltiples llamadas concurrentes del mismo usuario.
+ * Reglas:
+ *  - Si el usuario tiene preferOwnKey=true y key propia válida, se usa su key y NO se cobra.
+ *  - Si no, se usa la key global del admin (AppSetting 'openai_global_key' o AdminConfig
+ *    legacy) y se descuenta el costo exacto en tokens/segundos/imágenes.
+ *  - Pre-check: si el balance es <= 0 Y no hay key propia, se bloquea ANTES de la llamada
+ *    (bot queda mudo / endpoint devuelve NO_CREDITS).
+ *  - El cobro post-llamada usa un UPDATE atómico con SELECT … FOR UPDATE para evitar
+ *    race conditions. El balance puede quedar ligeramente negativo en la última llamada
+ *    (porque cobramos por tokens reales después del hecho), pero la siguiente llamada
+ *    queda bloqueada por el pre-check.
+ *
+ * API expuesta:
+ *  - resolveOpenAIKey(userId)        → resuelve key (propia o admin) sin cobrar
+ *  - hasBalanceOrOwnKey(userId)      → boolean rápido pre-check
+ *  - chargeForChatUsage(...)         → cobro por tokens reales (chat / embedding)
+ *  - chargeForWhisperSeconds(...)    → cobro por segundos de audio transcrito
+ *  - chargeForImage(...)             → cobro por imagen generada (DALL-E)
+ *  - refundUserForAI(...)            → devolver un cobro (uso interno por fallos)
+ *  - getUserAIBalanceUsd(userId)     → lectura simple del balance
+ *
+ * Wrappers @deprecated (no romper endpoints HTTP no migrados):
+ *  - chargeUserForAI(userId, model, reason)  → flat por llamada (legacy)
+ *  - costForModel(model)                     → costo flat (legacy)
  */
 
 import { prisma } from '@/lib/prisma'
@@ -17,220 +34,294 @@ import { decrypt } from '@/lib/ads/encryption'
 
 const ENC_KEY = process.env.ADS_ENCRYPTION_KEY || ''
 
-/**
- * Costo por llamada/uso de cada modelo, en USD (defaults).
- * Valores con markup razonable sobre el costo real de OpenAI.
- * El admin puede sobrescribir estos valores vía AppSetting con key
- * "ai_model_cost_usd" (JSON: { "gpt-4o": 0.05, "gpt-4o-mini": 0.01, ... }).
- */
-export const DEFAULT_MODEL_COST_USD: Record<string, number> = {
-    // Chat models
-    'gpt-4o':         0.05,
-    'gpt-4o-mini':    0.01,
-    'gpt-4-turbo':    0.05,
-    'gpt-3.5-turbo':  0.01,
-    // Audio
-    'whisper-1':      0.02,
-    // Images
-    'dall-e-3':       0.10,   // standard
-    'dall-e-3-hd':    0.20,
-    'gpt-image-1':    0.10,
-    // Embeddings (futuro)
-    'text-embedding-3-small': 0.001,
-    'text-embedding-3-large': 0.005,
+// ─── Tarifas oficiales de OpenAI por TOKEN (USD por 1M tokens) ──────────────
+//
+// Markup 1:1 — cobramos exactamente lo que cobra OpenAI.
+//
+// Estos valores se pueden sobrescribir vía AppSetting con key
+// "ai_model_token_pricing" (JSON: { "gpt-4o": { "input": 2.5, "output": 10 }, ... }).
+//
+// Para modelos NO listados acá, el fallback es gpt-4o-mini.
+export interface TokenPricing { input: number; output: number }
+export const DEFAULT_TOKEN_PRICING: Record<string, TokenPricing> = {
+    // Modelos GPT-4
+    'gpt-4o':           { input: 2.50,  output: 10.00 },
+    'gpt-4o-mini':      { input: 0.15,  output: 0.60  },
+    'gpt-4-turbo':      { input: 10.00, output: 30.00 },
+    'gpt-3.5-turbo':    { input: 0.50,  output: 1.50  },
+    // Modelos GPT-5 — placeholder (mismas tarifas que gpt-4o; admin puede ajustar)
+    'gpt-5.1':          { input: 2.50,  output: 10.00 },
+    'gpt-5.2':          { input: 2.50,  output: 10.00 },
+    // Embeddings
+    'text-embedding-3-small': { input: 0.020, output: 0 },
+    'text-embedding-3-large': { input: 0.130, output: 0 },
 }
 
-// Backwards-compat: algunos lugares aún pueden importar MODEL_COST_USD
-export const MODEL_COST_USD = DEFAULT_MODEL_COST_USD
+// Whisper-1: $0.006 por minuto de audio. Internamente cobramos por segundo.
+export const WHISPER_USD_PER_SECOND = 0.006 / 60   // ≈ $0.0001/s
 
-// Cache en memoria de los costos custom (se refresca cada 60s)
-let cachedCosts: Record<string, number> | null = null
+// DALL-E 3 (USD por imagen generada)
+export const IMAGE_PRICING: Record<string, number> = {
+    'dall-e-3':           0.040,  // standard 1024×1024
+    'dall-e-3-hd':        0.080,  // HD 1024×1024
+    'dall-e-3-wide':      0.080,  // 1792×1024 standard
+    'dall-e-3-wide-hd':   0.120,  // 1792×1024 HD
+    'gpt-image-1':        0.040,  // alias del nuevo image gen
+}
+
+// ─── Cache de tarifas custom (60s) ──────────────────────────────────────────
+
+let cachedTokenPricing: Record<string, TokenPricing> | null = null
 let cachedAt = 0
 const CACHE_TTL_MS = 60_000
 
-async function getEffectiveCosts(): Promise<Record<string, number>> {
+async function getEffectiveTokenPricing(): Promise<Record<string, TokenPricing>> {
     const now = Date.now()
-    if (cachedCosts && now - cachedAt < CACHE_TTL_MS) return cachedCosts
+    if (cachedTokenPricing && now - cachedAt < CACHE_TTL_MS) return cachedTokenPricing
     try {
         const setting = await (prisma as any).appSetting.findUnique({
-            where: { key: 'ai_model_cost_usd' },
+            where: { key: 'ai_model_token_pricing' },
             select: { value: true },
         })
         if (setting?.value) {
             const parsed = JSON.parse(setting.value)
             if (parsed && typeof parsed === 'object') {
-                // Merge: defaults + overrides del admin
-                const merged: Record<string, number> = { ...DEFAULT_MODEL_COST_USD, ...parsed }
-                cachedCosts = merged
+                const merged: Record<string, TokenPricing> = { ...DEFAULT_TOKEN_PRICING, ...parsed }
+                cachedTokenPricing = merged
                 cachedAt = now
                 return merged
             }
         }
-    } catch {
-        // Si falla la lectura, caemos a defaults
-    }
-    const merged: Record<string, number> = { ...DEFAULT_MODEL_COST_USD }
-    cachedCosts = merged
+    } catch { /* fallthrough a defaults */ }
+    const merged: Record<string, TokenPricing> = { ...DEFAULT_TOKEN_PRICING }
+    cachedTokenPricing = merged
     cachedAt = now
     return merged
 }
 
-/** Invalida el cache de costos (llamar después de que el admin edite los valores). */
 export function invalidateCostCache() {
-    cachedCosts = null
+    cachedTokenPricing = null
     cachedAt = 0
 }
 
-export async function costForModel(model: string): Promise<number> {
-    const costs = await getEffectiveCosts()
-    return costs[model] ?? costs['gpt-4o-mini'] ?? 0.01
+async function getTokenPricingFor(model: string): Promise<TokenPricing> {
+    const all = await getEffectiveTokenPricing()
+    return all[model] ?? all['gpt-4o-mini'] ?? DEFAULT_TOKEN_PRICING['gpt-4o-mini']
 }
 
-export type AIChargeOk = {
+// ─── Tipos del API ──────────────────────────────────────────────────────────
+
+export type ResolveKeyOk = {
     ok: true
     key: string
-    /** 'own' = usa key del usuario (sin descuento); 'admin' = usa key admin (descontó balance) */
+    /** 'own' = key del usuario (no cobrar); 'admin' = key global (cobrar después) */
     source: 'own' | 'admin'
-    /** Balance USD restante (solo cuando source = 'admin') */
-    remainingUsd?: number
-    /** Costo cobrado (solo cuando source = 'admin') */
-    chargedUsd?: number
 }
-
-export type AIChargeError = {
+export type ResolveKeyError = {
     ok: false
     error: 'NO_CREDITS' | 'NO_KEY' | 'INTERNAL'
-    /** Balance USD actual cuando error = NO_CREDITS */
     balanceUsd?: number
-    /** Costo requerido cuando error = NO_CREDITS */
-    requiredUsd?: number
 }
 
+export type ChargeOk = { ok: true; chargedUsd: number; remainingUsd: number }
+export type ChargeError = { ok: false; error: 'INTERNAL' }
+export type ChargeResult = ChargeOk | ChargeError
+
+// ─── Lectura privada de claves admin (2 fuentes legacy) ─────────────────────
+
+async function readAdminApiKey(): Promise<string | null> {
+    const [globalSetting, adminConfig] = await Promise.all([
+        (prisma as any).appSetting.findUnique({
+            where: { key: 'openai_global_key' },
+            select: { value: true },
+        }),
+        (prisma as any).adminConfig.findUnique({
+            where: { id: 'global' },
+            select: { openaiKeyEnc: true },
+        }),
+    ])
+    const enc = globalSetting?.value || adminConfig?.openaiKeyEnc
+    if (!enc) return null
+    try { return decrypt(enc, ENC_KEY) } catch { return null }
+}
+
+// ─── API pública nueva ──────────────────────────────────────────────────────
+
 /**
- * Obtiene la key correcta para usar y, si aplica, descuenta del balance USD del usuario.
- *
- * @param userId       UUID del usuario que dispara la llamada
- * @param model        Modelo de OpenAI a usar (para calcular costo)
- * @param reason       Identificador del uso (ej: "ads.copies", "whatsapp.chat") para auditoría
- * @param metadata     Metadata extra opcional para el log de uso
+ * Resuelve qué key usar (propia o admin) y verifica que haya saldo si toca admin.
+ * NO descuenta nada — eso lo hace chargeForChatUsage / chargeForWhisperSeconds /
+ * chargeForImage después de la llamada exitosa.
  */
-export async function chargeUserForAI(
-    userId: string,
-    model: string,
-    reason: string,
-    metadata?: Record<string, any>,
-): Promise<AIChargeOk | AIChargeError> {
+export async function resolveOpenAIKey(userId: string): Promise<ResolveKeyOk | ResolveKeyError> {
     try {
-        // 1) Leer config del usuario y key global SIN transacción (lectura barata).
-        //    La key admin puede estar en 2 lugares por compatibilidad histórica:
-        //      - AppSetting('openai_global_key')  (forma nueva)
-        //      - AdminConfig(id='global').openaiKeyEnc  (legacy del panel admin actual)
-        //    Leemos ambos y usamos el primero que tenga valor.
-        const [userRow, ownConfig, globalSetting, adminConfig] = await Promise.all([
+        const [userRow, ownConfig] = await Promise.all([
             prisma.user.findUnique({
                 where: { id: userId },
-                select: { preferOwnKey: true },
+                select: { preferOwnKey: true, aiBalanceUsd: true },
             }),
             (prisma as any).openAIConfig.findUnique({
                 where: { userId },
                 select: { apiKeyEnc: true, isValid: true },
             }),
-            (prisma as any).appSetting.findUnique({
-                where: { key: 'openai_global_key' },
-                select: { value: true },
-            }),
-            (prisma as any).adminConfig.findUnique({
-                where: { id: 'global' },
-                select: { openaiKeyEnc: true },
-            }),
         ])
 
         if (!userRow) return { ok: false, error: 'INTERNAL' }
 
-        // 2) Si el usuario prefiere su propia key y la tiene válida, usar la suya sin descontar
+        // Si el usuario prefiere su propia key y la tiene válida → usarla sin descontar
         if (userRow.preferOwnKey && ownConfig?.isValid && ownConfig.apiKeyEnc) {
             try {
                 const ownKey = decrypt(ownConfig.apiKeyEnc, ENC_KEY)
                 if (ownKey) return { ok: true, key: ownKey, source: 'own' }
-            } catch {
-                // Si falla decrypt, caemos al flujo de admin key
-            }
+            } catch { /* cae a admin */ }
         }
 
-        // 3) Resolver key global del admin: primero AppSetting (nueva), después AdminConfig (legacy)
-        let adminKey: string | null = null
-        const adminKeyEnc = globalSetting?.value || adminConfig?.openaiKeyEnc
-        if (!adminKeyEnc) return { ok: false, error: 'NO_KEY' }
-        try {
-            adminKey = decrypt(adminKeyEnc, ENC_KEY)
-        } catch {
-            return { ok: false, error: 'NO_KEY' }
+        // Admin key — pero antes verificar saldo > 0
+        const balance = Number(userRow.aiBalanceUsd ?? 0)
+        if (balance <= 0) {
+            return { ok: false, error: 'NO_CREDITS', balanceUsd: balance }
         }
+
+        const adminKey = await readAdminApiKey()
         if (!adminKey) return { ok: false, error: 'NO_KEY' }
 
-        // 4) Cobrar al balance USD del usuario en transacción con FOR UPDATE
-        const cost = await costForModel(model)
+        return { ok: true, key: adminKey, source: 'admin' }
+    } catch (e: any) {
+        console.error('[ai-credits] resolveOpenAIKey error:', e?.message ?? e)
+        return { ok: false, error: 'INTERNAL' }
+    }
+}
 
+/**
+ * Pre-check rápido: ¿puede este usuario hacer una llamada a OpenAI?
+ * (Tiene key propia válida o tiene saldo > 0)
+ */
+export async function hasBalanceOrOwnKey(userId: string): Promise<boolean> {
+    const r = await resolveOpenAIKey(userId)
+    return r.ok
+}
+
+/**
+ * Cobra el costo exacto de tokens de chat (input + output) al balance USD.
+ * Llamar SOLO si resolveOpenAIKey devolvió source='admin'.
+ */
+export async function chargeForChatUsage(
+    userId: string,
+    model: string,
+    promptTokens: number,
+    completionTokens: number,
+    reason: string,
+    metadata?: Record<string, any>,
+): Promise<ChargeResult> {
+    const pricing = await getTokenPricingFor(model)
+    const inputUsd  = (promptTokens     / 1_000_000) * pricing.input
+    const outputUsd = (completionTokens / 1_000_000) * pricing.output
+    const totalUsd  = Math.max(0, inputUsd + outputUsd)
+    return chargeAtomic(userId, totalUsd, model, reason, {
+        ...metadata,
+        promptTokens,
+        completionTokens,
+    })
+}
+
+/**
+ * Cobra el costo de transcripción Whisper proporcional a la duración del audio.
+ * Si no se conoce la duración exacta, pasar una estimación (ej: 30 segundos).
+ */
+export async function chargeForWhisperSeconds(
+    userId: string,
+    seconds: number,
+    reason: string,
+    metadata?: Record<string, any>,
+): Promise<ChargeResult> {
+    const safeSeconds = Math.max(1, Math.ceil(seconds || 30))  // mínimo 1s, default 30s
+    const totalUsd = safeSeconds * WHISPER_USD_PER_SECOND
+    return chargeAtomic(userId, totalUsd, 'whisper-1', reason, {
+        ...metadata,
+        seconds: safeSeconds,
+    })
+}
+
+/**
+ * Cobra el costo de N imágenes generadas con DALL-E.
+ */
+export async function chargeForImage(
+    userId: string,
+    model: string,
+    n: number,
+    reason: string,
+    metadata?: Record<string, any>,
+): Promise<ChargeResult> {
+    const perImage = IMAGE_PRICING[model] ?? IMAGE_PRICING['dall-e-3']
+    const count = Math.max(1, n || 1)
+    const totalUsd = perImage * count
+    return chargeAtomic(userId, totalUsd, model, reason, {
+        ...metadata,
+        count,
+    })
+}
+
+/**
+ * Descuento atómico común a todos los charge*. NO bloquea por saldo —
+ * deja que el balance vaya hasta 0 (la próxima llamada queda bloqueada
+ * por resolveOpenAIKey()).
+ */
+async function chargeAtomic(
+    userId: string,
+    costUsd: number,
+    model: string,
+    reason: string,
+    metadata?: Record<string, any>,
+): Promise<ChargeResult> {
+    if (costUsd <= 0) {
+        // Costo cero (puede pasar con embeddings vacíos) — registrar pero no tocar balance
+        try {
+            await (prisma as any).aIUsageLog.create({
+                data: { userId, model, reason, costUsd: 0, metadata: metadata ?? undefined },
+            })
+        } catch { /* no fatal */ }
+        return { ok: true, chargedUsd: 0, remainingUsd: await getUserAIBalanceUsd(userId) }
+    }
+
+    try {
         const result = await prisma.$transaction(async (tx) => {
-            // Lock row del usuario para evitar race conditions
+            // Lock row del usuario
             const locked = await tx.$queryRaw<Array<{ ai_balance_usd: string }>>`
                 SELECT ai_balance_usd::text
                 FROM users
                 WHERE id = ${userId}::uuid
                 FOR UPDATE
             `
-            const currentBalance = parseFloat(locked[0]?.ai_balance_usd ?? '0')
+            const before = parseFloat(locked[0]?.ai_balance_usd ?? '0')
 
-            if (currentBalance < cost) {
-                return { type: 'NO_CREDITS' as const, balance: currentBalance, required: cost }
-            }
-
-            // Descontar — GREATEST(0, ...) por seguridad ante imprecisión Decimal
+            // GREATEST(0, …): nunca vamos a negativo. Si costUsd > before, queda en 0.
             await tx.$executeRaw`
                 UPDATE users
-                SET ai_balance_usd = GREATEST(0::numeric, ai_balance_usd - ${cost}::numeric)
+                SET ai_balance_usd = GREATEST(0::numeric, ai_balance_usd - ${costUsd}::numeric)
                 WHERE id = ${userId}::uuid
             `
 
-            // Log del uso
             await (tx as any).aIUsageLog.create({
                 data: {
                     userId,
                     model,
                     reason,
-                    costUsd: cost,
+                    costUsd,
                     metadata: metadata ?? undefined,
                 },
             })
 
-            return { type: 'OK' as const, remaining: currentBalance - cost, charged: cost }
+            return { charged: costUsd, remaining: Math.max(0, before - costUsd) }
         })
-
-        if (result.type === 'NO_CREDITS') {
-            return {
-                ok: false,
-                error: 'NO_CREDITS',
-                balanceUsd: result.balance,
-                requiredUsd: result.required,
-            }
-        }
-
-        return {
-            ok: true,
-            key: adminKey,
-            source: 'admin',
-            remainingUsd: result.remaining,
-            chargedUsd: result.charged,
-        }
+        return { ok: true, chargedUsd: result.charged, remainingUsd: result.remaining }
     } catch (e: any) {
-        console.error('[ai-credits] chargeUserForAI error:', e?.message ?? e)
+        console.error('[ai-credits] chargeAtomic error:', e?.message ?? e)
         return { ok: false, error: 'INTERNAL' }
     }
 }
 
 /**
- * Refund: devuelve el costo al balance USD si la llamada a OpenAI falló después de cobrar.
- * Llamar SOLO si chargeUserForAI devolvió source='admin' y la llamada externa falló.
+ * Refund: devuelve un cobro al balance USD del usuario.
+ * Usar cuando una llamada se cobró pero después falló (ej: envío Baileys roto).
  */
 export async function refundUserForAI(
     userId: string,
@@ -260,7 +351,7 @@ export async function refundUserForAI(
 }
 
 /**
- * Lectura simple del balance USD del usuario (no toca nada).
+ * Lectura simple del balance USD.
  */
 export async function getUserAIBalanceUsd(userId: string): Promise<number> {
     const u = await prisma.user.findUnique({
@@ -268,4 +359,79 @@ export async function getUserAIBalanceUsd(userId: string): Promise<number> {
         select: { aiBalanceUsd: true },
     })
     return u?.aiBalanceUsd ? Number(u.aiBalanceUsd) : 0
+}
+
+// ─── Wrappers legacy @deprecated (compatibilidad con endpoints HTTP no migrados) ──
+
+// Tabla flat por llamada — se mantiene para que chargeUserForAI() siga funcionando
+// hasta que se migren todos los endpoints HTTP en Fase 1B.
+export const DEFAULT_MODEL_COST_USD: Record<string, number> = {
+    'gpt-4o':         0.05,
+    'gpt-4o-mini':    0.01,
+    'gpt-4-turbo':    0.05,
+    'gpt-3.5-turbo':  0.01,
+    'whisper-1':      0.02,
+    'dall-e-3':       0.10,
+    'dall-e-3-hd':    0.20,
+    'gpt-image-1':    0.10,
+    'text-embedding-3-small': 0.001,
+    'text-embedding-3-large': 0.005,
+}
+export const MODEL_COST_USD = DEFAULT_MODEL_COST_USD
+
+/** @deprecated usar getTokenPricingFor / chargeForChatUsage en su lugar */
+export async function costForModel(model: string): Promise<number> {
+    return DEFAULT_MODEL_COST_USD[model] ?? DEFAULT_MODEL_COST_USD['gpt-4o-mini'] ?? 0.01
+}
+
+export type AIChargeOk = {
+    ok: true
+    key: string
+    source: 'own' | 'admin'
+    remainingUsd?: number
+    chargedUsd?: number
+}
+export type AIChargeError = {
+    ok: false
+    error: 'NO_CREDITS' | 'NO_KEY' | 'INTERNAL'
+    balanceUsd?: number
+    requiredUsd?: number
+}
+
+/**
+ * @deprecated Sistema flat por llamada. Usar resolveOpenAIKey() + chargeForChatUsage()
+ * para cobro por tokens reales. Se mantiene para endpoints HTTP no migrados aún.
+ */
+export async function chargeUserForAI(
+    userId: string,
+    model: string,
+    reason: string,
+    metadata?: Record<string, any>,
+): Promise<AIChargeOk | AIChargeError> {
+    const resolved = await resolveOpenAIKey(userId)
+    if (!resolved.ok) {
+        if (resolved.error === 'NO_CREDITS') {
+            return {
+                ok: false,
+                error: 'NO_CREDITS',
+                balanceUsd: resolved.balanceUsd,
+                requiredUsd: await costForModel(model),
+            }
+        }
+        return { ok: false, error: resolved.error }
+    }
+    if (resolved.source === 'own') {
+        return { ok: true, key: resolved.key, source: 'own' }
+    }
+    // Admin key: cobrar flat (legacy)
+    const cost = await costForModel(model)
+    const chargeRes = await chargeAtomic(userId, cost, model, reason, metadata)
+    if (!chargeRes.ok) return { ok: false, error: 'INTERNAL' }
+    return {
+        ok: true,
+        key: resolved.key,
+        source: 'admin',
+        chargedUsd: chargeRes.chargedUsd,
+        remainingUsd: chargeRes.remainingUsd,
+    }
 }

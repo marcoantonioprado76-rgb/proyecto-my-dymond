@@ -14,8 +14,8 @@
 
 import { prisma } from './prisma'
 import { decrypt } from './crypto'
-import { transcribeAudio, analyzeImage, chat, ChatMessage } from './openai'
-import { chargeUserForAI } from './ai-credits'
+import { transcribeAudio, analyzeImageWithUsage, chatWithUsage, ChatMessage } from './openai'
+import { resolveOpenAIKey, chargeForChatUsage, chargeForWhisperSeconds } from './ai-credits'
 import { markAsRead, sendText, sendImage, sendVideo } from './ycloud'
 import { createNotification } from './notifications'
 import { sendBotSaleReportEmail } from './email'
@@ -675,16 +675,16 @@ export class BotEngine {
 
     const apiKey = decrypt(bot.secret.ycloudApiKeyEnc)
     let openaiKey = bot.secret.openaiApiKeyEnc ? decrypt(bot.secret.openaiApiKeyEnc) : ''
-    // Si el bot no tiene key propia configurada, intentamos cobrar el saldo del propietario
-    // y usar la key del admin global. El cobro principal es por la llamada chat() del final;
-    // transcripción de audio y análisis de imagen usan la misma key (auxiliares).
+    // Si el bot no tiene key propia → resolver admin key (sólo si hay saldo USD > 0).
+    // El cobro se hace DESPUÉS de cada llamada, por tokens / segundos reales.
+    let keySource: 'own' | 'admin' = 'own'
     if (!openaiKey && bot.userId) {
-      const model = (bot as any).aiModel || 'gpt-4o'
-      const charge = await chargeUserForAI(bot.userId, model, 'bot.message', { botId: bot.id })
-      if (charge.ok) {
-        openaiKey = charge.key
+      const resolved = await resolveOpenAIKey(bot.userId)
+      if (resolved.ok) {
+        openaiKey = resolved.key
+        keySource = resolved.source
       } else {
-        console.warn(`[BOT] Bot ${bot.id} sin key propia y sin saldo IA del propietario (${charge.error})`)
+        console.warn(`[BOT] Bot ${bot.id} sin key propia (${resolved.error}). Mensaje ignorado.`)
         return
       }
     }
@@ -728,14 +728,27 @@ export class BotEngine {
         resolvedType = 'text'
       } else if (type === 'audio') {
         resolvedType = 'audio'
-        userText = norm.audioUrl
-          ? await transcribeAudio(norm.audioUrl, openaiKey)
-          : '[Audio recibido – sin URL]'
+        if (norm.audioUrl) {
+          userText = await transcribeAudio(norm.audioUrl, openaiKey)
+          if (keySource === 'admin' && bot.userId && userText) {
+            chargeForWhisperSeconds(bot.userId, 30, 'bot.audio', { botId: bot.id })
+              .catch(e => console.error('[BOT] chargeForWhisperSeconds error:', e))
+          }
+        } else {
+          userText = '[Audio recibido – sin URL]'
+        }
       } else if (type === 'image') {
         resolvedType = 'image'
-        userText = norm.imageUrl
-          ? `[Imagen enviada] ${await analyzeImage(norm.imageUrl, openaiKey)} `
-          : '[Imagen recibida – sin URL]'
+        if (norm.imageUrl) {
+          const imgResult = await analyzeImageWithUsage(norm.imageUrl, openaiKey)
+          userText = `[Imagen enviada] ${imgResult.text} `
+          if (keySource === 'admin' && bot.userId) {
+            chargeForChatUsage(bot.userId, 'gpt-4o-mini', imgResult.promptTokens, imgResult.completionTokens, 'bot.image', { botId: bot.id })
+              .catch(e => console.error('[BOT] chargeForChatUsage(image) error:', e))
+          }
+        } else {
+          userText = '[Imagen recibida – sin URL]'
+        }
       } else if (type === 'location') {
         resolvedType = 'location'
         const lat = norm.locationLat
@@ -911,10 +924,15 @@ export class BotEngine {
       welcomeSent,
     )
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let response: Awaited<ReturnType<typeof chat>>
+    const aiModel = (bot as any).aiModel || 'gpt-4o'
+    let response: Awaited<ReturnType<typeof chatWithUsage>>['response']
     try {
-      response = await chat(systemPrompt, chatHistory, openaiKey, (bot as any).aiModel || 'gpt-4o')
+      const result = await chatWithUsage(systemPrompt, chatHistory, openaiKey, aiModel)
+      response = result.response
+      if (keySource === 'admin' && bot.userId) {
+        chargeForChatUsage(bot.userId, aiModel, result.promptTokens, result.completionTokens, 'bot.message', { botId: bot.id })
+          .catch(e => console.error('[BOT] chargeForChatUsage error:', e))
+      }
     } catch (aiErr: any) {
       console.error(`[BOT] OpenAI error para ${userPhone}:`, aiErr.message)
       const isQuotaError = aiErr.message?.includes('insufficient_quota') || aiErr.message?.includes('429')
