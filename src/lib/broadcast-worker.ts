@@ -7,7 +7,7 @@
 import { prisma } from '@/lib/prisma'
 import { BaileysManager } from '@/lib/baileys-manager'
 import { decrypt as decryptAds } from '@/lib/ads/encryption'
-import { chargeUserForAI, refundUserForAI } from '@/lib/ai-credits'
+import { resolveOpenAIKey, chargeForChatUsage } from '@/lib/ai-credits'
 
 const ADS_ENC_KEY = process.env.ADS_ENCRYPTION_KEY || ''
 
@@ -18,7 +18,7 @@ async function generateUniqueMessage(
     apiKey: string,
     botRules?: string | null,
     messageExample?: string | null,
-): Promise<string> {
+): Promise<{ text: string; promptTokens: number; completionTokens: number }> {
     const controller = new AbortController()
     const timeout = setTimeout(() => controller.abort(), 15000)
 
@@ -55,7 +55,11 @@ REGLAS:
         })
         if (!res.ok) throw new Error(`OpenAI error: ${res.status}`)
         const data = await res.json()
-        return data.choices?.[0]?.message?.content?.trim() || prompt
+        return {
+            text: data.choices?.[0]?.message?.content?.trim() || prompt,
+            promptTokens: data.usage?.prompt_tokens ?? 0,
+            completionTokens: data.usage?.completion_tokens ?? 0,
+        }
     } finally {
         clearTimeout(timeout)
     }
@@ -153,29 +157,31 @@ export async function executeBroadcast(campaignId: string) {
                 continue
             }
 
-            // Cobrar saldo por este mensaje (o usar key propia sin cobrar)
-            const charge = await chargeUserForAI(campaign.userId, 'gpt-4o', 'broadcast.message', { campaignId, contactId: contact.id })
+            // Resolver key (NO cobra — el cobro va por tokens reales después)
+            const resolved = await resolveOpenAIKey(campaign.userId)
 
             let generated: string
-            if (charge.ok) {
+            if (resolved.ok) {
                 try {
-                    generated = await generateUniqueMessage(
-                        campaign.prompt, charge.key,
+                    const result = await generateUniqueMessage(
+                        campaign.prompt, resolved.key,
                         campaign.bot?.systemPromptTemplate,
                         campaign.messageExample,
                     )
-                } catch (e) {
-                    // Si falló la llamada después de cobrar, devolver el saldo
-                    if (charge.source === 'admin' && charge.chargedUsd) {
-                        await refundUserForAI(campaign.userId, charge.chargedUsd, 'broadcast.message.failed')
+                    generated = result.text
+                    // Cobrar tokens reales solo si admin key
+                    if (resolved.source === 'admin') {
+                        chargeForChatUsage(campaign.userId, 'gpt-4o', result.promptTokens, result.completionTokens, 'broadcast.message', { campaignId, contactId: contact.id })
+                            .catch(e => console.error('[BROADCAST] charge error:', e))
                     }
-                    // Fallback al prompt fijo si la llamada falla
+                } catch (e) {
+                    // Fallback al prompt fijo si la llamada falla. Sin pre-cobro no hay refund.
                     console.warn(`[BROADCAST] AI falló para ${contact.phone}, usando prompt fijo:`, (e as any)?.message)
                     generated = campaign.prompt?.trim() || campaign.messageExample?.trim() || ''
                 }
             } else {
                 // Sin saldo o sin key → enviar el prompt fijo en lugar de IA personalizada
-                if (charge.error === 'NO_CREDITS') {
+                if (resolved.error === 'NO_CREDITS') {
                     console.warn(`[BROADCAST] Sin saldo IA para usuario ${campaign.userId} — enviando prompt fijo`)
                 }
                 generated = campaign.prompt?.trim() || campaign.messageExample?.trim() || ''

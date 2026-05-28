@@ -5,7 +5,7 @@ import { prisma } from '@/lib/prisma'
 import { decrypt } from '@/lib/crypto'
 import { verifyToken } from '@/lib/auth'
 import { getPlanLimits, PLAN_NAMES, type UserPlan } from '@/lib/plan-limits'
-import { chargeUserForAI, refundUserForAI } from '@/lib/ai-credits'
+import { resolveOpenAIKey, chargeForChatUsage } from '@/lib/ai-credits'
 
 function getAuth() {
   const cookieStore = cookies()
@@ -56,13 +56,13 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'La descripción es requerida' }, { status: 400 })
   }
 
-  // Prioridad de resolución de key OpenAI (no romper lógica existente):
+  // Prioridad de resolución de key OpenAI:
   //   1. Key explícita del form (bodyKey) → usar tal cual, sin cobrar saldo.
   //   2. Key de algún bot ACTIVE del usuario → usar, sin cobrar saldo.
-  //   3. Fallback: chargeUserForAI() → usa la propia del usuario (preferOwnKey)
-  //      o la del admin global, descontando saldo USD si corresponde.
+  //   3. Fallback: resolveOpenAIKey() → usa la propia del usuario (preferOwnKey)
+  //      o la del admin global. El cobro se hace por tokens reales DESPUÉS.
   let openaiKey = bodyKey?.trim()
-  let charge: Awaited<ReturnType<typeof chargeUserForAI>> | null = null
+  let keySource: 'own' | 'admin' = 'own'  // 'own' significa no cobrar (key del usuario, bot, o body)
 
   if (!openaiKey) {
     const bot = await prisma.bot.findFirst({
@@ -77,15 +77,15 @@ export async function POST(req: NextRequest) {
 
   // Último recurso: key admin global con cobro de saldo USD
   if (!openaiKey) {
-    charge = await chargeUserForAI(auth.userId, 'gpt-4o', 'landing.generate')
-    if (charge.ok) {
-      openaiKey = charge.key
-    } else if (charge.error === 'NO_CREDITS') {
+    const resolved = await resolveOpenAIKey(auth.userId)
+    if (resolved.ok) {
+      openaiKey = resolved.key
+      keySource = resolved.source
+    } else if (resolved.error === 'NO_CREDITS') {
       return NextResponse.json({
         error: 'Sin saldo de IA. Comprá saldo, configurá tu propia API Key o configurá una en tu bot de WhatsApp.',
         code: 'NO_CREDITS',
-        balanceUsd: charge.balanceUsd,
-        requiredUsd: charge.requiredUsd,
+        balanceUsd: resolved.balanceUsd,
       }, { status: 402 })
     } else {
       return NextResponse.json({
@@ -158,15 +158,18 @@ Genera SOLO el HTML. Nada más.`
 
     if (!res.ok) {
       const err = await res.text()
-      // Si cobramos saldo y la llamada falló, devolver
-      if (charge?.ok && charge.source === 'admin' && charge.chargedUsd) {
-        await refundUserForAI(auth.userId, charge.chargedUsd, 'landing.generate.openai_error')
-      }
       console.error('[LANDING-GEN] OpenAI error:', err)
       return NextResponse.json({ error: `Error OpenAI: ${res.status}` }, { status: 500 })
     }
 
     const data = await res.json()
+    // Cobrar tokens reales SOLO si usamos admin key (no si bodyKey ni bot key ni propia)
+    if (keySource === 'admin' && data?.usage) {
+      const promptTokens = data.usage?.prompt_tokens ?? 0
+      const completionTokens = data.usage?.completion_tokens ?? 0
+      chargeForChatUsage(auth.userId, 'gpt-4o', promptTokens, completionTokens, 'landing.generate')
+        .catch(e => console.error('[LANDING-GEN] charge error:', e))
+    }
     let html = (data.choices?.[0]?.message?.content as string) || ''
 
     // Strip markdown code blocks if AI wrapped the HTML
@@ -174,10 +177,6 @@ Genera SOLO el HTML. Nada más.`
 
     return NextResponse.json({ html })
   } catch (err: unknown) {
-    // Si cobramos saldo y algo crasheó (red, parseo, etc.), devolver
-    if (charge?.ok && charge.source === 'admin' && charge.chargedUsd) {
-      await refundUserForAI(auth.userId, charge.chargedUsd, 'landing.generate.failed')
-    }
     const message = err instanceof Error ? err.message : 'Error generando la landing'
     console.error('[LANDING-GEN] Error:', err)
     return NextResponse.json({ error: message }, { status: 500 })

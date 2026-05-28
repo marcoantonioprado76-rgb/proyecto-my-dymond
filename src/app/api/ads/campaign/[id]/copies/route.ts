@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server'
 import { getAuthUser } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { generateAdCopies } from '@/lib/ads/openai-ads'
-import { chargeUserForAI, refundUserForAI } from '@/lib/ai-credits'
+import { resolveOpenAIKey, chargeForChatUsage } from '@/lib/ai-credits'
 
 export async function POST(req: Request, { params }: { params: { id: string } }) {
     const user = await getAuthUser()
@@ -21,20 +21,20 @@ export async function POST(req: Request, { params }: { params: { id: string } })
     })
     if (!campaign) return NextResponse.json({ error: 'Campaña no encontrada' }, { status: 404 })
 
-    // Cobrar saldo (o usar key propia si el usuario la prefiere)
-    const charge = await chargeUserForAI(user.id, model, 'ads.copies', { campaignId: params.id })
-    if (!charge.ok) {
-        if (charge.error === 'NO_CREDITS') {
+    // Resolver key (NO cobra todavía — cobro por tokens reales después)
+    const resolved = await resolveOpenAIKey(user.id)
+    if (!resolved.ok) {
+        if (resolved.error === 'NO_CREDITS') {
             return NextResponse.json({
                 error: 'Sin saldo de IA. Comprá saldo o configurá tu propia API Key.',
-                code: 'NO_CREDITS', balanceUsd: charge.balanceUsd, requiredUsd: charge.requiredUsd,
+                code: 'NO_CREDITS', balanceUsd: resolved.balanceUsd,
             }, { status: 402 })
         }
-        return NextResponse.json({ error: 'No hay API Key disponible.', code: charge.error }, { status: 400 })
+        return NextResponse.json({ error: 'No hay API Key disponible.', code: resolved.error }, { status: 400 })
     }
-    const apiKey = charge.key
 
     try {
+        let usage: { promptTokens: number; completionTokens: number } | null = null
         const copies = await generateAdCopies({
             brief: {
                 name: campaign.brief.name,
@@ -60,9 +60,15 @@ export async function POST(req: Request, { params }: { params: { id: string } })
             destination: campaign.strategy.destination,
             mediaType: campaign.strategy.mediaType,
             count: campaign.strategy.mediaCount,
-            apiKey,
-            model: oaiConfig.model
+            apiKey: resolved.key,
+            model: oaiConfig?.model || model,
+            onUsage: (u) => { usage = u },
         })
+        if (resolved.source === 'admin' && usage) {
+            const u = usage as { promptTokens: number; completionTokens: number }
+            chargeForChatUsage(user.id, model, u.promptTokens, u.completionTokens, 'ads.copies', { campaignId: params.id })
+                .catch(e => console.error('[GenerateCopies] charge error:', e))
+        }
 
         // Upsert by slotIndex: update existing records (preserving uploaded mediaUrl/mediaType)
         // or create new ones if slot doesn't exist yet. This avoids duplicate records.
@@ -137,10 +143,7 @@ export async function POST(req: Request, { params }: { params: { id: string } })
 
         return NextResponse.json({ creatives: saved, count: saved.length })
     } catch (err: any) {
-        // Si falló después de cobrar saldo, devolverlo
-        if (charge.source === 'admin' && charge.chargedUsd) {
-            await refundUserForAI(user.id, charge.chargedUsd, 'ads.copies.failed')
-        }
+        // Sin pre-cobro, no hay refund que hacer.
         console.error('[GenerateCopies]', err)
         return NextResponse.json({ error: err.message || 'Error al generar copies' }, { status: 500 })
     }

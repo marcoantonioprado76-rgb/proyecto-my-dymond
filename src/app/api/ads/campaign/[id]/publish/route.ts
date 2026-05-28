@@ -145,22 +145,21 @@ export async function POST(req: Request, { params }: { params: { id: string } })
             try {
                 const oaiConfig = await (prisma as any).openAIConfig.findUnique({ where: { userId: user.id } })
                 const audienceModel = oaiConfig?.model || 'gpt-4o'
-                const { chargeUserForAI, refundUserForAI } = await import('@/lib/ai-credits')
-                const charge = await chargeUserForAI(user.id, audienceModel, 'ads.publish.audience', { campaignId: params.id })
-                if (!charge.ok) {
-                    audienceError = charge.error === 'NO_CREDITS'
+                const filterModel = oaiConfig?.model || 'gpt-4o-mini'
+                const { resolveOpenAIKey, chargeForChatUsage } = await import('@/lib/ai-credits')
+                const resolved = await resolveOpenAIKey(user.id)
+                if (!resolved.ok) {
+                    audienceError = resolved.error === 'NO_CREDITS'
                         ? 'Sin saldo de IA para generar intereses de audiencia. Comprá saldo o configurá tu propia API Key.'
                         : 'Configura tu API Key de OpenAI o pedile al admin que active la global.'
                 } else {
-                    const oaiKey = charge.key
-                    let keywords
-                    try {
-                        keywords = await generateAudienceInterests(campaign.brief, oaiKey, audienceModel)
-                    } catch (e) {
-                        if (charge.source === 'admin' && charge.chargedUsd) {
-                            await refundUserForAI(user.id, charge.chargedUsd, 'ads.publish.audience.failed')
-                        }
-                        throw e
+                    const oaiKey = resolved.key
+                    let kwUsage: { promptTokens: number; completionTokens: number } | null = null
+                    const keywords = await generateAudienceInterests(campaign.brief, oaiKey, audienceModel, (u) => { kwUsage = u })
+                    if (resolved.source === 'admin' && kwUsage) {
+                        const u = kwUsage as { promptTokens: number; completionTokens: number }
+                        chargeForChatUsage(user.id, audienceModel, u.promptTokens, u.completionTokens, 'ads.publish.audience.keywords', { campaignId: params.id })
+                            .catch(e => console.error('[Publish] charge(keywords) error:', e))
                     }
                     console.log(`[Publish] AI generated ${keywords.length} interest keywords:`, keywords.join(', '))
 
@@ -184,7 +183,13 @@ export async function POST(req: Request, { params }: { params: { id: string } })
                     console.log(`[Publish] Resolved ${audienceInterests.length} raw Meta interest candidates`)
 
                     // AI filtering step — remove irrelevant results (e.g. "Acne Studios" for skincare)
-                    audienceInterests = await filterAudienceInterests(campaign.brief, audienceInterests, oaiKey, oaiConfig?.model || 'gpt-4o-mini')
+                    let filterUsage: { promptTokens: number; completionTokens: number } | null = null
+                    audienceInterests = await filterAudienceInterests(campaign.brief, audienceInterests, oaiKey, filterModel, (u) => { filterUsage = u })
+                    if (resolved.source === 'admin' && filterUsage) {
+                        const u = filterUsage as { promptTokens: number; completionTokens: number }
+                        chargeForChatUsage(user.id, filterModel, u.promptTokens, u.completionTokens, 'ads.publish.audience.filter', { campaignId: params.id })
+                            .catch(e => console.error('[Publish] charge(filter) error:', e))
+                    }
                     audienceInterests = audienceInterests.slice(0, 15)
                     console.log(`[Publish] After AI filter: ${audienceInterests.length} Meta interests:`, audienceInterests.map(i => i.name).join(', '))
                     if (audienceInterests.length === 0) {

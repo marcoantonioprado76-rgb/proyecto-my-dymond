@@ -2,8 +2,7 @@ export const dynamic = 'force-dynamic'
 import { NextRequest, NextResponse } from 'next/server'
 import { getAuthUser } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
-import { chargeUserForAI, refundUserForAI } from '@/lib/ai-credits'
-
+import { resolveOpenAIKey, chargeForChatUsage } from '@/lib/ai-credits'
 import { generateStrategySuggestions } from '@/lib/ads/openai-ads'
 
 export async function POST(req: NextRequest) {
@@ -26,35 +25,32 @@ export async function POST(req: NextRequest) {
         const openaiConfig = await (prisma as any).openAIConfig.findUnique({ where: { userId: user.id } })
         const model = openaiConfig?.model || 'gpt-4o'
 
-        // Resolver key + cobrar saldo si aplica (admin key); si usa la suya, no cobra
-        const charge = await chargeUserForAI(user.id, model, 'ads.strategies.suggest', { briefId })
-        if (!charge.ok) {
-            if (charge.error === 'NO_CREDITS') {
+        // Resolver key (NO cobra todavía — el cobro va por tokens reales después)
+        const resolved = await resolveOpenAIKey(user.id)
+        if (!resolved.ok) {
+            if (resolved.error === 'NO_CREDITS') {
                 return NextResponse.json({
                     error: 'Sin saldo de IA. Comprá saldo o configurá tu propia API Key.',
                     code: 'NO_CREDITS',
-                    balanceUsd: charge.balanceUsd,
-                    requiredUsd: charge.requiredUsd,
+                    balanceUsd: resolved.balanceUsd,
                 }, { status: 402 })
             }
             return NextResponse.json({
                 error: 'No hay API Key disponible para esta función. Configurá tu propia key o pedile al admin que active la global.',
-                code: charge.error,
+                code: resolved.error,
             }, { status: 400 })
         }
 
-        const apiKey = charge.key
-
-        // Generate AI suggestions
-        let suggestions
-        try {
-            suggestions = await generateStrategySuggestions(brief, apiKey, model, platform, objective, destination, mediaType)
-        } catch (e) {
-            // Si falló la llamada externa después de cobrar, devolvemos el saldo
-            if (charge.source === 'admin' && charge.chargedUsd) {
-                await refundUserForAI(user.id, charge.chargedUsd, 'ads.strategies.suggest.failed')
-            }
-            throw e
+        // Generate AI suggestions + capturar tokens consumidos
+        let usage: { promptTokens: number; completionTokens: number } | null = null
+        const suggestions = await generateStrategySuggestions(
+            brief, resolved.key, model, platform, objective, destination, mediaType,
+            (u) => { usage = u },
+        )
+        if (resolved.source === 'admin' && usage) {
+            const u = usage as { promptTokens: number; completionTokens: number }
+            chargeForChatUsage(user.id, model, u.promptTokens, u.completionTokens, 'ads.strategies.suggest', { briefId })
+                .catch(e => console.error('[StrategySuggest] charge error:', e))
         }
 
         // Delete old AI suggestions that are NOT referenced by any campaign AND not saved by user

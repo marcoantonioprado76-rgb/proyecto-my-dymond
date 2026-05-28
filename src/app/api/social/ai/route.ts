@@ -2,9 +2,9 @@ export const dynamic = 'force-dynamic'
 import { NextResponse } from 'next/server'
 import { getAuthUser } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
-import { chargeUserForAI, refundUserForAI } from '@/lib/ai-credits'
+import { resolveOpenAIKey, chargeForChatUsage } from '@/lib/ai-credits'
 
-async function callOpenAI(apiKey: string, model: string, systemPrompt: string, userPrompt: string) {
+async function callOpenAI(apiKey: string, model: string, systemPrompt: string, userPrompt: string): Promise<{ content: string; promptTokens: number; completionTokens: number }> {
     const res = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
@@ -19,16 +19,17 @@ async function callOpenAI(apiKey: string, model: string, systemPrompt: string, u
     })
     const data = await res.json()
     if (!res.ok) throw new Error(data.error?.message || 'OpenAI error')
-    return data.choices[0].message.content.trim()
+    return {
+        content: (data.choices[0].message.content as string).trim(),
+        promptTokens: data.usage?.prompt_tokens ?? 0,
+        completionTokens: data.usage?.completion_tokens ?? 0,
+    }
 }
 
 export async function POST(req: Request) {
-    let charge: Awaited<ReturnType<typeof chargeUserForAI>> | null = null
-    let userId: string | null = null
     try {
         const user = await getAuthUser()
         if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-        userId = user.id
 
         const { action, content, networks, topic, language = 'es' } = await req.json()
 
@@ -36,27 +37,27 @@ export async function POST(req: Request) {
         const oaiConfig = await (prisma as any).openAIConfig.findUnique({ where: { userId: user.id } })
         const model = oaiConfig?.model || 'gpt-4o'
 
-        // Resolver key + cobrar saldo si aplica (admin key)
-        charge = await chargeUserForAI(user.id, model, `social.ai.${action ?? 'generate'}`)
-        if (!charge.ok) {
-            if (charge.error === 'NO_CREDITS') {
+        // Resolver key (NO cobra todavía — cobro por tokens reales después)
+        const resolved = await resolveOpenAIKey(user.id)
+        if (!resolved.ok) {
+            if (resolved.error === 'NO_CREDITS') {
                 return NextResponse.json({
                     error: 'Sin saldo de IA. Comprá saldo o configurá tu propia API Key.',
                     code: 'NO_CREDITS',
-                    balanceUsd: charge.balanceUsd,
-                    requiredUsd: charge.requiredUsd,
+                    balanceUsd: resolved.balanceUsd,
                 }, { status: 402 })
             }
             return NextResponse.json({
                 error: 'No hay API Key disponible. Configurá la tuya en Configuración → IA o pedile al admin que active la global.',
-                code: charge.error,
+                code: resolved.error,
             }, { status: 400 })
         }
-        const apiKey = charge.key
+        const apiKey = resolved.key
 
         const networkList = (networks || []).join(', ') || 'redes sociales'
+        const reason = `social.ai.${action ?? 'generate'}`
 
-        let result: string
+        let result: { content: string; promptTokens: number; completionTokens: number }
 
         if (action === 'generate') {
             result = await callOpenAI(apiKey, model,
@@ -82,12 +83,14 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: 'Acción no válida' }, { status: 400 })
         }
 
-        return NextResponse.json({ result })
-    } catch (err: any) {
-        // Si llegamos a cobrar saldo y después falló la llamada, devolverlo
-        if (charge?.ok && charge.source === 'admin' && charge.chargedUsd && userId) {
-            await refundUserForAI(userId, charge.chargedUsd, 'social.ai.failed')
+        // Cobrar tokens reales solo si admin key
+        if (resolved.source === 'admin') {
+            chargeForChatUsage(user.id, model, result.promptTokens, result.completionTokens, reason)
+                .catch(e => console.error('[SocialAI] charge error:', e))
         }
+
+        return NextResponse.json({ result: result.content })
+    } catch (err: any) {
         console.error('[SocialAI]', err)
         return NextResponse.json({ error: err.message || 'Error de IA' }, { status: 500 })
     }

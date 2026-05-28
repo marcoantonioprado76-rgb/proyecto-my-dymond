@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server'
 import { getAuthUser } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { generateFieldSuggestions } from '@/lib/ads/openai-ads'
-import { chargeUserForAI, refundUserForAI } from '@/lib/ai-credits'
+import { resolveOpenAIKey, chargeForChatUsage } from '@/lib/ai-credits'
 
 export async function POST(req: Request, { params }: { params: { id: string } }) {
     const user = await getAuthUser()
@@ -25,20 +25,19 @@ export async function POST(req: Request, { params }: { params: { id: string } })
         return NextResponse.json({ error: 'Campo inválido' }, { status: 400 })
     }
 
-    // Cobrar saldo (o usar key propia)
-    const charge = await chargeUserForAI(user.id, model, 'ads.field.suggest', { campaignId: params.id, field })
-    if (!charge.ok) {
-        if (charge.error === 'NO_CREDITS') {
+    const resolved = await resolveOpenAIKey(user.id)
+    if (!resolved.ok) {
+        if (resolved.error === 'NO_CREDITS') {
             return NextResponse.json({
                 error: 'Sin saldo de IA. Comprá saldo o configurá tu propia API Key.',
-                code: 'NO_CREDITS', balanceUsd: charge.balanceUsd, requiredUsd: charge.requiredUsd,
+                code: 'NO_CREDITS', balanceUsd: resolved.balanceUsd,
             }, { status: 402 })
         }
-        return NextResponse.json({ error: 'No hay API Key disponible.', code: charge.error }, { status: 400 })
+        return NextResponse.json({ error: 'No hay API Key disponible.', code: resolved.error }, { status: 400 })
     }
-    const apiKey = charge.key
 
     try {
+        let usage: { promptTokens: number; completionTokens: number } | null = null
         const suggestions = await generateFieldSuggestions({
             brief: {
                 name: campaign.brief.name,
@@ -63,15 +62,18 @@ export async function POST(req: Request, { params }: { params: { id: string } })
             platform: campaign.strategy.platform,
             destination: campaign.strategy.destination,
             currentContent,
-            apiKey,
-            model: oaiConfig.model || 'gpt-4o'
+            apiKey: resolved.key,
+            model,
+            onUsage: (u) => { usage = u },
         })
+        if (resolved.source === 'admin' && usage) {
+            const u = usage as { promptTokens: number; completionTokens: number }
+            chargeForChatUsage(user.id, model, u.promptTokens, u.completionTokens, 'ads.field.suggest', { campaignId: params.id, field })
+                .catch(e => console.error('[SuggestField] charge error:', e))
+        }
 
         return NextResponse.json({ suggestions })
     } catch (err: any) {
-        if (charge.source === 'admin' && charge.chargedUsd) {
-            await refundUserForAI(user.id, charge.chargedUsd, 'ads.field.suggest.failed')
-        }
         console.error('[SuggestField]', err)
         return NextResponse.json({ error: err.message || 'Error al generar sugerencias' }, { status: 500 })
     }

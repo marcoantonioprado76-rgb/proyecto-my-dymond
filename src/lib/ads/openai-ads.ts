@@ -33,6 +33,17 @@ export interface AdCopyData {
 
 const OPENAI_BASE = 'https://api.openai.com/v1'
 
+/** Callback opcional para reportar tokens consumidos al sistema de créditos. */
+export type UsageCallback = (usage: { promptTokens: number; completionTokens: number }) => void
+
+function emitUsage(data: any, onUsage?: UsageCallback) {
+    if (!onUsage || !data?.usage) return
+    onUsage({
+        promptTokens: data.usage?.prompt_tokens ?? 0,
+        completionTokens: data.usage?.completion_tokens ?? 0,
+    })
+}
+
 /** Validates a user's OpenAI API key with a lightweight model call */
 export async function validateApiKey(apiKey: string): Promise<boolean> {
     try {
@@ -76,7 +87,8 @@ export async function transcribeAudio(
 export async function generateBusinessBrief(
     text: string,
     apiKey: string,
-    model = 'gpt-4o'
+    model = 'gpt-4o',
+    onUsage?: UsageCallback,
 ): Promise<BusinessBriefData> {
     const systemPrompt = `Eres un experto en marketing digital, copywriting y estrategia de marca. Tu tarea es analizar la descripción de un negocio y extraer información estructurada para crear campañas publicitarias de alto rendimiento. Responde ÚNICAMENTE con un JSON válido, sin markdown, sin texto adicional.`
 
@@ -131,6 +143,7 @@ Devuelve EXACTAMENTE este JSON (todos los campos son obligatorios):
     }
 
     const data = await res.json()
+    emitUsage(data, onUsage)
     const content = data.choices?.[0]?.message?.content
     if (!content) throw new Error('OpenAI no devolvió contenido')
 
@@ -152,8 +165,9 @@ export async function generateAdCopies(params: {
     count: number
     apiKey: string
     model?: string
+    onUsage?: UsageCallback
 }): Promise<AdCopyData[]> {
-    const { brief, strategyName, platform, objective, destination, mediaType, count, apiKey, model = 'gpt-4o' } = params
+    const { brief, strategyName, platform, objective, destination, mediaType, count, apiKey, model = 'gpt-4o', onUsage } = params
 
     const platformLimits: Record<string, { primaryText: number; headline: number; description: number }> = {
         META: { primaryText: 500, headline: 40, description: 30 },
@@ -281,6 +295,7 @@ Genera EXACTAMENTE ${count} objetos (slotIndex del 0 al ${count - 1}).`
     }
 
     const data = await res.json()
+    emitUsage(data, onUsage)
     const content = data.choices?.[0]?.message?.content
     if (!content) throw new Error('OpenAI no devolvió contenido')
 
@@ -322,7 +337,8 @@ export async function generateStrategySuggestions(
     platform?: string,
     objective?: string,
     destination?: string,
-    mediaType?: string
+    mediaType?: string,
+    onUsage?: UsageCallback,
 ): Promise<SuggestedStrategy[]> {
     const systemPrompt = `Eres un experto en publicidad digital con 15 años de experiencia en Meta Ads, TikTok Ads y Google Ads. Tu especialidad es analizar negocios y recomendar exactamente qué tipo de campaña publicitaria les funcionará mejor. Respondes ÚNICAMENTE con JSON válido.`
 
@@ -456,6 +472,7 @@ ${platform === 'META' ? 'Destinos válidos para META: instagram, whatsapp, websi
     }
 
     const data = await res.json()
+    emitUsage(data, onUsage)
     const content = data.choices?.[0]?.message?.content
     if (!content) throw new Error('OpenAI no devolvió contenido')
 
@@ -473,7 +490,8 @@ ${platform === 'META' ? 'Destinos válidos para META: instagram, whatsapp, websi
 export async function generateAudienceInterests(
     brief: BusinessBriefData,
     apiKey: string,
-    model = 'gpt-4o'
+    model = 'gpt-4o',
+    onUsage?: UsageCallback,
 ): Promise<string[]> {
     const prompt = `You are a senior Meta Ads specialist with deep knowledge of Meta's interest targeting taxonomy. Your job is to generate search terms that will find REAL, EXISTING interests in Meta's Targeting Search API.
 
@@ -541,6 +559,7 @@ Return ONLY valid JSON: {"interests": ["term1", "term2", ...]}`
         throw new Error(`OpenAI: ${msg}`)
     }
     const data = await res.json()
+    emitUsage(data, onUsage)
     const content = data.choices?.[0]?.message?.content
     if (!content) throw new Error('OpenAI no devolvió contenido al generar intereses de audiencia')
     const parsed = JSON.parse(content)
@@ -561,7 +580,8 @@ export async function filterAudienceInterests(
     brief: BusinessBriefData,
     candidates: Array<{ id: string; name: string }>,
     apiKey: string,
-    model = 'gpt-4o-mini'
+    model = 'gpt-4o-mini',
+    onUsage?: UsageCallback,
 ): Promise<Array<{ id: string; name: string }>> {
     if (candidates.length === 0) return []
 
@@ -608,6 +628,7 @@ Return ONLY valid JSON: {"relevant": [1, 4, 7, ...]} (list of numbers)`
         })
         if (!res.ok) return candidates // fallback: return all if filtering fails
         const data = await res.json()
+        emitUsage(data, onUsage)
         const content = data.choices?.[0]?.message?.content
         if (!content) return candidates
         const parsed = JSON.parse(content)
@@ -636,8 +657,9 @@ export async function generateFieldSuggestions(params: {
     currentContent?: string
     apiKey: string
     model?: string
+    onUsage?: UsageCallback
 }): Promise<string[]> {
-    const { brief, field, slotIndex, platform, destination, currentContent, apiKey, model = 'gpt-4o' } = params
+    const { brief, field, slotIndex, platform, destination, currentContent, apiKey, model = 'gpt-4o', onUsage } = params
 
     const limits: Record<string, number> = {
         primaryText: platform === 'GOOGLE_ADS' ? 90 : platform === 'TIKTOK' ? 300 : 500,
@@ -695,6 +717,7 @@ Devuelve ÚNICAMENTE este JSON:
     }
 
     const data = await res.json()
+    emitUsage(data, onUsage)
     const content = data.choices?.[0]?.message?.content
     if (!content) throw new Error('OpenAI no devolvió contenido')
     const parsed = JSON.parse(content)
@@ -865,8 +888,9 @@ export async function editAdImageWithReference(params: {
 export async function analyzeProductImageForAd(params: {
     imageUrl: string
     apiKey: string
+    onUsage?: UsageCallback
 }): Promise<string> {
-    const { imageUrl, apiKey } = params
+    const { imageUrl, apiKey, onUsage } = params
 
     const controller = new AbortController()
     const timeout = setTimeout(() => controller.abort(), 20_000)
@@ -924,6 +948,7 @@ Be very specific. This description will be used to recreate the product visually
     }
 
     const visionData = await res.json()
+    emitUsage(visionData, onUsage)
     return visionData.choices?.[0]?.message?.content?.trim() || ''
 }
 
@@ -937,8 +962,9 @@ export async function generateCreativeDirection(params: {
     productDescription: string
     slotIndex: number
     apiKey: string
+    onUsage?: UsageCallback
 }): Promise<string> {
-    const { brief, productDescription, slotIndex, apiKey } = params
+    const { brief, productDescription, slotIndex, apiKey, onUsage } = params
 
     const conceptTypes = [
         'product hero shot with ingredients/components around it',
@@ -1007,6 +1033,7 @@ Return ONLY the scene description, nothing else. No quotes, no labels.`
         })
         if (!res.ok) return ''
         const data = await res.json()
+        emitUsage(data, onUsage)
         return data.choices?.[0]?.message?.content?.trim() || ''
     } catch {
         return ''
@@ -1026,8 +1053,9 @@ export async function generateTextOverlay(params: {
     objective: string
     destination: string
     apiKey: string
+    onUsage?: UsageCallback
 }): Promise<string> {
-    const { brief, slotIndex, objective, destination, apiKey } = params
+    const { brief, slotIndex, objective, destination, apiKey, onUsage } = params
 
     const keyMsg = (brief.keyMessages || [])[slotIndex] || (brief.keyMessages || [])[0] || brief.valueProposition || ''
     const cta = brief.mainCTA || 'Contáctanos'
@@ -1090,6 +1118,7 @@ Return ONLY the overlay instruction (2-3 sentences), no quotes, no labels. This 
         })
         if (!res.ok) return ''
         const data = await res.json()
+        emitUsage(data, onUsage)
         return data.choices?.[0]?.message?.content?.trim() || ''
     } catch {
         return ''
