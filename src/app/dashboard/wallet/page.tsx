@@ -90,17 +90,30 @@ export default function CreditsPage() {
 
   async function load() {
     setLoading(true)
-    const [credRes, purRes, settingsRes] = await Promise.all([
+    // Cada fetch/parse aislado: si una request rompe (rate-limit, 500 con body
+    // vacío, network blip), las demás siguen poblando sus respectivos states.
+    // ANTES un fallo en /api/credits arrastraba al QR a quedar "no configurado".
+    const [credRes, purRes, settingsRes] = await Promise.allSettled([
       fetch('/api/credits'),
       fetch('/api/credits/purchase'),
       fetch('/api/settings'),
     ])
-    const d = await credRes.json()
-    const p = await purRes.json()
-    const s = await settingsRes.json().catch(() => ({ settings: {} }))
-    setData(d)
-    setPurchases(p.purchases ?? [])
-    setPaymentQrUrl(s.settings?.PAYMENT_QR_URL || null)
+
+    if (credRes.status === 'fulfilled' && credRes.value.ok) {
+      try { setData(await credRes.value.json()) } catch { /* keep prev */ }
+    }
+    if (purRes.status === 'fulfilled' && purRes.value.ok) {
+      try {
+        const p = await purRes.value.json()
+        setPurchases(p.purchases ?? [])
+      } catch { /* keep prev */ }
+    }
+    if (settingsRes.status === 'fulfilled' && settingsRes.value.ok) {
+      try {
+        const s = await settingsRes.value.json()
+        setPaymentQrUrl(s.settings?.PAYMENT_QR_URL || null)
+      } catch { /* keep prev */ }
+    }
     setLoading(false)
   }
 
