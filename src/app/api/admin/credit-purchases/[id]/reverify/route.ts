@@ -73,7 +73,8 @@ export async function POST(
 
             await tx.$executeRaw`
                 UPDATE users
-                SET ai_balance_usd = ai_balance_usd + ${amountUsd}::numeric
+                SET ai_balance_usd = ai_balance_usd + ${amountUsd}::numeric,
+                    low_balance_warned_at = NULL
                 WHERE id = ${req.userId}::uuid
             `
 

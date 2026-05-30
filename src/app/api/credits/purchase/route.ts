@@ -94,10 +94,12 @@ export async function POST(req: NextRequest) {
                 // Lock user antes de sumar
                 await tx.$queryRaw`SELECT id FROM users WHERE id = ${user.id}::uuid FOR UPDATE`
 
-                // Sumar saldo USD al usuario
+                // Sumar saldo USD + reset low_balance_warned_at (para que el aviso
+                // "saldo bajo" se vuelva a disparar tras gastar este nuevo saldo).
                 await tx.$executeRaw`
                     UPDATE users
-                    SET ai_balance_usd = ai_balance_usd + ${amountUsd}::numeric
+                    SET ai_balance_usd = ai_balance_usd + ${amountUsd}::numeric,
+                        low_balance_warned_at = NULL
                     WHERE id = ${user.id}::uuid
                 `
 

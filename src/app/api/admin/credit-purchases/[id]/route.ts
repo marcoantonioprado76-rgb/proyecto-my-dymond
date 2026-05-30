@@ -75,10 +75,13 @@ export async function PATCH(
                     },
                 })
 
-                // 2) Sumar al balance USD del usuario
+                // 2) Sumar al balance USD del usuario + resetear low_balance_warned_at
+                //    para que el aviso "saldo bajo" se vuelva a disparar si gasta el nuevo
+                //    saldo más adelante (el throttle de 24h se reinicia con cada recarga).
                 await tx.$executeRaw`
                     UPDATE users
-                    SET ai_balance_usd = ai_balance_usd + ${amountUsd}::numeric
+                    SET ai_balance_usd = ai_balance_usd + ${amountUsd}::numeric,
+                        low_balance_warned_at = NULL
                     WHERE id = ${purchaseRequest.userId}::uuid
                 `
 
