@@ -32,9 +32,20 @@ export async function verifyTurnstile(token: string | null | undefined, ip?: str
     })
 
     const data: TurnstileResponse = await res.json()
+    if (!data.success) {
+      // Loguear razón exacta de Cloudflare para poder diagnosticar fallos.
+      // Códigos posibles: invalid-input-response, timeout-or-duplicate,
+      // bad-request, internal-error, missing-input-secret, etc.
+      console.warn('[TURNSTILE] validation failed:', {
+        ip: ip || 'unknown',
+        errorCodes: data['error-codes'] ?? [],
+        tokenPrefix: token.slice(0, 12),
+      })
+    }
     return data.success === true
-  } catch {
-    // Si Cloudflare no responde, no bloqueamos al usuario
+  } catch (e: any) {
+    // Si Cloudflare no responde (red caída/timeout) → no bloqueamos al usuario.
+    console.warn('[TURNSTILE] network error contacting Cloudflare:', e?.message ?? e)
     return true
   }
 }
