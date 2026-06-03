@@ -27,8 +27,8 @@ const IMAGES = [
 // pero su lógica/ruta siguen intactas. Para restaurarlo: quitar `hidden: true`.
 const SERVICES = [
   { href: '/dashboard/services/ads/meta',      icon: 'fa-brands fa-meta',          label: 'Meta Ads',       desc: 'Facebook & Instagram',   accent: '#0081FB' },
-  { href: '/dashboard/services/ads/tiktok',    icon: 'fa-brands fa-tiktok',        label: 'TikTok Ads',     desc: 'TikTok for Business',    accent: '#EE1D52' },
-  { href: '/dashboard/services/ads/google',    icon: 'fa-brands fa-google',        label: 'Google Ads',     desc: 'Search · Display · YT',  accent: '#FBBC04' },
+  { href: '/dashboard/services/ads/tiktok',    icon: 'fa-brands fa-tiktok',        label: 'TikTok Ads',     desc: 'TikTok for Business',    accent: '#EE1D52', hidden: true },
+  { href: '/dashboard/services/ads/google',    icon: 'fa-brands fa-google',        label: 'Google Ads',     desc: 'Search · Display · YT',  accent: '#FBBC04', hidden: true },
   { href: '/dashboard/services/social',        icon: 'fa-solid fa-circle-nodes',   label: 'Social',         desc: 'Todas tus redes',        accent: '#9B6BFF' },
   { href: '/dashboard/services/landing-pages', icon: 'fa-solid fa-layer-group',    label: 'Landing Pages',  desc: 'Páginas que venden',     accent: '#7B5BFF' },
   { href: '/dashboard/services/whatsapp',      icon: 'fa-solid fa-robot',          label: 'Agentes de IA', desc: 'Venden 24/7',            accent: '#00C2FF' },
