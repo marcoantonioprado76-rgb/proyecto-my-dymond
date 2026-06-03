@@ -2,6 +2,7 @@ export const dynamic = 'force-dynamic'
 import { NextRequest, NextResponse } from 'next/server'
 import { getAdminUser, unauthorizedAdmin } from '@/lib/admin-auth'
 import { prisma } from '@/lib/prisma'
+import { reactivateUserAssetsAfterPlanRenewal } from '@/lib/plan-lifecycle'
 
 export async function DELETE(
   _request: NextRequest,
@@ -75,6 +76,8 @@ export async function PATCH(
             )
         WHERE id = ${params.id}::uuid
       `
+      // Reactivar stores/bots que el cron expirePlans haya pausado antes.
+      await reactivateUserAssetsAfterPlanRenewal(params.id)
     }
   }
   if (isActive !== undefined) {

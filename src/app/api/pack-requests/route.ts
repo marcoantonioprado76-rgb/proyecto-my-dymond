@@ -4,6 +4,7 @@ import { getAuthUser } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { verifyBscTransaction } from '@/lib/blockchain'
 import { sendAdminNewPlanRequestEmail, sendAdminPlanAutoActivatedEmail } from '@/lib/email'
+import { reactivateUserAssetsAfterPlanRenewal } from '@/lib/plan-lifecycle'
 
 /**
  * Dispara la notificación al admin (fire-and-forget) cuando se crea una solicitud PENDING.
@@ -241,6 +242,9 @@ export async function POST(request: NextRequest) {
               WHERE id = ${user.id}::uuid
             `
           }
+
+          // Reactivar stores/bots que el cron expirePlans haya pausado antes.
+          await reactivateUserAssetsAfterPlanRenewal(user.id, tx)
 
           await tx.auditLog.create({
             data: {

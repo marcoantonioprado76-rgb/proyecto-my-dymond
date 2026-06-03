@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getAdminUser, unauthorizedAdmin } from '@/lib/admin-auth'
 import { prisma } from '@/lib/prisma'
 import { sendPlanPurchaseConfirmedEmail } from '@/lib/email'
+import { reactivateUserAssetsAfterPlanRenewal } from '@/lib/plan-lifecycle'
 
 const PLAN_RANK: Record<string, number> = { NONE: 0, BASIC: 1, PRO: 2, ELITE: 3 }
 
@@ -103,6 +104,11 @@ export async function PATCH(
             WHERE id = ${purchaseRequest.userId}::uuid
           `
         }
+
+        // 4.5 Reactivar tiendas/bots que el cron expirePlans haya pausado
+        //     en períodos vencidos anteriores. Idempotente: si no hay nada
+        //     que reactivar, no hace nada.
+        await reactivateUserAssetsAfterPlanRenewal(purchaseRequest.userId, tx)
 
         // 5. Audit log
         await tx.auditLog.create({

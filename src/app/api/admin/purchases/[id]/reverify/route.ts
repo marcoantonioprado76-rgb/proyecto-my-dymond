@@ -4,6 +4,7 @@ import { getAdminUser, unauthorizedAdmin } from '@/lib/admin-auth'
 import { prisma } from '@/lib/prisma'
 import { verifyBscTransaction } from '@/lib/blockchain'
 import { sendPlanPurchaseConfirmedEmail, sendAdminPlanAutoActivatedEmail } from '@/lib/email'
+import { reactivateUserAssetsAfterPlanRenewal } from '@/lib/plan-lifecycle'
 
 const PLAN_RANK: Record<string, number> = { NONE: 0, BASIC: 1, PRO: 2, ELITE: 3 }
 
@@ -98,6 +99,9 @@ export async function POST(
                 `
             }
             // Si newRank <= currentRank y no es renewal: solo cierra la solicitud, no degrada
+
+            // Reactivar stores/bots que el cron expirePlans haya pausado antes.
+            await reactivateUserAssetsAfterPlanRenewal(req.userId, tx)
 
             await tx.auditLog.create({
                 data: {
