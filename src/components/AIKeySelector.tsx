@@ -61,10 +61,10 @@ export default function AIKeySelector({ onChange, compact = false }: Props) {
   const dotColor = usingOwn ? '#60a5fa' : lowBalance ? '#f59e0b' : usingAdmin ? '#a78bfa' : '#ef4444'
 
   return (
-    <div className="relative inline-block">
+    <div className="relative inline-block shrink-0 max-w-full">
       <button
         onClick={() => setOpen(v => !v)}
-        className="flex items-center gap-2 rounded-xl transition-all"
+        className="flex items-center gap-2 rounded-xl transition-all max-w-full"
         style={{
           padding: compact ? '5px 10px' : '7px 14px',
           background: 'rgba(255,255,255,0.06)',
@@ -73,15 +73,17 @@ export default function AIKeySelector({ onChange, compact = false }: Props) {
           fontSize: compact ? 11 : 12,
           fontWeight: 600,
         }}>
-        <Cpu style={{ width: compact ? 12 : 14, height: compact ? 12 : 14 }} />
+        <Cpu className="shrink-0" style={{ width: compact ? 12 : 14, height: compact ? 12 : 14 }} />
         <span
           className="w-1.5 h-1.5 rounded-full shrink-0"
           style={{ background: dotColor, boxShadow: `0 0 6px ${dotColor}` }}
         />
-        <span>{label}</span>
+        <span className="truncate whitespace-nowrap" style={{ maxWidth: compact ? 160 : 200 }}>
+          {label}
+        </span>
         {toggling
-          ? <Loader2 style={{ width: 12, height: 12 }} className="animate-spin" />
-          : <ChevronDown style={{ width: 12, height: 12, opacity: 0.5 }} />
+          ? <Loader2 style={{ width: 12, height: 12 }} className="animate-spin shrink-0" />
+          : <ChevronDown className="shrink-0" style={{ width: 12, height: 12, opacity: 0.5 }} />
         }
       </button>
 
@@ -90,10 +92,11 @@ export default function AIKeySelector({ onChange, compact = false }: Props) {
           {/* Backdrop */}
           <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
 
-          {/* Dropdown */}
+          {/* Dropdown — en móvil se ancla a la derecha pero respeta el viewport */}
           <div className="absolute right-0 mt-1.5 z-50 rounded-2xl overflow-hidden shadow-2xl"
             style={{
               width: 240,
+              maxWidth: 'calc(100vw - 24px)',
               background: 'rgba(28,25,44,0.97)',
               border: '1px solid rgba(255,255,255,0.15)',
               backdropFilter: 'blur(20px)',
