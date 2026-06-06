@@ -18,7 +18,7 @@ export async function GET() {
     const u = await prisma.user.findUnique({
         where: { id: user.id },
         select: {
-            id: true, username: true, email: true, fullName: true,
+            id: true, username: true, email: true, fullName: true, avatarUrl: true,
             country: true, city: true, identityDocument: true, dateOfBirth: true,
             isActive: true, plan: true, createdAt: true,
         },
@@ -52,6 +52,19 @@ export async function PATCH(req: NextRequest) {
         data.fullName = name
     }
 
+    // avatarUrl: URL de la foto subida (acepta null para borrar). Validamos que
+    // sea una URL de nuestro propio Supabase Storage (evita injection de URLs
+    // arbitrarias del cliente).
+    if (body.avatarUrl === null) {
+        data.avatarUrl = null
+    } else if (typeof body.avatarUrl === 'string') {
+        const url = body.avatarUrl.trim()
+        if (url && !/^https:\/\/[a-z0-9-]+\.supabase\.co\/storage\/v1\/object\/public\//i.test(url)) {
+            return NextResponse.json({ error: 'URL de avatar inválida' }, { status: 400 })
+        }
+        data.avatarUrl = url || null
+    }
+
     if (Object.keys(data).length === 0) {
         return NextResponse.json({ error: 'Nada que actualizar' }, { status: 400 })
     }
@@ -59,7 +72,7 @@ export async function PATCH(req: NextRequest) {
     const updated = await prisma.user.update({
         where: { id: user.id },
         data,
-        select: { id: true, username: true, email: true, fullName: true },
+        select: { id: true, username: true, email: true, fullName: true, avatarUrl: true },
     })
 
     return NextResponse.json({ success: true, user: updated })
