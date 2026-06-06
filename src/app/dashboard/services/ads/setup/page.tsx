@@ -24,14 +24,25 @@ export default function SetupPage() {
     useEffect(() => { fetchData() }, [])
 
     async function fetchData() {
-        const [oaiRes, intRes] = await Promise.all([
+        // Promise.allSettled + parseo aislado: una request que rompa (rate-limit,
+        // 500, network blip) ya no arrastra al resto del state.
+        const [oaiRes, intRes] = await Promise.allSettled([
             fetch('/api/ads/config/openai'),
             fetch('/api/ads/integrations/status')
         ])
-        const [oaiData, intData] = await Promise.all([oaiRes.json(), intRes.json()])
-        setConfig(oaiData.config)
-        if (oaiData.config?.model) setModel(oaiData.config.model)
-        setIntegrations(intData.integrations || [])
+        if (oaiRes.status === 'fulfilled' && oaiRes.value.ok) {
+            try {
+                const oaiData = await oaiRes.value.json()
+                setConfig(oaiData.config)
+                if (oaiData.config?.model) setModel(oaiData.config.model)
+            } catch { /* keep prev */ }
+        }
+        if (intRes.status === 'fulfilled' && intRes.value.ok) {
+            try {
+                const intData = await intRes.value.json()
+                setIntegrations(intData.integrations || [])
+            } catch { /* keep prev */ }
+        }
     }
 
     async function handleSaveOpenAI(e: React.FormEvent) {

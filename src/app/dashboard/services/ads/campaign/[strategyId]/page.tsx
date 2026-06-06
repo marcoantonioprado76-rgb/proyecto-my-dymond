@@ -177,11 +177,21 @@ function CampaignPageInner() {
     async function fetchAll() {
         setLoading(true)
         try {
-            const [strRes, briefRes] = await Promise.all([
+            // Promise.allSettled + parseo aislado: si una request rompe, las demás
+            // siguen poblando su state. La estrategia es REQUERIDA (early return),
+            // las otras son tolerantes a fallo.
+            const [strRes, briefRes] = await Promise.allSettled([
                 fetch('/api/ads/strategies'),
                 fetch('/api/ads/brief')
             ])
-            const [strData, briefData] = await Promise.all([strRes.json(), briefRes.json()])
+            let strData: any = { strategies: [] }
+            let briefData: any = { brief: null }
+            if (strRes.status === 'fulfilled' && strRes.value.ok) {
+                try { strData = await strRes.value.json() } catch { /* fallback {} */ }
+            }
+            if (briefRes.status === 'fulfilled' && briefRes.value.ok) {
+                try { briefData = await briefRes.value.json() } catch { /* fallback {} */ }
+            }
             const strat = strData.strategies?.find((s: any) => s.id === strategyId)
             if (!strat) { router.push('/dashboard/services/ads/strategies'); return }
             setStrategy(strat)
@@ -244,17 +254,24 @@ function CampaignPageInner() {
             }
 
             if (strat.platform === 'META') {
-                const [pagesRes, pixelsRes, waRes] = await Promise.all([
+                // Mismo patrón allSettled: pages/pixels/whatsapp-numbers son
+                // independientes y si una falla no debería tumbar a las otras.
+                const [pagesRes, pixelsRes, waRes] = await Promise.allSettled([
                     fetch('/api/ads/integrations/meta/pages'),
                     firstAccountId
                         ? fetch(`/api/ads/integrations/meta/pixels?adAccountId=${firstAccountId}`)
                         : Promise.resolve(new Response(JSON.stringify({ pixels: [] }))),
                     fetch('/api/ads/integrations/meta/whatsapp-numbers')
                 ])
-                const [pData, pxData, waData] = await Promise.all([pagesRes.json(), pixelsRes.json(), waRes.json()])
-                setPages(pData.pages || [])
-                setPixels(pxData.pixels || [])
-                setWaNumbers(waData.phoneNumbers || [])
+                if (pagesRes.status === 'fulfilled' && pagesRes.value.ok) {
+                    try { const d = await pagesRes.value.json(); setPages(d.pages || []) } catch { /* keep prev */ }
+                }
+                if (pixelsRes.status === 'fulfilled' && pixelsRes.value.ok) {
+                    try { const d = await pixelsRes.value.json(); setPixels(d.pixels || []) } catch { /* keep prev */ }
+                }
+                if (waRes.status === 'fulfilled' && waRes.value.ok) {
+                    try { const d = await waRes.value.json(); setWaNumbers(d.phoneNumbers || []) } catch { /* keep prev */ }
+                }
             }
         } catch (e) { console.error(e) }
         finally { setLoading(false) }

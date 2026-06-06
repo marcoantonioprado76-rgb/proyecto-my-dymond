@@ -69,26 +69,32 @@ function MetaAdsDashboardInner() {
 
     async function fetchAll() {
         setLoading(true)
-        try {
-            const [intRes, campaignRes, briefRes, oaiRes] = await Promise.all([
-                fetch('/api/ads/integrations/status'),
-                fetch('/api/ads/campaign'),
-                fetch('/api/ads/brief'),
-                fetch('/api/ads/config/openai')
-            ])
-            const [iData, cData, bData, oData] = await Promise.all([
-                intRes.json(), campaignRes.json(), briefRes.json(), oaiRes.json()
-            ])
-            setIntegrations(iData.integrations || [])
-            setCampaigns(cData.campaigns || [])
-            setBrief(bData.brief || null)
-            setAllBriefs(bData.briefs || [])
-            setOpenaiConfig(oData.config || null)
-        } catch (e) {
-            console.error(e)
-        } finally {
-            setLoading(false)
+        // Promise.allSettled + parseo aislado por request: si una falla (rate-limit,
+        // 500, network blip, deploy en curso), las demás siguen poblando su state.
+        // ANTES: cualquier .json() roto rechazaba todo y se "perdían" los 4 states.
+        const [intRes, campaignRes, briefRes, oaiRes] = await Promise.allSettled([
+            fetch('/api/ads/integrations/status'),
+            fetch('/api/ads/campaign'),
+            fetch('/api/ads/brief'),
+            fetch('/api/ads/config/openai')
+        ])
+        if (intRes.status === 'fulfilled' && intRes.value.ok) {
+            try { const d = await intRes.value.json(); setIntegrations(d.integrations || []) } catch { /* keep prev */ }
         }
+        if (campaignRes.status === 'fulfilled' && campaignRes.value.ok) {
+            try { const d = await campaignRes.value.json(); setCampaigns(d.campaigns || []) } catch { /* keep prev */ }
+        }
+        if (briefRes.status === 'fulfilled' && briefRes.value.ok) {
+            try {
+                const d = await briefRes.value.json()
+                setBrief(d.brief || null)
+                setAllBriefs(d.briefs || [])
+            } catch { /* keep prev */ }
+        }
+        if (oaiRes.status === 'fulfilled' && oaiRes.value.ok) {
+            try { const d = await oaiRes.value.json(); setOpenaiConfig(d.config || null) } catch { /* keep prev */ }
+        }
+        setLoading(false)
     }
 
     const handleConnect = async () => {

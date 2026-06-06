@@ -36,15 +36,26 @@ export default function PreviewPage() {
     async function fetchData() {
         setLoading(true)
         try {
-            const [campRes, copyRes] = await Promise.all([
+            // Promise.allSettled + parseo aislado: una request rota no arrastra
+            // a la otra. La campaña es requerida (early return); los copies
+            // se mantienen si la request específica falla.
+            const [campRes, copyRes] = await Promise.allSettled([
                 fetch('/api/ads/campaign'),
                 fetch(`/api/ads/campaign/${campaignId}/copies`)
             ])
-            const [campData, copyData] = await Promise.all([campRes.json(), copyRes.json()])
+            let campData: any = { campaigns: [] }
+            if (campRes.status === 'fulfilled' && campRes.value.ok) {
+                try { campData = await campRes.value.json() } catch { /* fallback */ }
+            }
             const camp = campData.campaigns?.find((c: any) => c.id === campaignId)
             if (!camp) { router.push('/dashboard/services/ads'); return }
             setCampaign(camp)
-            setCreatives(copyData.creatives || [])
+            if (copyRes.status === 'fulfilled' && copyRes.value.ok) {
+                try {
+                    const copyData = await copyRes.value.json()
+                    setCreatives(copyData.creatives || [])
+                } catch { /* keep prev */ }
+            }
         } catch (e) { console.error(e) }
         finally { setLoading(false) }
     }
