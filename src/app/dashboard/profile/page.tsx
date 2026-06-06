@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { User, Mail, MapPin, Calendar, FileText, UserCircle } from 'lucide-react'
+import { User, Mail, MapPin, Calendar, FileText, UserCircle, Pencil, Check, X, Loader2 } from 'lucide-react'
 
 interface UserProfile {
   fullName: string
@@ -18,6 +18,10 @@ interface UserProfile {
 export default function ProfilePage() {
   const [user, setUser] = useState<UserProfile | null>(null)
   const [loading, setLoading] = useState(true)
+  const [editing, setEditing] = useState(false)
+  const [nameInput, setNameInput] = useState('')
+  const [saving, setSaving] = useState(false)
+  const [msg, setMsg] = useState<{ type: 'ok' | 'err'; text: string } | null>(null)
 
   useEffect(() => {
     fetch('/api/network')
@@ -28,6 +32,49 @@ export default function ProfilePage() {
       })
       .catch(() => setLoading(false))
   }, [])
+
+  function startEdit() {
+    if (!user) return
+    setNameInput(user.fullName)
+    setEditing(true)
+    setMsg(null)
+  }
+
+  function cancelEdit() {
+    setEditing(false)
+    setMsg(null)
+  }
+
+  async function saveName() {
+    if (!user) return
+    const trimmed = nameInput.trim()
+    if (trimmed.length < 3) {
+      setMsg({ type: 'err', text: 'El nombre debe tener al menos 3 caracteres' })
+      return
+    }
+    setSaving(true)
+    setMsg(null)
+    try {
+      const res = await fetch('/api/profile', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ fullName: trimmed }),
+      })
+      const d = await res.json().catch(() => ({}))
+      if (!res.ok) {
+        setMsg({ type: 'err', text: d.error || 'Error al guardar' })
+      } else {
+        setUser({ ...user, fullName: trimmed })
+        setEditing(false)
+        setMsg({ type: 'ok', text: 'Nombre actualizado ✓' })
+        setTimeout(() => setMsg(null), 2500)
+      }
+    } catch {
+      setMsg({ type: 'err', text: 'Error de red. Probá de nuevo.' })
+    } finally {
+      setSaving(false)
+    }
+  }
 
   if (loading) {
     return (
@@ -91,8 +138,63 @@ export default function ProfilePage() {
               style={{ background: user.isActive ? '#00FF88' : '#ef4444', boxShadow: user.isActive ? '0 0 8px #00FF88' : 'none' }} />
           </div>
 
-          <h2 className="text-base font-medium text-white uppercase tracking-widest mb-1">{user.fullName}</h2>
-          <p className="text-xs font-light tracking-[0.3em] uppercase mb-5" style={{ color: '#D203DD' }}>@{user.username}</p>
+          {/* Nombre editable */}
+          {editing ? (
+            <div className="w-full mb-1 space-y-2">
+              <input
+                type="text"
+                value={nameInput}
+                onChange={e => setNameInput(e.target.value)}
+                onKeyDown={e => { if (e.key === 'Enter') saveName(); if (e.key === 'Escape') cancelEdit() }}
+                autoFocus
+                disabled={saving}
+                maxLength={80}
+                className="w-full text-center text-base font-medium text-white uppercase tracking-widest px-3 py-2 rounded-lg outline-none transition-all"
+                style={{
+                  background: 'rgba(255,255,255,0.06)',
+                  border: '1px solid rgba(210,3,221,0.5)',
+                  boxShadow: '0 0 12px rgba(210,3,221,0.18)',
+                }}
+              />
+              <div className="flex gap-2 justify-center">
+                <button onClick={saveName} disabled={saving}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-widest transition-all disabled:opacity-50"
+                  style={{ background: 'rgba(0,255,136,0.15)', border: '1px solid rgba(0,255,136,0.35)', color: '#00FF88' }}>
+                  {saving ? <Loader2 size={12} className="animate-spin" /> : <Check size={12} />}
+                  Guardar
+                </button>
+                <button onClick={cancelEdit} disabled={saving}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-widest transition-all disabled:opacity-50"
+                  style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.15)', color: 'rgba(255,255,255,0.6)' }}>
+                  <X size={12} />
+                  Cancelar
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="group relative flex items-center justify-center gap-2 mb-1">
+              <h2 className="text-base font-medium text-white uppercase tracking-widest">{user.fullName}</h2>
+              <button onClick={startEdit}
+                className="flex items-center justify-center w-7 h-7 rounded-lg transition-all opacity-50 group-hover:opacity-100"
+                style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.15)' }}
+                title="Editar nombre">
+                <Pencil className="w-3 h-3" style={{ color: '#D203DD' }} />
+              </button>
+            </div>
+          )}
+
+          <p className="text-xs font-light tracking-[0.3em] uppercase mb-3" style={{ color: '#D203DD' }}>@{user.username}</p>
+
+          {msg && (
+            <div className="w-full mb-3 py-2 px-3 rounded-lg text-[11px] font-medium"
+              style={{
+                background: msg.type === 'ok' ? 'rgba(0,255,136,0.10)' : 'rgba(239,68,68,0.10)',
+                border: `1px solid ${msg.type === 'ok' ? 'rgba(0,255,136,0.30)' : 'rgba(239,68,68,0.30)'}`,
+                color: msg.type === 'ok' ? '#00FF88' : '#fca5a5',
+              }}>
+              {msg.text}
+            </div>
+          )}
 
           <div className="w-full py-2.5 px-4 rounded-xl"
             style={{ background: 'linear-gradient(135deg, rgba(154,203,255,0.12) 0%, rgba(255,125,224,0.12) 50%, rgba(162,102,255,0.12) 100%)', border: '1px solid rgba(255,255,255,0.15)' }}>
