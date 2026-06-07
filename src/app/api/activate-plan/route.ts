@@ -86,6 +86,20 @@ export async function POST(request: NextRequest) {
         `
       }
 
+      // Reactivar bots y stores que el cron de expire-plans hubiera pausado por
+      // vencimiento. Sin esto, los bots quedan PAUSED después de renovar y dejan
+      // de responder mensajes (handleMessage ignora bots no-ACTIVE).
+      await tx.$executeRaw`
+        UPDATE bots
+        SET status = 'ACTIVE'::"BotStatus"
+        WHERE user_id = ${user.id}::uuid AND status = 'PAUSED'
+      `
+      await tx.$executeRaw`
+        UPDATE stores
+        SET active = true
+        WHERE user_id = ${user.id}::uuid AND active = false
+      `
+
       await tx.auditLog.create({
         data: {
           userId: user.id,
