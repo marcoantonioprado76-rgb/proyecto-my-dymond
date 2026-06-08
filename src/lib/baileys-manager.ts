@@ -536,11 +536,28 @@ export const BaileysManager = {
         }
     },
 
-    async connect(botId: string, botName: string, openaiKey: string, reportPhone: string) {
+    async connect(botId: string, botName: string, openaiKey: string, reportPhone: string, opts: { forceFresh?: boolean } = {}) {
         const existing = connections.get(botId)
-        if (existing?.status === 'connected' || existing?.status === 'connecting') return
+        // Si ya está realmente conectado, no tocar nunca.
+        if (existing?.status === 'connected') return
+        // Reconexión automática (sin forceFresh): no duplicar un intento en curso.
+        if (!opts.forceFresh && (existing?.status === 'connecting' || existing?.status === 'qr_ready')) return
 
         const sessionDir = path.join(SESSIONS_DIR, botId)
+
+        // forceFresh = el usuario pidió un QR nuevo desde el panel. Matamos cualquier
+        // socket atascado y BORRAMOS la sesión vieja/corrupta del disco, porque Baileys
+        // solo emite QR cuando NO hay credenciales guardadas. Sin esto, un bot con
+        // sesión inválida reintenta con esas credenciales rotas y nunca muestra QR.
+        if (opts.forceFresh) {
+            if (existing?.sock) {
+                try { (existing.sock as any).end?.(undefined) } catch { /* noop */ }
+                try { (existing.sock as any).ws?.close?.() } catch { /* noop */ }
+            }
+            connections.delete(botId)
+            try { if (fs.existsSync(sessionDir)) fs.rmSync(sessionDir, { recursive: true, force: true }) } catch { /* noop */ }
+        }
+
         if (!fs.existsSync(sessionDir)) fs.mkdirSync(sessionDir, { recursive: true })
 
         const conn: BaileysConnection = { status: 'connecting', openaiKey, reportPhone, botId, botName }

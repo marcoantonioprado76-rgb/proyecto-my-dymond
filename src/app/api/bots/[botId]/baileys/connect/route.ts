@@ -75,12 +75,16 @@ export async function POST(
             }
         }
 
-        // Iniciar conexión en background (no bloquea el response)
+        // Iniciar conexión en background (no bloquea el response).
+        // forceFresh: el usuario pulsó "Conectar" en el panel → siempre arrancar sesión
+        // nueva (borra la sesión vieja/corrupta en disco) para GARANTIZAR que salga el QR.
+        // Si el bot ya está realmente conectado, connect() retorna sin hacer nada.
         BaileysManager.connect(
             bot.id,
             bot.name,
             openaiKey,                       // puede ser '' — baileys-manager hará fallback dinámico
             bot.secret.reportPhone ?? '',
+            { forceFresh: true },
         ).catch(err => console.error('[BAILEYS] connect error:', err))
 
         return NextResponse.json({ ok: true })
