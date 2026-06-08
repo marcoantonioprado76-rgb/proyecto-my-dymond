@@ -161,5 +161,32 @@ export async function register() {
 
         // (B) Health check cada 5 minutos
         setInterval(() => reconnectAllPendingBaileys('HEALTHCHECK'), 5 * 60 * 1000)
+
+        // ── Broadcast CRM: arrancar el scheduler + reanudar campañas interrumpidas ──
+        //
+        // Antes el scheduler solo arrancaba al tocar /execute → tras un reinicio, una
+        // campaña PROGRAMADA podía no ejecutarse nunca. Y una campaña RUNNING cortada
+        // por un deploy quedaba colgada para siempre (corre en una tarea larga sin
+        // resume). Acá arrancamos el scheduler en el boot y reanudamos las RUNNING
+        // (executeBroadcast solo procesa contactos PENDING, así que es seguro).
+        const startBroadcasts = async () => {
+            try {
+                const { startBroadcastScheduler, executeBroadcast } = await import('@/lib/broadcast-worker')
+                const { prisma } = await import('@/lib/prisma')
+                startBroadcastScheduler()
+                const running = await (prisma as any).broadcastCampaign.findMany({
+                    where: { status: 'RUNNING' },
+                    select: { id: true },
+                })
+                for (const c of running) {
+                    console.log(`[BROADCAST] Reanudando campaña interrumpida ${c.id}`)
+                    executeBroadcast(c.id).catch((err: unknown) => console.error(`[BROADCAST] Error reanudando ${c.id}:`, err))
+                }
+            } catch (err) {
+                console.error('[BROADCAST] startup error:', err)
+            }
+        }
+        // 12s tras el boot — después del reconnect de Baileys (10s), para que el bot esté listo.
+        setTimeout(startBroadcasts, 12_000)
     }
 }

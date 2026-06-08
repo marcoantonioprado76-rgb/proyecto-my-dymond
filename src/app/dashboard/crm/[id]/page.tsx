@@ -151,15 +151,21 @@ export default function CrmCampaignDetailPage() {
 
     async function fetchCampaign() {
         try {
-            const res = await fetch(`/api/crm/campaigns/${id}`)
+            const res = await fetch(`/api/crm/campaigns/${id}`, { cache: 'no-store' })
+            // Solo expulsamos si la campaña realmente NO existe (404). Un 429/500/red
+            // transitorio durante el polling de 4s NO debe sacarte de la pantalla ni
+            // perder el estado — conservamos la campaña que ya teníamos.
+            if (res.status === 404) { router.push('/dashboard/crm'); return }
+            if (!res.ok) return
             const data = await res.json()
-            if (!res.ok) { router.push('/dashboard/crm'); return }
-            setCampaign(data.campaign)
-            if (data.campaign?.bot?.status) {
-                setBotAiActive(data.campaign.bot.status === 'ACTIVE')
-                setActiveBotId(data.campaign.bot.id)
+            if (data.campaign) {
+                setCampaign(data.campaign)
+                if (data.campaign?.bot?.status) {
+                    setBotAiActive(data.campaign.bot.status === 'ACTIVE')
+                    setActiveBotId(data.campaign.bot.id)
+                }
             }
-        } catch { setError('Error al cargar') }
+        } catch { /* fallo transitorio → conservar estado actual */ }
         finally { setLoading(false) }
     }
 

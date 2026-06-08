@@ -48,10 +48,18 @@ export default function CrmPage() {
 
     async function fetchCampaigns() {
         try {
-            const res = await fetch('/api/crm/campaigns')
-            const data = await res.json()
-            setCampaigns(data.campaigns || [])
-        } catch { setError('Error al cargar campañas') }
+            const res = await fetch('/api/crm/campaigns', { cache: 'no-store' })
+            if (res.ok) {
+                const data = await res.json()
+                // Solo actualizamos si vino una lista válida. Ante 429/500/red NO
+                // vaciamos la lista — conservamos la anterior para que las campañas
+                // no "desaparezcan" por un fallo transitorio durante el polling.
+                if (Array.isArray(data.campaigns)) {
+                    setCampaigns(data.campaigns)
+                    setError(null)
+                }
+            }
+        } catch { /* fallo transitorio → conservar lista previa */ }
         finally { setLoading(false) }
     }
 

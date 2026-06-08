@@ -88,7 +88,25 @@ function delayMs(value: number, unit: string): number {
     return value * 1000
 }
 
+// Guard de concurrencia: campañas que se están ejecutando AHORA en este proceso.
+// Evita doble envío si la misma campaña la disparan a la vez el scheduler, el
+// reanude de arranque y/o un /execute manual.
+const _running = new Set<string>()
+
 export async function executeBroadcast(campaignId: string) {
+    if (_running.has(campaignId)) {
+        console.warn(`[BROADCAST] Campaña ${campaignId} ya en ejecución en este proceso, omitiendo`)
+        return
+    }
+    _running.add(campaignId)
+    try {
+        await _runBroadcast(campaignId)
+    } finally {
+        _running.delete(campaignId)
+    }
+}
+
+async function _runBroadcast(campaignId: string) {
     const campaign = await (prisma as any).broadcastCampaign.findUnique({
         where: { id: campaignId },
         include: {

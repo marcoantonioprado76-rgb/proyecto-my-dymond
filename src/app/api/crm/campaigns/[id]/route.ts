@@ -69,12 +69,26 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
 
     const campaign = await (prisma as any).broadcastCampaign.findFirst({
         where: { id: params.id, userId: user.id },
+        include: { bot: { select: { id: true, name: true } } },
     })
     if (!campaign) return NextResponse.json({ error: 'Campaña no encontrada' }, { status: 404 })
     if (campaign.status === 'RUNNING') {
         return NextResponse.json({ error: 'No se puede eliminar una campaña en ejecución' }, { status: 400 })
     }
 
-    await (prisma as any).broadcastCampaign.delete({ where: { id: params.id } })
+    // Si la campaña usa un bot DEDICADO oculto (__crm__...), lo borramos también para no
+    // dejar bots + sesiones huérfanas en disco (cada uno consume inodos del disco de Render).
+    // NUNCA tocamos un bot real que el usuario haya asignado — solo los con prefijo __crm__.
+    const crmBot = campaign.bot?.name?.startsWith('__crm__') ? campaign.bot : null
+    if (crmBot) {
+        try {
+            const { BaileysManager } = await import('@/lib/baileys-manager')
+            BaileysManager.disconnect(crmBot.id) // cierra el socket + borra la sesión del disco
+        } catch { /* noop */ }
+        // Borrar el bot cascadea la campaña + contactos + logs + imágenes.
+        await prisma.bot.delete({ where: { id: crmBot.id } }).catch(() => {})
+    }
+    // Red de seguridad: si no era __crm__ (o el cascade no aplicó), borrar la campaña igual.
+    await (prisma as any).broadcastCampaign.delete({ where: { id: params.id } }).catch(() => {})
     return NextResponse.json({ ok: true })
 }
