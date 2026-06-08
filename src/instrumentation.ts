@@ -29,6 +29,66 @@ export async function register() {
         expirePlans() // ejecutar al iniciar también
         setInterval(expirePlans, 60 * 60 * 1000)
 
+        // ── Limpieza de sesiones Baileys huérfanas (al arrancar) ─────────────
+        //
+        // Las sesiones se guardan en disco por botId. Al borrar un bot, su carpeta
+        // queda huérfana acumulando miles de archivos (pre-keys) que llenan el disco
+        // persistente de Render → ENOSPC (inodos) → no se crean sesiones nuevas (no
+        // sale QR). Acá borramos SOLO carpetas cuyo botId ya NO existe en la BD.
+        //
+        // Guardas de seguridad (para NO borrar sesiones buenas):
+        //   1. Solo carpetas cuyo nombre es un UUID válido (los botId).
+        //   2. Solo borra si el botId no aparece en la BD.
+        //   3. Si la consulta a la BD falla → el try/catch aborta sin borrar nada.
+        //   4. Si la BD devuelve 0 bots pero hay carpetas (situación anómala) →
+        //      abortamos por seguridad en vez de borrar todo.
+        const cleanupOrphanBaileysSessions = async () => {
+            try {
+                const fs = await import('fs')
+                const path = await import('path')
+                const { prisma } = await import('@/lib/prisma')
+
+                const dir = process.env.BAILEYS_SESSIONS_DIR || path.join(process.cwd(), 'baileys-sessions')
+                if (!fs.existsSync(dir)) return
+
+                const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+                const entries = fs.readdirSync(dir, { withFileTypes: true })
+                    .filter(e => e.isDirectory() && UUID_RE.test(e.name))
+                if (entries.length === 0) return
+
+                const dirIds = entries.map(e => e.name)
+                const existing = await prisma.bot.findMany({
+                    where: { id: { in: dirIds } },
+                    select: { id: true },
+                })
+                const existingSet = new Set(existing.map(b => b.id))
+
+                // Guarda #4: si NINGUNA carpeta matchea un bot, algo raro pasó
+                // (BD vacía/incompleta). No borramos nada para no romper sesiones buenas.
+                if (existingSet.size === 0) {
+                    console.warn(`[CLEANUP] ${dirIds.length} carpeta(s) de sesión y 0 bots coincidentes en BD — aborto por seguridad, no borro nada`)
+                    return
+                }
+
+                let removed = 0
+                for (const e of entries) {
+                    if (existingSet.has(e.name)) continue // bot existe → NO tocar
+                    try {
+                        fs.rmSync(path.join(dir, e.name), { recursive: true, force: true })
+                        removed++
+                    } catch (rmErr) {
+                        console.error(`[CLEANUP] No se pudo borrar sesión huérfana ${e.name}:`, rmErr)
+                    }
+                }
+                if (removed > 0) console.log(`[CLEANUP] ${removed} sesión(es) huérfana(s) de bots eliminados borradas (liberando inodos del disco)`)
+                else console.log('[CLEANUP] Sin sesiones huérfanas que limpiar')
+            } catch (err) {
+                console.error('[CLEANUP] cleanupOrphanBaileysSessions error (no se borró nada):', err)
+            }
+        }
+        // Corre 5s tras el boot — antes de la reconexión (10s), para liberar inodos primero.
+        setTimeout(cleanupOrphanBaileysSessions, 5_000)
+
         // ── Reconectar bots Baileys en background ──────────────────────────
         //
         // Estrategia en 2 capas:
