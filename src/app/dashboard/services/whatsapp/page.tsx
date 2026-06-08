@@ -3311,17 +3311,44 @@ export default function WhatsAppPage() {
   async function loadBots() {
     setLoading(true)
     try {
-      const res = await fetch('/api/bots')
-      if (res.ok) {
-        const data = await res.json()
-        setBots(data.bots)
+      // Reintenta ante fallos transitorios (429 del rate-limit, BD lenta, 500).
+      // CLAVE: nunca vaciamos la lista si falla — conservamos la anterior, así los
+      // bots no "desaparecen" del panel por un parpadeo de red/servidor.
+      const delays = [600, 1200, 2400, 4000]
+      for (let attempt = 0; attempt <= delays.length; attempt++) {
+        try {
+          const res = await fetch('/api/bots', { cache: 'no-store' })
+          if (res.ok) {
+            const data = await res.json()
+            if (Array.isArray(data.bots)) {
+              setBots(data.bots)
+              return
+            }
+          }
+          // 429 / 500 / forma inesperada → caer al backoff y reintentar
+        } catch {
+          // error de red → reintentar
+        }
+        if (attempt < delays.length) {
+          await new Promise(r => setTimeout(r, delays[attempt]))
+        }
       }
+      // Si tras todos los reintentos no se pudo: NO tocar `bots` (se mantiene lo previo).
     } finally {
       setLoading(false)
     }
   }
 
   useEffect(() => { loadBots() }, [])
+
+  // Si la pestaña vuelve a tener foco y la lista quedó vacía por un fallo previo,
+  // reintentamos cargar (recupera el caso "se vació y no volvió solo").
+  useEffect(() => {
+    const onFocus = () => { if (bots.length === 0) loadBots() }
+    window.addEventListener('focus', onFocus)
+    return () => window.removeEventListener('focus', onFocus)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [bots.length])
 
   function handleBotCreated(bot: Bot, webhookUrl: string) {
     setBots(prev => [bot, ...prev])
