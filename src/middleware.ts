@@ -5,16 +5,24 @@ import type { NextRequest } from 'next/server'
 // Clave: primeros 32 chars del JWT → 1 entrada por usuario
 const _apiStore = new Map<string, { count: number; resetAt: number }>()
 
+// Límite por usuario autenticado. 10/10s era demasiado bajo: al cargar una página
+// del dashboard se disparan ~12 requests de golpe (analytics, credenciales, productos,
+// conversaciones, plan-status, notificaciones…) MÁS el polling de estado cada 3s, lo
+// que daba 429 en uso legítimo (y bloqueaba el QR de WhatsApp). 60/10s deja headroom
+// de sobra para el dashboard pero sigue frenando floods abusivos.
+const API_RL_MAX = 60
+const API_RL_WINDOW_MS = 10_000
+
 function dashboardRateLimit(token: string): boolean {
   const key = token.slice(0, 32)
   const now = Date.now()
   const entry = _apiStore.get(key)
 
   if (!entry || entry.resetAt < now) {
-    _apiStore.set(key, { count: 1, resetAt: now + 10_000 }) // ventana 10s
+    _apiStore.set(key, { count: 1, resetAt: now + API_RL_WINDOW_MS })
     return true
   }
-  if (entry.count >= 10) return false // bloqueado: 10 requests / 10s
+  if (entry.count >= API_RL_MAX) return false
   entry.count++
   return true
 }
@@ -61,9 +69,12 @@ export function middleware(request: NextRequest) {
 
   // Rate limiting en todas las rutas /api/ autenticadas
   // Excluir: auth, webhooks (no tienen token → excluidos naturalmente)
+  // El polling de estado del QR (cada 3s) se excluye del rate-limit: es un read
+  // liviano y CRÍTICO para que aparezca el código QR al vincular WhatsApp.
   if (pathname.startsWith('/api/') && token &&
       !pathname.startsWith('/api/auth/') &&
-      !pathname.startsWith('/api/webhooks/')) {
+      !pathname.startsWith('/api/webhooks/') &&
+      !pathname.endsWith('/baileys/status')) {
     if (!dashboardRateLimit(token)) {
       return new NextResponse(
         JSON.stringify({ error: 'Demasiadas solicitudes. Espera 10 segundos.' }),
