@@ -20,7 +20,7 @@ import { chatWithUsage } from '@/lib/openai'
 import { decrypt } from '@/lib/crypto'
 import { toDataURL } from 'qrcode'
 import { processFollowUps } from './follow-up-worker'
-import { buildSystemPrompt, detectIdentifiedProduct, enforceCharLimits } from './bot-engine'
+import { buildSystemPrompt, detectIdentifiedProduct, enforceCharLimits, extractSentUrls } from './bot-engine'
 import { createNotification } from './notifications'
 import { sendBotSaleReportEmail } from './email'
 import { notifyCreditsExhausted } from './notify-credits'
@@ -46,6 +46,8 @@ declare global {
     var __baileys_connections: Map<string, BaileysConnection> | undefined
     // eslint-disable-next-line no-var
     var __follow_up_worker_started: boolean | undefined
+    // eslint-disable-next-line no-var
+    var __follow_up_worker_running: boolean | undefined
     // eslint-disable-next-line no-var
     var __social_scheduler_started: boolean | undefined
 }
@@ -253,12 +255,17 @@ async function handleMessage(
             botId: conn.botId,
             userPhone,
             userName,
+            botState: { create: { welcomeSent: false } },
         },
+        include: { botState: true },
     })
 
     const resolvedUserName = userName || conversation.userName || ''
     const conversationId = conversation.id
     const arrivedAt = conversation.updatedAt
+    // welcomeSent: si el primer mensaje del producto ya se envió, NO repetirlo ni su foto.
+    // Conversaciones viejas sin botState → false (se tratará como aún-no-enviado).
+    const welcomeSent = conversation.botState?.welcomeSent ?? false
 
     await prisma.message.create({
         data: {
@@ -331,6 +338,15 @@ async function handleMessage(
         where: { bots: { some: { botId: conn.botId } }, active: true },
     })
 
+    // URLs ya enviadas — escanear TODOS los mensajes del asistente (no solo los últimos 10),
+    // para que aunque una foto/video se haya mandado hace 20 mensajes, no se repita.
+    const allAssistantMessages = await prisma.message.findMany({
+        where: { conversationId, role: 'assistant', buffered: false },
+        select: { content: true, role: true },
+        orderBy: { createdAt: 'asc' },
+    })
+    const sentUrls = extractSentUrls(allAssistantMessages)
+
     const identifiedProductIds = detectIdentifiedProduct(chatHistory, botProducts as Array<Record<string, unknown>>)
     if (identifiedProductIds.length) {
         const names = identifiedProductIds.map(id => botProducts.find(p => p.id === id)?.name).join(', ')
@@ -343,6 +359,8 @@ async function handleMessage(
         resolvedUserName,
         userPhone,
         identifiedProductIds,
+        sentUrls,
+        welcomeSent,
     )
 
     const aiModel = (bot as any).aiModel || 'gpt-4o'
@@ -377,7 +395,15 @@ async function handleMessage(
         return
     }
 
-    enforceCharLimits(response, bot, chatHistory.length === 0)
+    // isFirstInteraction = el primer mensaje del producto aún no se envió → no truncar mensaje1.
+    enforceCharLimits(response, bot, !welcomeSent)
+
+    // Filtro de seguridad: quitar URLs ya enviadas aunque la IA las vuelva a incluir.
+    if (sentUrls.length) {
+        const sentSet = new Set(sentUrls)
+        response.fotos_mensaje1 = (response.fotos_mensaje1 ?? []).filter((u: string) => !sentSet.has(u))
+        response.videos_mensaje1 = (response.videos_mensaje1 ?? []).filter((u: string) => !sentSet.has(u))
+    }
 
     const sendMsg = async (text: string) => {
         await sock.sendPresenceUpdate('composing', jid)
@@ -404,14 +430,17 @@ async function handleMessage(
     if (response.mensaje2) await sendMsg(response.mensaje2)
     if (response.mensaje3) await sendMsg(response.mensaje3)
 
-    if (response.reporte && conn.reportPhone) {
+    // reportPhone FRESCO de BD: si el dueño lo cambió en Credenciales, el socket vivo
+    // sigue con el viejo en memoria. Preferimos el de BD y caemos al de memoria.
+    const reportPhone = freshSecret?.reportPhone || conn.reportPhone
+    if (response.reporte && reportPhone) {
         // Persistir SIEMPRE el reporte en BD aunque falle el envío por WhatsApp.
         await prisma.conversation.update({
             where: { id: conversationId },
             data: { sold: true, soldAt: new Date(), orderReport: response.reporte }
         }).catch(() => { })
 
-        const reportJid = `${conn.reportPhone.replace(/^\+/, '')}@s.whatsapp.net`
+        const reportJid = `${reportPhone.replace(/^\+/, '')}@s.whatsapp.net`
         const sendOk = await sock.sendMessage(reportJid, { text: response.reporte })
             .then(() => true)
             .catch((e: any) => { console.error('[BAILEYS] sendReport ERROR:', e?.message); return false })
@@ -461,6 +490,17 @@ async function handleMessage(
             buffered: false,
         },
     })
+
+    // Marcar welcomeSent=true SOLO cuando el producto ya está identificado y se envió
+    // mensaje1: así el primer mensaje del producto + su foto principal no se repiten en
+    // turnos siguientes. upsert para conversaciones viejas que no tienen fila botState.
+    if (!welcomeSent && response.mensaje1 && identifiedProductIds.length > 0) {
+        await prisma.botState.upsert({
+            where: { conversationId },
+            create: { conversationId, welcomeSent: true, welcomeSentAt: new Date() },
+            update: { welcomeSent: true, welcomeSentAt: new Date() },
+        }).catch(() => { })
+    }
 }
 
 export const BaileysManager = {
@@ -603,8 +643,18 @@ export const BaileysManager = {
 
 if (!global.__follow_up_worker_started) {
     global.__follow_up_worker_started = true
-    setInterval(() => {
-        processFollowUps().catch(() => { })
+    setInterval(async () => {
+        // Guard de re-entrada: si el tick anterior AÚN corre (muchos seguimientos
+        // pendientes + llamadas lentas a OpenAI), no arrancar otro en paralelo.
+        // Sin esto los ticks se solapan y la misma conversación recibe varios
+        // seguimientos seguidos.
+        if (global.__follow_up_worker_running) return
+        global.__follow_up_worker_running = true
+        try {
+            await processFollowUps()
+        } catch { /* noop */ } finally {
+            global.__follow_up_worker_running = false
+        }
     }, 60 * 1000)
 }
 

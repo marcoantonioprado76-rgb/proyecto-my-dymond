@@ -145,9 +145,26 @@ async function readAdminApiKey(): Promise<string | null> {
             select: { openaiKeyEnc: true },
         }),
     ])
-    const enc = globalSetting?.value || adminConfig?.openaiKeyEnc
-    if (!enc) return null
-    try { return decrypt(enc, ENC_KEY) } catch { return null }
+
+    // Fuente 1 — AppSetting 'openai_global_key'. El panel /admin/settings lo guarda
+    // en TEXTO PLANO (`String(value)`), pero versiones previas podían cifrarlo con
+    // ads/encryption. Aceptamos ambos: si parece una key real (sk-...) la usamos tal
+    // cual; si no, intentamos descifrarla. Sin esto, una key global en claro hacía
+    // que decrypt() siempre lanzara → readAdminApiKey devolvía null → bots mudos.
+    const rawGlobal = (globalSetting?.value ?? '').trim()
+    if (rawGlobal) {
+        if (rawGlobal.startsWith('sk-')) return rawGlobal
+        try { const d = decrypt(rawGlobal, ENC_KEY); if (d) return d } catch { /* probar siguiente fuente */ }
+    }
+
+    // Fuente 2 — AdminConfig.openaiKeyEnc (cifrado con ads/encryption).
+    const adminEnc = (adminConfig?.openaiKeyEnc ?? '').trim()
+    if (adminEnc) {
+        if (adminEnc.startsWith('sk-')) return adminEnc
+        try { const d = decrypt(adminEnc, ENC_KEY); if (d) return d } catch { /* sin key admin usable */ }
+    }
+
+    return null
 }
 
 // ─── API pública nueva ──────────────────────────────────────────────────────

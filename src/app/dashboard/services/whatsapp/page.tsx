@@ -2493,6 +2493,25 @@ function QRTab({ bot }: { bot: Bot }) {
     setMsg({ type: 'success', text: 'Sesión borrada correctamente.' })
   }
 
+  // Reinicio forzado: borra la sesión atascada (estado 'connecting' que nunca
+  // emite QR porque reusa una sesión vencida) y genera un QR nuevo desde cero.
+  async function handleReset() {
+    setConnecting(true)
+    setMsg(null)
+    try {
+      await fetch(`/api/bots/${bot.id}/baileys/status`, { method: 'DELETE' }).catch(() => {})
+      setQrBase64(undefined)
+      const res = await fetch(`/api/bots/${bot.id}/baileys/connect`, { method: 'POST' })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Error al reiniciar la conexión')
+      setStatus('connecting')
+    } catch (err: unknown) {
+      setMsg({ type: 'error', text: err instanceof Error ? err.message : 'Error desconocido' })
+    } finally {
+      setConnecting(false)
+    }
+  }
+
   async function handleClearMemory() {
     if (!confirm('¿Eliminar todas las conversaciones de este bot? El bot olvidará el historial de todos los clientes. Esta acción no se puede deshacer.')) return
     setClearingMemory(true)
@@ -2531,14 +2550,26 @@ function QRTab({ bot }: { bot: Bot }) {
               <WifiOff className="w-3.5 h-3.5" /> Desconectar
             </button>
           ) : (
-            <button
-              onClick={handleConnect}
-              disabled={connecting || status === 'connecting' || status === 'qr_ready'}
-              className="flex items-center gap-2 px-3 py-2 bg-neon-green/10 border border-neon-green/30 text-neon-green hover:bg-neon-green/20 rounded-xl text-xs font-medium transition-colors disabled:opacity-50"
-            >
-              {connecting || status === 'connecting' ? <Spinner /> : <RefreshCw className="w-3.5 h-3.5" />}
-              {status === 'qr_ready' ? 'Escanea el QR' : 'Conectar'}
-            </button>
+            <>
+              <button
+                onClick={handleConnect}
+                disabled={connecting || status === 'connecting' || status === 'qr_ready'}
+                className="flex items-center gap-2 px-3 py-2 bg-neon-green/10 border border-neon-green/30 text-neon-green hover:bg-neon-green/20 rounded-xl text-xs font-medium transition-colors disabled:opacity-50"
+              >
+                {connecting || status === 'connecting' ? <Spinner /> : <RefreshCw className="w-3.5 h-3.5" />}
+                {status === 'qr_ready' ? 'Escanea el QR' : 'Conectar'}
+              </button>
+              {(status === 'connecting' || status === 'qr_ready') && (
+                <button
+                  onClick={handleReset}
+                  disabled={connecting}
+                  title="¿No aparece el QR? Borra la sesión atascada y genera un código nuevo."
+                  className="flex items-center gap-2 px-3 py-2 bg-amber-500/10 border border-amber-500/30 text-amber-400 hover:bg-amber-500/20 rounded-xl text-xs font-medium transition-colors disabled:opacity-50"
+                >
+                  <RefreshCw className="w-3.5 h-3.5" /> Reiniciar
+                </button>
+              )}
+            </>
           )}
         </div>
       </div>

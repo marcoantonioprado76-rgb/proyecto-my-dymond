@@ -143,6 +143,35 @@ async function executeFollowUp(conv: any, type: 1 | 2) {
             }
         }
 
+        // ── CLAIM ATÓMICO ────────────────────────────────────────────────────
+        // Marca esta ventana de seguimiento como "tomada" ANTES de la llamada a
+        // OpenAI y el envío (que tardan varios segundos). Sin esto, los ticks del
+        // worker se solapan (setInterval no espera al anterior) y/o varias
+        // instancias procesan la MISMA conversación a la vez → el cliente recibe
+        // N saludos repetidos. updateMany condicional = solo UN proceso gana.
+        if (type === 1) {
+            const claim = await prisma.conversation.updateMany({
+                where: { id: conversationId, followUp1Sent: false },
+                data: { followUp1Sent: true },
+            })
+            if (claim.count === 0) {
+                console.log(`[WORKER] Seguimiento 1 de ${userPhone} ya tomado por otro proceso, omitiendo`)
+                return
+            }
+        } else {
+            // type 2: mover followUp2At al delay normal de inmediato (optimista),
+            // así otro tick concurrente ya no lo ve como vencido.
+            const nextRun = new Date(Date.now() + (bot.followUp2Delay || 4320) * 60 * 1000)
+            const claim = await prisma.conversation.updateMany({
+                where: { id: conversationId, followUp2Sent: false, followUp2At: { lte: new Date() } },
+                data: { followUp2At: nextRun },
+            })
+            if (claim.count === 0) {
+                console.log(`[WORKER] Seguimiento 2 de ${userPhone} ya tomado por otro proceso, omitiendo`)
+                return
+            }
+        }
+
         // Decodificar JSON de mensajes del asistente
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const history = messages.reverse().map((m: any) => {
@@ -253,16 +282,10 @@ IMPORTANTE: Responde únicamente en formato JSON con este schema exacto:
         }
 
         if (sent) {
-            if (type === 1) {
-                // Primer seguimiento (15m) — UNA sola vez por diseño
-                await prisma.conversation.update({
-                    where: { id: conversationId },
-                    data: { followUp1Sent: true },
-                })
-            } else {
-                // Segundo seguimiento (3d) — RECURRENTE: reprograma con delay normal
-                const nextRun = await rescheduleFollowUp2(conversationId, bot.followUp2Delay || 4320)
-                console.log(`[WORKER] Seguimiento recurrente (3d) reprogramado para ${nextRun.toLocaleString()} para ${userPhone}`)
+            // El estado ya quedó marcado/reprogramado por el CLAIM atómico de arriba
+            // (type 1 → followUp1Sent=true; type 2 → followUp2At movido al delay normal).
+            if (type === 2) {
+                console.log(`[WORKER] Seguimiento recurrente (3d) enviado y reprogramado para ${userPhone}`)
             }
 
             // Guardar el mensaje enviado en el historial
@@ -277,17 +300,11 @@ IMPORTANTE: Responde únicamente en formato JSON con este schema exacto:
 
             console.log(`[WORKER] Seguimiento ${type} enviado con éxito a ${userPhone}`)
         } else {
-            // ── FIX CRÍTICO: si NO se envió, igual reprogramamos hacia el futuro para
-            //    evitar el loop de procesamiento cada 60s. Si es followUp1, marcarlo
-            //    como "ya intentado" (followUp1Sent=true) para que no se reintente
-            //    eternamente — el seguimiento de 15min es one-shot por diseño.
-            console.warn(`[WORKER] No se pudo enviar seguimiento ${type} a ${userPhone} (bot desconectado o error). Reprogramando.`)
-            if (type === 1) {
-                await prisma.conversation.update({
-                    where: { id: conversationId },
-                    data: { followUp1Sent: true },  // perdimos esta ventana; no insistir
-                })
-            } else {
+            // No se pudo enviar. El CLAIM ya evitó el loop de cada 60s:
+            //   type 1 → quedó followUp1Sent=true (one-shot, perdimos la ventana).
+            //   type 2 → estaba movido al delay normal; lo acercamos a 1h para reintentar.
+            console.warn(`[WORKER] No se pudo enviar seguimiento ${type} a ${userPhone} (bot desconectado o error).`)
+            if (type === 2) {
                 await rescheduleFollowUp2(conversationId, FAILED_SEND_RETRY_MIN)
             }
         }
