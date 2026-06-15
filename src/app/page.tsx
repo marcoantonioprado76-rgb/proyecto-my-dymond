@@ -330,8 +330,16 @@ export default function HomePage() {
       const max = (d.scrollHeight - d.clientHeight) || 1
       return Math.min(1, Math.max(0, (window.scrollY || d.scrollTop) / max))
     }
-    let ticking = false
+    // El diamante (video) gira acoplado al scroll: mapeo LINEAL del progreso al
+    // tiempo del video — al BAJAR avanza (gira hacia adelante), al SUBIR retrocede
+    // (gira al revés). Un loop continuo (rAF) + suavizado lo hace fluido y direccional,
+    // sin el salto que causaba TURNS=2.5 con módulo (reiniciaba el giro a media página).
+    if (gemVid) { gemVid.muted = true; gemVid.pause() }
+    let curT = 0
+    let uiRaf = 0
     const uiTick = () => {
+      uiRaf = requestAnimationFrame(uiTick)
+      if (document.hidden) return
       const p = scrollProgress()
       if (bar) bar.style.width = (p * 100).toFixed(2) + '%'
       if (nav) nav.classList.toggle('scrolled', (window.scrollY || 0) > 24)
@@ -343,22 +351,12 @@ export default function HomePage() {
         glow.style.transform = `translate(-50%,-50%) scale(${(0.8 + s * 0.5).toFixed(2)})`
       }
       if (gemVid && gemVid.readyState >= 2 && gemVid.duration) {
-        const TURNS = 2.5
-        const tt = ((p * TURNS) % 1) * (gemVid.duration - 0.04)
-        if (Math.abs(gemVid.currentTime - tt) > 0.008) { try { gemVid.currentTime = tt } catch { /* noop */ } }
+        const target = p * (gemVid.duration - 0.05) // lineal: 1 pasada del video en todo el scroll
+        curT += (target - curT) * 0.2               // suavizado hacia el objetivo
+        if (Math.abs(gemVid.currentTime - curT) > 0.01) { try { gemVid.currentTime = curT } catch { /* noop */ } }
       }
-      ticking = false
     }
-    if (gemVid) {
-      gemVid.muted = true
-      gemVid.pause()
-      gemVid.addEventListener('loadeddata', uiTick, { once: true })
-      if (gemVid.readyState >= 2) uiTick()
-    }
-    const onScroll = () => { if (!ticking) { requestAnimationFrame(uiTick); ticking = true } }
-    window.addEventListener('scroll', onScroll, { passive: true })
-    window.addEventListener('resize', uiTick)
-    uiTick()
+    uiRaf = requestAnimationFrame(uiTick)
 
     // ===== Reveal escalonado =====
     document.querySelectorAll<HTMLElement>('[data-stagger]').forEach(g => {
@@ -459,8 +457,7 @@ export default function HomePage() {
     }
 
     return () => {
-      window.removeEventListener('scroll', onScroll)
-      window.removeEventListener('resize', uiTick)
+      if (uiRaf) cancelAnimationFrame(uiRaf)
       io.disconnect(); cio.disconnect()
       if (galaxyRaf) cancelAnimationFrame(galaxyRaf)
       if (onGalaxyResize) window.removeEventListener('resize', onGalaxyResize)
