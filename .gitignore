@@ -92,3 +92,6 @@ tmpclaude-*
 .vercel
 *.pem
 .backups/
+
+# Playwright MCP screenshots/snapshots
+.playwright-mcp/
