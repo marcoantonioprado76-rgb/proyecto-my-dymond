@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma'
 import { publishToNetworks } from '@/lib/social/publisher'
+import { getValidToken } from '@/lib/social/tokens'
 import { supabaseAdmin } from '@/lib/supabase'
 import { createNotification } from '@/lib/notifications'
 
@@ -43,16 +44,18 @@ export async function processScheduledSocialPosts(): Promise<number> {
     let processed = 0
     for (const post of due) {
         try {
-            const targets = post.networks
-                .filter((n: any) => n.connection)
-                .map((n: any) => ({
-                    network: n.network,
-                    connectionId: n.connectionId,
-                    accountId: n.connection.accountId,
-                    accessToken: n.connection.accessToken,
-                    pageId: n.connection.pageId || undefined,
-                    postType: post.postType
-                }))
+            const targets = await Promise.all(
+                post.networks
+                    .filter((n: any) => n.connection)
+                    .map(async (n: any) => ({
+                        network: n.network,
+                        connectionId: n.connectionId,
+                        accountId: n.connection.accountId,
+                        accessToken: await getValidToken(n.connection),
+                        pageId: n.connection.pageId || undefined,
+                        postType: post.postType
+                    }))
+            )
 
             const results = await publishToNetworks({
                 content: post.content,

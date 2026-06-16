@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server'
 import { getAuthUser } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { publishToNetworks } from '@/lib/social/publisher'
+import { getValidToken } from '@/lib/social/tokens'
 import { supabaseAdmin } from '@/lib/supabase'
 import { createNotification } from '@/lib/notifications'
 
@@ -175,17 +176,20 @@ export async function POST(req: Request) {
             })
         }
 
-        // Publish now — override pageId/accessToken/accountId si el usuario seleccionó una página específica
-        const targets = connections.map((c: any) => {
+        // Publish now — override pageId/accessToken/accountId si el usuario seleccionó una página específica.
+        // El token por defecto se valida/refresca con getValidToken (si una página fue
+        // seleccionada explícitamente, se usa su pageAccessToken fresco del cliente).
+        const targets = await Promise.all(connections.map(async (c: any) => {
             const sel = pageSelections?.[c.network]
+            const token = sel?.pageAccessToken || await getValidToken(c)
             if (c.network === 'FACEBOOK' && sel?.pageId) {
-                return { network: c.network, connectionId: c.id, accountId: c.accountId, accessToken: sel.pageAccessToken || c.accessToken, pageId: sel.pageId, postType }
+                return { network: c.network, connectionId: c.id, accountId: c.accountId, accessToken: token, pageId: sel.pageId, postType }
             }
             if (c.network === 'INSTAGRAM' && sel?.accountId) {
-                return { network: c.network, connectionId: c.id, accountId: sel.accountId, accessToken: sel.pageAccessToken || c.accessToken, pageId: c.pageId || undefined, postType }
+                return { network: c.network, connectionId: c.id, accountId: sel.accountId, accessToken: token, pageId: c.pageId || undefined, postType }
             }
-            return { network: c.network, connectionId: c.id, accountId: c.accountId, accessToken: c.accessToken, pageId: c.pageId || undefined, postType }
-        })
+            return { network: c.network, connectionId: c.id, accountId: c.accountId, accessToken: token, pageId: c.pageId || undefined, postType }
+        }))
 
         const results = await publishToNetworks({ content, mediaUrl, mediaType, targets })
 
