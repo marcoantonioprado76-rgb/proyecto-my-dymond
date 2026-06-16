@@ -24,6 +24,7 @@ export type RefreshableConnection = {
   accessToken: string
   refreshToken?: string | null
   expiresAt?: Date | string | null
+  pageId?: string | null
 }
 
 /** Extiende un token de usuario de larga duración de Facebook (fb_exchange_token). */
@@ -43,13 +44,58 @@ async function refreshFacebookLongLived(
 }
 
 /**
+ * Obtiene el token de PÁGINA de Facebook a partir del token de usuario.
+ * Publicar en una página requiere el token de página (pages_manage_posts),
+ * no el de usuario — sin esto, el scheduler fallaba con el error #200.
+ */
+async function getFacebookPageToken(userToken: string, pageId: string): Promise<string | null> {
+  const res = await fetch(`${FB_GRAPH}/${pageId}?fields=access_token&access_token=${userToken}`)
+  const data = await res.json()
+  if (!res.ok || data.error || !data.access_token) return null
+  return data.access_token as string
+}
+
+/**
  * Devuelve un access token válido para la conexión.
  * Refresca y persiste si está vencido o por vencer; si no puede, devuelve el actual.
  */
 export async function getValidToken(conn: RefreshableConnection): Promise<string> {
   const exp = conn.expiresAt ? new Date(conn.expiresAt).getTime() : null
-  // Sin fecha de expiración o aún lejos de vencer → el token actual sirve.
-  if (exp === null || exp - Date.now() > SKEW_MS) return conn.accessToken
+  const needsRefresh = exp !== null && exp - Date.now() < SKEW_MS
+
+  // FACEBOOK: para publicar en una PÁGINA hace falta el TOKEN DE PÁGINA, no el de
+  // usuario (que es el que se guarda en accessToken). Antes el scheduler usaba el de
+  // usuario y fallaba con el error #200. Aquí resolvemos SIEMPRE el token de página
+  // a partir del de usuario (refrescando el de usuario antes si está por vencer).
+  if (conn.network === 'FACEBOOK') {
+    let userToken = conn.accessToken
+    if (needsRefresh) {
+      try {
+        const ext = await refreshFacebookLongLived(userToken)
+        if (ext) {
+          await (prisma as any).socialConnection.update({
+            where: { id: conn.id },
+            data: { accessToken: ext.accessToken, expiresAt: ext.expiresAt },
+          })
+          userToken = ext.accessToken
+        }
+      } catch (e: any) {
+        console.error(`[SocialTokens] FB refresh (${conn.id}) failed:`, e?.message)
+      }
+    }
+    if (conn.pageId) {
+      try {
+        const pageToken = await getFacebookPageToken(userToken, conn.pageId)
+        if (pageToken) return pageToken
+      } catch (e: any) {
+        console.error(`[SocialTokens] FB page token (${conn.id}) failed:`, e?.message)
+      }
+    }
+    return userToken // fallback (probablemente requiera reconectar la página)
+  }
+
+  // Resto de redes: si no está por vencer, el token actual sirve.
+  if (!needsRefresh) return conn.accessToken
 
   try {
     if (conn.network === 'YOUTUBE' && conn.refreshToken) {
@@ -72,18 +118,7 @@ export async function getValidToken(conn: RefreshableConnection): Promise<string
       return r.accessToken
     }
 
-    if (conn.network === 'FACEBOOK') {
-      const ext = await refreshFacebookLongLived(conn.accessToken)
-      if (ext) {
-        await (prisma as any).socialConnection.update({
-          where: { id: conn.id },
-          data: { accessToken: ext.accessToken, expiresAt: ext.expiresAt },
-        })
-        return ext.accessToken
-      }
-    }
-
-    // INSTAGRAM: el token guardado es un token de PÁGINA de larga duración
+    // INSTAGRAM: el token guardado ya es un token de PÁGINA de larga duración
     // (no expira mientras el token de usuario siga vivo) → no se refresca aquí.
   } catch (e: any) {
     console.error(`[SocialTokens] refresh ${conn.network} (${conn.id}) failed:`, e?.message)
