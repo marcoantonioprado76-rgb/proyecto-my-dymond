@@ -73,20 +73,52 @@ export async function publishFacebookStory(opts: {
     const { pageId, accessToken, mediaUrl, mediaType } = opts
 
     if (mediaType === 'video') {
-        const res = await fbPost(`/${pageId}/video_stories`, {
-            video_state: 'PUBLISHED',
-            upload_phase: 'finish',
-            video: { file_url: mediaUrl },
+        // Historia de VIDEO: flujo de 3 fases (start → subir por URL → finish).
+        const start = await fbPost(`/${pageId}/video_stories`, {
+            upload_phase: 'start',
             access_token: accessToken
         })
-        return res.post_id || res.id
+        const videoId = start.video_id
+        const uploadUrl = start.upload_url
+        if (!videoId || !uploadUrl) throw new Error('Facebook no devolvió video_id/upload_url para la historia')
+
+        // Subida "hosted": Facebook descarga el video desde la URL pública.
+        const upRes = await fetch(uploadUrl, {
+            method: 'POST',
+            headers: {
+                'Authorization': `OAuth ${accessToken}`,
+                'file_url': mediaUrl
+            }
+        })
+        const upData = await upRes.json().catch(() => ({}))
+        if (!upRes.ok || upData.success === false || upData.error) {
+            throw new Error(upData.error?.message || `Facebook story upload error ${upRes.status}`)
+        }
+
+        const finish = await fbPost(`/${pageId}/video_stories`, {
+            upload_phase: 'finish',
+            video_id: videoId,
+            access_token: accessToken
+        })
+        return finish.post_id || finish.id || videoId
     }
 
-    const res = await fbPost(`/${pageId}/photo_stories`, {
-        photo: { url: mediaUrl },
+    // Historia de FOTO: flujo de 2 pasos.
+    // 1) Subir la foto como NO publicada → obtener photo_id.
+    const photo = await fbPost(`/${pageId}/photos`, {
+        url: mediaUrl,
+        published: false,
         access_token: accessToken
     })
-    return res.post_id || res.id
+    const photoId = photo.id
+    if (!photoId) throw new Error('Facebook no devolvió photo_id para la historia')
+
+    // 2) Publicar la historia con ese photo_id.
+    const story = await fbPost(`/${pageId}/photo_stories`, {
+        photo_id: photoId,
+        access_token: accessToken
+    })
+    return story.post_id || story.id
 }
 
 export async function getFacebookMetrics(pageId: string, accessToken: string) {
