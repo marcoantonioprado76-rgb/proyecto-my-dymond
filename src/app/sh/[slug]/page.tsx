@@ -46,9 +46,22 @@ export default async function PublicStorePage({ params }: PublicStorePageProps) 
     const cleanPhone = botPhone.replace(/\D/g, '')
     const finalPhone = store.whatsappNumber ? store.whatsappNumber.replace(/\D/g, '') : cleanPhone
 
+    // Solo se exponen al cliente los campos que la vitrina necesita.
+    // NO se filtran userId, botId, el número de instancia del bot ni otros datos
+    // internos: todo lo que se pasa a un Client Component es visible para cualquier
+    // visitante anónimo.
+    const safeStore = {
+        name: store.name,
+        type: store.type,
+        description: store.description,
+        logoUrl: store.logoUrl,
+        bannerUrl: store.bannerUrl,
+        themeConfig: store.themeConfig,
+    }
+
     return (
         <StoreViewClient
-            store={store}
+            store={safeStore}
             products={products}
             categories={categories}
             phone={finalPhone}

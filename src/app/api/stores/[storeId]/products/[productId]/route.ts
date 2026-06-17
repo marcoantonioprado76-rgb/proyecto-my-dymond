@@ -32,20 +32,55 @@ export async function PATCH(
             return NextResponse.json({ error: 'Tienda no encontrada' }, { status: 404 })
         }
 
+        // Verificar que el producto pertenezca a ESTA tienda (anti-IDOR)
+        const existingProduct = await prisma.storeProduct.findUnique({
+            where: { id: productId },
+            select: { storeId: true, price: true },
+        })
+        if (!existingProduct || existingProduct.storeId !== storeId) {
+            return NextResponse.json({ error: 'Producto no encontrado' }, { status: 404 })
+        }
+
+        // Validar valores numéricos provistos (no negativos; promo <= precio)
+        const priceNum = body.price !== undefined ? Number(body.price) : undefined
+        const stockNum = body.stock !== undefined ? Number(body.stock) : undefined
+        const pointsNum = body.points !== undefined ? Number(body.points) : undefined
+        let promoNum: number | null | undefined = undefined
+        if (body.pricePromo !== undefined) {
+            promoNum = (body.pricePromo !== '' && body.pricePromo !== null) ? Number(body.pricePromo) : null
+        }
+        if (priceNum !== undefined && (!Number.isFinite(priceNum) || priceNum < 0)) {
+            return NextResponse.json({ error: 'El precio debe ser mayor o igual a 0' }, { status: 400 })
+        }
+        if (stockNum !== undefined && (!Number.isFinite(stockNum) || stockNum < 0)) {
+            return NextResponse.json({ error: 'El stock no puede ser negativo' }, { status: 400 })
+        }
+        if (pointsNum !== undefined && (!Number.isFinite(pointsNum) || pointsNum < 0)) {
+            return NextResponse.json({ error: 'Los puntos no pueden ser negativos' }, { status: 400 })
+        }
+        if (typeof promoNum === 'number') {
+            const ref = priceNum !== undefined ? priceNum : Number(existingProduct.price)
+            if (!Number.isFinite(promoNum) || promoNum < 0 || promoNum > ref) {
+                return NextResponse.json({ error: 'El precio promocional debe ser mayor o igual a 0 y no superar al precio normal' }, { status: 400 })
+            }
+        }
+
         const updateData: any = {
             name: body.name,
             description: body.description,
             category: body.category,
-            price: body.price !== undefined ? Number(body.price) : undefined,
+            price: priceNum,
             currency: body.currency,
-            points: body.points !== undefined ? Number(body.points) : undefined,
-            stock: body.stock !== undefined ? Number(body.stock) : undefined,
-            images: body.images,
+            points: pointsNum,
+            stock: stockNum,
+            images: body.images !== undefined
+                ? (Array.isArray(body.images) ? body.images.filter((u: any) => typeof u === 'string' && /^https?:\/\//i.test(u)).slice(0, 12) : [])
+                : undefined,
             active: body.active,
         }
 
-        if (body.pricePromo !== undefined) {
-            updateData.pricePromo = (body.pricePromo !== '' && body.pricePromo !== null) ? Number(body.pricePromo) : null
+        if (promoNum !== undefined) {
+            updateData.pricePromo = promoNum
         }
 
         let updated
@@ -88,9 +123,13 @@ export async function DELETE(
             return NextResponse.json({ error: 'Tienda no encontrada' }, { status: 404 })
         }
 
-        await prisma.storeProduct.delete({
-            where: { id: productId }
+        // deleteMany con storeId → solo borra si el producto es de ESTA tienda (anti-IDOR)
+        const result = await prisma.storeProduct.deleteMany({
+            where: { id: productId, storeId }
         })
+        if (result.count === 0) {
+            return NextResponse.json({ error: 'Producto no encontrado' }, { status: 404 })
+        }
 
         return NextResponse.json({ success: true })
     } catch (err) {

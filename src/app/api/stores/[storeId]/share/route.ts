@@ -90,8 +90,10 @@ export async function POST(
         name: source.name,
         slug,
         type: source.type,
-        whatsappNumber: source.whatsappNumber,
-        paymentQrUrl: source.paymentQrUrl,
+        // No heredar el WhatsApp ni el QR de pago del remitente: el receptor debe
+        // configurar los suyos, si no los pedidos/pagos irían al dueño original.
+        whatsappNumber: null,
+        paymentQrUrl: null,
         description: source.description,
         logoUrl: source.logoUrl,
         bannerUrl: source.bannerUrl,

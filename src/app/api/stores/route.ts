@@ -81,25 +81,31 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'El nombre de usuario/slug de la tienda ya está en uso' }, { status: 400 })
         }
 
-        const store = await prisma.store.create({
-            data: {
-                userId: auth.userId,
-                botId: botId || null,
-                name,
-                slug: slug.toLowerCase().trim(),
-                type: type as any,
-                whatsappNumber: body.whatsappNumber || null,
-                paymentQrUrl: body.paymentQrUrl || null,
-                description: description || '',
+        let store
+        try {
+            store = await prisma.store.create({
+                data: {
+                    userId: auth.userId,
+                    botId: botId || null,
+                    name,
+                    slug: slug.toLowerCase().trim(),
+                    type: type as any,
+                    whatsappNumber: body.whatsappNumber || null,
+                    paymentQrUrl: body.paymentQrUrl || null,
+                    description: description || '',
+                }
+            })
+        } catch (e: any) {
+            // Carrera de slug único: dos requests pasan el check y chocan en el @unique
+            if (e?.code === 'P2002') {
+                return NextResponse.json({ error: 'El nombre de usuario/slug de la tienda ya está en uso' }, { status: 409 })
             }
-        })
+            throw e
+        }
 
         return NextResponse.json({ store }, { status: 201 })
     } catch (err: any) {
         console.error('[POST /api/stores] Error completo:', err)
-        return NextResponse.json({
-            error: 'Error al crear la tienda',
-            details: err.message
-        }, { status: 500 })
+        return NextResponse.json({ error: 'Error al crear la tienda' }, { status: 500 })
     }
 }

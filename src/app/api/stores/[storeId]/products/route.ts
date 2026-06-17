@@ -3,6 +3,13 @@ import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import { prisma } from '@/lib/prisma'
 import { verifyToken } from '@/lib/auth'
+import { getPlanLimits, PLAN_NAMES, type UserPlan } from '@/lib/plan-limits'
+
+/** Filtra el array de imágenes a solo URLs http(s) válidas, con tope de cantidad. */
+function sanitizeImages(images: unknown): string[] {
+    if (!Array.isArray(images)) return []
+    return images.filter((u): u is string => typeof u === 'string' && /^https?:\/\//i.test(u)).slice(0, 12)
+}
 
 function getAuth() {
     const cookieStore = cookies()
@@ -69,21 +76,52 @@ export async function POST(
             return NextResponse.json({ error: 'Tienda no encontrada' }, { status: 404 })
         }
 
+        // Validar valores numéricos (no negativos; promo <= precio)
+        const priceNum = Number(price)
+        const stockNum = stock !== undefined ? Number(stock) : 0
+        const pointsNum = points !== undefined ? Number(points) : 0
+        const promoNum = (pricePromo !== undefined && pricePromo !== '' && pricePromo !== null) ? Number(pricePromo) : undefined
+        if (!Number.isFinite(priceNum) || priceNum < 0) {
+            return NextResponse.json({ error: 'El precio debe ser un número mayor o igual a 0' }, { status: 400 })
+        }
+        if (!Number.isFinite(stockNum) || stockNum < 0) {
+            return NextResponse.json({ error: 'El stock no puede ser negativo' }, { status: 400 })
+        }
+        if (!Number.isFinite(pointsNum) || pointsNum < 0) {
+            return NextResponse.json({ error: 'Los puntos no pueden ser negativos' }, { status: 400 })
+        }
+        if (promoNum !== undefined && (!Number.isFinite(promoNum) || promoNum < 0 || promoNum > priceNum)) {
+            return NextResponse.json({ error: 'El precio promocional debe ser mayor o igual a 0 y no superar al precio normal' }, { status: 400 })
+        }
+
+        // Límite de productos por plan (suma de productos de TODAS las tiendas del usuario)
+        const planUser = await prisma.user.findUnique({ where: { id: auth.userId }, select: { plan: true } })
+        const plan = (planUser?.plan ?? 'NONE') as UserPlan
+        const limits = getPlanLimits(plan)
+        const productCount = await prisma.storeProduct.count({ where: { store: { userId: auth.userId } } })
+        if (productCount >= limits.productsPerUser) {
+            return NextResponse.json({
+                error: `Tu ${PLAN_NAMES[plan]} permite hasta ${limits.productsPerUser} producto(s). Actualiza tu plan para agregar más.`,
+                limitReached: true,
+                plan,
+            }, { status: 403 })
+        }
+
         const productData: any = {
             storeId,
             name,
             description: description || '',
             category: category || 'General',
-            price: Number(price),
+            price: priceNum,
             currency: currency || 'USD',
-            points: points !== undefined ? Number(points) : 0,
-            stock: Number(stock) || 0,
-            images: images || [],
+            points: pointsNum,
+            stock: stockNum,
+            images: sanitizeImages(images),
             active: active !== undefined ? active : true,
         }
 
-        if (pricePromo !== undefined && pricePromo !== '' && pricePromo !== null) {
-            productData.pricePromo = Number(pricePromo)
+        if (promoNum !== undefined) {
+            productData.pricePromo = promoNum
         }
 
         let product

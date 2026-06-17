@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import { prisma } from '@/lib/prisma'
 import { verifyToken } from '@/lib/auth'
+import { getPlanLimits, PLAN_NAMES, type UserPlan } from '@/lib/plan-limits'
 
 function getAuth() {
   const token = cookies().get('auth_token')?.value
@@ -36,6 +37,21 @@ export async function POST(
     })
     if (!source) {
       return NextResponse.json({ error: 'Tienda no encontrada' }, { status: 404 })
+    }
+
+    // Límite de tiendas por plan (clonar también cuenta)
+    const planUser = await prisma.user.findUnique({ where: { id: auth.userId }, select: { plan: true } })
+    const plan = (planUser?.plan ?? 'NONE') as UserPlan
+    const limits = getPlanLimits(plan)
+    if (limits.stores !== Infinity) {
+      const storeCount = await prisma.store.count({ where: { userId: auth.userId } })
+      if (storeCount >= limits.stores) {
+        return NextResponse.json({
+          error: `Tu ${PLAN_NAMES[plan]} permite hasta ${limits.stores} tienda(s). Actualiza tu plan para crear más.`,
+          limitReached: true,
+          plan,
+        }, { status: 403 })
+      }
     }
 
     // Generar slug único para la copia
@@ -81,7 +97,8 @@ export async function POST(
           stock: p.stock,
           images: Array.isArray(p.images) ? p.images : JSON.parse(JSON.stringify(p.images)),
           active: p.active,
-        },
+          pricePromo: (p as any).pricePromo ?? null,
+        } as any,
       })
     }
 

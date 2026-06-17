@@ -53,11 +53,7 @@ export async function PATCH(
         return NextResponse.json({ store: updated })
     } catch (err: any) {
         console.error('[PATCH /api/stores] Error detallado:', err)
-        return NextResponse.json({
-            error: 'Error al actualizar la tienda',
-            details: err.message,
-            code: err.code
-        }, { status: 500 })
+        return NextResponse.json({ error: 'Error al actualizar la tienda' }, { status: 500 })
     }
 }
 
