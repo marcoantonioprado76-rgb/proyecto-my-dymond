@@ -1,19 +1,17 @@
 'use client'
 
-import { useState } from 'react'
-import { Plus, Minus, ShoppingCart, Star, ChevronDown, ChevronUp } from 'lucide-react'
+import React, { useState } from 'react'
+import { Plus, Minus, ShoppingCart, Star } from 'lucide-react'
 import { ProductImageGallery } from './ProductImageGallery'
 import { useCart } from './CartContext'
 
-const CYAN = '#D203DD'
-const GREEN = '#00FF88'
+const OFFER = '#FF8C42'
 
 const currencySymbol = (c: string) =>
     c === 'PEN' ? 'S/' : c === 'BOB' ? 'Bs' : c === 'VES' ? 'Bs.S' : c === 'EUR' ? '€' : '$'
 
 export function ProductCard({ p, whatsappPhone, isMLM }: any) {
     const [quantity, setQuantity] = useState(1)
-    const [showFullDesc, setShowFullDesc] = useState(false)
     const [added, setAdded] = useState(false)
     const { addToCart } = useCart()
 
@@ -36,123 +34,125 @@ export function ProductCard({ p, whatsappPhone, isMLM }: any) {
     return (
         <div style={{
             display: 'flex', flexDirection: 'column',
-            background: `linear-gradient(135deg, ${CYAN}06, ${CYAN}03)`,
-            border: `1px solid ${CYAN}18`,
-            borderRadius: 16,
+            background: 'var(--st-card)',
+            border: '1px solid var(--st-card-border)',
+            borderRadius: 'var(--st-radius)',
             overflow: 'hidden',
             position: 'relative',
-            fontFamily: "'Montserrat', sans-serif",
+            boxShadow: 'var(--st-card-shadow)',
+            fontFamily: 'inherit',
         }}>
-            {/* Top accent line */}
-            <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 1, background: `linear-gradient(90deg, transparent, ${CYAN}70, transparent)` }} />
+            {/* Línea de acento superior */}
+            <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 1, background: 'linear-gradient(90deg, transparent, rgba(var(--st-primary-rgb),0.7), transparent)', zIndex: 2 }} />
 
-            {/* Image */}
+            {/* Imagen */}
             <div style={{ position: 'relative' }}>
                 <ProductImageGallery images={p.images} name={p.name} />
-                {/* Badges */}
+                {/* Badges sobre la imagen (pill oscura legible sobre cualquier foto) */}
                 {isMLM && p.points > 0 && (
                     <div style={{
                         position: 'absolute', top: 10, right: 10,
-                        background: `${CYAN}CC`, color: '#000',
-                        fontSize: 9, fontWeight: 700, padding: '3px 8px', borderRadius: 9999,
+                        background: 'var(--st-primary)', color: 'var(--st-on-primary)',
+                        fontSize: 9.5, fontWeight: 800, padding: '4px 9px', borderRadius: 9999,
                         display: 'flex', alignItems: 'center', gap: 4,
-                        letterSpacing: '0.06em', textTransform: 'uppercase',
+                        letterSpacing: '0.05em', textTransform: 'uppercase',
                     }}>
-                        <Star size={8} fill="currentColor" /> {p.points} PV
+                        <Star size={9} fill="currentColor" /> {p.points} PV
                     </div>
                 )}
                 {p.stock > 0 && p.stock <= 5 && (
                     <div style={{
                         position: 'absolute', top: 10, left: 10,
-                        background: 'rgba(11,12,20,0.9)', color: 'rgba(255,255,255,0.8)',
-                        fontSize: 9, fontWeight: 700, padding: '3px 8px', borderRadius: 9999,
-                        border: '1px solid rgba(255,255,255,0.1)',
-                        letterSpacing: '0.06em', textTransform: 'uppercase',
+                        background: 'rgba(0,0,0,0.62)', color: '#fff',
+                        fontSize: 9.5, fontWeight: 700, padding: '4px 9px', borderRadius: 9999,
+                        backdropFilter: 'blur(4px)',
+                        letterSpacing: '0.05em', textTransform: 'uppercase',
                     }}>
                         Últimos {p.stock}
                     </div>
                 )}
             </div>
 
-            {/* Content */}
-            <div style={{ padding: '8px 10px 10px', flex: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>
+            {/* Contenido */}
+            <div style={{ padding: '12px 13px 13px', flex: 1, display: 'flex', flexDirection: 'column', gap: 7 }}>
 
-                {/* Name */}
-                <h3 style={{ fontSize: 'clamp(9px, 2.5vw, 13px)', fontWeight: 700, color: '#fff', lineHeight: 1.3, margin: 0,
+                {/* Nombre */}
+                <h3 style={{ fontSize: 'clamp(12px, 2.6vw, 15px)', fontWeight: 700, color: 'var(--st-text)', lineHeight: 1.3, margin: 0,
                     display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 2, overflow: 'hidden' } as React.CSSProperties}>
                     {p.name}
                 </h3>
 
-                {/* Description — solo en pantallas grandes */}
+                {/* Descripción (ahora visible también en móvil) */}
                 {p.description && (
-                    <p className="hidden sm:block" style={{
-                        fontSize: 11, color: 'rgba(255,255,255,0.45)', lineHeight: 1.6, margin: 0,
+                    <p style={{
+                        fontSize: 'clamp(11px, 2.2vw, 12.5px)', color: 'var(--st-muted)', lineHeight: 1.55, margin: 0,
                         display: '-webkit-box', WebkitBoxOrient: 'vertical',
                         WebkitLineClamp: 2, overflow: 'hidden',
-                    } as any}>
+                    } as React.CSSProperties}>
                         {p.description}
                     </p>
                 )}
 
-                {/* Bottom section */}
-                <div style={{ marginTop: 'auto', display: 'flex', flexDirection: 'column', gap: 6 }}>
+                {/* Sección inferior */}
+                <div style={{ marginTop: 'auto', display: 'flex', flexDirection: 'column', gap: 9 }}>
 
-                    {/* Quantity — solo en pantallas grandes */}
+                    {/* Cantidad — solo en pantallas grandes */}
                     <div className="hidden sm:flex" style={{
                         alignItems: 'center', justifyContent: 'space-between',
-                        background: 'rgba(255,255,255,0.04)', borderRadius: 10, padding: '6px 10px',
-                        border: '1px solid rgba(255,255,255,0.07)',
+                        background: 'rgba(var(--st-primary-rgb),0.06)', borderRadius: 10, padding: '6px 10px',
+                        border: '1px solid var(--st-border)',
                     }}>
-                        <span style={{ fontSize: 9, fontWeight: 500, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.3)' }}>Cant.</span>
+                        <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--st-muted)' }}>Cant.</span>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                            <button onClick={() => setQuantity(Math.max(1, quantity - 1))} style={{
-                                width: 26, height: 26, borderRadius: 7, background: 'rgba(255,255,255,0.06)',
-                                border: '1px solid rgba(255,255,255,0.1)', color: '#fff', cursor: 'pointer',
+                            <button onClick={() => setQuantity(Math.max(1, quantity - 1))} aria-label="Menos" style={{
+                                width: 28, height: 28, borderRadius: 8, background: 'rgba(var(--st-primary-rgb),0.10)',
+                                border: '1px solid var(--st-card-border)', color: 'var(--st-text)', cursor: 'pointer',
                                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            }}><Minus size={11} /></button>
-                            <span style={{ fontSize: 13, fontWeight: 700, color: '#fff', width: 18, textAlign: 'center' }}>{quantity}</span>
-                            <button onClick={() => setQuantity(quantity + 1)} style={{
-                                width: 26, height: 26, borderRadius: 7, background: 'rgba(255,255,255,0.06)',
-                                border: '1px solid rgba(255,255,255,0.1)', color: '#fff', cursor: 'pointer',
+                            }}><Minus size={12} /></button>
+                            <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--st-text)', width: 18, textAlign: 'center' }}>{quantity}</span>
+                            <button onClick={() => setQuantity(quantity + 1)} aria-label="Más" style={{
+                                width: 28, height: 28, borderRadius: 8, background: 'rgba(var(--st-primary-rgb),0.10)',
+                                border: '1px solid var(--st-card-border)', color: 'var(--st-text)', cursor: 'pointer',
                                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            }}><Plus size={11} /></button>
+                            }}><Plus size={12} /></button>
                         </div>
                     </div>
 
-                    {/* Price */}
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                    {/* Precio */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                         {p.pricePromo && (
-                            <span style={{ fontSize: 'clamp(9px, 2vw, 11px)', color: 'rgba(255,255,255,0.35)', textDecoration: 'line-through', lineHeight: 1 }}>
+                            <span style={{ fontSize: 'clamp(10px, 2vw, 12px)', color: 'var(--st-muted)', textDecoration: 'line-through', lineHeight: 1 }}>
                                 {currencySymbol(p.currency)}{Number(p.price * quantity).toLocaleString()}
                             </span>
                         )}
-                        <div style={{ display: 'flex', alignItems: 'baseline', gap: 4 }}>
-                            <span style={{ fontSize: 'clamp(12px, 3vw, 18px)', fontWeight: 800, color: p.pricePromo ? '#FF8C42' : GREEN, lineHeight: 1 }}>
+                        <div style={{ display: 'flex', alignItems: 'baseline', gap: 5, flexWrap: 'wrap' }}>
+                            <span style={{ fontSize: 'clamp(16px, 4vw, 22px)', fontWeight: 800, color: p.pricePromo ? OFFER : 'var(--st-price)', lineHeight: 1 }}>
                                 {currencySymbol(p.currency)}{Number(effectivePrice * quantity).toLocaleString()}
                             </span>
                             {p.pricePromo && (
-                                <span style={{ fontSize: 8, fontWeight: 700, color: '#FF8C42', background: 'rgba(255,140,66,0.15)', border: '1px solid rgba(255,140,66,0.3)', borderRadius: 99, padding: '1px 5px', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
-                                    OFERTA
+                                <span style={{ fontSize: 9, fontWeight: 800, color: OFFER, background: 'rgba(255,140,66,0.15)', border: '1px solid rgba(255,140,66,0.3)', borderRadius: 99, padding: '2px 6px', letterSpacing: '0.05em', textTransform: 'uppercase' }}>
+                                    Oferta
                                 </span>
                             )}
                             {isMLM && p.points > 0 && (
-                                <span className="hidden sm:flex" style={{ fontSize: 9, fontWeight: 600, color: `${CYAN}90`, alignItems: 'center', gap: 3 }}>
-                                    <Star size={8} fill="currentColor" /> +{p.points * quantity}PV
+                                <span className="hidden sm:flex" style={{ fontSize: 9.5, fontWeight: 600, color: 'var(--st-primary)', alignItems: 'center', gap: 3 }}>
+                                    <Star size={9} fill="currentColor" /> +{p.points * quantity}PV
                                 </span>
                             )}
                         </div>
                     </div>
 
-                    {/* Add button */}
+                    {/* Botón añadir (más grande y táctil) */}
                     <button onClick={handleAddToCart} style={{
-                        width: '100%', padding: '7px 0',
-                        borderRadius: 8, fontSize: 'clamp(8px, 2vw, 10px)', fontWeight: 700,
-                        letterSpacing: '0.05em', textTransform: 'uppercase', cursor: 'pointer',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4,
-                        background: added ? GREEN : CYAN,
-                        color: '#000', border: 'none', transition: 'all 0.2s',
+                        width: '100%', padding: '11px 0',
+                        borderRadius: 12, fontSize: 'clamp(11px, 2.4vw, 12.5px)', fontWeight: 800,
+                        letterSpacing: '0.04em', textTransform: 'uppercase', cursor: 'pointer',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+                        background: added ? 'var(--st-price)' : 'var(--st-primary)',
+                        color: added ? '#04210f' : 'var(--st-on-primary)', border: 'none', transition: 'all 0.2s',
+                        fontFamily: 'inherit',
                     }}>
-                        <ShoppingCart size={12} />
+                        <ShoppingCart size={14} />
                         {added ? '¡Listo!' : 'Añadir'}
                     </button>
                 </div>
