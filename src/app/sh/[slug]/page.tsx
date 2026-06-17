@@ -84,6 +84,7 @@ export default async function PublicStorePage({ params }: PublicStorePageProps) 
     // visitante anónimo.
     const safeStore = {
         name: store.name,
+        slug: store.slug, // público (está en la URL); aísla el carrito por tienda
         type: store.type,
         description: store.description,
         logoUrl: store.logoUrl,

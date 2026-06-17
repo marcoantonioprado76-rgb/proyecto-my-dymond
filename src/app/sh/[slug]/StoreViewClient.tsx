@@ -12,7 +12,7 @@ import { resolveStoreTheme } from '@/lib/store-themes'
 export function StoreViewClient({ store, products, categories, phone, paymentQrUrl }: any) {
     const theme = resolveStoreTheme(store?.themeConfig)
     return (
-        <CartProvider>
+        <CartProvider storeKey={store?.slug}>
             {/* Tipografía del tema (Next la sube al <head>) */}
             <link rel="preconnect" href="https://fonts.googleapis.com" />
             <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />

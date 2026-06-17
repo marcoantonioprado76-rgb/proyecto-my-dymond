@@ -1,6 +1,6 @@
 'use client'
 
-import React, { createContext, useContext, useState, useEffect } from 'react'
+import React, { createContext, useContext, useState, useEffect, useRef } from 'react'
 
 export interface CartItem {
     id: string
@@ -25,25 +25,33 @@ interface CartContextType {
 
 const CartContext = createContext<CartContextType | undefined>(undefined)
 
-export function CartProvider({ children }: { children: React.ReactNode }) {
+export function CartProvider({ children, storeKey }: { children: React.ReactNode; storeKey?: string }) {
     const [cart, setCart] = useState<CartItem[]>([])
+    // Clave por TIENDA: así el carrito de una tienda no se mezcla con el de otra.
+    const KEY = `jd_cart_${storeKey || 'default'}`
+    const skipSave = useRef(true)
 
-    // Load from localStorage
+    // Cargar el carrito de ESTA tienda
     useEffect(() => {
-        const saved = localStorage.getItem('jd_cart')
+        const saved = localStorage.getItem(KEY)
         if (saved) {
             try {
                 setCart(JSON.parse(saved))
             } catch (e) {
                 console.error('Error parsing cart', e)
+                setCart([])
             }
+        } else {
+            setCart([])
         }
-    }, [])
+        skipSave.current = true
+    }, [KEY])
 
-    // Save to localStorage
+    // Guardar (omite la primera ejecución tras cargar, para no pisar lo guardado)
     useEffect(() => {
-        localStorage.setItem('jd_cart', JSON.stringify(cart))
-    }, [cart])
+        if (skipSave.current) { skipSave.current = false; return }
+        localStorage.setItem(KEY, JSON.stringify(cart))
+    }, [cart, KEY])
 
     const addToCart = (item: CartItem) => {
         setCart(prev => {
