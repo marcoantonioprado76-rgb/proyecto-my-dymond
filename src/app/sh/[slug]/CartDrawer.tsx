@@ -3,6 +3,7 @@
 import React, { useState } from 'react'
 import { X, ShoppingCart, Trash2, Minus, Plus, MessageCircle, MapPin, User, Phone, ClipboardList, Wallet, Banknote, QrCode, CheckCircle2, UploadCloud, Navigation } from 'lucide-react'
 import { useCart } from './CartContext'
+import { LocationPicker } from './LocationPicker'
 
 export function CartDrawer({ isOpen, onClose, storeWhatsapp, paymentQrUrl, isMLM, storeName, storeSlug }: { isOpen: boolean, onClose: () => void, storeWhatsapp: string, paymentQrUrl?: string, isMLM?: boolean, storeName?: string, storeSlug?: string }) {
     const { cart, removeFromCart, updateQuantity, totalPrice, totalPoints, clearCart } = useCart()
@@ -23,6 +24,13 @@ export function CartDrawer({ isOpen, onClose, storeWhatsapp, paymentQrUrl, isMLM
     })
     const [geoStatus, setGeoStatus] = useState<'idle' | 'loading' | 'ok' | 'error'>('idle')
     const [uploadStatus, setUploadStatus] = useState<'idle' | 'loading' | 'ok' | 'error'>('idle')
+    const [mapOpen, setMapOpen] = useState(false)
+
+    // Coordenadas guardadas (para reabrir el mapa donde quedó)
+    const initialCoords = (() => {
+        const m = form.locationUrl.match(/q=([-\d.]+),([-\d.]+)/)
+        return m ? { lat: parseFloat(m[1]), lng: parseFloat(m[2]) } : null
+    })()
 
     // Ubicación exacta por GPS (un toque)
     const handleGetLocation = () => {
@@ -225,25 +233,39 @@ ${pointsSection}*TOTAL:* ${cart[0]?.currency || '$'} ${totalPrice.toLocaleString
                                     onChange={e => setForm({ ...form, houseNum: e.target.value })}
                                 />
 
-                                {/* Ubicación exacta por GPS */}
-                                <button
-                                    type="button"
-                                    onClick={handleGetLocation}
-                                    disabled={geoStatus === 'loading'}
-                                    className={`w-full flex items-center justify-center gap-2 py-3 rounded-xl font-black text-[11px] uppercase tracking-widest border-2 transition-all ${form.locationUrl
-                                        ? 'border-green-500 bg-green-50 text-green-700'
-                                        : 'border-slate-300 bg-white text-slate-700 hover:border-slate-800'}`}
-                                >
-                                    {form.locationUrl ? <CheckCircle2 size={15} /> : <Navigation size={15} />}
-                                    {geoStatus === 'loading' ? 'Obteniendo ubicación...' : form.locationUrl ? 'Ubicación capturada' : 'Enviar mi ubicación exacta (GPS)'}
-                                </button>
+                                {/* Ubicación: 2 opciones (GPS o elegir en el mapa) */}
+                                <div className="grid grid-cols-2 gap-2">
+                                    <button
+                                        type="button"
+                                        onClick={handleGetLocation}
+                                        disabled={geoStatus === 'loading'}
+                                        className="flex flex-col items-center justify-center gap-1.5 py-3 rounded-xl border-2 border-slate-300 bg-white text-slate-700 hover:border-slate-800 transition-all"
+                                    >
+                                        <Navigation size={18} />
+                                        <span className="text-[10px] font-black uppercase tracking-wide text-center leading-tight">
+                                            {geoStatus === 'loading' ? 'Obteniendo...' : 'Ubicación exacta (GPS)'}
+                                        </span>
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => setMapOpen(true)}
+                                        className="flex flex-col items-center justify-center gap-1.5 py-3 rounded-xl border-2 border-slate-300 bg-white text-slate-700 hover:border-slate-800 transition-all"
+                                    >
+                                        <MapPin size={18} />
+                                        <span className="text-[10px] font-black uppercase tracking-wide text-center leading-tight">Seleccionar en mapa</span>
+                                    </button>
+                                </div>
                                 {geoStatus === 'error' && (
-                                    <p className="text-[11px] text-red-500 text-center -mt-1">No pudimos obtener tu ubicación. Activa el GPS y permite el acceso en tu navegador.</p>
+                                    <p className="text-[11px] text-red-500 text-center">No pudimos obtener tu ubicación. Activa el GPS, o usa “Seleccionar en mapa”.</p>
                                 )}
                                 {form.locationUrl && (
-                                    <a href={form.locationUrl} target="_blank" rel="noreferrer" className="block text-[11px] text-center text-blue-600 underline -mt-1">
-                                        Ver mi ubicación en el mapa
-                                    </a>
+                                    <div className="flex items-center justify-between gap-2 bg-green-50 border-2 border-green-500 rounded-xl px-3 py-2">
+                                        <span className="text-[11px] font-bold text-green-700 flex items-center gap-1.5"><CheckCircle2 size={14} /> Ubicación lista</span>
+                                        <div className="flex items-center gap-3">
+                                            <a href={form.locationUrl} target="_blank" rel="noreferrer" className="text-[11px] text-blue-600 underline">Ver</a>
+                                            <button type="button" onClick={() => setForm(f => ({ ...f, locationUrl: '' }))} className="text-[11px] text-slate-400 underline">Quitar</button>
+                                        </div>
+                                    </div>
                                 )}
                             </div>
 
@@ -392,6 +414,14 @@ ${pointsSection}*TOTAL:* ${cart[0]?.currency || '$'} ${totalPrice.toLocaleString
                     </div>
                 )}
             </div>
+
+            {/* Selector de ubicación en el mapa */}
+            <LocationPicker
+                isOpen={mapOpen}
+                onClose={() => setMapOpen(false)}
+                initial={initialCoords}
+                onSelect={(url) => { setForm(f => ({ ...f, locationUrl: url })); setGeoStatus('ok') }}
+            />
         </div>
     )
 }
