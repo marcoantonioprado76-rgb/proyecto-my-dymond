@@ -73,31 +73,56 @@ export function CartDrawer({ isOpen, onClose, storeWhatsapp, paymentQrUrl, isMLM
             alert('Esta tienda no tiene un número de WhatsApp configurado. Contacta al administrador.')
             return
         }
-        const productList = cart.map(i => `- ${i.quantity} x ${i.name} (${i.currency} ${i.price}) ${isMLM && i.points ? `[+${i.points * i.quantity} PV]` : ''}`).join('\n')
+        const displayName = (storeName || 'Tienda').trim()
         const fullProofUrl = form.proofUrl ? (form.proofUrl.startsWith('http') ? form.proofUrl : `${window.location.origin}${form.proofUrl}`) : ''
 
-        const pointsSection = (isMLM && totalPoints > 0) ? `\n✨ *PUNTOS PV TOTALES:* ${totalPoints} PV\n` : ''
-        const displayName = storeName || 'Tienda'
+        const cs = (c: string) => c === 'PEN' ? 'S/' : c === 'BOB' ? 'Bs' : c === 'VES' ? 'Bs.S' : c === 'EUR' ? '€' : '$'
+        const cur = cart[0]?.currency || 'USD'
+        const money = (n: number) => `${cs(cur)} ${Number(n).toLocaleString()}`
 
-        const message = `🛍️ *NUEVO PEDIDO - ${displayName.toUpperCase()}* 🛍️
+        // Cada producto: cantidad, nombre y SUBTOTAL de la línea (con precio c/u si hay más de 1)
+        const productLines = cart.map(i => {
+            const lineTotal = i.price * i.quantity
+            const unit = i.quantity > 1 ? ` (${cs(i.currency)} ${Number(i.price).toLocaleString()} c/u)` : ''
+            const pv = (isMLM && i.points) ? `  ✨ +${i.points * i.quantity} PV` : ''
+            return `• ${i.quantity}× ${i.name} — ${cs(i.currency)} ${Number(lineTotal).toLocaleString()}${unit}${pv}`
+        }).join('\n')
 
-*DATOS DE ENTREGA:*
-👤 *Nombre:* ${form.name}
-📞 *Teléfono:* ${form.phone}
-🏙️ *Ciudad:* ${form.city}
-📍 *Dirección:* ${form.street1}
-🗺️ *Entre calle:* ${form.street2}
-🏠 *Nro:* ${form.houseNum || 'N/A'}
-${form.locationUrl ? `📍 *Ubicación exacta (GPS):* ${form.locationUrl}\n` : ''}📝 *Instrucciones:* ${form.instructions || 'Ninguna'}
+        // Se arma por líneas y se omite todo lo que esté vacío (más claro de leer).
+        const L: string[] = []
+        L.push('🛍️ *NUEVO PEDIDO*')
+        L.push(`🏪 ${displayName}`)
+        L.push('')
+        L.push('*🧾 PEDIDO*')
+        L.push(productLines)
+        if (isMLM && totalPoints > 0) L.push(`✨ Puntos PV: *${totalPoints} PV*`)
+        L.push(`💰 *TOTAL: ${money(totalPrice)}*`)
+        L.push('')
+        L.push('*👤 CLIENTE*')
+        L.push(`Nombre: ${form.name}`)
+        L.push(`Teléfono: ${form.phone}`)
+        L.push('')
+        L.push('*📍 ENTREGA*')
+        L.push(`Ciudad: ${form.city}`)
+        L.push(`Dirección: ${form.street1}`)
+        if (form.street2) L.push(`Entre calles: ${form.street2}`)
+        if (form.houseNum) L.push(`N° de casa: ${form.houseNum}`)
+        if (form.locationUrl) L.push(`📍 Ubicación en mapa: ${form.locationUrl}`)
+        if (form.instructions) L.push(`Indicaciones: ${form.instructions}`)
+        L.push('')
+        L.push('*💳 PAGO*')
+        if (form.paymentMethod === 'CASH') {
+            L.push('Efectivo — pago al recibir 💵')
+        } else {
+            L.push('Transferencia / QR 🏦')
+            L.push(fullProofUrl ? `Comprobante: ${fullProofUrl}` : '⚠️ Comprobante: lo envío en este chat')
+        }
+        L.push('')
+        L.push(`¡Hola ${displayName}! Te dejo mi pedido 🙌 ${form.paymentMethod === 'QR'
+            ? (fullProofUrl ? 'Ya pagué y adjunté el comprobante.' : 'Ya realicé el pago, enseguida envío el comprobante.')
+            : 'Pagaré en efectivo al recibir.'} ¿Cómo coordinamos la entrega?`)
 
-*MÉTODO DE PAGO:* ${form.paymentMethod === 'CASH' ? '💵 Efectivo' : '🏦 Transferencia / QR'}
-${fullProofUrl ? `📄 *Comprobante:* ${fullProofUrl}` : ''}
-
-*PRODUCTOS:*
-${productList}
-${pointsSection}*TOTAL:* ${cart[0]?.currency || '$'} ${totalPrice.toLocaleString()}
-
-¡Hola! He completado mi pedido. ${form.paymentMethod === 'QR' ? 'Ya realicé la transferencia.' : 'Pagaré al recibir.'} ¿Cómo procedemos?`
+        const message = L.join('\n')
 
         const link = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`
         window.open(link, '_blank')
