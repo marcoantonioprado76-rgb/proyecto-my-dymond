@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
-import { X, ShoppingCart, Trash2, Minus, Plus, MessageCircle, MapPin, User, Phone, ClipboardList, Wallet, Banknote, QrCode, Upload, CheckCircle2, Loader2 } from 'lucide-react'
+import { X, ShoppingCart, Trash2, Minus, Plus, MessageCircle, MapPin, User, Phone, ClipboardList, Wallet, Banknote, QrCode, CheckCircle2 } from 'lucide-react'
 import { useCart } from './CartContext'
 
 export function CartDrawer({ isOpen, onClose, storeWhatsapp, paymentQrUrl, isMLM, storeName }: { isOpen: boolean, onClose: () => void, storeWhatsapp: string, paymentQrUrl?: string, isMLM?: boolean, storeName?: string }) {
@@ -20,7 +20,6 @@ export function CartDrawer({ isOpen, onClose, storeWhatsapp, paymentQrUrl, isMLM
         paymentMethod: 'CASH' as 'CASH' | 'QR',
         proofUrl: ''
     })
-    const [uploading, setUploading] = useState(false)
 
     if (!isOpen) return null
 
@@ -248,49 +247,9 @@ ${pointsSection}*TOTAL:* ${cart[0]?.currency || '$'} ${totalPrice.toLocaleString
                                             </div>
                                         )}
 
-                                        <div className="space-y-3">
-                                            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 text-center">Sube tu comprobante</p>
-                                            {form.proofUrl ? (
-                                                <div className="flex items-center justify-center gap-2 text-green-400 py-3 bg-white/5 rounded-2xl border border-green-400/20">
-                                                    <CheckCircle2 size={16} />
-                                                    <span className="text-[10px] font-black uppercase tracking-widest">¡Comprobante Listo!</span>
-                                                    <button onClick={() => setForm({ ...form, proofUrl: '' })} className="text-white hover:text-red-400 ml-2">
-                                                        <X size={14} />
-                                                    </button>
-                                                </div>
-                                            ) : (
-                                                <div className="relative group">
-                                                    <input
-                                                        type="file"
-                                                        onChange={async (e) => {
-                                                            const file = e.target.files?.[0]
-                                                            if (!file) return
-                                                            setUploading(true)
-                                                            const formData = new FormData()
-                                                            formData.append('file', file)
-                                                            try {
-                                                                const res = await fetch('/api/upload', { method: 'POST', body: formData })
-                                                                const data = await res.json()
-                                                                if (res.ok) setForm({ ...form, proofUrl: data.url })
-                                                                else alert(data.error)
-                                                            } catch (err) { alert('Error al subir comprobante') }
-                                                            finally { setUploading(false) }
-                                                        }}
-                                                        className="absolute inset-0 opacity-0 cursor-pointer z-10"
-                                                        accept="image/*"
-                                                    />
-                                                    <div className="w-full py-4 bg-white/10 hover:bg-white/20 border border-white/10 border-dashed rounded-2xl flex flex-col items-center gap-2 transition-all">
-                                                        {uploading ? (
-                                                            <Loader2 size={24} className="animate-spin text-slate-400" />
-                                                        ) : (
-                                                            <>
-                                                                <Upload size={20} className="text-slate-400" />
-                                                                <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 underline">Elegir Imagen</span>
-                                                            </>
-                                                        )}
-                                                    </div>
-                                                </div>
-                                            )}
+                                        <div className="space-y-2 text-center">
+                                            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">¿Ya realizaste el pago?</p>
+                                            <p className="text-xs text-slate-300 leading-relaxed">Al finalizar, envía la <strong className="text-white">captura del comprobante</strong> directamente por WhatsApp.</p>
                                         </div>
                                     </div>
                                 )}
