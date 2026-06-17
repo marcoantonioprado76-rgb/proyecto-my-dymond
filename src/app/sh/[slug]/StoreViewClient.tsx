@@ -68,6 +68,7 @@ function StoreViewContent({ store, products, categories, phone, paymentQrUrl, th
                 paymentQrUrl={paymentQrUrl}
                 isMLM={store.type === 'NETWORK_MARKETING'}
                 storeName={store.name}
+                storeSlug={store.slug}
             />
         </div>
     )

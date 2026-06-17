@@ -1,10 +1,10 @@
 'use client'
 
 import React, { useState } from 'react'
-import { X, ShoppingCart, Trash2, Minus, Plus, MessageCircle, MapPin, User, Phone, ClipboardList, Wallet, Banknote, QrCode, CheckCircle2 } from 'lucide-react'
+import { X, ShoppingCart, Trash2, Minus, Plus, MessageCircle, MapPin, User, Phone, ClipboardList, Wallet, Banknote, QrCode, CheckCircle2, UploadCloud, Navigation } from 'lucide-react'
 import { useCart } from './CartContext'
 
-export function CartDrawer({ isOpen, onClose, storeWhatsapp, paymentQrUrl, isMLM, storeName }: { isOpen: boolean, onClose: () => void, storeWhatsapp: string, paymentQrUrl?: string, isMLM?: boolean, storeName?: string }) {
+export function CartDrawer({ isOpen, onClose, storeWhatsapp, paymentQrUrl, isMLM, storeName, storeSlug }: { isOpen: boolean, onClose: () => void, storeWhatsapp: string, paymentQrUrl?: string, isMLM?: boolean, storeName?: string, storeSlug?: string }) {
     const { cart, removeFromCart, updateQuantity, totalPrice, totalPoints, clearCart } = useCart()
     const [step, setStep] = useState<'ITEMS' | 'CHECKOUT' | 'SUCCESS'>('ITEMS')
 
@@ -18,8 +18,44 @@ export function CartDrawer({ isOpen, onClose, storeWhatsapp, paymentQrUrl, isMLM
         houseNum: '',
         instructions: '',
         paymentMethod: 'CASH' as 'CASH' | 'QR',
-        proofUrl: ''
+        proofUrl: '',
+        locationUrl: ''
     })
+    const [geoStatus, setGeoStatus] = useState<'idle' | 'loading' | 'ok' | 'error'>('idle')
+    const [uploadStatus, setUploadStatus] = useState<'idle' | 'loading' | 'ok' | 'error'>('idle')
+
+    // Ubicación exacta por GPS (un toque)
+    const handleGetLocation = () => {
+        if (typeof navigator === 'undefined' || !navigator.geolocation) { setGeoStatus('error'); return }
+        setGeoStatus('loading')
+        navigator.geolocation.getCurrentPosition(
+            (pos) => {
+                const { latitude, longitude } = pos.coords
+                setForm(f => ({ ...f, locationUrl: `https://www.google.com/maps?q=${latitude},${longitude}` }))
+                setGeoStatus('ok')
+            },
+            () => setGeoStatus('error'),
+            { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+        )
+    }
+
+    // Subir comprobante de pago (cliente anónimo → endpoint público)
+    const handleUploadProof = async (file?: File | null) => {
+        if (!file) return
+        setUploadStatus('loading')
+        try {
+            const fd = new FormData()
+            fd.append('file', file)
+            fd.append('slug', storeSlug || '')
+            const res = await fetch('/api/store-receipt', { method: 'POST', body: fd })
+            const data = await res.json()
+            if (!res.ok) throw new Error(data?.error || 'Error')
+            setForm(f => ({ ...f, proofUrl: data.url }))
+            setUploadStatus('ok')
+        } catch {
+            setUploadStatus('error')
+        }
+    }
 
     if (!isOpen) return null
 
@@ -44,7 +80,7 @@ export function CartDrawer({ isOpen, onClose, storeWhatsapp, paymentQrUrl, isMLM
 📍 *Dirección:* ${form.street1}
 🗺️ *Entre calle:* ${form.street2}
 🏠 *Nro:* ${form.houseNum || 'N/A'}
-📝 *Instrucciones:* ${form.instructions || 'Ninguna'}
+${form.locationUrl ? `📍 *Ubicación exacta (GPS):* ${form.locationUrl}\n` : ''}📝 *Instrucciones:* ${form.instructions || 'Ninguna'}
 
 *MÉTODO DE PAGO:* ${form.paymentMethod === 'CASH' ? '💵 Efectivo' : '🏦 Transferencia / QR'}
 ${fullProofUrl ? `📄 *Comprobante:* ${fullProofUrl}` : ''}
@@ -188,6 +224,27 @@ ${pointsSection}*TOTAL:* ${cart[0]?.currency || '$'} ${totalPrice.toLocaleString
                                     value={form.houseNum}
                                     onChange={e => setForm({ ...form, houseNum: e.target.value })}
                                 />
+
+                                {/* Ubicación exacta por GPS */}
+                                <button
+                                    type="button"
+                                    onClick={handleGetLocation}
+                                    disabled={geoStatus === 'loading'}
+                                    className={`w-full flex items-center justify-center gap-2 py-3 rounded-xl font-black text-[11px] uppercase tracking-widest border-2 transition-all ${form.locationUrl
+                                        ? 'border-green-500 bg-green-50 text-green-700'
+                                        : 'border-slate-300 bg-white text-slate-700 hover:border-slate-800'}`}
+                                >
+                                    {form.locationUrl ? <CheckCircle2 size={15} /> : <Navigation size={15} />}
+                                    {geoStatus === 'loading' ? 'Obteniendo ubicación...' : form.locationUrl ? 'Ubicación capturada' : 'Enviar mi ubicación exacta (GPS)'}
+                                </button>
+                                {geoStatus === 'error' && (
+                                    <p className="text-[11px] text-red-500 text-center -mt-1">No pudimos obtener tu ubicación. Activa el GPS y permite el acceso en tu navegador.</p>
+                                )}
+                                {form.locationUrl && (
+                                    <a href={form.locationUrl} target="_blank" rel="noreferrer" className="block text-[11px] text-center text-blue-600 underline -mt-1">
+                                        Ver mi ubicación en el mapa
+                                    </a>
+                                )}
                             </div>
 
                             <div className="space-y-3">
@@ -247,9 +304,38 @@ ${pointsSection}*TOTAL:* ${cart[0]?.currency || '$'} ${totalPrice.toLocaleString
                                             </div>
                                         )}
 
-                                        <div className="space-y-2 text-center">
-                                            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">¿Ya realizaste el pago?</p>
-                                            <p className="text-xs text-slate-300 leading-relaxed">Al finalizar, envía la <strong className="text-white">captura del comprobante</strong> directamente por WhatsApp.</p>
+                                        {/* Subir comprobante de pago */}
+                                        <div className="space-y-3">
+                                            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 text-center">¿Ya pagaste? Sube tu comprobante</p>
+
+                                            {form.proofUrl ? (
+                                                <div className="space-y-2">
+                                                    <div className="bg-white p-2 rounded-2xl">
+                                                        <img src={form.proofUrl} className="w-full max-h-52 object-contain rounded-xl" />
+                                                    </div>
+                                                    <p className="text-[11px] text-green-400 text-center font-bold flex items-center justify-center gap-1">
+                                                        <CheckCircle2 size={13} /> Comprobante adjuntado
+                                                    </p>
+                                                    <label className="block text-center text-[11px] font-bold text-slate-300 underline cursor-pointer">
+                                                        Cambiar comprobante
+                                                        <input type="file" accept="image/*" className="hidden" onChange={e => handleUploadProof(e.target.files?.[0])} />
+                                                    </label>
+                                                </div>
+                                            ) : (
+                                                <label className={`flex flex-col items-center justify-center gap-2 py-6 px-3 rounded-2xl border-2 border-dashed cursor-pointer transition-all ${uploadStatus === 'loading' ? 'border-slate-500 bg-slate-800' : 'border-slate-600 bg-slate-800/40 hover:bg-slate-800'}`}>
+                                                    <UploadCloud size={26} className="text-slate-400" />
+                                                    <span className="text-xs font-bold text-slate-200 text-center">
+                                                        {uploadStatus === 'loading' ? 'Subiendo comprobante...' : 'Toca para subir la foto del comprobante'}
+                                                    </span>
+                                                    <span className="text-[10px] text-slate-500">JPG, PNG o WEBP · máx. 6 MB</span>
+                                                    <input type="file" accept="image/*" className="hidden" disabled={uploadStatus === 'loading'} onChange={e => handleUploadProof(e.target.files?.[0])} />
+                                                </label>
+                                            )}
+
+                                            {uploadStatus === 'error' && (
+                                                <p className="text-[11px] text-red-400 text-center">No se pudo subir. Intenta otra vez o envía la captura por WhatsApp.</p>
+                                            )}
+                                            <p className="text-[11px] text-slate-400 leading-relaxed text-center">El comprobante se adjuntará a tu pedido en WhatsApp.</p>
                                         </div>
                                     </div>
                                 )}
