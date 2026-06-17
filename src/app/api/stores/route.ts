@@ -92,6 +92,8 @@ export async function POST(request: NextRequest) {
                     type: type as any,
                     whatsappNumber: body.whatsappNumber || null,
                     paymentQrUrl: body.paymentQrUrl || null,
+                    bannerUrl: body.bannerUrl || null,
+                    themeConfig: (body.themeConfig && typeof body.themeConfig === 'object') ? body.themeConfig : undefined,
                     description: description || '',
                 }
             })

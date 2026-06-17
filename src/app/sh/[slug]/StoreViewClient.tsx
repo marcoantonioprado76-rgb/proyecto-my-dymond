@@ -6,7 +6,7 @@ import { CartProvider, useCart } from './CartContext'
 import { CartDrawer } from './CartDrawer'
 import { LandingViewClient } from './LandingViewClient'
 import { ProductCard } from './ProductCard'
-import { resolveStoreTheme } from './theme'
+import { resolveStoreTheme } from '@/lib/store-themes'
 
 export function StoreViewClient({ store, products, categories, phone, paymentQrUrl }: any) {
     const theme = resolveStoreTheme(store?.themeConfig)

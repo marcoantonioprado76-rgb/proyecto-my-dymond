@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { STORE_THEMES, STORE_FONTS } from '@/lib/store-themes'
 import {
     ShoppingCart,
     Plus,
@@ -47,7 +48,7 @@ interface StoreRecord {
     whatsappNumber: string | null
     paymentQrUrl: string | null
     bannerUrl: string | null
-    themeConfig: { bannerUrl2?: string } | null
+    themeConfig: { bannerUrl2?: string; theme?: { preset?: string; font?: string; primary?: string } } | null
     active: boolean
     description: string | null
     sharedByUsername?: string | null
@@ -174,6 +175,9 @@ export default function VirtualStorePage() {
     const [storeQr, setStoreQr] = useState('')
     const [storeBanner1, setStoreBanner1] = useState('')
     const [storeBanner2, setStoreBanner2] = useState('')
+    const [storeThemePreset, setStoreThemePreset] = useState('neon-dark')
+    const [storeThemeFont, setStoreThemeFont] = useState('')
+    const [storeThemePrimary, setStoreThemePrimary] = useState('')
     const [editStore, setEditStore] = useState<StoreRecord | null>(null)
 
     // Product Form
@@ -234,7 +238,14 @@ export default function VirtualStorePage() {
                     whatsappNumber: storeWhatsapp,
                     paymentQrUrl: storeQr,
                     bannerUrl: storeBanner1 || null,
-                    themeConfig: { bannerUrl2: storeBanner2 || undefined }
+                    themeConfig: {
+                        bannerUrl2: storeBanner2 || undefined,
+                        theme: {
+                            preset: storeThemePreset,
+                            font: storeThemeFont || undefined,
+                            primary: storeThemePrimary || undefined,
+                        },
+                    }
                 })
             })
             const data = await res.json()
@@ -262,6 +273,9 @@ export default function VirtualStorePage() {
         setStoreQr('')
         setStoreBanner1('')
         setStoreBanner2('')
+        setStoreThemePreset('neon-dark')
+        setStoreThemeFont('')
+        setStoreThemePrimary('')
     }
 
     const convertStoreType = async (store: StoreRecord) => {
@@ -906,6 +920,9 @@ export default function VirtualStorePage() {
                                                     setStoreQr(store.paymentQrUrl || '');
                                                     setStoreBanner1(store.bannerUrl || '');
                                                     setStoreBanner2(store.themeConfig?.bannerUrl2 || '');
+                                                    setStoreThemePreset(store.themeConfig?.theme?.preset || 'neon-dark');
+                                                    setStoreThemeFont(store.themeConfig?.theme?.font || '');
+                                                    setStoreThemePrimary(store.themeConfig?.theme?.primary || '');
                                                     setShowStoreModal(true);
                                                 }}
                                                 className="p-1 rounded-md transition-colors hover:bg-white/5"
@@ -1171,6 +1188,50 @@ export default function VirtualStorePage() {
                                     </div>
                                 </div>
                             </div>
+                            {/* ── APARIENCIA (tema de la tienda) ── */}
+                            <div>
+                                <label className="text-xs font-bold text-dark-400 uppercase tracking-widest block mb-2">Apariencia de la tienda</label>
+                                <p className="text-[10px] text-dark-500 mb-3">Elige un tema: cambia los colores y la tipografía de tu vitrina.</p>
+                                <div className="grid grid-cols-3 gap-2">
+                                    {Object.entries(STORE_THEMES).map(([id, t]) => {
+                                        const sel = storeThemePreset === id
+                                        return (
+                                            <button key={id} type="button" onClick={() => setStoreThemePreset(id)}
+                                                className={`relative rounded-xl p-2 border text-left transition-all ${sel ? 'border-neon-blue' : 'border-white/10 hover:border-white/25'}`}
+                                                style={{ background: 'rgba(255,255,255,0.03)' }}>
+                                                <div className="h-9 rounded-lg mb-1.5 flex items-center gap-1 px-2" style={{ background: t.vars['--st-bg'] }}>
+                                                    <span className="w-3.5 h-3.5 rounded-full" style={{ background: t.vars['--st-primary'] }} />
+                                                    <span className="w-3.5 h-3.5 rounded-full" style={{ background: t.vars['--st-price'] }} />
+                                                    <span className="flex-1 h-2 rounded-full" style={{ background: t.vars['--st-card-border'] }} />
+                                                </div>
+                                                <span className="text-[10px] font-bold block truncate" style={{ color: sel ? '#fff' : 'rgba(255,255,255,0.6)' }}>{t.label}</span>
+                                                {sel && <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 rounded-full bg-neon-blue" />}
+                                            </button>
+                                        )
+                                    })}
+                                </div>
+
+                                <label className="text-xs font-bold text-dark-400 uppercase tracking-widest block mb-2 mt-4">Tipografía</label>
+                                <div className="flex flex-wrap gap-2">
+                                    <button type="button" onClick={() => setStoreThemeFont('')}
+                                        className={`px-3 py-1.5 rounded-lg text-[11px] font-bold border transition-all ${storeThemeFont === '' ? 'border-neon-blue text-white' : 'border-white/10 text-dark-400'}`}>Auto</button>
+                                    {Object.entries(STORE_FONTS).map(([key, f]) => (
+                                        <button key={key} type="button" onClick={() => setStoreThemeFont(key)}
+                                            className={`px-3 py-1.5 rounded-lg text-[11px] font-bold border transition-all ${storeThemeFont === key ? 'border-neon-blue text-white' : 'border-white/10 text-dark-400'}`}
+                                            style={{ fontFamily: f.family }}>{f.label}</button>
+                                    ))}
+                                </div>
+
+                                <label className="text-xs font-bold text-dark-400 uppercase tracking-widest block mb-2 mt-4">Color principal (opcional)</label>
+                                <div className="flex items-center gap-3">
+                                    <input type="color" value={storeThemePrimary || '#D203DD'} onChange={e => setStoreThemePrimary(e.target.value)}
+                                        className="w-11 h-9 rounded-lg bg-transparent border border-white/10 cursor-pointer p-0.5" />
+                                    {storeThemePrimary
+                                        ? <button type="button" onClick={() => setStoreThemePrimary('')} className="text-[10px] text-dark-400 underline">usar el del tema</button>
+                                        : <span className="text-[10px] text-dark-500">Sobrescribe el color del tema con el tuyo.</span>}
+                                </div>
+                            </div>
+
                             <button type="submit" className="w-full bg-neon-blue text-dark-950 font-bold py-4 rounded-xl shadow-lg active:scale-[0.98] transition-all">
                                 {editStore ? 'Guardar Cambios' : 'Crear Tienda'}
                             </button>
