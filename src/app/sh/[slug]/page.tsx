@@ -1,9 +1,41 @@
+import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import { StoreViewClient } from './StoreViewClient'
 
 interface PublicStorePageProps {
     params: { slug: string }
+}
+
+// Open Graph: al compartir el link de la tienda (WhatsApp, redes) muestra una
+// tarjeta con el nombre, descripción y portada de la tienda.
+export async function generateMetadata({ params }: PublicStorePageProps): Promise<Metadata> {
+    const store = await (prisma as any).store.findUnique({
+        where: { slug: params.slug },
+        select: { name: true, description: true, logoUrl: true, bannerUrl: true, active: true },
+    })
+    if (!store || !store.active) return { title: 'Tienda no encontrada · MY DIAMOND' }
+
+    const title = store.name
+    const description = store.description || `Mira el catálogo de ${store.name} y haz tu pedido por WhatsApp.`
+    const image: string | undefined = store.bannerUrl || store.logoUrl || undefined
+
+    return {
+        title,
+        description,
+        openGraph: {
+            title,
+            description,
+            type: 'website',
+            images: image ? [{ url: image }] : undefined,
+        },
+        twitter: {
+            card: image ? 'summary_large_image' : 'summary',
+            title,
+            description,
+            images: image ? [image] : undefined,
+        },
+    }
 }
 
 export default async function PublicStorePage({ params }: PublicStorePageProps) {

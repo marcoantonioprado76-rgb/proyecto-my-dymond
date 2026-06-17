@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { STORE_THEMES, STORE_FONTS } from '@/lib/store-themes'
+import { STORE_THEMES, STORE_FONTS, resolveStoreTheme } from '@/lib/store-themes'
 import {
     ShoppingCart,
     Plus,
@@ -1230,6 +1230,38 @@ export default function VirtualStorePage() {
                                         ? <button type="button" onClick={() => setStoreThemePrimary('')} className="text-[10px] text-dark-400 underline">usar el del tema</button>
                                         : <span className="text-[10px] text-dark-500">Sobrescribe el color del tema con el tuyo.</span>}
                                 </div>
+
+                                {/* Vista previa en vivo del tema */}
+                                {(() => {
+                                    const pv = resolveStoreTheme({ theme: { preset: storeThemePreset, font: storeThemeFont || undefined, primary: storeThemePrimary || undefined } })
+                                    return (
+                                        <div className="mt-4">
+                                            <label className="text-xs font-bold text-dark-400 uppercase tracking-widest block mb-2">Vista previa</label>
+                                            <link rel="stylesheet" href={pv.fontHref} />
+                                            <div style={{ ...(pv.vars as any), background: 'var(--st-bg)', fontFamily: 'var(--st-font)', borderRadius: 16, padding: 14, border: '1px solid var(--st-border)' }}>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+                                                    <div style={{ width: 26, height: 26, borderRadius: 8, background: 'rgba(var(--st-primary-rgb),0.15)', border: '1px solid var(--st-card-border)' }} />
+                                                    <span style={{ color: 'var(--st-text)', fontWeight: 800, fontSize: 13 }}>{storeName || 'Mi Tienda'}</span>
+                                                    <div style={{ marginLeft: 'auto', width: 28, height: 28, borderRadius: 8, background: 'rgba(var(--st-primary-rgb),0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                                        <ShoppingBag size={14} style={{ color: 'var(--st-primary)' }} />
+                                                    </div>
+                                                </div>
+                                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+                                                    {[0, 1].map(i => (
+                                                        <div key={i} style={{ background: 'var(--st-card)', border: '1px solid var(--st-card-border)', borderRadius: 'var(--st-radius)', boxShadow: 'var(--st-card-shadow)', overflow: 'hidden' }}>
+                                                            <div style={{ height: 64, background: 'linear-gradient(135deg, rgba(var(--st-primary-rgb),0.28), rgba(var(--st-primary-rgb),0.08))' }} />
+                                                            <div style={{ padding: '8px 9px' }}>
+                                                                <div style={{ color: 'var(--st-text)', fontWeight: 700, fontSize: 11, marginBottom: 4 }}>Producto {i + 1}</div>
+                                                                <div style={{ color: 'var(--st-price)', fontWeight: 800, fontSize: 14, marginBottom: 7 }}>$199</div>
+                                                                <div style={{ background: 'var(--st-primary)', color: 'var(--st-on-primary)', borderRadius: 9, padding: '6px 0', textAlign: 'center', fontSize: 9.5, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Añadir</div>
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )
+                                })()}
                             </div>
 
                             <button type="submit" className="w-full bg-neon-blue text-dark-950 font-bold py-4 rounded-xl shadow-lg active:scale-[0.98] transition-all">

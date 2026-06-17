@@ -10,7 +10,7 @@ const OFFER = '#FF8C42'
 const currencySymbol = (c: string) =>
     c === 'PEN' ? 'S/' : c === 'BOB' ? 'Bs' : c === 'VES' ? 'Bs.S' : c === 'EUR' ? '€' : '$'
 
-export function ProductCard({ p, whatsappPhone, isMLM }: any) {
+export function ProductCard({ p, whatsappPhone, isMLM, onOpenDetail }: any) {
     const [quantity, setQuantity] = useState(1)
     const [added, setAdded] = useState(false)
     const { addToCart } = useCart()
@@ -45,8 +45,8 @@ export function ProductCard({ p, whatsappPhone, isMLM }: any) {
             {/* Línea de acento superior */}
             <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 1, background: 'linear-gradient(90deg, transparent, rgba(var(--st-primary-rgb),0.7), transparent)', zIndex: 2 }} />
 
-            {/* Imagen */}
-            <div style={{ position: 'relative' }}>
+            {/* Imagen (clic abre el detalle) */}
+            <div style={{ position: 'relative', cursor: 'pointer' }} onClick={onOpenDetail}>
                 <ProductImageGallery images={p.images} name={p.name} />
                 {/* Badges sobre la imagen (pill oscura legible sobre cualquier foto) */}
                 {isMLM && p.points > 0 && (
@@ -77,7 +77,7 @@ export function ProductCard({ p, whatsappPhone, isMLM }: any) {
             <div style={{ padding: '12px 13px 13px', flex: 1, display: 'flex', flexDirection: 'column', gap: 7 }}>
 
                 {/* Nombre */}
-                <h3 style={{ fontSize: 'clamp(12px, 2.6vw, 15px)', fontWeight: 700, color: 'var(--st-text)', lineHeight: 1.3, margin: 0,
+                <h3 onClick={onOpenDetail} style={{ fontSize: 'clamp(12px, 2.6vw, 15px)', fontWeight: 700, color: 'var(--st-text)', lineHeight: 1.3, margin: 0, cursor: 'pointer',
                     display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 2, overflow: 'hidden' } as React.CSSProperties}>
                     {p.name}
                 </h3>

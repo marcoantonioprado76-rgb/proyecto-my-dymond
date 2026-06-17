@@ -6,6 +6,7 @@ import { CartProvider, useCart } from './CartContext'
 import { CartDrawer } from './CartDrawer'
 import { LandingViewClient } from './LandingViewClient'
 import { ProductCard } from './ProductCard'
+import { ProductDetailModal } from './ProductDetailModal'
 import { resolveStoreTheme } from '@/lib/store-themes'
 
 export function StoreViewClient({ store, products, categories, phone, paymentQrUrl }: any) {
@@ -126,6 +127,7 @@ function CatalogView({ store, products, categories, phone, onOpenCart, totalItem
     const [activeCategory, setActiveCategory] = useState('Todos')
     const [searchQuery, setSearchQuery] = useState('')
     const [menuOpen, setMenuOpen] = useState(false)
+    const [detailProduct, setDetailProduct] = useState<any>(null)
     const menuRef = useRef<HTMLDivElement>(null)
     const categoryList = ['Todos', ...Object.keys(categories)]
 
@@ -285,7 +287,7 @@ function CatalogView({ store, products, categories, phone, onOpenCart, totalItem
                         ).filter((p: any) =>
                             !searchQuery.trim() || p.name.toLowerCase().includes(searchQuery.trim().toLowerCase())
                         ).map((p: any) => (
-                            <ProductCard key={p.id} p={p} whatsappPhone={phone} isMLM={isMLM} />
+                            <ProductCard key={p.id} p={p} whatsappPhone={phone} isMLM={isMLM} onOpenDetail={() => setDetailProduct(p)} />
                         ))}
                     </div>
                 )}
@@ -297,6 +299,15 @@ function CatalogView({ store, products, categories, phone, onOpenCart, totalItem
                     {store.name} · Powered by MY DIAMOND © 2026
                 </p>
             </footer>
+
+            {/* ── DETALLE DE PRODUCTO ── */}
+            {detailProduct && (
+                <ProductDetailModal
+                    product={detailProduct}
+                    isMLM={isMLM}
+                    onClose={() => setDetailProduct(null)}
+                />
+            )}
         </div>
     )
 }
