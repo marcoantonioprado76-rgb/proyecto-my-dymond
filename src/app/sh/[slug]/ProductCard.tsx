@@ -32,7 +32,7 @@ export function ProductCard({ p, whatsappPhone, isMLM, onOpenDetail }: any) {
     }
 
     return (
-        <div style={{
+        <div className="st-prodcard" style={{
             display: 'flex', flexDirection: 'column',
             background: 'var(--st-card)',
             border: '1px solid var(--st-card-border)',

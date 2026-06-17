@@ -1,7 +1,7 @@
 'use client'
 
-import React, { useState, useEffect, useRef } from 'react'
-import { ShoppingBag, Store, Search, Menu, X, ChevronRight } from 'lucide-react'
+import React, { useState, useEffect } from 'react'
+import { ShoppingBag, Store, Search, ChevronRight } from 'lucide-react'
 import { CartProvider, useCart } from './CartContext'
 import { CartDrawer } from './CartDrawer'
 import { LandingViewClient } from './LandingViewClient'
@@ -73,7 +73,7 @@ function StoreViewContent({ store, products, categories, phone, paymentQrUrl, th
     )
 }
 
-function BannerCarousel({ banners }: { banners: string[] }) {
+function BannerCarousel({ banners, height = 190, overlay = null }: { banners: string[]; height?: number; overlay?: React.ReactNode }) {
     const [idx, setIdx] = useState(0)
 
     useEffect(() => {
@@ -82,11 +82,13 @@ function BannerCarousel({ banners }: { banners: string[] }) {
         return () => clearInterval(t)
     }, [banners.length])
 
-    if (!banners.length) return null
+    const hasImg = banners.length > 0
+    // Sin imagen y sin contenido superpuesto: no se muestra nada.
+    if (!hasImg && !overlay) return null
 
     return (
-        <div style={{ position: 'relative', borderRadius: 'var(--st-radius)', overflow: 'hidden', height: 190, marginBottom: 24, border: '1px solid var(--st-border)', boxShadow: 'var(--st-card-shadow)' }}>
-            {banners.map((url, i) => (
+        <div style={{ position: 'relative', borderRadius: 'calc(var(--st-radius) + 4px)', overflow: 'hidden', height, marginBottom: overlay ? 0 : 24, border: '1px solid var(--st-border)', boxShadow: 'var(--st-card-shadow)' }}>
+            {hasImg ? banners.map((url, i) => (
                 <img
                     key={url}
                     src={url}
@@ -98,11 +100,22 @@ function BannerCarousel({ banners }: { banners: string[] }) {
                         transition: 'opacity 0.8s ease',
                     }}
                 />
-            ))}
-            {/* Degradado inferior para legibilidad */}
-            <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.35), transparent 55%)', pointerEvents: 'none' }} />
-            {banners.length > 1 && (
-                <div style={{ position: 'absolute', bottom: 12, left: 0, right: 0, display: 'flex', justifyContent: 'center', gap: 6 }}>
+            )) : (
+                // Sin banner: fondo con degradado del color de la tienda.
+                <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(135deg, rgba(var(--st-primary-rgb),0.9), rgba(var(--st-primary-rgb),0.22))' }} />
+            )}
+            {/* Degradado para legibilidad (más fuerte cuando hay texto encima) */}
+            <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', background: overlay
+                ? 'linear-gradient(to top, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0.30) 55%, rgba(0,0,0,0.10) 100%)'
+                : 'linear-gradient(to top, rgba(0,0,0,0.35), transparent 55%)' }} />
+            {/* Contenido superpuesto (identidad de la tienda) */}
+            {overlay && (
+                <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', padding: '20px' }}>
+                    {overlay}
+                </div>
+            )}
+            {hasImg && banners.length > 1 && (
+                <div style={{ position: 'absolute', bottom: 12, left: 0, right: 0, display: 'flex', justifyContent: 'center', gap: 6, zIndex: 3 }}>
                     {banners.map((_, i) => (
                         <button
                             key={i}
@@ -126,20 +139,14 @@ function CatalogView({ store, products, categories, phone, onOpenCart, totalItem
     const isMLM = store.type === 'NETWORK_MARKETING'
     const [activeCategory, setActiveCategory] = useState('Todos')
     const [searchQuery, setSearchQuery] = useState('')
-    const [menuOpen, setMenuOpen] = useState(false)
     const [detailProduct, setDetailProduct] = useState<any>(null)
-    const menuRef = useRef<HTMLDivElement>(null)
     const categoryList = ['Todos', ...Object.keys(categories)]
 
-    useEffect(() => {
-        function handleClick(e: MouseEvent) {
-            if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
-                setMenuOpen(false)
-            }
-        }
-        if (menuOpen) document.addEventListener('mousedown', handleClick)
-        return () => document.removeEventListener('mousedown', handleClick)
-    }, [menuOpen])
+    // Productos visibles según categoría + búsqueda
+    const visibleProducts: any[] = (activeCategory === 'Todos'
+        ? (Object.values(categories).flat() as any[])
+        : (categories[activeCategory] || [])
+    ).filter((p: any) => !searchQuery.trim() || p.name.toLowerCase().includes(searchQuery.trim().toLowerCase()))
 
     const currencySymbol = (currency: string) =>
         currency === 'PEN' ? 'S/' : currency === 'BOB' ? 'Bs' : currency === 'VES' ? 'Bs.S' : currency === 'EUR' ? '€' : '$'
@@ -195,15 +202,29 @@ function CatalogView({ store, products, categories, phone, onOpenCart, totalItem
                 </div>
             </header>
 
-            {/* ── HERO DE LA TIENDA ── */}
-            <div style={{ maxWidth: 1280, margin: '0 auto', padding: '28px 20px 0' }}>
-                <BannerCarousel banners={[store.bannerUrl, store.themeConfig?.bannerUrl2].filter(Boolean) as string[]} />
-                <div style={{ marginBottom: 22 }}>
-                    <h1 style={{ fontSize: 'clamp(22px, 5vw, 32px)', fontWeight: 800, color: 'var(--st-text)', marginBottom: 6, letterSpacing: '-0.02em' }}>{store.name}</h1>
-                    {store.description && (
-                        <p style={{ fontSize: 13.5, color: 'var(--st-muted)', lineHeight: 1.7, maxWidth: 640 }}>{store.description}</p>
-                    )}
-                </div>
+            {/* ── HERO DE LA TIENDA (identidad sobre el banner) ── */}
+            <div style={{ maxWidth: 1280, margin: '0 auto', padding: '18px 16px 0' }}>
+                <BannerCarousel
+                    banners={[store.bannerUrl, store.themeConfig?.bannerUrl2].filter(Boolean) as string[]}
+                    height={250}
+                    overlay={
+                        <>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 13, marginBottom: store.description ? 10 : 0 }}>
+                                {store.logoUrl && (
+                                    <img src={store.logoUrl} alt={store.name} style={{ width: 58, height: 58, borderRadius: 16, objectFit: 'cover', border: '2px solid rgba(255,255,255,0.9)', boxShadow: '0 6px 18px rgba(0,0,0,0.45)', flexShrink: 0 }} />
+                                )}
+                                <h1 style={{ fontSize: 'clamp(23px, 6.5vw, 36px)', fontWeight: 800, color: '#fff', lineHeight: 1.08, letterSpacing: '-0.02em', textShadow: '0 2px 14px rgba(0,0,0,0.55)' }}>{store.name}</h1>
+                            </div>
+                            {store.description && (
+                                <p style={{ fontSize: 13.5, color: 'rgba(255,255,255,0.92)', lineHeight: 1.6, maxWidth: 580, textShadow: '0 1px 8px rgba(0,0,0,0.5)', display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 2, overflow: 'hidden' } as React.CSSProperties}>{store.description}</p>
+                            )}
+                        </>
+                    }
+                />
+            </div>
+
+            {/* ── BUSCADOR + CATEGORÍAS ── */}
+            <div style={{ maxWidth: 1280, margin: '0 auto', padding: '18px 20px 0' }}>
 
                 {/* ── BUSCADOR ── */}
                 <div style={{ position: 'relative', marginBottom: 14 }}>
@@ -223,73 +244,66 @@ function CatalogView({ store, products, categories, phone, onOpenCart, totalItem
                     />
                 </div>
 
-                {/* ── CATEGORÍAS ── */}
+                {/* ── CATEGORÍAS (chips deslizables) ── */}
                 {categoryList.length > 1 && (
-                    <div ref={menuRef} style={{ position: 'relative', marginBottom: 18 }}>
-                        <button
-                            onClick={() => setMenuOpen(o => !o)}
-                            style={{
-                                display: 'flex', alignItems: 'center', gap: 8,
-                                padding: '10px 16px', borderRadius: 12, cursor: 'pointer',
-                                background: menuOpen ? 'rgba(var(--st-primary-rgb),0.16)' : 'rgba(var(--st-primary-rgb),0.08)',
-                                border: `1px solid rgba(var(--st-primary-rgb),${menuOpen ? '0.5' : '0.2'})`,
-                                color: 'var(--st-primary)', fontSize: 13, fontWeight: 700,
-                                letterSpacing: '0.03em', transition: 'all 0.2s',
-                            }}
-                        >
-                            {menuOpen ? <X size={16} style={{ color: 'var(--st-primary)' }} /> : <Menu size={16} style={{ color: 'var(--st-primary)' }} />}
-                            <span>{activeCategory}</span>
-                        </button>
-
-                        {menuOpen && (
-                            <div style={{
-                                position: 'absolute', top: '110%', left: 0, zIndex: 100,
-                                background: 'var(--st-bg)', border: '1px solid var(--st-card-border)',
-                                borderRadius: 14, overflow: 'hidden', minWidth: 200,
-                                boxShadow: 'var(--st-card-shadow)',
-                            }}>
-                                {categoryList.map(cat => (
-                                    <button
-                                        key={cat}
-                                        onClick={() => { setActiveCategory(cat); setMenuOpen(false) }}
-                                        style={{
-                                            width: '100%', display: 'flex', alignItems: 'center',
-                                            justifyContent: 'space-between',
-                                            padding: '11px 16px', background: 'none',
-                                            border: 'none', borderBottom: '1px solid var(--st-border)',
-                                            color: activeCategory === cat ? 'var(--st-primary)' : 'var(--st-muted)',
-                                            fontSize: 13.5, fontWeight: activeCategory === cat ? 700 : 500,
-                                            cursor: 'pointer', textAlign: 'left', fontFamily: 'inherit',
-                                        }}
-                                    >
-                                        {cat}
-                                        {activeCategory === cat && <ChevronRight size={14} style={{ color: 'var(--st-primary)' }} />}
-                                    </button>
-                                ))}
-                            </div>
-                        )}
+                    <div style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 4, marginBottom: 4, scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' } as React.CSSProperties}>
+                        {categoryList.map(cat => {
+                            const active = activeCategory === cat
+                            return (
+                                <button
+                                    key={cat}
+                                    onClick={() => setActiveCategory(cat)}
+                                    style={{
+                                        flexShrink: 0, padding: '9px 17px', borderRadius: 999, cursor: 'pointer', fontFamily: 'inherit',
+                                        fontSize: 13, fontWeight: 700, whiteSpace: 'nowrap', letterSpacing: '0.01em', transition: 'all 0.2s',
+                                        background: active ? 'var(--st-primary)' : 'rgba(var(--st-primary-rgb),0.08)',
+                                        color: active ? 'var(--st-on-primary)' : 'var(--st-muted)',
+                                        border: `1px solid ${active ? 'transparent' : 'rgba(var(--st-primary-rgb),0.2)'}`,
+                                        boxShadow: active ? '0 4px 14px rgba(var(--st-primary-rgb),0.35)' : 'none',
+                                    }}
+                                >
+                                    {cat}
+                                </button>
+                            )
+                        })}
                     </div>
                 )}
             </div>
 
             {/* ── GRID DE PRODUCTOS (2 columnas en móvil) ── */}
-            <main style={{ maxWidth: 1280, margin: '0 auto', padding: totalItems > 0 ? '8px 20px 120px' : '8px 20px 60px' }}>
+            <main style={{ maxWidth: 1280, margin: '0 auto', padding: totalItems > 0 ? '14px 20px 120px' : '14px 20px 60px' }}>
+                <style>{`.st-prodcard{transition:transform .22s ease, box-shadow .22s ease}.st-prodcard:hover{transform:translateY(-5px)}`}</style>
                 {products.length === 0 ? (
                     <div style={{ textAlign: 'center', padding: '80px 20px', color: 'var(--st-muted)' }}>
                         <Store size={40} style={{ margin: '0 auto 16px', opacity: 0.4 }} />
                         <p style={{ fontSize: 14 }}>No hay productos disponibles aún.</p>
                     </div>
                 ) : (
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
-                        {(activeCategory === 'Todos'
-                            ? (Object.values(categories).flat() as any[])
-                            : (categories[activeCategory] || [])
-                        ).filter((p: any) =>
-                            !searchQuery.trim() || p.name.toLowerCase().includes(searchQuery.trim().toLowerCase())
-                        ).map((p: any) => (
-                            <ProductCard key={p.id} p={p} whatsappPhone={phone} isMLM={isMLM} onOpenDetail={() => setDetailProduct(p)} />
-                        ))}
-                    </div>
+                    <>
+                        {/* Encabezado de sección */}
+                        <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 12, marginBottom: 16 }}>
+                            <h2 style={{ fontSize: 17, fontWeight: 800, color: 'var(--st-text)', letterSpacing: '-0.01em', display: 'flex', alignItems: 'center', gap: 9 }}>
+                                <span style={{ width: 4, height: 18, borderRadius: 99, background: 'var(--st-primary)', display: 'inline-block' }} />
+                                {activeCategory === 'Todos' ? 'Todos los productos' : activeCategory}
+                            </h2>
+                            <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--st-muted)', whiteSpace: 'nowrap' }}>
+                                {visibleProducts.length} {visibleProducts.length === 1 ? 'producto' : 'productos'}
+                            </span>
+                        </div>
+
+                        {visibleProducts.length === 0 ? (
+                            <div style={{ textAlign: 'center', padding: '60px 20px', color: 'var(--st-muted)' }}>
+                                <Search size={36} style={{ margin: '0 auto 14px', opacity: 0.4 }} />
+                                <p style={{ fontSize: 14 }}>No encontramos productos para “{searchQuery}”.</p>
+                            </div>
+                        ) : (
+                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
+                                {visibleProducts.map((p: any) => (
+                                    <ProductCard key={p.id} p={p} whatsappPhone={phone} isMLM={isMLM} onOpenDetail={() => setDetailProduct(p)} />
+                                ))}
+                            </div>
+                        )}
+                    </>
                 )}
             </main>
 
