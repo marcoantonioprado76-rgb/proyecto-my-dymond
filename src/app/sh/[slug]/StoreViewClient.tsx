@@ -273,7 +273,7 @@ function CatalogView({ store, products, categories, phone, onOpenCart, totalItem
             </div>
 
             {/* ── GRID DE PRODUCTOS (2 columnas en móvil) ── */}
-            <main style={{ maxWidth: 1280, margin: '0 auto', padding: '8px 20px 60px' }}>
+            <main style={{ maxWidth: 1280, margin: '0 auto', padding: totalItems > 0 ? '8px 20px 120px' : '8px 20px 60px' }}>
                 {products.length === 0 ? (
                     <div style={{ textAlign: 'center', padding: '80px 20px', color: 'var(--st-muted)' }}>
                         <Store size={40} style={{ margin: '0 auto 16px', opacity: 0.4 }} />
@@ -307,6 +307,50 @@ function CatalogView({ store, products, categories, phone, onOpenCart, totalItem
                     isMLM={isMLM}
                     onClose={() => setDetailProduct(null)}
                 />
+            )}
+
+            {/* ── BARRA FLOTANTE DE PEDIDO (visible cuando hay productos) ── */}
+            {totalItems > 0 && (
+                <div style={{
+                    position: 'fixed', left: 0, right: 0, bottom: 0, zIndex: 120,
+                    padding: '0 12px 12px', display: 'flex', justifyContent: 'center',
+                    pointerEvents: 'none',
+                }}>
+                    <style>{`@keyframes st-cartbar{from{transform:translateY(140%);opacity:0}to{transform:translateY(0);opacity:1}}@keyframes st-cartpulse{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}`}</style>
+                    <button onClick={onOpenCart} aria-label="Ver mi pedido" style={{
+                        pointerEvents: 'auto', width: '100%', maxWidth: 540,
+                        display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12,
+                        padding: '13px 16px', borderRadius: 18, border: 'none', cursor: 'pointer',
+                        background: 'var(--st-primary)', color: 'var(--st-on-primary)', fontFamily: 'inherit',
+                        boxShadow: '0 10px 34px rgba(0,0,0,0.32), 0 0 0 1px rgba(var(--st-primary-rgb),0.55)',
+                        animation: 'st-cartbar 0.4s cubic-bezier(.22,1,.36,1)',
+                    }}>
+                        <span style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                            <span style={{ position: 'relative', display: 'flex' }}>
+                                <ShoppingBag size={23} />
+                                <span style={{
+                                    position: 'absolute', top: -8, right: -10,
+                                    background: 'var(--st-price)', color: '#04210f',
+                                    fontSize: 10, fontWeight: 800, minWidth: 19, height: 19, padding: '0 4px',
+                                    borderRadius: 999, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                    border: '2px solid var(--st-primary)', animation: 'st-cartpulse 1.8s ease-in-out infinite',
+                                }}>{totalItems}</span>
+                            </span>
+                            <span style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', lineHeight: 1.15 }}>
+                                <span style={{ fontSize: 14.5, fontWeight: 800, letterSpacing: '0.01em' }}>Ver mi pedido</span>
+                                <span style={{ fontSize: 11, fontWeight: 600, opacity: 0.85 }}>
+                                    {totalItems} {totalItems === 1 ? 'producto' : 'productos'}{isMLM && totalPoints > 0 ? ` · +${totalPoints} PV` : ''}
+                                </span>
+                            </span>
+                        </span>
+                        <span style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
+                            <span style={{ fontSize: 17.5, fontWeight: 800 }}>
+                                {currencySymbol(cart?.[0]?.currency || products?.[0]?.currency || 'USD')}{Number(totalPrice).toLocaleString()}
+                            </span>
+                            <ChevronRight size={21} />
+                        </span>
+                    </button>
+                </div>
             )}
         </div>
     )
