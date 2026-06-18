@@ -6,7 +6,7 @@ import { prisma } from '@/lib/prisma'
 import { decrypt } from '@/lib/ads/encryption'
 import { AdapterFactory } from '@/lib/ads/factory'
 import { supabaseAdmin } from '@/lib/supabase'
-import { generateAudienceInterests, filterAudienceInterests } from '@/lib/ads/openai-ads'
+import { generateAudienceInterests, filterAudienceInterests, generateAudienceProfile } from '@/lib/ads/openai-ads'
 import { MetaAdapter } from '@/lib/ads/adapters/meta'
 
 const BUCKET = 'ad-creatives'
@@ -140,6 +140,7 @@ export async function POST(req: Request, { params }: { params: { id: string } })
         // Generate interest keywords from the brief with OpenAI, then resolve
         // each keyword to a real Meta interest ID via the Targeting Search API.
         let audienceInterests: Array<{ id: string; name: string }> = []
+        let audienceProfile: { ageMin: number; ageMax: number; gender: 'all' | 'female' | 'male' } | null = null
         if (campaign.platform === 'META') {
             let audienceError = 'No se pudieron generar intereses de audiencia. Verifica tu API Key de OpenAI en Configuración → IA.'
             try {
@@ -154,6 +155,18 @@ export async function POST(req: Request, { params }: { params: { id: string } })
                         : 'Configura tu API Key de OpenAI o pedile al admin que active la global.'
                 } else {
                     const oaiKey = resolved.key
+
+                    // Perfil de audiencia (edad/género) desde el brief — segmenta mejor.
+                    // En su propio try: si falla, se publica igual (edad/género amplios).
+                    try {
+                        let profUsage: { promptTokens: number; completionTokens: number } | null = null
+                        audienceProfile = await generateAudienceProfile({ brief: campaign.brief, apiKey: oaiKey, model: audienceModel, onUsage: (u) => { profUsage = u } })
+                        if (resolved.source === 'admin' && profUsage) {
+                            const u = profUsage as { promptTokens: number; completionTokens: number }
+                            chargeForChatUsage(user.id, audienceModel, u.promptTokens, u.completionTokens, 'ads.publish.audience.profile', { campaignId: params.id }).catch(() => { })
+                        }
+                    } catch (e) { console.warn('[Publish] audience profile failed (se publica con edad/genero amplios):', e) }
+
                     let kwUsage: { promptTokens: number; completionTokens: number } | null = null
                     const keywords = await generateAudienceInterests(campaign.brief, oaiKey, audienceModel, (u) => { kwUsage = u })
                     if (resolved.source === 'admin' && kwUsage) {
@@ -265,6 +278,12 @@ export async function POST(req: Request, { params }: { params: { id: string } })
                     })),
                 // AI audience interests (Meta only — resolved from brief via OpenAI + Meta Targeting Search)
                 ...(audienceInterests.length > 0 ? { audienceInterests } : {}),
+                // Edad/género de la audiencia (IA, desde el brief). El adapter los aplica.
+                ...(audienceProfile ? {
+                    ageMin: audienceProfile.ageMin,
+                    ageMax: audienceProfile.ageMax,
+                    ...(audienceProfile.gender === 'female' ? { gender: 'FEMALE' } : audienceProfile.gender === 'male' ? { gender: 'MALE' } : {}),
+                } : {}),
                 // Pass advantageType so Google adapter knows Search/Display/PMax
                 ...(campaign.platform === 'GOOGLE_ADS' ? { advantageType: campaign.strategy.advantageType } : {}),
                 // Advantage+ Audience — from UI override

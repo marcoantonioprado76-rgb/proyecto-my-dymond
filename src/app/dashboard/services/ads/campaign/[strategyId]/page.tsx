@@ -43,6 +43,8 @@ function CampaignPageInner() {
     const [previewIdx, setPreviewIdx] = useState(0)
     const [showAdvanced, setShowAdvanced] = useState(false)
     const [genWaChat, setGenWaChat] = useState(false)
+    const [audienceProfile, setAudienceProfile] = useState<any>(null)
+    const [genAudience, setGenAudience] = useState(false)
 
     // AI image generation per slot
     const [generatingImages, setGeneratingImages] = useState<Record<number, boolean>>({})
@@ -310,6 +312,19 @@ function CampaignPageInner() {
             }
         } catch (e) { console.error(e) }
         finally { setLoading(false) }
+    }
+
+    // Genera la audiencia (edad/género/intereses) con IA, desde el brief
+    async function generateAudience() {
+        if (!campaign) return
+        setGenAudience(true); setError(null)
+        try {
+            const res = await fetch(`/api/ads/campaign/${campaign.id}/audience`, { method: 'POST' })
+            const data = await res.json()
+            if (!res.ok) { setError(data.error || 'No se pudo generar la audiencia'); return }
+            setAudienceProfile(data.audience)
+        } catch { setError('Error de conexión') }
+        finally { setGenAudience(false) }
     }
 
     // Genera el saludo + botón de respuesta rápida con IA (desde el brief)
@@ -1029,6 +1044,36 @@ function CampaignPageInner() {
                                     </div>
                                 </div>
                             )}
+
+                            {/* Audiencia (IA) — edad, género e intereses desde el brief */}
+                            <div className="rounded-xl border border-purple-500/20 bg-purple-500/5 p-3.5">
+                                <div className="flex items-center justify-between gap-2 mb-2">
+                                    <p className="text-xs font-bold text-white/80 flex items-center gap-1.5"><Target size={12} className="text-purple-400" /> Audiencia (IA)</p>
+                                    <button type="button" onClick={generateAudience} disabled={genAudience || !campaign}
+                                        className="flex items-center gap-1.5 text-[10px] font-bold px-2.5 py-1.5 rounded-lg bg-purple-500/15 border border-purple-500/30 text-purple-200 hover:bg-purple-500/25 transition-all disabled:opacity-50">
+                                        {genAudience ? <Loader2 size={11} className="animate-spin" /> : <Sparkles size={11} />}
+                                        {genAudience ? 'Generando…' : audienceProfile ? 'Regenerar' : 'Sugerir con IA'}
+                                    </button>
+                                </div>
+                                {audienceProfile ? (
+                                    <div className="space-y-2">
+                                        <div className="flex flex-wrap gap-1.5">
+                                            <span className="text-[11px] font-medium px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-white/70">👤 {audienceProfile.gender === 'female' ? 'Mujeres' : audienceProfile.gender === 'male' ? 'Hombres' : 'Todos'}</span>
+                                            <span className="text-[11px] font-medium px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-white/70">🎂 {audienceProfile.ageMin}–{audienceProfile.ageMax} años</span>
+                                        </div>
+                                        {audienceProfile.interests?.length > 0 && (
+                                            <div className="flex flex-wrap gap-1.5">
+                                                {audienceProfile.interests.map((it: string, i: number) => (
+                                                    <span key={i} className="text-[11px] px-2.5 py-1 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-200">{it}</span>
+                                                ))}
+                                            </div>
+                                        )}
+                                        <p className="text-[10px] text-white/30 leading-relaxed">Con Advantage+ activado, Meta usa esto como punto de partida y amplía para encontrar más compradores.</p>
+                                    </div>
+                                ) : (
+                                    <p className="text-[11px] text-white/35 leading-relaxed">La IA define edad, género e intereses ideales según tu negocio. Toca “Sugerir con IA”.</p>
+                                )}
+                            </div>
 
                             {/* Advantage+ Audience */}
                             <div className="flex items-start justify-between gap-4">

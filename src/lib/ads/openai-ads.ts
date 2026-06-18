@@ -779,6 +779,64 @@ Devuelve ÚNICAMENTE este JSON: {"greeting": "..."}`
     }
 }
 
+// Define la audiencia ideal (edad, género e intereses) a partir del brief,
+// para segmentar mejor el anuncio. Temperatura baja para que sea estable.
+export async function generateAudienceProfile(params: {
+    brief: BusinessBriefData
+    apiKey: string
+    model?: string
+    onUsage?: UsageCallback
+}): Promise<{ ageMin: number; ageMax: number; gender: 'all' | 'female' | 'male'; interests: string[] }> {
+    const { brief, apiKey, model = 'gpt-4o', onUsage } = params
+
+    const prompt = `Eres experto en segmentación de audiencias para Meta Ads. Define la audiencia IDEAL (quién compra) para este negocio.
+
+NEGOCIO: ${brief.name} (${brief.industry})
+DESCRIPCIÓN: ${brief.description}
+PROPUESTA DE VALOR: ${brief.valueProposition}
+PUNTOS DE DOLOR: ${(brief.painPoints || []).slice(0, 4).join(', ')}
+INTERESES BASE: ${(brief.interests || []).slice(0, 6).join(', ')}
+
+Devuelve ÚNICAMENTE este JSON:
+{
+  "ageMin": número entre 18 y 65 (edad mínima realista del comprador),
+  "ageMax": número entre 18 y 65 (edad máxima),
+  "gender": "all" | "female" | "male"  (USA "all" salvo que el producto sea CLARAMENTE para un solo género),
+  "interests": [5 a 8 intereses concretos del cliente ideal, en español, que se puedan targetear en Meta]
+}`
+
+    const res = await fetch(`${OPENAI_BASE}/chat/completions`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}` },
+        body: JSON.stringify({
+            model,
+            messages: [{ role: 'user', content: prompt }],
+            temperature: 0.3,
+            max_tokens: 400,
+            response_format: { type: 'json_object' }
+        })
+    })
+
+    if (!res.ok) {
+        const err = await res.json().catch(() => ({}))
+        throw new Error(err?.error?.message || `OpenAI error ${res.status}`)
+    }
+
+    const data = await res.json()
+    emitUsage(data, onUsage)
+    const content = data.choices?.[0]?.message?.content
+    if (!content) throw new Error('OpenAI no devolvió contenido')
+    const p = JSON.parse(content)
+
+    const clampAge = (n: any, d: number) => { const x = Math.round(Number(n)); return Number.isFinite(x) ? Math.min(65, Math.max(18, x)) : d }
+    let ageMin = clampAge(p.ageMin, 18)
+    let ageMax = clampAge(p.ageMax, 65)
+    if (ageMin > ageMax) { const t = ageMin; ageMin = ageMax; ageMax = t }
+    const gender = (p.gender === 'female' || p.gender === 'male') ? p.gender : 'all'
+    const interests = Array.isArray(p.interests) ? p.interests.filter((s: any) => typeof s === 'string' && s.trim()).slice(0, 8) : []
+    return { ageMin, ageMax, gender, interests }
+}
+
 export type ImageQuality = 'fast' | 'standard' | 'premium'
 export type ImageSize = '1024x1024' | '1024x1792' | '1792x1024'
 
