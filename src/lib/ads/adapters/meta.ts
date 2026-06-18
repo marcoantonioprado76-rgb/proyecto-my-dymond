@@ -281,13 +281,20 @@ export class MetaAdapter implements IAdsAdapter {
             destinationType = 'APP'
         }
 
-        // Targeting
+        // Targeting.
+        // Con Advantage+ Audience ON, Meta toma edad/género como SUGERENCIA y RECHAZA una
+        // edad máxima fija (<65) o géneros restrictivos. Por eso: con ON solo fijamos la
+        // edad MÍNIMA (piso, que Meta sí respeta) y dejamos el resto amplio; con OFF
+        // aplicamos edad y género exactos.
+        const advAudience = draft.advantageAudience !== false
         const targeting: any = {
             age_min: draft.ageMin || 18,
-            age_max: draft.ageMax || 65,
+            age_max: advAudience ? 65 : (draft.ageMax || 65),
         }
-        if (draft.gender === 'MALE') targeting.genders = [1]
-        else if (draft.gender === 'FEMALE') targeting.genders = [2]
+        if (!advAudience) {
+            if (draft.gender === 'MALE') targeting.genders = [1]
+            else if (draft.gender === 'FEMALE') targeting.genders = [2]
+        }
 
         // AI-generated audience interests → flexible_spec
         if (draft.audienceInterests && draft.audienceInterests.length > 0) {
@@ -309,10 +316,9 @@ export class MetaAdapter implements IAdsAdapter {
             targeting.geo_locations = { countries: ['US'] }
         }
 
-        // Advantage+ Audience — Meta expands beyond defined targeting if it finds better results
-        if (draft.advantageAudience) {
-            targeting.targeting_automation = { advantage_audience: 1 }
-        }
+        // Advantage+ Audience — Meta EXIGE el flag explícito (0 o 1). ON = expande más allá
+        // del targeting definido; OFF = respeta el targeting exacto.
+        targeting.targeting_automation = { advantage_audience: advAudience ? 1 : 0 }
 
         // Bid strategy
         let metaBidStrategy = 'LOWEST_COST_WITHOUT_CAP'
