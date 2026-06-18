@@ -14,6 +14,32 @@ import { useRouter, useParams, useSearchParams } from 'next/navigation'
 import LocationSelector, { resolveBriefLocations } from '@/components/ads/LocationSelector'
 import AIKeySelector from '@/components/AIKeySelector'
 
+// Moneda de la cuenta publicitaria: símbolo + mínimos/paso sensatos (aprox. el
+// mínimo diario que pide Meta por moneda). El monto SIEMPRE va en la moneda de
+// la cuenta — Meta lo interpreta así. Fallback genérico para monedas no listadas.
+const CURRENCY_INFO: Record<string, { symbol: string; min: number; max: number; step: number }> = {
+    USD: { symbol: '$', min: 5, max: 100, step: 1 },
+    EUR: { symbol: '€', min: 5, max: 100, step: 1 },
+    MXN: { symbol: '$', min: 100, max: 2000, step: 10 },
+    COP: { symbol: '$', min: 20000, max: 400000, step: 1000 },
+    ARS: { symbol: '$', min: 3000, max: 60000, step: 500 },
+    CLP: { symbol: '$', min: 4000, max: 80000, step: 500 },
+    PEN: { symbol: 'S/', min: 18, max: 360, step: 2 },
+    BOB: { symbol: 'Bs', min: 35, max: 700, step: 5 },
+    BRL: { symbol: 'R$', min: 25, max: 500, step: 5 },
+    GTQ: { symbol: 'Q', min: 40, max: 800, step: 5 },
+    DOP: { symbol: 'RD$', min: 300, max: 6000, step: 50 },
+    UYU: { symbol: '$U', min: 200, max: 4000, step: 50 },
+    PYG: { symbol: '₲', min: 35000, max: 700000, step: 5000 },
+    HNL: { symbol: 'L', min: 125, max: 2500, step: 25 },
+    CRC: { symbol: '₡', min: 2500, max: 50000, step: 500 },
+    NIO: { symbol: 'C$', min: 180, max: 3600, step: 20 },
+    PAB: { symbol: 'B/.', min: 5, max: 100, step: 1 },
+}
+function currencyInfo(code?: string) {
+    return CURRENCY_INFO[(code || 'USD').toUpperCase()] || { symbol: (code || '$'), min: 5, max: 100, step: 1 }
+}
+
 function CampaignPageInner() {
     const router = useRouter()
     const { strategyId } = useParams() as { strategyId: string }
@@ -158,6 +184,17 @@ function CampaignPageInner() {
     }
 
     useEffect(() => { fetchAll() }, [strategyId])
+
+    // Si la cuenta es de otra moneda y el presupuesto quedó por debajo del mínimo
+    // de esa moneda, lo subimos al mínimo (Meta rechaza montos muy bajos).
+    useEffect(() => {
+        const acct = accounts.find((a: any) => a.providerAccountId === form.providerAccountId)
+        if (!acct) return
+        const ci = currencyInfo(acct.currency)
+        const val = parseFloat(form.dailyBudgetUSD || '0') || 0
+        if (val < ci.min) setForm(f => ({ ...f, dailyBudgetUSD: String(ci.min) }))
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [form.providerAccountId, accounts])
 
     // Reset adFormat to 'single' when loaded strategy is a messaging destination
     useEffect(() => {
@@ -982,20 +1019,33 @@ function CampaignPageInner() {
                             <label className="text-[10px] font-bold text-white/35 uppercase tracking-widest flex items-center gap-1 mb-2">
                                 <DollarSign size={9} /> Presupuesto diario
                             </label>
-                            <div className="space-y-2">
-                                <div className="flex items-center justify-between">
-                                    <span className="text-2xl font-black text-white">${form.dailyBudgetUSD}</span>
-                                    <span className="text-xs text-white/25">USD/día</span>
-                                </div>
-                                <input type="range" min={strategy.minBudgetUSD} max={Math.max(100, strategy.minBudgetUSD * 10)}
-                                    step="0.5" value={form.dailyBudgetUSD}
-                                    onChange={e => setForm(f => ({ ...f, dailyBudgetUSD: e.target.value }))}
-                                    className="w-full accent-purple-500" />
-                                <div className="flex justify-between text-[10px] text-white/15">
-                                    <span>Mín ${strategy.minBudgetUSD}</span>
-                                    <span>Máx ${Math.max(100, strategy.minBudgetUSD * 10)}</span>
-                                </div>
-                            </div>
+                            {(() => {
+                                const acct = accounts.find((a: any) => a.providerAccountId === form.providerAccountId)
+                                const cur = (acct?.currency || 'USD').toUpperCase()
+                                const ci = currencyInfo(cur)
+                                const min = Math.max(ci.min, cur === 'USD' ? (strategy.minBudgetUSD || 0) : 0)
+                                const max = Math.max(ci.max, min * 10)
+                                const val = Math.min(Math.max(parseFloat(form.dailyBudgetUSD || String(min)) || min, min), max)
+                                return (
+                                    <div className="space-y-2">
+                                        <div className="flex items-center justify-between">
+                                            <span className="text-2xl font-black text-white">{ci.symbol}{Number(form.dailyBudgetUSD || 0).toLocaleString()}</span>
+                                            <span className="text-xs text-white/25">{cur}/día</span>
+                                        </div>
+                                        <input type="range" min={min} max={max} step={ci.step}
+                                            value={val}
+                                            onChange={e => setForm(f => ({ ...f, dailyBudgetUSD: e.target.value }))}
+                                            className="w-full accent-purple-500" />
+                                        <div className="flex justify-between text-[10px] text-white/15">
+                                            <span>Mín {ci.symbol}{min.toLocaleString()}</span>
+                                            <span>Máx {ci.symbol}{max.toLocaleString()}</span>
+                                        </div>
+                                        {cur !== 'USD' && (
+                                            <p className="text-[10px] text-white/25 leading-relaxed">💱 El monto está en <b className="text-white/45">{cur}</b>, la moneda de tu cuenta publicitaria.</p>
+                                        )}
+                                    </div>
+                                )
+                            })()}
                         </div>
                         <div>
                             <label className="text-[10px] font-bold text-white/35 uppercase tracking-widest flex items-center gap-1 mb-2">
