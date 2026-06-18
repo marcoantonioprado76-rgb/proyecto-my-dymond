@@ -112,7 +112,7 @@ Devuelve EXACTAMENTE este JSON (todos los campos son obligatorios):
   "visualStyle": ["estilo visual 1 (ej: minimalista)", "estilo 2", "estilo 3"],
   "primaryObjective": "conversion",
   "mainCTA": "llamada a la acción principal (ej: Comprar ahora, Solicitar info, Ver oferta)",
-  "targetLocations": ["país o ciudad principal"],
+  "targetLocations": ["1 a 3 países o ciudades REALES donde vende el negocio (ej: Bolivia, Perú, Lima, Cochabamba). NUNCA continentes ni regiones como 'Latinoamérica'. Nunca lo dejes vacío: si no está claro, usa el país del negocio"],
   "keyMessages": ["mensaje clave 1", "mensaje clave 2", "mensaje clave 3"],
   "personalityTraits": ["rasgo de marca 1", "rasgo 2", "rasgo 3"],
   "contentThemes": ["tema de contenido 1", "tema 2", "tema 3"],

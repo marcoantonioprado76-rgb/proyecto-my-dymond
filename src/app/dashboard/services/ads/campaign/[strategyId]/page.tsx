@@ -11,7 +11,7 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter, useParams, useSearchParams } from 'next/navigation'
-import LocationSelector from '@/components/ads/LocationSelector'
+import LocationSelector, { resolveBriefLocations } from '@/components/ads/LocationSelector'
 import AIKeySelector from '@/components/AIKeySelector'
 
 function CampaignPageInner() {
@@ -209,7 +209,11 @@ function CampaignPageInner() {
                         ...f,
                         name: existingCampaign.name || f.name,
                         dailyBudgetUSD: String(existingCampaign.dailyBudgetUSD ?? f.dailyBudgetUSD),
-                        locations: existingCampaign.locations || [],
+                        // Si la campaña aún no tiene ubicación, pre-cargamos la del
+                        // brief (texto libre de la IA) resuelta a ubicaciones reales de Meta.
+                        locations: (existingCampaign.locations?.length
+                            ? existingCampaign.locations
+                            : resolveBriefLocations(existingCampaign.brief?.targetLocations || [])),
                         pageId: existingCampaign.pageId || '',
                         whatsappNumber: existingCampaign.whatsappNumber || '',
                         welcomeMessage: existingCampaign.welcomeMessage?.split('||QA:')[0] || '',

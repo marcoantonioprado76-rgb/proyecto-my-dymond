@@ -180,6 +180,29 @@ export function parseLocation(loc: string): { type: 'country' | 'city'; code: st
     return { type: 'country', code: loc.toUpperCase(), name: country?.name || loc }
 }
 
+// Resuelve ubicaciones en texto libre (las que genera la IA en el brief,
+// ej. "Bolivia", "Peru", "Cochabamba ,Sacaba") al formato de almacenamiento
+// del selector ("BO", "cc:BO:Cochabamba"). Lo que no se reconoce (continentes,
+// países no listados) se ignora — así nunca mete un valor que Meta rechace.
+export function resolveBriefLocations(texts: string[]): string[] {
+    const strip = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '')
+    const norm = (s: string) => strip(String(s).toLowerCase()).trim()
+    const out: string[] = []
+    const add = (v: string) => { if (v && !out.includes(v)) out.push(v) }
+    for (const raw of texts || []) {
+        for (const piece of String(raw).split(/[,/;|\n]+/)) {
+            const t = norm(piece)
+            if (!t) continue
+            const country = COUNTRIES.find(c => norm(c.name) === t || c.code.toLowerCase() === t)
+            if (country) { add(country.code); continue }
+            const city = CITIES.find(c => norm(c.name) === t)
+            if (city) { add(encodeCity(city)); continue }
+            // no reconocido → se ignora
+        }
+    }
+    return out
+}
+
 interface Props {
     selected: string[]
     onChange: (locs: string[]) => void
