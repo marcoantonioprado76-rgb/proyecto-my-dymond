@@ -744,8 +744,8 @@ VOZ DE MARCA: ${brief.brandVoice}
 CTA PRINCIPAL: ${brief.mainCTA}
 
 REGLAS:
-1. "greeting" (saludo): cálido, breve, da la bienvenida y motiva a continuar la conversación. Máx 150 caracteres. 1-2 emojis. Habla de "tú".
-2. "quickReply" (botón de respuesta rápida): frase muy corta que el cliente toca para responder. Máx 24 caracteres. Sin emojis. Ej: "Quiero más info", "Ver precios".
+1. "greeting" (saludo): MUY breve y cálido, UNA sola frase corta. Máx 80 caracteres. Solo 1 emoji. Habla de "tú".
+2. "quickReply" (botón de respuesta rápida): frase corta que el cliente toca para responder, e INCLUYE el nombre del producto/negocio "${brief.name}". Máx 55 caracteres. Sin emojis. Ejemplo: "Quiero más información del ${brief.name}".
 
 Devuelve ÚNICAMENTE este JSON:
 {"greeting": "...", "quickReply": "..."}`
