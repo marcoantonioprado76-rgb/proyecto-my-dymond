@@ -735,20 +735,19 @@ export async function generateWhatsAppChat(params: {
 }): Promise<{ greeting: string; quickReply: string }> {
     const { brief, apiKey, model = 'gpt-4o', onUsage } = params
 
-    const prompt = `Eres experto en mensajes de WhatsApp Business para anuncios Click-to-WhatsApp en español.
-Genera el mensaje de bienvenida y el botón de respuesta rápida para cuando un cliente escriba desde el anuncio.
+    const prompt = `Eres experto en mensajes de bienvenida de WhatsApp Business para anuncios Click-to-WhatsApp en español.
+Genera SOLO el saludo de bienvenida para cuando un cliente escriba desde el anuncio.
 
 NEGOCIO: ${brief.name} (${brief.industry})
 PROPUESTA DE VALOR: ${brief.valueProposition}
 VOZ DE MARCA: ${brief.brandVoice}
-CTA PRINCIPAL: ${brief.mainCTA}
 
-REGLAS (el nombre del producto/negocio es "${brief.name}" y DEBE aparecer textual en AMBOS campos):
-1. "greeting" (saludo): MUY breve y cálido, UNA sola frase. DEBE mencionar SÍ O SÍ el nombre "${brief.name}". Máx 90 caracteres. Solo 1 emoji. Habla de "tú". Ejemplo: "¡Hola! 😊 Bienvenido a ${brief.name}, ¿en qué te ayudo?".
-2. "quickReply" (botón de respuesta rápida): frase corta que el cliente toca para responder, que INCLUYE SÍ O SÍ el nombre "${brief.name}". Máx 55 caracteres. Sin emojis. Ejemplo: "Quiero más información del ${brief.name}".
+REGLAS del saludo:
+- Cálido y natural, 1 o 2 frases cortas. Da la bienvenida e invita a seguir la conversación.
+- DEBE mencionar el nombre del producto/negocio "${brief.name}".
+- Máx 140 caracteres. 1-2 emojis. Habla de "tú".
 
-Devuelve ÚNICAMENTE este JSON:
-{"greeting": "...", "quickReply": "..."}`
+Devuelve ÚNICAMENTE este JSON: {"greeting": "..."}`
 
     const res = await fetch(`${OPENAI_BASE}/chat/completions`, {
         method: 'POST',
@@ -774,7 +773,9 @@ Devuelve ÚNICAMENTE este JSON:
     const parsed = JSON.parse(content)
     return {
         greeting: String(parsed.greeting || '').slice(0, 180),
-        quickReply: String(parsed.quickReply || '').slice(0, 160),
+        // Botón FIJO con el nombre del producto: así el bot de WhatsApp detecta el
+        // producto y responde directo sobre ESE producto (no se deja a la IA).
+        quickReply: `Quiero más información de ${brief.name}`.slice(0, 160),
     }
 }
 
