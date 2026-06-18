@@ -743,9 +743,9 @@ PROPUESTA DE VALOR: ${brief.valueProposition}
 VOZ DE MARCA: ${brief.brandVoice}
 CTA PRINCIPAL: ${brief.mainCTA}
 
-REGLAS:
-1. "greeting" (saludo): MUY breve y cálido, UNA sola frase corta. Máx 80 caracteres. Solo 1 emoji. Habla de "tú".
-2. "quickReply" (botón de respuesta rápida): frase corta que el cliente toca para responder, e INCLUYE el nombre del producto/negocio "${brief.name}". Máx 55 caracteres. Sin emojis. Ejemplo: "Quiero más información del ${brief.name}".
+REGLAS (el nombre del producto/negocio es "${brief.name}" y DEBE aparecer textual en AMBOS campos):
+1. "greeting" (saludo): MUY breve y cálido, UNA sola frase. DEBE mencionar SÍ O SÍ el nombre "${brief.name}". Máx 90 caracteres. Solo 1 emoji. Habla de "tú". Ejemplo: "¡Hola! 😊 Bienvenido a ${brief.name}, ¿en qué te ayudo?".
+2. "quickReply" (botón de respuesta rápida): frase corta que el cliente toca para responder, que INCLUYE SÍ O SÍ el nombre "${brief.name}". Máx 55 caracteres. Sin emojis. Ejemplo: "Quiero más información del ${brief.name}".
 
 Devuelve ÚNICAMENTE este JSON:
 {"greeting": "...", "quickReply": "..."}`
