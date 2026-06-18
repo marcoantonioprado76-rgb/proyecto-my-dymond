@@ -179,7 +179,7 @@ function CampaignPageInner() {
                         const list = (await res.json()).locations || []
                         const top = list.find((l: any) => l.type === 'country') || list[0]
                         if (top?.type === 'country' && top.countryCode) { push(String(top.countryCode).toUpperCase()); done = true }
-                        else if (top?.countryCode) { push(`cc:${String(top.countryCode).toUpperCase()}:${top.name}`); done = true }
+                        else if (top?.key) { push(`city:${top.key}:${top.name}`); done = true } // ciudad con clave REAL de Meta
                     }
                 } catch { /* cae al respaldo estático */ }
                 if (!done) resolveBriefLocations([piece]).forEach(push)
