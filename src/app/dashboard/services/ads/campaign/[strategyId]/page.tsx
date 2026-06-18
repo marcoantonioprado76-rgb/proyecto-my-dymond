@@ -163,6 +163,40 @@ function CampaignPageInner() {
         }
     }, [strategy?.destination])
 
+    // ── Pre-cargar la ubicación del brief, resuelta DINÁMICAMENTE con la búsqueda
+    // real de Meta (funciona para CUALQUIER lugar que genere la IA). La lista
+    // estática solo es respaldo instantáneo si Meta no responde.
+    const locPrefillTried = useRef(false)
+    async function resolveLocationsSmart(texts: string[]): Promise<string[]> {
+        const out: string[] = []
+        const push = (v: string) => { if (v && !out.includes(v)) out.push(v) }
+        for (const raw of texts || []) {
+            for (const piece of String(raw).split(/[,/;|\n]+/).map(s => s.trim()).filter(Boolean)) {
+                let done = false
+                try {
+                    const res = await fetch(`/api/ads/integrations/meta/locations?q=${encodeURIComponent(piece)}`)
+                    if (res.ok) {
+                        const list = (await res.json()).locations || []
+                        const top = list.find((l: any) => l.type === 'country') || list[0]
+                        if (top?.type === 'country' && top.countryCode) { push(String(top.countryCode).toUpperCase()); done = true }
+                        else if (top?.countryCode) { push(`cc:${String(top.countryCode).toUpperCase()}:${top.name}`); done = true }
+                    }
+                } catch { /* cae al respaldo estático */ }
+                if (!done) resolveBriefLocations([piece]).forEach(push)
+            }
+        }
+        return out
+    }
+    useEffect(() => {
+        if (locPrefillTried.current || loading) return
+        if (!brief?.targetLocations?.length || form.locations.length > 0) return
+        locPrefillTried.current = true
+        resolveLocationsSmart(brief.targetLocations).then(locs => {
+            if (locs.length) setForm(f => (f.locations.length === 0 ? { ...f, locations: locs } : f))
+        })
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [loading, brief])
+
     async function fetchPixels(accountId: string) {
         if (!accountId) { setPixels([]); return }
         try {
@@ -209,11 +243,7 @@ function CampaignPageInner() {
                         ...f,
                         name: existingCampaign.name || f.name,
                         dailyBudgetUSD: String(existingCampaign.dailyBudgetUSD ?? f.dailyBudgetUSD),
-                        // Si la campaña aún no tiene ubicación, pre-cargamos la del
-                        // brief (texto libre de la IA) resuelta a ubicaciones reales de Meta.
-                        locations: (existingCampaign.locations?.length
-                            ? existingCampaign.locations
-                            : resolveBriefLocations(existingCampaign.brief?.targetLocations || [])),
+                        locations: existingCampaign.locations || [],
                         pageId: existingCampaign.pageId || '',
                         whatsappNumber: existingCampaign.whatsappNumber || '',
                         welcomeMessage: existingCampaign.welcomeMessage?.split('||QA:')[0] || '',
