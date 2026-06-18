@@ -11,6 +11,12 @@ import { randomInt } from 'crypto'
 
 const JWT_SECRET = process.env.JWT_SECRET!
 
+// Verificación de dispositivo por código al correo.
+// APAGADA por defecto (el envío de correo por Gmail no es confiable desde el
+// servidor). Para reactivarla, poner DEVICE_VERIFICATION_ENABLED=true en las
+// variables de entorno — pero antes hay que tener un correo que funcione (Resend).
+const DEVICE_VERIFICATION_ENABLED = process.env.DEVICE_VERIFICATION_ENABLED === 'true'
+
 function generateCode(): string {
   // Cryptographically secure 6-digit code (100000–999999)
   return String(randomInt(100000, 1000000))
@@ -58,7 +64,7 @@ export async function POST(request: NextRequest) {
     }
 
     // ── Device verification (skip for admins) ──────────────────────────────
-    if (!user.isAdmin) {
+    if (DEVICE_VERIFICATION_ENABLED && !user.isAdmin) {
       const deviceId = request.cookies.get('device_id')?.value ?? null
 
       if (deviceId) {
