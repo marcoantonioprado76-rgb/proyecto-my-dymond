@@ -87,6 +87,7 @@ function WizardContent() {
     const [loadingAI, setLoadingAI] = useState(false)
     const [loadingSaved, setLoadingSaved] = useState(false)
     const [creating, setCreating] = useState(false)
+    const [creatingAndromeda, setCreatingAndromeda] = useState(false)
     const [error, setError] = useState<string | null>(null)
     const [aiError, setAiError] = useState<string | null>(null)
 
@@ -289,6 +290,44 @@ function WizardContent() {
             router.push(`/dashboard/services/ads/campaign/${selectedStrategy.id}?edit=${data.campaign.id}`)
         } catch {
             setError('Error de conexión'); setCreating(false)
+        }
+    }
+
+    // ── Método Andromeda (un toque): crea la estrategia y la campaña, y va al editor ──
+    async function useAndromeda() {
+        if (!selectedBrief) return
+        setCreatingAndromeda(true); setError(null)
+        try {
+            const r1 = await fetch('/api/ads/strategies/from-template', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    briefId: selectedBrief.id,
+                    method: 'andromeda',
+                    platform: selectedPlatform || 'META',
+                    objective: selectedObjective || undefined,
+                    destination: selectedDestination || undefined,
+                    mediaType: selectedMediaPref || undefined,
+                }),
+            })
+            const d1 = await r1.json()
+            if (!r1.ok) { setError(d1.error || 'No se pudo preparar la estrategia'); setCreatingAndromeda(false); return }
+            const strat = d1.strategy
+            const r2 = await fetch('/api/ads/campaign', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    briefId: selectedBrief.id,
+                    strategyId: strat.id,
+                    name: `${selectedBrief.name} · ${strat.name}`,
+                    dailyBudgetUSD: strat.minBudgetUSD || 8,
+                }),
+            })
+            const d2 = await r2.json()
+            if (!r2.ok) { setError(d2.error || 'Error al crear campaña'); setCreatingAndromeda(false); return }
+            router.push(`/dashboard/services/ads/campaign/${strat.id}?edit=${d2.campaign.id}`)
+        } catch {
+            setError('Error de conexión'); setCreatingAndromeda(false)
         }
     }
 
@@ -569,6 +608,36 @@ function WizardContent() {
                     {/* ── Strategies view ── */}
                     {!showPlatformPicker && !showAdTypePicker && (
                         <>
+                            {/* ⭐ Método Andromeda — recomendado (un toque) */}
+                            {selectedBrief && (
+                                <div className="mb-5 rounded-2xl p-4 sm:p-5 relative overflow-hidden"
+                                    style={{ background: 'linear-gradient(135deg, rgba(0,129,251,0.16), rgba(139,92,246,0.14))', border: '1px solid rgba(0,129,251,0.35)' }}>
+                                    <span className="inline-block text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full mb-2.5"
+                                        style={{ background: 'rgba(250,204,21,0.15)', color: '#facc15', border: '1px solid rgba(250,204,21,0.3)' }}>
+                                        ⭐ Recomendado · Lo más fácil
+                                    </span>
+                                    <div className="flex items-start gap-3">
+                                        <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 text-lg"
+                                            style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.12)' }}>🚀</div>
+                                        <div className="flex-1 min-w-0">
+                                            <h3 className="font-black text-sm sm:text-base">Método Andromeda</h3>
+                                            <p className="text-xs text-white/55 mt-1 leading-relaxed">
+                                                La IA crea tus anuncios y Meta encuentra solo a tus compradores
+                                                {selectedDestination === 'website' ? ' en tu página web' : selectedDestination === 'instagram' ? ' en Instagram' : ' por WhatsApp'}. Tú solo eliges cuánto invertir.
+                                            </p>
+                                            <p className="text-[11px] text-white/35 mt-1.5">✓ La IA hace casi todo · Desde $8/día · Listo en 2 min</p>
+                                        </div>
+                                    </div>
+                                    <button onClick={useAndromeda} disabled={creatingAndromeda}
+                                        className="mt-3 w-full flex items-center justify-center gap-2 py-3 rounded-xl font-black text-sm text-white transition-all active:scale-[0.98] disabled:opacity-60"
+                                        style={{ background: 'linear-gradient(135deg, #0081FB, #3b82f6)' }}>
+                                        {creatingAndromeda
+                                            ? <><Loader2 size={16} className="animate-spin" /> Preparando tu campaña…</>
+                                            : <><Sparkles size={16} /> Usar este método →</>}
+                                    </button>
+                                </div>
+                            )}
+
                             {/* Tabs */}
                             <div className="flex gap-1 p-1 bg-white/4 border border-white/8 rounded-xl mb-5">
                                 <button
