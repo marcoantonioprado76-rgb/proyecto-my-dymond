@@ -42,6 +42,7 @@ function CampaignPageInner() {
     const [showPreview, setShowPreview] = useState(false)
     const [previewIdx, setPreviewIdx] = useState(0)
     const [showAdvanced, setShowAdvanced] = useState(false)
+    const [genWaChat, setGenWaChat] = useState(false)
 
     // AI image generation per slot
     const [generatingImages, setGeneratingImages] = useState<Record<number, boolean>>({})
@@ -309,6 +310,23 @@ function CampaignPageInner() {
             }
         } catch (e) { console.error(e) }
         finally { setLoading(false) }
+    }
+
+    // Genera el saludo + botón de respuesta rápida con IA (desde el brief)
+    async function generateWaChat() {
+        if (!campaign) return
+        setGenWaChat(true); setError(null)
+        try {
+            const res = await fetch(`/api/ads/campaign/${campaign.id}/whatsapp-chat`, { method: 'POST' })
+            const data = await res.json()
+            if (!res.ok) { setError(data.error || 'No se pudo generar el chat'); return }
+            setForm(f => ({
+                ...f,
+                welcomeMessage: (data.chat?.greeting || f.welcomeMessage).slice(0, 180),
+                whatsappQuestion: (data.chat?.quickReply || f.whatsappQuestion).slice(0, 160),
+            }))
+        } catch { setError('Error de conexión') }
+        finally { setGenWaChat(false) }
     }
 
     async function saveConfig() {
@@ -841,9 +859,16 @@ function CampaignPageInner() {
                     {/* WhatsApp chat editor */}
                     {needsWhatsApp && (
                         <div className="rounded-2xl border border-green-500/15 bg-green-500/3 p-4 space-y-3">
-                            <p className="text-[10px] font-bold uppercase tracking-widest text-green-400 flex items-center gap-1.5">
-                                <Phone size={10} /> Editor de chat WhatsApp
-                            </p>
+                            <div className="flex items-center justify-between gap-2">
+                                <p className="text-[10px] font-bold uppercase tracking-widest text-green-400 flex items-center gap-1.5">
+                                    <Phone size={10} /> Editor de chat WhatsApp
+                                </p>
+                                <button type="button" onClick={generateWaChat} disabled={genWaChat || !campaign}
+                                    className="flex items-center gap-1.5 text-[10px] font-bold px-2.5 py-1.5 rounded-lg bg-green-500/15 border border-green-500/30 text-green-300 hover:bg-green-500/25 transition-all disabled:opacity-50">
+                                    {genWaChat ? <Loader2 size={11} className="animate-spin" /> : <Sparkles size={11} />}
+                                    {genWaChat ? 'Generando…' : 'Generar con IA'}
+                                </button>
+                            </div>
                             <div>
                                 <label className="text-[10px] font-bold text-white/30 uppercase tracking-widest block mb-1.5">Saludo</label>
                                 <textarea

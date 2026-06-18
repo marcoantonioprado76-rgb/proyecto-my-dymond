@@ -725,6 +725,59 @@ Devuelve ÚNICAMENTE este JSON:
     return (suggestions as string[]).slice(0, 3)
 }
 
+// Genera el saludo + botón de respuesta rápida para anuncios Click-to-WhatsApp,
+// a partir del brief del negocio.
+export async function generateWhatsAppChat(params: {
+    brief: BusinessBriefData
+    apiKey: string
+    model?: string
+    onUsage?: UsageCallback
+}): Promise<{ greeting: string; quickReply: string }> {
+    const { brief, apiKey, model = 'gpt-4o', onUsage } = params
+
+    const prompt = `Eres experto en mensajes de WhatsApp Business para anuncios Click-to-WhatsApp en español.
+Genera el mensaje de bienvenida y el botón de respuesta rápida para cuando un cliente escriba desde el anuncio.
+
+NEGOCIO: ${brief.name} (${brief.industry})
+PROPUESTA DE VALOR: ${brief.valueProposition}
+VOZ DE MARCA: ${brief.brandVoice}
+CTA PRINCIPAL: ${brief.mainCTA}
+
+REGLAS:
+1. "greeting" (saludo): cálido, breve, da la bienvenida y motiva a continuar la conversación. Máx 150 caracteres. 1-2 emojis. Habla de "tú".
+2. "quickReply" (botón de respuesta rápida): frase muy corta que el cliente toca para responder. Máx 24 caracteres. Sin emojis. Ej: "Quiero más info", "Ver precios".
+
+Devuelve ÚNICAMENTE este JSON:
+{"greeting": "...", "quickReply": "..."}`
+
+    const res = await fetch(`${OPENAI_BASE}/chat/completions`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}` },
+        body: JSON.stringify({
+            model,
+            messages: [{ role: 'user', content: prompt }],
+            temperature: 0.8,
+            max_tokens: 300,
+            response_format: { type: 'json_object' }
+        })
+    })
+
+    if (!res.ok) {
+        const err = await res.json().catch(() => ({}))
+        throw new Error(err?.error?.message || `OpenAI error ${res.status}`)
+    }
+
+    const data = await res.json()
+    emitUsage(data, onUsage)
+    const content = data.choices?.[0]?.message?.content
+    if (!content) throw new Error('OpenAI no devolvió contenido')
+    const parsed = JSON.parse(content)
+    return {
+        greeting: String(parsed.greeting || '').slice(0, 180),
+        quickReply: String(parsed.quickReply || '').slice(0, 160),
+    }
+}
+
 export type ImageQuality = 'fast' | 'standard' | 'premium'
 export type ImageSize = '1024x1024' | '1024x1792' | '1792x1024'
 
