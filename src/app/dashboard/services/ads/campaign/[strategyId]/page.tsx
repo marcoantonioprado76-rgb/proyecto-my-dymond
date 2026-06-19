@@ -868,71 +868,43 @@ function CampaignPageInner() {
                             <label className="text-[10px] font-bold text-white/35 uppercase tracking-widest flex items-center gap-1 mb-1.5">
                                 <Phone size={9} /> WhatsApp Business
                             </label>
-                            {(() => {
-                                const norm = (s: string) => String(s || '').replace(/\D/g, '')
-                                const selPage = pages.find((p: any) => p.id === form.pageId)
-                                const pageNums: string[] = selPage?.whatsappNumbers?.length ? selPage.whatsappNumbers : (selPage?.whatsappNumber ? [selPage.whatsappNumber] : [])
-                                const connectedSet = new Set<string>([
-                                    ...pageNums.map(norm),
-                                    ...waNumbers.filter((w: any) => w.status === 'CONNECTED').map((w: any) => norm(w.displayPhone)),
-                                ])
-                                const isConnected = (num: string) => connectedSet.has(norm(num))
-
-                                if (form.whatsappNumber) {
-                                    const ok = isConnected(form.whatsappNumber)
-                                    return (
-                                        <div className="space-y-1.5">
-                                            <div className={`flex items-center justify-between px-3 py-2.5 rounded-xl border ${ok ? 'bg-green-500/5 border-green-500/20' : 'bg-amber-500/5 border-amber-500/25'}`}>
-                                                <div className="flex items-center gap-2 flex-wrap">
-                                                    <Phone size={12} className={ok ? 'text-green-400' : 'text-amber-400'} />
-                                                    <span className={`text-sm font-mono ${ok ? 'text-green-300' : 'text-amber-200'}`}>{form.whatsappNumber}</span>
-                                                    <span className={`text-[10px] font-bold uppercase ${ok ? 'text-green-400' : 'text-amber-400'}`}>{ok ? '✓ Conectado' : '⚠ Sin conectar'}</span>
-                                                </div>
-                                                <button onClick={() => setForm(f => ({ ...f, whatsappNumber: '' }))} className="text-[11px] text-white/30 hover:text-white shrink-0">Cambiar</button>
-                                            </div>
-                                            {!ok && (
-                                                <p className="text-[11px] text-amber-300/80 leading-relaxed px-1">
-                                                    ⚠️ Este número no figura conectado como WhatsApp Business a tu página. Si el anuncio falla con “número no vinculado”, conéctalo en <b>Configuración de la Página → WhatsApp</b>, o elige uno de los conectados.
-                                                </p>
-                                            )}
-                                        </div>
-                                    )
-                                }
-
-                                const nums = pageNums.length > 0
-                                    ? pageNums.map((ph: string) => ({ displayPhone: ph, name: '', id: ph, status: 'CONNECTED' }))
-                                    : waNumbers
-                                return (
-                                    <div className="space-y-1.5">
-                                        {!form.pageId && (
-                                            <p className="text-[11px] text-white/30 px-1 mb-1">Primero elige tu <b className="text-white/50">Página de Facebook</b> arriba para ver sus números conectados.</p>
-                                        )}
-                                        {nums.map((n: any) => {
-                                            const ok = n.status === 'CONNECTED' || isConnected(n.displayPhone)
-                                            return (
-                                                <button key={n.id || n.displayPhone} type="button"
-                                                    onClick={() => { setForm(f => ({ ...f, whatsappNumber: n.displayPhone })); if (form.pageId) saveWaPref(form.pageId, n.displayPhone) }}
-                                                    className="w-full flex items-center justify-between px-3 py-2.5 bg-white/3 border border-purple-500/20 hover:border-green-500/40 hover:bg-green-500/5 rounded-xl transition-all text-left">
-                                                    <div className="flex items-center gap-2">
-                                                        <Phone size={12} className="text-green-400/60" />
-                                                        <span className="text-sm font-mono text-white/90">{n.displayPhone}</span>
-                                                        {n.name && <span className="text-[11px] text-white/30">{n.name}</span>}
-                                                    </div>
-                                                    <span className={`text-[10px] font-bold uppercase ${ok ? 'text-green-400' : 'text-amber-400'}`}>{ok ? '✓ Conectado' : '⚠ Conéctalo'}</span>
-                                                </button>
-                                            )
-                                        })}
-                                        <input
-                                            value={form.whatsappNumber}
-                                            onChange={e => setForm(f => ({ ...f, whatsappNumber: e.target.value }))}
-                                            onBlur={e => { if (form.pageId && e.target.value) saveWaPref(form.pageId, e.target.value) }}
-                                            placeholder="O escribe el número… +591 70012345"
-                                            className="w-full bg-[#1c1d2e] border border-white/20 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-green-500/50 placeholder:text-white/20"
-                                        />
-                                        <p className="text-[10px] text-white/25 px-1 leading-relaxed">📲 Usa un número de <b className="text-white/45">WhatsApp Business conectado a tu página</b>. Solo esos sirven para anuncios.</p>
+                            {form.whatsappNumber ? (
+                                <div className="flex items-center justify-between px-3 py-2.5 bg-green-500/5 border border-green-500/20 rounded-xl">
+                                    <div className="flex items-center gap-2">
+                                        <Phone size={12} className="text-green-400" />
+                                        <span className="text-sm text-green-300 font-mono">{form.whatsappNumber}</span>
                                     </div>
-                                )
-                            })()}
+                                    <button onClick={() => setForm(f => ({ ...f, whatsappNumber: '' }))} className="text-[11px] text-white/30 hover:text-white">Cambiar</button>
+                                </div>
+                            ) : (
+                                <div className="space-y-1.5">
+                                    {(() => {
+                                        const selPage = pages.find((p: any) => p.id === form.pageId)
+                                        const pageNums: string[] = selPage?.whatsappNumbers?.length ? selPage.whatsappNumbers : selPage?.whatsappNumber ? [selPage.whatsappNumber] : []
+                                        const nums = pageNums.length > 0 ? pageNums.map((ph: string) => ({ displayPhone: ph, name: '', id: ph })) : waNumbers
+                                        if (nums.length > 0) return nums.map((n: any) => (
+                                            <button key={n.id || n.displayPhone} type="button"
+                                                onClick={() => { setForm(f => ({ ...f, whatsappNumber: n.displayPhone })); if (form.pageId) saveWaPref(form.pageId, n.displayPhone) }}
+                                                className="w-full flex items-center justify-between px-3 py-2.5 bg-white/3 border border-purple-500/20 hover:border-green-500/40 hover:bg-green-500/5 rounded-xl transition-all text-left">
+                                                <div className="flex items-center gap-2">
+                                                    <Phone size={12} className="text-green-400/60" />
+                                                    <span className="text-sm font-mono text-white/90">{n.displayPhone}</span>
+                                                    {n.name && <span className="text-[11px] text-white/30">{n.name}</span>}
+                                                </div>
+                                                {n.status && <span className={`text-[10px] font-bold uppercase ${n.status === 'CONNECTED' ? 'text-green-400' : 'text-yellow-400'}`}>{n.status}</span>}
+                                            </button>
+                                        ))
+                                        return null
+                                    })()}
+                                    <input
+                                        value={form.whatsappNumber}
+                                        onChange={e => setForm(f => ({ ...f, whatsappNumber: e.target.value }))}
+                                        onBlur={e => { if (form.pageId && e.target.value) saveWaPref(form.pageId, e.target.value) }}
+                                        placeholder="+573001234567"
+                                        className="w-full bg-[#1c1d2e] border border-white/20 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-green-500/50 placeholder:text-white/20"
+                                    />
+                                </div>
+                            )}
                         </div>
                     )}
 
