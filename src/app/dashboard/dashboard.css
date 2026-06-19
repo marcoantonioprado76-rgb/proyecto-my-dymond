@@ -763,7 +763,6 @@
     border-radius: 0;
     padding: 0;
     z-index: 1;
-    animation: logo-float 4.5s ease-in-out infinite;
 }
 
 .sidebar__logo-ring img {
@@ -799,6 +798,8 @@
     height: auto;
     display: block;
     margin: 0 auto;
+    position: relative;
+    top: -3px;            /* sube el nombre un poco para alinear con el centro visual del diamante */
     filter: drop-shadow(0 0 9px rgba(0,160,255,0.25)) drop-shadow(0 1px 4px rgba(0,0,0,0.4));
 }
 
