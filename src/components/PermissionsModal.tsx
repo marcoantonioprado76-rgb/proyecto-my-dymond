@@ -80,7 +80,7 @@ export default function PermissionsModal() {
           <div className="w-16 h-16 rounded-2xl overflow-hidden shadow-lg" style={{ border: '1px solid rgba(255,255,255,0.12)' }}>
             <img src="/logo.png" alt="Logo" className="w-full h-full object-contain" />
           </div>
-          <h1 className="text-base font-black tracking-[0.18em] text-white uppercase">MY DIAMOND</h1>
+          <h1 className="flex justify-center"><img src="/wordmark-mydiamond.png" alt="MY DIAMOND" className="h-[18px] w-auto" /></h1>
         </div>
 
         {/* Message */}

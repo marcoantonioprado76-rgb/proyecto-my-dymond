@@ -57,9 +57,7 @@ export default function Navbar() {
             <img src="/logo.png" alt="MY DIAMOND" />
           </div>
           <div className="sidebar__logo-info">
-            <span className="sidebar__logo-jd">MY</span>
-            <span className="sidebar__logo-intl">DIAMOND</span>
-            <span className="sidebar__logo-badge"><span className="u-live-dot"></span>&nbsp;Premium</span>
+            <img src="/wordmark-mydiamond.png" alt="MY DIAMOND" className="sidebar__logo-wordmark" />
           </div>
         </Link>
 

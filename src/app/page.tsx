@@ -59,9 +59,11 @@ const CSS = `
   .md-landing .nav-in{display:flex;align-items:center;justify-content:space-between;height:74px}
   .md-landing .brand{display:flex;align-items:center;gap:12px;font-family:"Plus Jakarta Sans";font-weight:800;
     letter-spacing:.12em;font-size:15px;white-space:nowrap}
-  .md-landing .brand .logo{width:42px;height:42px;border-radius:13px;display:grid;place-items:center;
-    background:linear-gradient(145deg,#1a1330,#0e0a1c);border:1px solid rgba(196,38,211,.5);
-    box-shadow:0 0 22px rgba(164,37,255,.45);animation:logopulse 3.4s ease-in-out infinite}
+  .md-landing .brand .wordmark{height:16px;width:auto;display:block;
+    filter:drop-shadow(0 0 10px rgba(164,37,255,.35))}
+  .md-landing .foot-in .brand .wordmark{height:13px}
+  .md-landing .brand .logo{width:auto;height:auto;display:grid;place-items:center;
+    background:none;border:none;box-shadow:none;border-radius:0;animation:none}
   @keyframes logopulse{0%,100%{box-shadow:0 0 18px rgba(164,37,255,.35)}50%{box-shadow:0 0 30px rgba(196,38,211,.7)}}
   .md-landing .nav-actions{display:flex;align-items:center;gap:14px}
   .md-landing .btn{font-family:"Plus Jakarta Sans";font-weight:700;letter-spacing:.12em;font-size:12.5px;text-transform:uppercase;
@@ -237,7 +239,7 @@ const CSS = `
   /* ====== FOOTER ====== */
   .md-landing footer{border-top:1px solid rgba(255,255,255,.06);padding:40px 0}
   .md-landing .foot-in{display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap}
-  .md-landing .foot-in .brand .logo{width:36px;height:36px;border-radius:11px;animation:none}
+  .md-landing .foot-in .brand .logo{width:auto;height:auto;border-radius:0;animation:none}
   .md-landing .foot-links{display:flex;gap:26px;color:var(--muted);font-size:14px}
   .md-landing .foot-links a:hover{color:#fff}
   .md-landing .copy{color:var(--muted-2);font-size:13.5px}
@@ -485,8 +487,8 @@ export default function HomePage() {
       <header className="nav" id="nav">
         <div className="wrap nav-in">
           <div className="brand">
-            <span className="logo"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M3 9l4-6h10l4 6-9 12L3 9z" fill="#fff" /><path d="M3 9h18M9 3l-2 6 5 12M15 3l2 6-5 12" stroke="#a425ff" strokeWidth="1" opacity=".7" /></svg></span>
-            MY DIAMOND
+            <span className="logo"><svg width="30" height="30" viewBox="0 0 24 24" fill="none"><path d="M3 9l4-6h10l4 6-9 12L3 9z" fill="#fff" /><path d="M3 9h18M9 3l-2 6 5 12M15 3l2 6-5 12" stroke="#a425ff" strokeWidth="1" opacity=".7" /></svg></span>
+            <img className="wordmark" src="/wordmark-mydiamond.png" alt="MY DIAMOND" />
           </div>
           <nav className="nav-actions">
             <a className="btn btn-ghost" href="/login">Iniciar sesión</a>
@@ -688,7 +690,7 @@ export default function HomePage() {
 
       <footer>
         <div className="wrap foot-in">
-          <div className="brand"><span className="logo"><svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M3 9l4-6h10l4 6-9 12L3 9z" fill="#fff" /></svg></span> MY DIAMOND</div>
+          <div className="brand"><span className="logo"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M3 9l4-6h10l4 6-9 12L3 9z" fill="#fff" /></svg></span> <img className="wordmark" src="/wordmark-mydiamond.png" alt="MY DIAMOND" /></div>
           <div className="copy">© 2026 MY DIAMOND · Todos los derechos reservados</div>
           <div className="foot-links"><a href="/login">Iniciar sesión</a><a href="/register">Registrarse</a></div>
         </div>

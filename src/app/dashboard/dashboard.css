@@ -786,9 +786,20 @@
 .sidebar__logo-info {
     display: flex;
     flex-direction: column;
+    align-items: center;
+    justify-content: center;
     gap: 0px;
     z-index: 1;
-    padding-bottom: 18px;
+    padding-bottom: 0;
+}
+
+.sidebar__logo-wordmark {
+    width: 108px;
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+    filter: drop-shadow(0 0 9px rgba(0,160,255,0.25)) drop-shadow(0 1px 4px rgba(0,0,0,0.4));
 }
 
 .sidebar__logo-jd {

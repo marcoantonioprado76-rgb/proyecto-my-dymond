@@ -58,7 +58,7 @@ export default function LoginPage() {
             style={{ border: '1px solid rgba(255,255,255,0.12)' }}>
             <img src="/logo.png" alt="Logo" className="w-full h-full object-contain" />
           </div>
-          <h1 className="text-lg font-black tracking-[0.18em] text-white uppercase">MY DIAMOND</h1>
+          <h1 className="flex justify-center"><img src="/wordmark-mydiamond.png" alt="MY DIAMOND" className="h-5 w-auto" /></h1>
           <p className="text-[11px] text-white/30 mt-1 tracking-widest uppercase">Network Marketing Digital</p>
         </div>
 

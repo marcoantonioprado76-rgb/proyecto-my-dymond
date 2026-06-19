@@ -51,7 +51,7 @@ export default function ForgotPasswordPage() {
           <div className="w-14 h-14 mb-3 rounded-xl overflow-hidden border border-white/10 shadow-lg shadow-black/50">
             <img src="/logo.png" alt="Logo" className="w-full h-full object-contain" />
           </div>
-          <h1 className="text-base font-black tracking-widest text-white uppercase">MY DIAMOND</h1>
+          <h1 className="flex justify-center"><img src="/wordmark-mydiamond.png" alt="MY DIAMOND" className="h-[18px] w-auto" /></h1>
           <p className="text-[11px] text-white/30 mt-0.5">Network Marketing Digital</p>
         </div>
 
