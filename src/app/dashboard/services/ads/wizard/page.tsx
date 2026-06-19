@@ -7,7 +7,7 @@ import {
     CheckCircle2, AlertCircle, Plus, Target, Globe,
     MessageCircle, Eye, ShoppingCart, DollarSign,
     Brain, RefreshCw, Pencil, X, Save, Bookmark, Trash2,
-    Smartphone, Heart, BookMarked, Clock, Image as ImageIcon, Video
+    Smartphone, Heart, BookMarked, Image as ImageIcon, Video
 } from 'lucide-react'
 import Link from 'next/link'
 import AIKeySelector from '@/components/AIKeySelector'
@@ -70,6 +70,11 @@ function WizardContent() {
     const platformFromUrl = searchParams.get('platform')
     const forcedPlatform = platformFromUrl === 'META' ? 'META' : null
 
+    // Hoy sólo Meta está activo → no mostramos el selector de plataforma:
+    // entramos directo como si el usuario ya hubiera elegido Meta.
+    // Cuando sumes TikTok/Google, poné esto en true y el selector vuelve solo.
+    const MULTI_PLATFORM = false
+
     const [step, setStep] = useState<1 | 2>(initialBriefId ? 2 : 1)
     const [briefs, setBriefs] = useState<Brief[]>([])
     const [aiStrategies, setAiStrategies] = useState<Strategy[]>([])
@@ -114,12 +119,13 @@ function WizardContent() {
 
     function enterPlatformPicker() {
         setStep(2)
-        // Si viene plataforma forzada por URL, saltamos el picker de plataforma
-        // y vamos directo al picker de tipo de anuncio
-        if (forcedPlatform) {
+        // Con una sola plataforma activa (Meta) saltamos el selector y vamos
+        // directo al tipo de anuncio, como si Meta ya estuviera seleccionado.
+        // Sólo mostramos el selector si hay varias plataformas disponibles.
+        if (forcedPlatform || !MULTI_PLATFORM) {
             setShowPlatformPicker(false)
             setShowAdTypePicker(true)
-            setSelectedPlatform(forcedPlatform)
+            setSelectedPlatform(forcedPlatform || 'META')
         } else {
             setShowPlatformPicker(true)
             setShowAdTypePicker(false)
@@ -441,7 +447,7 @@ function WizardContent() {
                             </div>
                             {selectedBrief && <p className="text-xs text-white/30 mt-0.5">Para: <span className="text-purple-400">{selectedBrief.name}</span></p>}
                         </div>
-                        {!showPlatformPicker && !showAdTypePicker && !forcedPlatform && (
+                        {MULTI_PLATFORM && !showPlatformPicker && !showAdTypePicker && !forcedPlatform && (
                             <button onClick={() => { setShowPlatformPicker(true); setSelectedStrategy(null) }}
                                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 text-xs text-white/40 hover:text-white/70 hover:bg-white/10 transition-all">
                                 <RefreshCw size={12} /> Cambiar
@@ -453,68 +459,26 @@ function WizardContent() {
                     {showPlatformPicker && (
                         <div>
                             <p className="text-xs text-white/30 mb-5 text-center">Selecciona la plataforma</p>
+                            {/* Solo Meta es seleccionable hoy: una sola acción clara, sin botones falsos */}
                             <div className="grid grid-cols-1 gap-3">
-                                {[
-                                    {
-                                        id: 'META', label: 'Meta Ads', sub: 'Facebook & Instagram', letter: 'f',
-                                        desc: 'Ideal para ventas directas por WhatsApp, leads, branding y audiencias amplias.',
-                                        color: 'text-blue-400', border: 'border-blue-500/25 hover:border-blue-500/50',
-                                        bg: 'bg-blue-500/5 hover:bg-blue-500/10', iconBg: 'bg-blue-500/15 border-blue-500/25',
-                                        comingSoon: false,
-                                    },
-                                    {
-                                        id: 'TIKTOK', label: 'TikTok Ads', sub: 'TikTok for Business', letter: 'T',
-                                        desc: 'Perfecto para productos visuales, audiencias jóvenes y contenido viral en video.',
-                                        color: 'text-rose-400', border: 'border-rose-500/25',
-                                        bg: 'bg-rose-500/5', iconBg: 'bg-rose-500/15 border-rose-500/25',
-                                        comingSoon: true,
-                                    },
-                                    {
-                                        id: 'GOOGLE_ADS', label: 'Google Ads', sub: 'Search & Display', letter: 'G',
-                                        desc: 'Captura clientes que ya buscan tu producto o servicio activamente.',
-                                        color: 'text-yellow-400', border: 'border-yellow-500/25',
-                                        bg: 'bg-yellow-500/5', iconBg: 'bg-yellow-500/15 border-yellow-500/25',
-                                        comingSoon: true,
-                                    },
-                                ].map(p => p.comingSoon ? (
-                                    <div key={p.id}
-                                        className={`w-full flex items-center gap-4 p-5 rounded-2xl border text-left opacity-50 cursor-not-allowed ${p.border} ${p.bg}`}>
-                                        <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 border ${p.iconBg}`}>
-                                            <span className={`font-black text-xl ${p.color}`}>{p.letter}</span>
-                                        </div>
-                                        <div className="flex-1 min-w-0">
-                                            <div className="flex items-center gap-2 mb-0.5">
-                                                <p className="font-black text-sm text-white">{p.label}</p>
-                                                <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-white/5 border border-white/10 ${p.color}`}>{p.sub}</span>
-                                                <span className="text-[9px] font-black px-2 py-0.5 rounded-full"
-                                                    style={{ background: 'rgba(251,146,60,0.15)', border: '1px solid rgba(251,146,60,0.3)', color: '#fb923c' }}>
-                                                    PRÓXIMAMENTE
-                                                </span>
-                                            </div>
-                                            <p className="text-xs text-white/35 leading-relaxed">{p.desc}</p>
-                                        </div>
-                                        <Clock size={16} className="text-white/20 shrink-0" />
+                                <button onClick={() => pickPlatform('META')}
+                                    className="w-full flex items-center gap-4 p-5 rounded-2xl border text-left transition-all active:scale-[0.98] group border-blue-500/25 hover:border-blue-500/50 bg-blue-500/5 hover:bg-blue-500/10">
+                                    <div className="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 border bg-blue-500/15 border-blue-500/25">
+                                        <span className="font-black text-xl text-blue-400">f</span>
                                     </div>
-                                ) : (
-                                    <button key={p.id} onClick={() => pickPlatform(p.id)}
-                                        className={`w-full flex items-center gap-4 p-5 rounded-2xl border text-left transition-all active:scale-[0.98] group ${p.border} ${p.bg}`}>
-                                        <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 border ${p.iconBg}`}>
-                                            <span className={`font-black text-xl ${p.color}`}>{p.letter}</span>
+                                    <div className="flex-1 min-w-0">
+                                        <div className="flex items-center gap-2 mb-0.5">
+                                            <p className="font-black text-sm text-white">Meta Ads</p>
+                                            <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-white/5 border border-white/10 text-blue-400">Facebook & Instagram</span>
+                                            <span className="text-[9px] font-black px-2 py-0.5 rounded-full"
+                                                style={{ background: 'rgba(34,197,94,0.12)', border: '1px solid rgba(34,197,94,0.25)', color: '#4ade80' }}>
+                                                DISPONIBLE
+                                            </span>
                                         </div>
-                                        <div className="flex-1 min-w-0">
-                                            <div className="flex items-center gap-2 mb-0.5">
-                                                <p className="font-black text-sm text-white">{p.label}</p>
-                                                <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-white/5 border border-white/10 ${p.color}`}>{p.sub}</span>
-                                                <span className="text-[9px] font-black px-2 py-0.5 rounded-full"
-                                                    style={{ background: 'rgba(34,197,94,0.12)', border: '1px solid rgba(34,197,94,0.25)', color: '#4ade80' }}>
-                                                    DISPONIBLE
-                                                </span>
-                                            </div>
-                                            <p className="text-xs text-white/35 leading-relaxed">{p.desc}</p>
-                                        </div>
-                                        <ArrowRight size={16} className={`${p.color} opacity-40 group-hover:opacity-100 shrink-0 transition-all`} />
-                                    </button>
-                                ))}
+                                        <p className="text-xs text-white/35 leading-relaxed">Ideal para ventas directas por WhatsApp, leads, branding y audiencias amplias.</p>
+                                    </div>
+                                    <ArrowRight size={16} className="text-blue-400 opacity-40 group-hover:opacity-100 shrink-0 transition-all" />
+                                </button>
                             </div>
                         </div>
                     )}
