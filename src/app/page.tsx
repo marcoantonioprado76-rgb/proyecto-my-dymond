@@ -15,9 +15,9 @@ const CSS = `
   }
   .md-landing *{box-sizing:border-box;margin:0;padding:0}
   html{scroll-behavior:smooth}
-  body{background:var(--bg);color:var(--ink);font-family:"Inter",system-ui,sans-serif;line-height:1.55;
+  body{background:var(--bg);color:var(--ink);font-family:"Archivo",system-ui,sans-serif;line-height:1.55;
     overflow-x:hidden;-webkit-font-smoothing:antialiased}
-  .md-landing h1,.md-landing h2,.md-landing h3,.md-landing .font-display{font-family:"Plus Jakarta Sans",sans-serif;letter-spacing:-.02em}
+  .md-landing h1,.md-landing h2,.md-landing h3,.md-landing .font-display{font-family:"Archivo",sans-serif;letter-spacing:-.02em}
   .md-landing a{color:inherit;text-decoration:none}
   .md-landing .wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
 
@@ -57,7 +57,7 @@ const CSS = `
     border-bottom:1px solid transparent}
   .md-landing header.nav.scrolled{background:rgba(8,6,15,.72);backdrop-filter:blur(14px);border-color:rgba(255,255,255,.06)}
   .md-landing .nav-in{display:flex;align-items:center;justify-content:space-between;height:74px}
-  .md-landing .brand{display:flex;align-items:center;gap:12px;font-family:"Plus Jakarta Sans";font-weight:800;
+  .md-landing .brand{display:flex;align-items:center;gap:12px;font-family:"Archivo";font-weight:800;
     letter-spacing:.12em;font-size:15px;white-space:nowrap}
   .md-landing .brand .wordmark{height:16px;width:auto;display:block;
     filter:drop-shadow(0 0 10px rgba(164,37,255,.35))}
@@ -66,7 +66,7 @@ const CSS = `
     background:none;border:none;box-shadow:none;border-radius:0;animation:none}
   @keyframes logopulse{0%,100%{box-shadow:0 0 18px rgba(164,37,255,.35)}50%{box-shadow:0 0 30px rgba(196,38,211,.7)}}
   .md-landing .nav-actions{display:flex;align-items:center;gap:14px}
-  .md-landing .btn{font-family:"Plus Jakarta Sans";font-weight:700;letter-spacing:.12em;font-size:12.5px;text-transform:uppercase;
+  .md-landing .btn{font-family:"Archivo";font-weight:700;letter-spacing:.12em;font-size:12.5px;text-transform:uppercase;
     border-radius:12px;padding:13px 22px;cursor:pointer;border:1px solid transparent;display:inline-flex;align-items:center;
     gap:9px;transition:transform .18s,box-shadow .25s,background .25s;white-space:nowrap}
   .md-landing .btn-ghost{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.12);color:#d8dae6}
@@ -78,14 +78,14 @@ const CSS = `
   /* ====== CONTENIDO ====== */
   .md-landing main{position:relative;z-index:3}
   .md-landing section{position:relative}
-  .md-landing .eyebrow{font-family:"Plus Jakarta Sans";font-weight:700;letter-spacing:.28em;font-size:12px;text-transform:uppercase}
+  .md-landing .eyebrow{font-family:"Archivo";font-weight:700;letter-spacing:.28em;font-size:12px;text-transform:uppercase}
 
   /* ====== HERO ====== */
   .md-landing .hero{padding:150px 0 90px}
   .md-landing .hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:60px;align-items:center}
   .md-landing .badge{display:inline-flex;align-items:center;gap:9px;padding:8px 16px;border-radius:999px;
     background:rgba(164,37,255,.10);border:1px solid rgba(164,37,255,.28);
-    font-family:"Plus Jakarta Sans";font-weight:700;letter-spacing:.18em;font-size:11px;text-transform:uppercase;color:#cdb9ff}
+    font-family:"Archivo";font-weight:700;letter-spacing:.18em;font-size:11px;text-transform:uppercase;color:#cdb9ff}
   .md-landing .dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green)}
   .md-landing .hero h1{font-size:clamp(40px,6vw,78px);font-weight:800;line-height:1.02;margin:26px 0 24px}
   .md-landing .g-magenta{background:linear-gradient(100deg,#ff2bd6,#b026ff);-webkit-background-clip:text;background-clip:text;color:transparent}
@@ -100,10 +100,10 @@ const CSS = `
     box-shadow:0 40px 90px rgba(0,0,0,.55),0 0 0 1px rgba(196,38,211,.10);max-width:430px;margin-left:auto}
   .md-landing .chat-head{display:flex;align-items:center;gap:12px;padding:16px 18px;background:#11161a;border-bottom:1px solid rgba(255,255,255,.05)}
   .md-landing .avatar{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:13px;
-    font-family:"Plus Jakarta Sans";flex-shrink:0}
+    font-family:"Archivo";flex-shrink:0}
   .md-landing .av-cm{background:linear-gradient(145deg,#0f3d2e,#0b2a20);color:#3ee29a;border:1.5px solid #1fd884}
   .md-landing .av-md{background:var(--green);color:#06291c}
-  .md-landing .chat-head .name{font-weight:700;font-size:15px;font-family:"Plus Jakarta Sans"}
+  .md-landing .chat-head .name{font-weight:700;font-size:15px;font-family:"Archivo"}
   .md-landing .chat-head .status{color:var(--green);font-size:12px}
   .md-landing .chat-head .meta-dots{margin-left:auto;display:flex;gap:5px}
   .md-landing .chat-head .meta-dots i{width:7px;height:7px;border-radius:50%;background:#2a3138}
@@ -130,7 +130,7 @@ const CSS = `
   .md-landing .stats{border-top:1px solid rgba(255,255,255,.06);border-bottom:1px solid rgba(255,255,255,.06);padding:54px 0}
   .md-landing .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:30px;text-align:center}
   .md-landing .stat .ic{width:58px;height:58px;border-radius:15px;display:grid;place-items:center;margin:0 auto 16px}
-  .md-landing .stat .num{font-family:"Plus Jakarta Sans";font-weight:800;font-size:clamp(30px,3.6vw,44px);line-height:1}
+  .md-landing .stat .num{font-family:"Archivo";font-weight:800;font-size:clamp(30px,3.6vw,44px);line-height:1}
   .md-landing .stat .lbl{color:var(--muted-2);font-size:12.5px;letter-spacing:.14em;text-transform:uppercase;margin-top:10px}
   .md-landing .ic-purple{background:rgba(164,37,255,.12);color:#c79bff;border:1px solid rgba(164,37,255,.3)}
   .md-landing .ic-green{background:rgba(31,216,132,.12);color:#4fe6a3;border:1px solid rgba(31,216,132,.3)}
@@ -159,7 +159,7 @@ const CSS = `
   .md-landing .card-h h3{margin:0}
   .md-landing .card h3{font-size:20px;font-weight:700;margin-bottom:12px}
   .md-landing .card p{color:var(--muted);font-size:14.5px}
-  .md-landing .card-foot{display:inline-flex;align-items:center;gap:7px;margin-top:16px;font-family:"Plus Jakarta Sans";
+  .md-landing .card-foot{display:inline-flex;align-items:center;gap:7px;margin-top:16px;font-family:"Archivo";
     font-weight:700;font-size:12.5px;letter-spacing:.03em;color:#c79bff;transition:gap .2s,color .2s}
   .md-landing .card:hover .card-foot{gap:11px;color:#e6ccff}
 
@@ -167,7 +167,7 @@ const CSS = `
   .md-landing .thumb{height:132px;border-radius:14px;margin-bottom:20px;position:relative;overflow:hidden;display:flex;padding:14px;
     background:linear-gradient(155deg,rgba(255,255,255,.07),rgba(255,255,255,.012));border:1px solid rgba(255,255,255,.07)}
   .md-landing .thumb::after{content:"";position:absolute;inset:0;background:radial-gradient(240px 120px at 18% -10%,rgba(164,37,255,.20),transparent 70%);pointer-events:none}
-  .md-landing .thumb .badge-sm{position:absolute;top:11px;right:11px;font-family:"Plus Jakarta Sans";font-weight:800;font-size:10px;
+  .md-landing .thumb .badge-sm{position:absolute;top:11px;right:11px;font-family:"Archivo";font-weight:800;font-size:10px;
     padding:4px 9px;border-radius:999px;background:rgba(31,216,132,.16);color:#5ef0ac;border:1px solid rgba(31,216,132,.35);z-index:2}
   /* chat */
   .md-landing .tb-chat{display:flex;flex-direction:column;gap:7px;justify-content:center;width:100%}
@@ -180,7 +180,7 @@ const CSS = `
   /* ads */
   .md-landing .tb-col{display:flex;flex-direction:column;gap:10px;width:100%;justify-content:center}
   .md-landing .tb-chips{display:flex;gap:6px}
-  .md-landing .tb-chip{font-family:"Plus Jakarta Sans";font-size:10px;font-weight:700;padding:4px 9px;border-radius:999px;color:#fff}
+  .md-landing .tb-chip{font-family:"Archivo";font-size:10px;font-weight:700;padding:4px 9px;border-radius:999px;color:#fff}
   .md-landing .tb-bars{display:flex;align-items:flex-end;gap:8px;height:50px}
   .md-landing .tb-bars span{flex:1;border-radius:5px 5px 0 0;background:linear-gradient(180deg,#d646ea,#7a1fd6)}
   /* store */
@@ -191,8 +191,8 @@ const CSS = `
   .md-landing .tb-meta{display:flex;flex-direction:column;gap:8px;flex:1}
   .md-landing .tb-line{height:8px;border-radius:5px;background:rgba(255,255,255,.16)}
   .md-landing .tb-line.s{width:60%}
-  .md-landing .tb-price{font-family:"Plus Jakarta Sans";font-weight:800;color:#fff;font-size:17px}
-  .md-landing .tb-add{align-self:flex-start;font-family:"Plus Jakarta Sans";font-size:10.5px;font-weight:700;color:#06291c;
+  .md-landing .tb-price{font-family:"Archivo";font-weight:800;color:#fff;font-size:17px}
+  .md-landing .tb-add{align-self:flex-start;font-family:"Archivo";font-size:10.5px;font-weight:700;color:#06291c;
     background:#1fd884;padding:6px 12px;border-radius:8px}
   /* lecciones */
   .md-landing .tb-les{display:flex;flex-direction:column;gap:9px;width:100%;justify-content:center}
@@ -218,7 +218,7 @@ const CSS = `
   .md-landing .tcard p{color:#c8cbda;font-size:15px;min-height:84px}
   .md-landing .tperson{display:flex;align-items:center;gap:13px;margin-top:18px;padding-top:18px;border-top:1px solid rgba(255,255,255,.06)}
   .md-landing .tperson .avatar{width:42px;height:42px}
-  .md-landing .tperson .pn{font-family:"Plus Jakarta Sans";font-weight:700;font-size:15px}
+  .md-landing .tperson .pn{font-family:"Archivo";font-weight:700;font-size:15px}
   .md-landing .tperson .pr{color:var(--muted-2);font-size:12.5px}
   .md-landing .av-1{background:linear-gradient(145deg,#3a1d52,#1e1030);color:#c79bff;border:1px solid rgba(164,37,255,.4)}
   .md-landing .av-2{background:linear-gradient(145deg,#0f3d2e,#0b2a20);color:#4fe6a3;border:1px solid rgba(31,216,132,.4)}
@@ -468,10 +468,10 @@ export default function HomePage() {
   }, [])
 
   return (
-    <div className="md-landing" style={{ fontFamily: "'Inter', system-ui, sans-serif" }}>
+    <div className="md-landing" style={{ fontFamily: "'Archivo', system-ui, sans-serif" }}>
       <link rel="preconnect" href="https://fonts.googleapis.com" />
       <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-      <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+      <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@100..900&display=swap" rel="stylesheet" />
       <style dangerouslySetInnerHTML={{ __html: CSS }} />
 
       <div className="bg" />
@@ -617,7 +617,7 @@ export default function HomePage() {
                     <line x1="120" y1="30" x2="50" y2="80" stroke="#a425ff" strokeWidth="2" opacity=".5" />
                     <line x1="120" y1="30" x2="120" y2="80" stroke="#a425ff" strokeWidth="2" opacity=".5" />
                     <line x1="120" y1="30" x2="190" y2="80" stroke="#a425ff" strokeWidth="2" opacity=".5" />
-                    <circle cx="120" cy="30" r="15" fill="#a425ff" /><text x="120" y="35" textAnchor="middle" fontSize="13" fill="#fff" fontFamily="Plus Jakarta Sans" fontWeight="700">Tú</text>
+                    <circle cx="120" cy="30" r="15" fill="#a425ff" /><text x="120" y="35" textAnchor="middle" fontSize="13" fill="#fff" fontFamily="Archivo" fontWeight="700">Tú</text>
                     <circle cx="50" cy="82" r="12" fill="#1e1233" stroke="#c026d3" strokeWidth="2" />
                     <circle cx="120" cy="82" r="12" fill="#1e1233" stroke="#c026d3" strokeWidth="2" />
                     <circle cx="190" cy="82" r="12" fill="#1e1233" stroke="#c026d3" strokeWidth="2" />
@@ -633,7 +633,7 @@ export default function HomePage() {
                   <div className="tb-les">
                     <div className="tb-row"><span className="tb-play"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z" /></svg></span><div className="tb-line" style={{ flex: 1 }} /></div>
                     <div className="tb-row"><span className="tb-play"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z" /></svg></span><div className="tb-line s" style={{ flex: 1 }} /></div>
-                    <div className="tb-row"><span className="tb-prog"><i /></span><span style={{ fontSize: '11px', fontWeight: 700, color: '#c79bff', fontFamily: "'Plus Jakarta Sans'" }}>62%</span></div>
+                    <div className="tb-row"><span className="tb-prog"><i /></span><span style={{ fontSize: '11px', fontWeight: 700, color: '#c79bff', fontFamily: "'Archivo'" }}>62%</span></div>
                   </div>
                 </div>
                 <div className="card-h"><span className="ic ic-purple sm"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M22 10L12 5 2 10l10 5 10-5zM6 12v5c0 1 2.7 3 6 3s6-2 6-3v-5" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" /></svg></span><h3>Academia de Negocios</h3></div>

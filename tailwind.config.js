@@ -94,7 +94,7 @@ module.exports = {
         },
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
+        sans: ['Archivo', 'system-ui', 'sans-serif'],
       },
       backgroundImage: {
         'gradient-liquid': 'linear-gradient(135deg, #0D1E79 0%, #D203DD 50%, #e855f0 100%)',

@@ -1,5 +1,5 @@
 @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css');
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Archivo:wght@100..900&display=swap');
 
 /* ─────────────────────────────────────────────────────────────
    DESIGN TOKENS
@@ -35,7 +35,7 @@
     --clr-dim: rgba(238, 240, 251, 0.50);
 
     /* typography */
-    --font-sans: 'Outfit', system-ui, sans-serif;
+    --font-sans: 'Archivo', system-ui, sans-serif;
     --font-mono: 'JetBrains Mono', monospace;
 
     /* spacing (4-pt grid) */
@@ -804,7 +804,7 @@
 }
 
 .sidebar__logo-jd {
-    font-family: 'Space Grotesk', 'Inter', system-ui, sans-serif;
+    font-family: 'Archivo', system-ui, sans-serif;
     font-size: 0.52rem;
     font-weight: 400;
     line-height: 1.2;
@@ -814,7 +814,7 @@
 }
 
 .sidebar__logo-intl {
-    font-family: 'Space Grotesk', 'Inter', system-ui, sans-serif;
+    font-family: 'Archivo', system-ui, sans-serif;
     font-size: 1.10rem;
     font-weight: 700;
     letter-spacing: 0.05em;
@@ -837,7 +837,7 @@
     align-items: center;
     gap: 5px;
     margin-top: 7px;
-    font-family: 'Space Grotesk', system-ui, sans-serif;
+    font-family: 'Archivo', system-ui, sans-serif;
     font-size: 0.52rem;
     font-weight: 600;
     letter-spacing: 0.14em;
