@@ -29,12 +29,16 @@ export default function UserEditor({ templateId }: { templateId: string }) {
   const overlayRef = useRef<any>(null) // imagen del flyer (encima)
   const photoRef = useRef<any>(null)   // foto del usuario (al fondo)
   const fileRef = useRef<HTMLInputElement>(null)
+  const measureRef = useRef<HTMLDivElement>(null)
 
   const [template, setTemplate] = useState<Template | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [ready, setReady] = useState(false)
   const [hasPhoto, setHasPhoto] = useState(false)
+  const [availW, setAvailW] = useState(360)
+  const [win, setWin] = useState({ w: 1200, h: 800 })
+  const [expanded, setExpanded] = useState(false)
 
   // 1) Cargar la plantilla
   useEffect(() => {
@@ -107,6 +111,30 @@ export default function UserEditor({ templateId }: { templateId: string }) {
     }
   }, [template])
 
+  // Medir ancho disponible + tamaño de ventana (para el lienzo y el modo ampliado)
+  useEffect(() => {
+    const measure = () => {
+      if (measureRef.current) setAvailW(measureRef.current.clientWidth)
+      setWin({ w: window.innerWidth, h: window.innerHeight })
+    }
+    measure()
+    const ro = typeof ResizeObserver !== 'undefined' && measureRef.current ? new ResizeObserver(measure) : null
+    if (ro && measureRef.current) ro.observe(measureRef.current)
+    window.addEventListener('resize', measure)
+    return () => { window.removeEventListener('resize', measure); ro?.disconnect() }
+  }, [template])
+
+  // Al ampliar/cambiar tamaño: bloquear scroll, Escape para cerrar, y recalcular el offset de Fabric
+  useEffect(() => {
+    const t = setTimeout(() => { try { fcanvasRef.current?.calcOffset() } catch {} }, 140)
+    if (!expanded) return () => clearTimeout(t)
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setExpanded(false) }
+    window.addEventListener('keydown', onKey)
+    const prev = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => { clearTimeout(t); window.removeEventListener('keydown', onKey); document.body.style.overflow = prev }
+  }, [expanded, availW, win])
+
   // 3) Subir foto del usuario → va AL FONDO (detrás del flyer), seleccionable/movible/escalable.
   //    Se procesa en el navegador, NO se sube al servidor.
   function onPhotoChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -160,34 +188,74 @@ export default function UserEditor({ templateId }: { templateId: string }) {
     return (
       <div className="max-w-md mx-auto text-center py-24">
         <p className="text-red-400 text-sm mb-4">{error}</p>
-        <Link href="/dashboard/recursos" className="text-[#D203DD] underline text-sm">Volver a Recursos</Link>
+        <Link href="/dashboard/recursos/flyers" className="text-[#D203DD] underline text-sm">Volver a Recursos</Link>
       </div>
     )
   }
 
+  // Tamaño visible del lienzo. Inline: compacto (como pediste). Ampliado: lo más grande que entre en pantalla.
+  const ratio = template ? template.ancho / template.alto : 0.8
+  const inlineW = Math.min(340, Math.max(220, availW - 24))
+  const expandedW = Math.min(win.w - 32, Math.round((win.h - 150) * ratio), 1200)
+  const canvasW = expanded ? Math.max(260, expandedW) : inlineW
+
   return (
-    <div className="max-w-5xl mx-auto px-4 py-6">
-      <div className="flex items-center gap-3 mb-5">
-        <Link href="/dashboard/recursos" className="w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-all">
+    <div ref={measureRef} className="max-w-5xl mx-auto px-4 py-6">
+      <div className="flex items-center gap-2 sm:gap-3 mb-5">
+        <Link href="/dashboard/recursos/flyers" className="w-9 h-9 shrink-0 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-all">
           <i className="fa-solid fa-arrow-left text-white/70 text-sm"></i>
         </Link>
-        <div className="min-w-0">
+        <div className="min-w-0 flex-1">
           <h1 className="text-lg font-black text-white truncate">{template?.nombre}</h1>
           <p className="text-xs text-white/40 capitalize">{template?.categoria}</p>
         </div>
+        <button onClick={() => setExpanded(true)} disabled={!ready}
+          className="shrink-0 flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold text-white/80 bg-white/5 border border-white/10 hover:bg-white/10 transition-all active:scale-95 disabled:opacity-50">
+          <i className="fa-solid fa-up-right-and-down-left-from-center"></i><span className="hidden sm:inline">Ampliar</span>
+        </button>
       </div>
 
-      <div className="grid md:grid-cols-[1fr_auto] gap-6 items-start">
-        {/* Lienzo */}
-        <div className="rounded-2xl border border-white/10 bg-black/30 p-3 flex justify-center overflow-hidden">
-          <div className="rec-canvas-wrap" style={{ maxWidth: 340, aspectRatio: `${template?.ancho} / ${template?.alto}` }}>
+      <input ref={fileRef} type="file" accept="image/png,image/jpeg,image/webp" onChange={onPhotoChange} className="hidden" />
+
+      <div className="flex flex-col md:flex-row md:items-start gap-6">
+        {/* Lienzo — el marco abraza el lienzo (sin recuadro negro). Al ampliar pasa a pantalla completa. */}
+        <div className={expanded
+          ? 'fixed inset-0 z-[80] bg-[#07070d]/98 backdrop-blur-sm flex flex-col items-center justify-center gap-3 p-3'
+          : 'rounded-2xl border border-white/10 bg-black/30 p-3 w-fit max-w-full mx-auto md:mx-0'}>
+          {expanded && (
+            <div className="w-full max-w-3xl flex items-center justify-between gap-3 shrink-0">
+              <p className="text-sm font-bold text-white truncate">{template?.nombre}</p>
+              <button onClick={() => setExpanded(false)}
+                className="w-9 h-9 rounded-xl bg-white/5 border border-white/10 text-white/80 hover:bg-white/10 transition-all flex items-center justify-center shrink-0">
+                <i className="fa-solid fa-xmark"></i>
+              </button>
+            </div>
+          )}
+          <div className="rec-canvas-wrap" style={{ width: canvasW, maxWidth: '100%', aspectRatio: `${template?.ancho} / ${template?.alto}` }}>
             <canvas ref={canvasElRef} className="rounded-lg" style={{ touchAction: 'none' }} />
           </div>
+          {expanded && (
+            <div className="flex items-center gap-2 flex-wrap justify-center shrink-0">
+              <button onClick={() => fileRef.current?.click()} disabled={!ready}
+                className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold text-white transition-all active:scale-95 disabled:opacity-50"
+                style={{ background: 'linear-gradient(135deg,#0D1E79,#D203DD)' }}>
+                <i className="fa-solid fa-image"></i> {hasPhoto ? 'Cambiar foto' : 'Subir foto'}
+              </button>
+              <button onClick={() => download('jpeg')} disabled={!ready}
+                className="flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-black text-black transition-all active:scale-95 disabled:opacity-50"
+                style={{ background: 'linear-gradient(135deg,#00FF9D,#00B4FF)' }}>
+                <i className="fa-solid fa-download"></i> JPG
+              </button>
+              <button onClick={() => download('png')} disabled={!ready}
+                className="flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-black text-white border border-white/15 bg-white/5 transition-all active:scale-95 disabled:opacity-50">
+                <i className="fa-solid fa-download"></i> PNG
+              </button>
+            </div>
+          )}
         </div>
 
-        {/* Controles */}
-        <div className="w-full md:w-64 space-y-3">
-          <input ref={fileRef} type="file" accept="image/png,image/jpeg,image/webp" onChange={onPhotoChange} className="hidden" />
+        {/* Controles (modo en línea) */}
+        <div className="w-full md:w-64 md:shrink-0 space-y-3">
           <button onClick={() => fileRef.current?.click()} disabled={!ready}
             className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold text-white transition-all active:scale-95 disabled:opacity-50"
             style={{ background: 'linear-gradient(135deg,#0D1E79,#D203DD)' }}>
@@ -198,6 +266,7 @@ export default function UserEditor({ templateId }: { templateId: string }) {
             <p className="font-bold text-white/70 mb-1.5"><i className="fa-solid fa-lightbulb text-amber-400 mr-1"></i> Cómo editar</p>
             <p>• Tu foto va <b>detrás</b> del diseño: arrastrala y escalala para acomodarla.</p>
             <p>• <b>Doble clic</b> en un texto para escribir el tuyo.</p>
+            <p>• Usa <b>Ampliar</b> para editar más grande.</p>
             <p>• Tu foto se procesa en tu navegador (no se sube).</p>
           </div>
 

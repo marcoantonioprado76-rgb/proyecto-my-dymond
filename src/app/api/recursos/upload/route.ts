@@ -5,12 +5,13 @@ import { supabaseAdmin } from '@/lib/supabase'
 import { getAuthUser } from '@/lib/auth'
 import { isRecursosAdmin } from '@/lib/recursos'
 
-// Subida de imágenes base / thumbnails de plantillas. SOLO ADMIN.
-// Reusa el bucket "uploads" (el mismo de toda la app), en la subcarpeta "recursos/".
+// Subida de imágenes (flyers base / thumbnails / portadas) y PDFs (presentaciones/libros).
+// SOLO ADMIN. Reusa el bucket "uploads" (el mismo de toda la app), subcarpeta "recursos/".
 const ALLOWED: Record<string, string> = {
   'image/jpeg': 'jpg',
   'image/png': 'png',
   'image/webp': 'webp',
+  'application/pdf': 'pdf',
 }
 
 export async function POST(request: Request) {
@@ -25,7 +26,7 @@ export async function POST(request: Request) {
     if (!file) return NextResponse.json({ error: 'No se subió ningún archivo' }, { status: 400 })
 
     const ext = ALLOWED[file.type]
-    if (!ext) return NextResponse.json({ error: 'Tipo de archivo no permitido (solo JPG, PNG o WEBP)' }, { status: 400 })
+    if (!ext) return NextResponse.json({ error: 'Tipo de archivo no permitido (JPG, PNG, WEBP o PDF)' }, { status: 400 })
 
     const fileName = `recursos/${(user as any).id}/${randomUUID()}.${ext}`
     const buffer = Buffer.from(await file.arrayBuffer())

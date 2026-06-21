@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { LayoutTemplate, Plus, Trash2, Eye, EyeOff, Loader2, Lock } from 'lucide-react'
+import RecursosTabs from './RecursosTabs'
 
 interface T {
   id: string; nombre: string; categoria: string
@@ -54,14 +55,14 @@ export default function AdminRecursosPage() {
 
   return (
     <div>
-      {/* Header */}
+      <h1 className="text-xl font-black text-white flex items-center gap-2 mb-5">
+        <LayoutTemplate size={20} className="text-purple-400" /> Recursos
+      </h1>
+      <RecursosTabs />
+
+      {/* Header de la pestaña Flyers */}
       <div className="flex items-center justify-between gap-4 mb-6">
-        <div>
-          <h1 className="text-xl font-black text-white flex items-center gap-2">
-            <LayoutTemplate size={20} className="text-purple-400" /> Recursos — Plantillas
-          </h1>
-          <p className="text-xs text-white/40 mt-0.5">{items.length} plantilla(s). Acá subís y administrás las plantillas editables.</p>
-        </div>
+        <p className="text-xs text-white/40">{items.length} plantilla(s). Acá subís y administrás las plantillas editables (flyers).</p>
         <Link href="/admin/recursos/nuevo"
           className="shrink-0 flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold text-white bg-purple-600 hover:bg-purple-500 transition-all">
           <Plus size={15} /> Nueva plantilla

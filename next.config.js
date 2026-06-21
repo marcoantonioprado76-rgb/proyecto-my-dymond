@@ -73,6 +73,10 @@ const nextConfig = {
                 ...nativeModules,
             ]
         }
+        // react-pdf / pdfjs-dist referencian el paquete Node opcional "canvas"
+        // (solo usado para render en servidor). No lo usamos → lo aliasamos a false.
+        config.resolve = config.resolve || {}
+        config.resolve.alias = { ...(config.resolve.alias || {}), canvas: false }
         return config
     },
 }

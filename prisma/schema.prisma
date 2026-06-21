@@ -1527,3 +1527,21 @@ model Template {
   @@index([activo, categoria])
   @@map("templates")
 }
+
+// ─── Recursos: presentaciones y libros (PDF: ver / descargar / flipbook) ──────────
+// Sección AISLADA, sin relaciones. tipo = 'presentacion' | 'libro'.
+model Resource {
+  id         String   @id @default(uuid()) @db.Uuid
+  tipo       String
+  titulo     String
+  categoria  String
+  archivoUrl String   @map("archivo_url")
+  portadaUrl String?  @map("portada_url")
+  paginas    Int?
+  activo     Boolean  @default(true)
+  creadoPor  String   @map("creado_por") @db.Uuid
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  @@index([tipo, activo, categoria])
+  @@map("resources")
+}
