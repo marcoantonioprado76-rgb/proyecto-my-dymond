@@ -30,7 +30,6 @@ export default function AdminEditor() {
     if (!file) return
     setUploading(true); setError(null)
     try {
-      // dimensiones naturales
       const dims = await new Promise<{ w: number; h: number }>((res, rej) => {
         const img = new Image()
         img.onload = () => res({ w: img.naturalWidth, h: img.naturalHeight })
@@ -125,11 +124,10 @@ export default function AdminEditor() {
     fc.remove(o); fc.discardActiveObject(); fc.renderAll(); setSel(null)
   }
 
-  // panel de texto: cambios sobre el objeto seleccionado
   function updSel(props: Record<string, any>) {
     const fc = fcanvasRef.current, o = sel
     if (!fc || !o) return
-    o.set(props); fc.renderAll(); setSel({ ...o, set: o.set.bind(o) }) // forzar re-render del panel
+    o.set(props); fc.renderAll(); setSel({ ...o, set: o.set.bind(o) })
   }
 
   async function save() {
@@ -172,7 +170,7 @@ export default function AdminEditor() {
       })
       const d = await r.json()
       if (!r.ok) throw new Error(d.error || 'No se pudo guardar')
-      router.push('/dashboard/recursos/admin')
+      router.push('/admin/recursos')
     } catch (err: any) {
       setError(err?.message || 'No se pudo guardar'); setSaving(false)
     }
@@ -181,16 +179,16 @@ export default function AdminEditor() {
   // ── UI ──
   if (step === 'upload') {
     return (
-      <div className="max-w-xl mx-auto px-4 py-10">
+      <div className="max-w-xl mx-auto py-6">
         <div className="flex items-center gap-3 mb-6">
-          <Link href="/dashboard/recursos/admin" className="w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10">
+          <Link href="/admin/recursos" className="w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10">
             <i className="fa-solid fa-arrow-left text-white/70 text-sm"></i>
           </Link>
           <h1 className="text-xl font-black text-white">Nueva plantilla</h1>
         </div>
         <input ref={baseFileRef} type="file" accept="image/png,image/jpeg,image/webp" onChange={onBaseFile} className="hidden" />
         <button onClick={() => baseFileRef.current?.click()} disabled={uploading}
-          className="w-full rounded-2xl border-2 border-dashed border-white/15 bg-white/[0.03] py-16 flex flex-col items-center gap-3 text-white/50 hover:border-[#D203DD]/40 hover:text-white/70 transition-all disabled:opacity-60">
+          className="w-full rounded-2xl border-2 border-dashed border-white/15 bg-white/[0.03] py-16 flex flex-col items-center gap-3 text-white/50 hover:border-purple-500/40 hover:text-white/70 transition-all disabled:opacity-60">
           {uploading
             ? <><i className="fa-solid fa-spinner fa-spin text-3xl"></i><span className="text-sm">Subiendo…</span></>
             : <><i className="fa-solid fa-cloud-arrow-up text-3xl"></i><span className="text-sm font-bold">Subir el flyer (PNG recomendado)</span><span className="text-xs">El lienzo toma el tamaño real de la imagen</span></>}
@@ -206,9 +204,9 @@ export default function AdminEditor() {
   const isTextSel = sel && (sel as any)._isText
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-6">
+    <div className="py-2">
       <div className="flex items-center gap-3 mb-5">
-        <Link href="/dashboard/recursos/admin" className="w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10">
+        <Link href="/admin/recursos" className="w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10">
           <i className="fa-solid fa-arrow-left text-white/70 text-sm"></i>
         </Link>
         <h1 className="text-lg font-black text-white">Definir plantilla</h1>
@@ -224,9 +222,9 @@ export default function AdminEditor() {
         <div className="w-full space-y-3">
           <div className="grid grid-cols-2 gap-2">
             <input value={nombre} onChange={e => setNombre(e.target.value)} placeholder="Nombre"
-              className="col-span-2 bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm text-white placeholder-white/30 outline-none focus:border-[#D203DD]/40" />
+              className="col-span-2 bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm text-white placeholder-white/30 outline-none focus:border-purple-500/40" />
             <input value={categoria} onChange={e => setCategoria(e.target.value)} placeholder="Categoría (ej: ventas)"
-              className="col-span-2 bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm text-white placeholder-white/30 outline-none focus:border-[#D203DD]/40" />
+              className="col-span-2 bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm text-white placeholder-white/30 outline-none focus:border-purple-500/40" />
           </div>
 
           <div className="flex gap-2">
@@ -246,7 +244,6 @@ export default function AdminEditor() {
             </button>
           )}
 
-          {/* Controles de texto seleccionado */}
           {isTextSel && (
             <div className="rounded-xl bg-white/[0.03] border border-white/10 p-3 space-y-2.5">
               <p className="text-[10px] font-black uppercase tracking-wider text-white/40">Texto seleccionado</p>
@@ -282,8 +279,7 @@ export default function AdminEditor() {
           </div>
 
           <button onClick={save} disabled={saving}
-            className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-black text-white transition-all active:scale-95 disabled:opacity-60"
-            style={{ background: 'linear-gradient(135deg,#0D1E79,#D203DD)' }}>
+            className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-black text-white bg-purple-600 hover:bg-purple-500 transition-all active:scale-95 disabled:opacity-60">
             {saving ? <><i className="fa-solid fa-spinner fa-spin"></i> Guardando…</> : <><i className="fa-solid fa-check"></i> Guardar plantilla</>}
           </button>
           {error && <p className="text-red-400 text-xs text-center">{error}</p>}

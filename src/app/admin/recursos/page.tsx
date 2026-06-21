@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import { LayoutTemplate, Plus, Trash2, Eye, EyeOff, Loader2, Lock } from 'lucide-react'
 
 interface T {
   id: string; nombre: string; categoria: string
@@ -9,7 +10,7 @@ interface T {
   activo?: boolean
 }
 
-export default function RecursosAdminPage() {
+export default function AdminRecursosPage() {
   const [items, setItems] = useState<T[]>([])
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null)
   const [loading, setLoading] = useState(true)
@@ -38,41 +39,40 @@ export default function RecursosAdminPage() {
     setBusy(null); load()
   }
 
-  if (loading) return <div className="flex items-center justify-center py-32 text-white/40"><i className="fa-solid fa-spinner fa-spin text-2xl"></i></div>
+  if (loading) {
+    return <div className="flex items-center justify-center py-24"><Loader2 className="animate-spin text-purple-400" /></div>
+  }
 
   if (isAdmin === false) {
     return (
-      <div className="max-w-md mx-auto text-center py-24">
-        <i className="fa-solid fa-lock text-3xl text-white/30 mb-3 block"></i>
-        <p className="text-white/60 text-sm mb-4">Esta sección es solo para administradores.</p>
-        <Link href="/dashboard/recursos" className="text-[#D203DD] underline text-sm">Volver a Recursos</Link>
+      <div className="max-w-md mx-auto text-center py-20">
+        <Lock className="mx-auto text-white/25 mb-3" size={28} />
+        <p className="text-white/60 text-sm">Tu cuenta no gestiona Recursos. La maneja la cuenta de administración designada.</p>
       </div>
     )
   }
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-6">
+    <div>
+      {/* Header */}
       <div className="flex items-center justify-between gap-4 mb-6">
-        <div className="flex items-center gap-3 min-w-0">
-          <Link href="/dashboard/recursos" className="w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10">
-            <i className="fa-solid fa-arrow-left text-white/70 text-sm"></i>
-          </Link>
-          <div>
-            <h1 className="text-xl font-black text-white">Plantillas — Admin</h1>
-            <p className="text-xs text-white/40">{items.length} plantilla(s)</p>
-          </div>
+        <div>
+          <h1 className="text-xl font-black text-white flex items-center gap-2">
+            <LayoutTemplate size={20} className="text-purple-400" /> Recursos — Plantillas
+          </h1>
+          <p className="text-xs text-white/40 mt-0.5">{items.length} plantilla(s). Acá subís y administrás las plantillas editables.</p>
         </div>
-        <Link href="/dashboard/recursos/admin/nuevo"
-          className="shrink-0 flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold text-white transition-all active:scale-95"
-          style={{ background: 'linear-gradient(135deg,#0D1E79,#D203DD)' }}>
-          <i className="fa-solid fa-plus"></i> Nueva plantilla
+        <Link href="/admin/recursos/nuevo"
+          className="shrink-0 flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold text-white bg-purple-600 hover:bg-purple-500 transition-all">
+          <Plus size={15} /> Nueva plantilla
         </Link>
       </div>
 
       {items.length === 0 ? (
-        <div className="text-center py-24 text-white/40">
-          <i className="fa-regular fa-image text-4xl mb-3 block opacity-50"></i>
-          <p className="text-sm">No hay plantillas todavía. Creá la primera.</p>
+        <div className="text-center py-20 text-white/40 border border-dashed border-white/10 rounded-2xl">
+          <LayoutTemplate className="mx-auto mb-3 opacity-40" size={32} />
+          <p className="text-sm">No hay plantillas todavía.</p>
+          <p className="text-xs mt-1">Creá la primera con “Nueva plantilla”.</p>
         </div>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
@@ -88,12 +88,12 @@ export default function RecursosAdminPage() {
                 <p className="text-[10px] text-white/35 capitalize mb-2">{t.categoria}</p>
                 <div className="flex gap-1.5">
                   <button onClick={() => toggle(t)} disabled={busy === t.id}
-                    className={`flex-1 py-1.5 rounded-lg text-[10px] font-bold transition-all disabled:opacity-50 ${t.activo ? 'bg-amber-500/15 text-amber-300 border border-amber-500/25' : 'bg-green-500/15 text-green-300 border border-green-500/25'}`}>
-                    {t.activo ? 'Ocultar' : 'Activar'}
+                    className={`flex-1 flex items-center justify-center gap-1 py-1.5 rounded-lg text-[10px] font-bold transition-all disabled:opacity-50 ${t.activo ? 'bg-amber-500/15 text-amber-300 border border-amber-500/25' : 'bg-green-500/15 text-green-300 border border-green-500/25'}`}>
+                    {t.activo ? <><EyeOff size={11} /> Ocultar</> : <><Eye size={11} /> Activar</>}
                   </button>
                   <button onClick={() => remove(t)} disabled={busy === t.id}
-                    className="px-2.5 py-1.5 rounded-lg text-[10px] font-bold bg-red-500/15 text-red-300 border border-red-500/25 transition-all disabled:opacity-50">
-                    <i className="fa-solid fa-trash"></i>
+                    className="px-2.5 py-1.5 rounded-lg text-red-300 bg-red-500/15 border border-red-500/25 transition-all disabled:opacity-50">
+                    <Trash2 size={11} />
                   </button>
                 </div>
               </div>

@@ -23,6 +23,7 @@ import {
   Ticket,
   Package,
   BrainCircuit,
+  LayoutTemplate,
 } from 'lucide-react'
 
 const NAV = [
@@ -35,6 +36,7 @@ const NAV = [
   { href: '/admin/credit-purchases', label: 'Compras Saldo IA', icon: Wallet },
   { href: '/admin/products', label: 'Productos Bots', icon: Package },
   { href: '/admin/bot-templates', label: 'Plantillas AI', icon: BrainCircuit },
+  { href: '/admin/recursos', label: 'Recursos', icon: LayoutTemplate },
   { href: '/admin/clipping', label: 'Clipping', icon: Play },
   { href: '/admin/courses', label: 'Cursos', icon: BookOpen },
   { href: '/admin/podcasts', label: 'Podcasts', icon: Mic },

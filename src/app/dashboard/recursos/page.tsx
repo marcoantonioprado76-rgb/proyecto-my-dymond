@@ -42,21 +42,12 @@ export default function RecursosGaleriaPage() {
   return (
     <div className="max-w-6xl mx-auto px-4 py-6">
       {/* Header */}
-      <div className="flex items-center justify-between gap-4 mb-6">
-        <div>
-          <h1 className="text-2xl font-black text-white flex items-center gap-2">
-            <i className="fa-solid fa-wand-magic-sparkles text-[#D203DD]"></i>
-            Recursos
-          </h1>
-          <p className="text-sm text-white/40 mt-0.5">Elegí una plantilla, poné tu foto y tu texto, y descargá tu diseño.</p>
-        </div>
-        {isAdmin && (
-          <Link href="/dashboard/recursos/admin"
-            className="shrink-0 flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold text-white transition-all active:scale-95"
-            style={{ background: 'linear-gradient(135deg,#0D1E79,#D203DD)' }}>
-            <i className="fa-solid fa-sliders"></i> Panel admin
-          </Link>
-        )}
+      <div className="mb-6">
+        <h1 className="text-2xl font-black text-white flex items-center gap-2">
+          <i className="fa-solid fa-wand-magic-sparkles text-[#D203DD]"></i>
+          Recursos
+        </h1>
+        <p className="text-sm text-white/40 mt-0.5">Elegí una plantilla, poné tu foto y tu texto, y descargá tu diseño.</p>
       </div>
 
       {/* Filtros por categoría */}
@@ -87,7 +78,7 @@ export default function RecursosGaleriaPage() {
         <div className="text-center py-24 text-white/40">
           <i className="fa-regular fa-image text-4xl mb-3 block opacity-50"></i>
           <p className="text-sm">Todavía no hay plantillas{cat !== 'todas' ? ' en esta categoría' : ''}.</p>
-          {isAdmin && <p className="text-xs mt-2">Subí la primera desde el <Link href="/dashboard/recursos/admin" className="underline text-[#D203DD]">panel admin</Link>.</p>}
+          {isAdmin && <p className="text-xs mt-2">Subí la primera desde <Link href="/admin/recursos" className="underline text-[#D203DD]">Admin → Recursos</Link>.</p>}
         </div>
       )}
 

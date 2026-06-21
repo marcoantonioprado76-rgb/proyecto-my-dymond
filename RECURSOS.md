@@ -24,12 +24,15 @@ prisma/migrations/20260621000001_add_recursos_templates/migration.sql
 src/app/api/recursos/templates/route.ts               GET (lista) · POST (crear, admin)
 src/app/api/recursos/templates/[id]/route.ts          GET · PATCH · DELETE (admin)
 src/app/api/recursos/upload/route.ts                  POST subir imagen base (admin)
-src/app/dashboard/recursos/page.tsx                   Galería
+src/app/dashboard/recursos/page.tsx                   Galería (USUARIO: solo elegir/editar/descargar)
 src/app/dashboard/recursos/[id]/page.tsx + UserEditor.tsx     Editor del usuario (Fabric)
-src/app/dashboard/recursos/admin/page.tsx             Lista admin
-src/app/dashboard/recursos/admin/nuevo/page.tsx + AdminEditor.tsx   Editor admin (Fabric)
+src/app/admin/recursos/page.tsx                       Gestión (ADMIN): lista + activar/ocultar/borrar
+src/app/admin/recursos/nuevo/page.tsx + AdminEditor.tsx       Editor admin (Fabric): subir + marcar zonas
 ```
-Único archivo existente modificado: `src/components/Navbar.tsx` (se agregó el item "Recursos" al menú — aditivo).
+La **gestión de plantillas vive en el Panel de Admin** (`/admin` → pestaña "Recursos"). Los usuarios solo
+ven la galería en el dashboard para **editar y descargar**.
+Archivos existentes modificados (aditivo): `src/components/Navbar.tsx` (item "Recursos" en el dashboard)
+y `src/app/admin/layout.tsx` (pestaña "Recursos" en el panel admin).
 
 ## Variables / permisos necesarios
 **Ya existen en el proyecto, no hay que crear nada nuevo:**
