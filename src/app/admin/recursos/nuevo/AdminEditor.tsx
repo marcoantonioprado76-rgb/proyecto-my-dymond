@@ -67,12 +67,9 @@ export default function AdminEditor() {
       })
       fcanvasRef.current = fcanvas
 
-      onResize = () => {
-        const parentW = canvasElRef.current?.parentElement?.clientWidth || 460
-        const scale = Math.min(1, Math.min(460, parentW) / ancho)
-        fcanvas.setDimensions({ width: ancho * scale, height: alto * scale }, { cssOnly: true })
-      }
-      onResize(); window.addEventListener('resize', onResize)
+      // El tamaño visual lo controla el CSS (.rec-canvas-wrap). Solo recalculamos el offset.
+      onResize = () => { try { fcanvas.calcOffset() } catch {} }
+      setTimeout(onResize, 120); window.addEventListener('resize', onResize)
 
       fabric.Image.fromURL(fondoUrl, (img: any) => {
         if (disposed) return
@@ -215,7 +212,9 @@ export default function AdminEditor() {
       <div className="grid md:grid-cols-[1fr_300px] gap-6 items-start">
         {/* Lienzo */}
         <div className="rounded-2xl border border-white/10 bg-black/30 p-3 flex justify-center overflow-hidden">
-          <canvas ref={canvasElRef} className="rounded-lg max-w-full" style={{ touchAction: 'none' }} />
+          <div className="rec-canvas-wrap" style={{ maxWidth: 420, aspectRatio: `${ancho} / ${alto}` }}>
+            <canvas ref={canvasElRef} className="rounded-lg" style={{ touchAction: 'none' }} />
+          </div>
         </div>
 
         {/* Panel */}

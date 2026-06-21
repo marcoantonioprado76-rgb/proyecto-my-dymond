@@ -63,13 +63,10 @@ export default function UserEditor({ templateId }: { templateId: string }) {
       })
       fcanvasRef.current = fcanvas
 
-      // Escala de visualización (backing store nativo → exporta a resolución real del flyer)
-      onResize = () => {
-        const parentW = canvasElRef.current?.parentElement?.clientWidth || 460
-        const scale = Math.min(1, Math.min(460, parentW) / W)
-        fcanvas.setDimensions({ width: W * scale, height: H * scale }, { cssOnly: true })
-      }
-      onResize()
+      // El tamaño visual lo controla el CSS (.rec-canvas-wrap → proporcional y compacto).
+      // Solo recalculamos el offset para que el puntero mapee bien sobre el lienzo escalado.
+      onResize = () => { try { fcanvas.calcOffset() } catch {} }
+      setTimeout(onResize, 120)
       window.addEventListener('resize', onResize)
 
       // FLYER (diseño) — va ENCIMA y bloqueado. evented:false → los clics atraviesan
@@ -183,7 +180,9 @@ export default function UserEditor({ templateId }: { templateId: string }) {
       <div className="grid md:grid-cols-[1fr_auto] gap-6 items-start">
         {/* Lienzo */}
         <div className="rounded-2xl border border-white/10 bg-black/30 p-3 flex justify-center overflow-hidden">
-          <canvas ref={canvasElRef} className="rounded-lg max-w-full" style={{ touchAction: 'none' }} />
+          <div className="rec-canvas-wrap" style={{ maxWidth: 340, aspectRatio: `${template?.ancho} / ${template?.alto}` }}>
+            <canvas ref={canvasElRef} className="rounded-lg" style={{ touchAction: 'none' }} />
+          </div>
         </div>
 
         {/* Controles */}

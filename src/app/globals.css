@@ -144,3 +144,21 @@
     @apply w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white placeholder-white/30 focus:outline-none focus:border-[#D203DD]/50 focus:ring-1 focus:ring-[#D203DD]/20;
   }
 }
+/* Recursos — lienzo del editor responsivo y compacto, sin distorsión.
+   El backing store de Fabric queda en tamaño nativo (exporta a full res);
+   acá escalamos solo la VISUALIZACIÓN proporcionalmente. */
+.rec-canvas-wrap {
+  width: 100%;
+  margin: 0 auto;
+  position: relative;
+}
+.rec-canvas-wrap .canvas-container {
+  position: absolute !important;
+  inset: 0;
+  width: 100% !important;
+  height: 100% !important;
+}
+.rec-canvas-wrap .canvas-container canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
