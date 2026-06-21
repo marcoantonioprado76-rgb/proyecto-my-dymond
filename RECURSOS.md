@@ -3,10 +3,11 @@
 Sección **aislada** dentro del dashboard para crear y editar plantillas tipo "editables"
 (inspirado en a3vte / Fancy Product Designer), usando **Fabric.js** en el navegador.
 
-- **Admin:** sube una imagen base, marca el hueco de la foto y las cajas de texto.
-- **Usuario:** elige una plantilla, sube su foto al hueco, edita los textos y **descarga en JPG/PNG**
-  al tamaño nativo de la plantilla (ej. 1080×1350). **La foto del usuario se procesa en el navegador,
-  nunca se sube al servidor.**
+- **Admin:** sube el flyer (PNG con la zona de la foto **transparente**), marca el hueco de la foto
+  y las cajas de texto.
+- **Usuario:** elige una plantilla, sube su foto (que va **al fondo**, detrás del diseño, y se ve por la
+  zona transparente del flyer — movible/escalable), edita los textos y **descarga en JPG/PNG** al
+  tamaño nativo de cada flyer. **La foto del usuario se procesa en el navegador, nunca se sube al servidor.**
 
 ## Qué reutiliza (no agrega nada nuevo de base)
 - **Auth:** la sesión por cookies existente (`getAuthUser`). Las páginas viven bajo `/dashboard/recursos`,
@@ -37,6 +38,15 @@ src/app/dashboard/recursos/admin/nuevo/page.tsx + AdminEditor.tsx   Editor admin
   Para que el editor pueda **exportar** la imagen, el bucket debe servir con CORS (`Access-Control-Allow-Origin: *`),
   que es el comportamiento por defecto de los buckets públicos de Supabase.
 - Dependencia nueva: **`fabric` 5.3.0** (+ `@types/fabric`). Ya quedó en `package.json`.
+- **`RECURSOS_ADMIN_EMAILS`** (opcional, lista de correos separada por comas) — restringe quién puede
+  **gestionar** plantillas. Si NO se define → cualquier `is_admin` puede gestionar. Si se define →
+  solo esos correos (que además sean `is_admin`). Ej. para que solo la cuenta dedicada gestione y otras
+  cuentas admin queden como usuarios normales:
+  ```
+  RECURSOS_ADMIN_EMAILS=admin@marcoproyectos.com
+  ```
+  > ⚠️ Esta variable hay que setearla también en **Render** (producción). Sin ella, todos los `is_admin`
+  > ven el panel de gestión.
 
 ## Base de datos
 La tabla `templates` se crea con la migración `20260621000001_add_recursos_templates`.

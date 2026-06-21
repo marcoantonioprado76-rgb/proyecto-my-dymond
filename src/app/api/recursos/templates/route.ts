@@ -3,33 +3,7 @@ import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { prisma } from '@/lib/prisma'
 import { getAuthUser } from '@/lib/auth'
-import { getAdminUser, unauthorizedAdmin } from '@/lib/admin-auth'
-
-// ── Esquema de "zonas" (hueco de foto + cajas de texto editables) ──────────────
-const photoZoneSchema = z.object({
-  x: z.number(),
-  y: z.number(),
-  w: z.number(),
-  h: z.number(),
-})
-
-const textZoneSchema = z.object({
-  id: z.string().min(1),
-  x: z.number(),
-  y: z.number(),
-  w: z.number(),
-  text: z.string().default(''),
-  fontSize: z.number().positive().default(48),
-  fontFamily: z.string().default('Archivo'),
-  fill: z.string().default('#ffffff'),
-  align: z.enum(['left', 'center', 'right']).default('left'),
-  fontWeight: z.union([z.string(), z.number()]).default('700'),
-})
-
-export const zonasSchema = z.object({
-  photo: photoZoneSchema.nullable().optional(),
-  texts: z.array(textZoneSchema).default([]),
-})
+import { zonasSchema, isRecursosAdmin } from '@/lib/recursos'
 
 const createSchema = z.object({
   nombre: z.string().min(1).max(120),
@@ -42,17 +16,15 @@ const createSchema = z.object({
 })
 
 // GET /api/recursos/templates           → plantillas ACTIVAS (cualquier usuario)
-// GET /api/recursos/templates?todos=1    → TODAS (activas + inactivas), SOLO ADMIN
+// GET /api/recursos/templates?todos=1    → TODAS (activas + inactivas), SOLO admin de Recursos
 export async function GET(req: Request) {
   const user = await getAuthUser()
   if (!user) return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
 
+  const admin = isRecursosAdmin(user)
   const { searchParams } = new URL(req.url)
   const categoria = searchParams.get('categoria') || undefined
-  const todos = searchParams.get('todos') === '1'
-
-  // El listado "todos" (incluye inactivas) es solo para el panel admin.
-  const verTodas = todos && (user as any).isAdmin === true
+  const verTodas = searchParams.get('todos') === '1' && admin
 
   const templates = await (prisma as any).template.findMany({
     where: { ...(verTodas ? {} : { activo: true }), ...(categoria ? { categoria } : {}) },
@@ -64,20 +36,18 @@ export async function GET(req: Request) {
     },
   })
 
-  return NextResponse.json({ templates, isAdmin: (user as any).isAdmin === true })
+  return NextResponse.json({ templates, isAdmin: admin })
 }
 
-// POST /api/recursos/templates  → crear plantilla (SOLO ADMIN)
+// POST /api/recursos/templates  → crear plantilla (SOLO admin de Recursos)
 export async function POST(req: Request) {
-  const admin = await getAdminUser()
-  if (!admin) return unauthorizedAdmin()
+  const user = await getAuthUser()
+  if (!isRecursosAdmin(user)) {
+    return NextResponse.json({ error: 'Acceso denegado. Solo administradores.' }, { status: 403 })
+  }
 
   let body: unknown
-  try {
-    body = await req.json()
-  } catch {
-    return NextResponse.json({ error: 'JSON inválido' }, { status: 400 })
-  }
+  try { body = await req.json() } catch { return NextResponse.json({ error: 'JSON inválido' }, { status: 400 }) }
 
   const parsed = createSchema.safeParse(body)
   if (!parsed.success) {
@@ -87,15 +57,9 @@ export async function POST(req: Request) {
 
   const template = await (prisma as any).template.create({
     data: {
-      nombre: d.nombre,
-      categoria: d.categoria,
-      ancho: d.ancho,
-      alto: d.alto,
-      fondoUrl: d.fondoUrl,
-      thumbUrl: d.thumbUrl ?? null,
-      zonas: d.zonas,
-      activo: true,
-      creadoPor: admin.id,
+      nombre: d.nombre, categoria: d.categoria, ancho: d.ancho, alto: d.alto,
+      fondoUrl: d.fondoUrl, thumbUrl: d.thumbUrl ?? null, zonas: d.zonas,
+      activo: true, creadoPor: (user as any).id,
     },
   })
 

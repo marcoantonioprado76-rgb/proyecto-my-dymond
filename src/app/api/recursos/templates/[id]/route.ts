@@ -3,8 +3,7 @@ import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { prisma } from '@/lib/prisma'
 import { getAuthUser } from '@/lib/auth'
-import { getAdminUser, unauthorizedAdmin } from '@/lib/admin-auth'
-import { zonasSchema } from '../route'
+import { zonasSchema, isRecursosAdmin } from '@/lib/recursos'
 
 // GET /api/recursos/templates/[id]  → una plantilla completa (con zonas) para el editor
 export async function GET(_req: Request, { params }: { params: { id: string } }) {
@@ -26,10 +25,12 @@ const updateSchema = z.object({
   thumbUrl: z.string().url().optional(),
 })
 
-// PATCH /api/recursos/templates/[id]  → editar / activar-desactivar (SOLO ADMIN)
+// PATCH /api/recursos/templates/[id]  → editar / activar-desactivar (SOLO admin de Recursos)
 export async function PATCH(req: Request, { params }: { params: { id: string } }) {
-  const admin = await getAdminUser()
-  if (!admin) return unauthorizedAdmin()
+  const user = await getAuthUser()
+  if (!isRecursosAdmin(user)) {
+    return NextResponse.json({ error: 'Acceso denegado. Solo administradores.' }, { status: 403 })
+  }
 
   let body: unknown
   try { body = await req.json() } catch { return NextResponse.json({ error: 'JSON inválido' }, { status: 400 }) }
@@ -40,20 +41,19 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
   }
 
   try {
-    const template = await (prisma as any).template.update({
-      where: { id: params.id },
-      data: parsed.data,
-    })
+    const template = await (prisma as any).template.update({ where: { id: params.id }, data: parsed.data })
     return NextResponse.json({ template })
   } catch {
     return NextResponse.json({ error: 'Plantilla no encontrada' }, { status: 404 })
   }
 }
 
-// DELETE /api/recursos/templates/[id]  → borrar (SOLO ADMIN)
+// DELETE /api/recursos/templates/[id]  → borrar (SOLO admin de Recursos)
 export async function DELETE(_req: Request, { params }: { params: { id: string } }) {
-  const admin = await getAdminUser()
-  if (!admin) return unauthorizedAdmin()
+  const user = await getAuthUser()
+  if (!isRecursosAdmin(user)) {
+    return NextResponse.json({ error: 'Acceso denegado. Solo administradores.' }, { status: 403 })
+  }
 
   try {
     await (prisma as any).template.delete({ where: { id: params.id } })

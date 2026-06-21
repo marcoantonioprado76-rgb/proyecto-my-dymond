@@ -2,7 +2,8 @@ export const dynamic = 'force-dynamic'
 import { NextResponse } from 'next/server'
 import { randomUUID } from 'crypto'
 import { supabaseAdmin } from '@/lib/supabase'
-import { getAdminUser, unauthorizedAdmin } from '@/lib/admin-auth'
+import { getAuthUser } from '@/lib/auth'
+import { isRecursosAdmin } from '@/lib/recursos'
 
 // Subida de imágenes base / thumbnails de plantillas. SOLO ADMIN.
 // Reusa el bucket "uploads" (el mismo de toda la app), en la subcarpeta "recursos/".
@@ -14,8 +15,10 @@ const ALLOWED: Record<string, string> = {
 
 export async function POST(request: Request) {
   try {
-    const admin = await getAdminUser()
-    if (!admin) return unauthorizedAdmin()
+    const user = await getAuthUser()
+    if (!isRecursosAdmin(user)) {
+      return NextResponse.json({ error: 'Acceso denegado. Solo administradores.' }, { status: 403 })
+    }
 
     const formData = await request.formData()
     const file = formData.get('file') as File | null
@@ -24,7 +27,7 @@ export async function POST(request: Request) {
     const ext = ALLOWED[file.type]
     if (!ext) return NextResponse.json({ error: 'Tipo de archivo no permitido (solo JPG, PNG o WEBP)' }, { status: 400 })
 
-    const fileName = `recursos/${admin.id}/${randomUUID()}.${ext}`
+    const fileName = `recursos/${(user as any).id}/${randomUUID()}.${ext}`
     const buffer = Buffer.from(await file.arrayBuffer())
 
     const { error } = await supabaseAdmin.storage

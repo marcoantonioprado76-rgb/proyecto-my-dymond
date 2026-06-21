@@ -193,8 +193,11 @@ export default function AdminEditor() {
           className="w-full rounded-2xl border-2 border-dashed border-white/15 bg-white/[0.03] py-16 flex flex-col items-center gap-3 text-white/50 hover:border-[#D203DD]/40 hover:text-white/70 transition-all disabled:opacity-60">
           {uploading
             ? <><i className="fa-solid fa-spinner fa-spin text-3xl"></i><span className="text-sm">Subiendo…</span></>
-            : <><i className="fa-solid fa-cloud-arrow-up text-3xl"></i><span className="text-sm font-bold">Subir imagen base (JPG/PNG/WEBP)</span><span className="text-xs">Recomendado 1080×1350</span></>}
+            : <><i className="fa-solid fa-cloud-arrow-up text-3xl"></i><span className="text-sm font-bold">Subir el flyer (PNG recomendado)</span><span className="text-xs">El lienzo toma el tamaño real de la imagen</span></>}
         </button>
+        <div className="mt-4 rounded-xl bg-white/[0.03] border border-white/10 p-3 text-[11px] text-white/45 leading-relaxed">
+          <p><i className="fa-solid fa-circle-info text-[#00B4FF] mr-1"></i> Subí el flyer en <b>PNG con la zona de la foto transparente</b>: ahí se verá la foto que ponga el usuario (la foto va <b>detrás</b> del diseño).</p>
+        </div>
         {error && <p className="text-red-400 text-sm mt-4 text-center">{error}</p>}
       </div>
     )
@@ -273,9 +276,9 @@ export default function AdminEditor() {
           )}
 
           <div className="rounded-xl bg-white/[0.03] border border-white/10 p-3 text-[11px] text-white/45 leading-relaxed">
-            <p>• Agregá <b>un</b> hueco de foto y los <b>textos</b> que quieras.</p>
-            <p>• Arrastrá y redimensioná cada uno sobre la imagen.</p>
-            <p>• Doble clic en un texto para escribir el texto por defecto.</p>
+            <p>• El <b>hueco de foto</b> marca dónde aparecerá (al fondo) la foto del usuario.</p>
+            <p>• Agregá los <b>textos</b> que quieras y ubicalos sobre el diseño.</p>
+            <p>• Arrastrá/redimensioná cada uno. Doble clic en un texto para el texto por defecto.</p>
           </div>
 
           <button onClick={save} disabled={saving}

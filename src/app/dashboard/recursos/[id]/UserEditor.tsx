@@ -26,13 +26,15 @@ interface Template {
 export default function UserEditor({ templateId }: { templateId: string }) {
   const canvasElRef = useRef<HTMLCanvasElement>(null)
   const fcanvasRef = useRef<any>(null)
-  const photoRef = useRef<any>(null)
+  const overlayRef = useRef<any>(null) // imagen del flyer (encima)
+  const photoRef = useRef<any>(null)   // foto del usuario (al fondo)
   const fileRef = useRef<HTMLInputElement>(null)
 
   const [template, setTemplate] = useState<Template | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [ready, setReady] = useState(false)
+  const [hasPhoto, setHasPhoto] = useState(false)
 
   // 1) Cargar la plantilla
   useEffect(() => {
@@ -61,54 +63,41 @@ export default function UserEditor({ templateId }: { templateId: string }) {
       })
       fcanvasRef.current = fcanvas
 
-      // Escala de visualización (el backing store queda en tamaño nativo para exportar a full res)
+      // Escala de visualización (backing store nativo → exporta a resolución real del flyer)
       onResize = () => {
         const parentW = canvasElRef.current?.parentElement?.clientWidth || 460
-        const maxW = Math.min(460, parentW)
-        const scale = Math.min(1, maxW / W)
+        const scale = Math.min(1, Math.min(460, parentW) / W)
         fcanvas.setDimensions({ width: W * scale, height: H * scale }, { cssOnly: true })
       }
       onResize()
       window.addEventListener('resize', onResize)
 
-      // Fondo bloqueado
+      // FLYER (diseño) — va ENCIMA y bloqueado. evented:false → los clics atraviesan
+      // hacia la foto del fondo para poder seleccionarla. La zona transparente del PNG
+      // deja ver la foto del usuario.
       fabric.Image.fromURL(template.fondoUrl, (img: any) => {
         if (disposed) return
         img.set({ left: 0, top: 0, selectable: false, evented: false })
         img.scaleToWidth(W)
+        overlayRef.current = img
         fcanvas.add(img)
-        img.sendToBack()
+        // textos encima del flyer
+        for (const tz of (template.zonas?.texts || [])) {
+          const it = new fabric.Textbox(tz.text || 'Tu texto', {
+            left: tz.x, top: tz.y,
+            width: tz.w || Math.round(W * 0.8),
+            fontSize: tz.fontSize || 48,
+            fontFamily: tz.fontFamily || 'Archivo',
+            fill: tz.fill || '#ffffff',
+            textAlign: tz.align || 'left',
+            fontWeight: (tz.fontWeight as any) || '700',
+            editable: true,
+          })
+          fcanvas.add(it)
+        }
         fcanvas.renderAll()
         setReady(true)
       }, { crossOrigin: 'anonymous' })
-
-      // Guía del hueco de foto
-      const pz = template.zonas?.photo
-      if (pz) {
-        const guide = new fabric.Rect({
-          left: pz.x, top: pz.y, width: pz.w, height: pz.h,
-          fill: 'rgba(210,3,221,0.06)', stroke: '#D203DD', strokeDashArray: [12, 9], strokeWidth: 3,
-          rx: 10, ry: 10, selectable: false, evented: false,
-        })
-        ;(guide as any)._guide = true
-        fcanvas.add(guide)
-      }
-
-      // Cajas de texto editables (doble clic para editar)
-      for (const tz of (template.zonas?.texts || [])) {
-        const it = new fabric.Textbox(tz.text || 'Tu texto', {
-          left: tz.x, top: tz.y,
-          width: tz.w || Math.round(template.ancho * 0.8),
-          fontSize: tz.fontSize || 48,
-          fontFamily: tz.fontFamily || 'Archivo',
-          fill: tz.fill || '#ffffff',
-          textAlign: tz.align || 'left',
-          fontWeight: (tz.fontWeight as any) || '700',
-          editable: true,
-        })
-        fcanvas.add(it)
-      }
-      fcanvas.renderAll()
     })()
 
     return () => {
@@ -117,10 +106,12 @@ export default function UserEditor({ templateId }: { templateId: string }) {
       try { fcanvas?.dispose() } catch {}
       fcanvasRef.current = null
       photoRef.current = null
+      overlayRef.current = null
     }
   }, [template])
 
-  // 3) Subir foto del usuario (se procesa en el navegador, NO se sube al servidor)
+  // 3) Subir foto del usuario → va AL FONDO (detrás del flyer), seleccionable/movible/escalable.
+  //    Se procesa en el navegador, NO se sube al servidor.
   function onPhotoChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
     if (!file || !template) return
@@ -132,38 +123,33 @@ export default function UserEditor({ templateId }: { templateId: string }) {
       if (!fcanvas) return
       fabric.Image.fromURL(reader.result as string, (img: any) => {
         if (photoRef.current) { fcanvas.remove(photoRef.current); photoRef.current = null }
+        // posición/escala inicial: cubrir la zona marcada por el admin (o todo el lienzo)
         const zone = template.zonas?.photo || { x: 0, y: 0, w: template.ancho, h: template.alto }
         const scale = Math.max(zone.w / img.width, zone.h / img.height)
         img.set({
           left: zone.x + zone.w / 2, top: zone.y + zone.h / 2,
           originX: 'center', originY: 'center', scaleX: scale, scaleY: scale,
-        })
-        img.clipPath = new fabric.Rect({
-          left: zone.x, top: zone.y, width: zone.w, height: zone.h,
-          absolutePositioned: true, rx: 10, ry: 10,
+          selectable: true, hasControls: true,
         })
         photoRef.current = img
         fcanvas.add(img)
-        img.moveTo(1) // arriba del fondo, debajo de guía/textos
-        fcanvas.setActiveObject(img)
+        img.sendToBack()              // ← AL FONDO: el flyer queda encima
+        fcanvas.setActiveObject(img)  // seleccionada para moverla de una
         fcanvas.renderAll()
+        setHasPhoto(true)
       })
     }
     reader.readAsDataURL(file)
-    e.target.value = '' // permite re-subir el mismo archivo
+    e.target.value = ''
   }
 
-  // 4) Descargar a tamaño nativo (1080x1350) en JPG o PNG
+  // 4) Descargar al tamaño real del flyer en JPG o PNG
   function download(format: 'jpeg' | 'png') {
     const fcanvas = fcanvasRef.current
     if (!fcanvas || !template) return
     fcanvas.discardActiveObject()
-    const guides = fcanvas.getObjects().filter((o: any) => o._guide)
-    guides.forEach((g: any) => g.set('visible', false))
     fcanvas.renderAll()
     const dataUrl = fcanvas.toDataURL({ format, quality: 0.95, multiplier: 1 })
-    guides.forEach((g: any) => g.set('visible', true))
-    fcanvas.renderAll()
     const a = document.createElement('a')
     a.href = dataUrl
     a.download = `${template.nombre.replace(/\s+/g, '-').toLowerCase()}.${format === 'jpeg' ? 'jpg' : 'png'}`
@@ -206,12 +192,12 @@ export default function UserEditor({ templateId }: { templateId: string }) {
           <button onClick={() => fileRef.current?.click()} disabled={!ready}
             className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold text-white transition-all active:scale-95 disabled:opacity-50"
             style={{ background: 'linear-gradient(135deg,#0D1E79,#D203DD)' }}>
-            <i className="fa-solid fa-image"></i> {photoRef.current ? 'Cambiar foto' : 'Subir foto'}
+            <i className="fa-solid fa-image"></i> {hasPhoto ? 'Cambiar foto' : 'Subir foto'}
           </button>
 
           <div className="rounded-xl bg-white/[0.03] border border-white/10 p-3 text-[11px] text-white/45 leading-relaxed">
             <p className="font-bold text-white/70 mb-1.5"><i className="fa-solid fa-lightbulb text-amber-400 mr-1"></i> Cómo editar</p>
-            <p>• Arrastrá/escalá tu foto dentro del recuadro.</p>
+            <p>• Tu foto va <b>detrás</b> del diseño: arrastrala y escalala para acomodarla.</p>
             <p>• <b>Doble clic</b> en un texto para escribir el tuyo.</p>
             <p>• Tu foto se procesa en tu navegador (no se sube).</p>
           </div>
