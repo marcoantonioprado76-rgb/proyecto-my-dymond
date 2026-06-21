@@ -210,6 +210,19 @@ export class MetaAdapter implements IAdsAdapter {
             throw new Error('Se requiere una Página de Facebook para publicar en Meta. Selecciónala en la configuración de la campaña.')
         }
 
+        // DSA (beneficiario/pagador): Meta exige declarar quién se promociona y quién paga.
+        // Lo rellenamos automáticamente con el nombre de la Página (la entidad promocionada),
+        // así el usuario no tiene que cargar nada. Si no se puede leer, usamos el nombre de la campaña.
+        let dsaName = draft.name
+        try {
+            const pageInfo = await this.api.get<any>(`/${this.apiVersion}/${draft.providerPageId}`, {
+                params: { access_token: accessToken, fields: 'name' }
+            })
+            if (pageInfo?.name) dsaName = pageInfo.name
+        } catch (e) {
+            console.warn('[Meta] No se pudo leer el nombre de la Página para DSA; uso el nombre de la campaña')
+        }
+
         const messagingDest = draft.messengerDestination
         const isMessagingAd = messagingDest === 'WHATSAPP' || messagingDest === 'MESSENGER' || messagingDest === 'INSTAGRAM'
 
@@ -341,6 +354,9 @@ export class MetaAdapter implements IAdsAdapter {
             daily_budget: Math.round(draft.budgetAmount * 100),
             targeting,
             status: 'ACTIVE',
+            // DSA — beneficiario y pagador (Meta lo exige por transparencia)
+            dsa_beneficiary: dsaName,
+            dsa_payor: dsaName,
             access_token: accessToken,
             ...adSetExtra
         }
