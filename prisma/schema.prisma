@@ -1507,3 +1507,23 @@ model BroadcastLog {
   @@index([campaignId])
   @@map("broadcast_logs")
 }
+
+// ─── Recursos: plantillas editables (editor tipo Fancy Product Designer) ──────────
+// Sección AISLADA. No tiene relaciones con otros modelos para no afectar nada.
+// `creadoPor` guarda el userId del admin que la creó (sin FK, a propósito).
+model Template {
+  id        String   @id @default(uuid()) @db.Uuid
+  nombre    String
+  categoria String
+  ancho     Int
+  alto      Int
+  fondoUrl  String   @map("fondo_url")
+  thumbUrl  String?  @map("thumb_url")
+  zonas     Json     @db.JsonB
+  activo    Boolean  @default(true)
+  creadoPor String   @map("creado_por") @db.Uuid
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([activo, categoria])
+  @@map("templates")
+}

@@ -23,6 +23,7 @@ const academyItems = [
 ]
 
 const mainItemsBottom = [
+  { href: '/dashboard/recursos', iconClass: 'fa-solid fa-wand-magic-sparkles', label: 'Recursos' },
   { href: '/dashboard/store',  iconClass: 'fa-solid fa-bag-shopping', label: 'Shop' },
   { href: '/dashboard/wallet', iconClass: 'fa-solid fa-wallet',       label: 'Créditos AI' },
 ]
