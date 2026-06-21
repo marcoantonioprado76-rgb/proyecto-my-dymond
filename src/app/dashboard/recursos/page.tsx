@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
+import { CATEGORIAS_RECURSOS } from '@/lib/recursos'
 
 interface TemplateItem {
   id: string
@@ -32,9 +33,13 @@ export default function RecursosGaleriaPage() {
       .finally(() => setLoading(false))
   }, [])
 
+  // "Todas" + las categorías predefinidas que tienen flyers (en su orden),
+  // más cualquier categoría vieja fuera de la lista, al final.
   const categorias = useMemo(() => {
-    const set = new Set(templates.map(t => t.categoria))
-    return ['todas', ...Array.from(set)]
+    const presentes = new Set(templates.map(t => t.categoria))
+    const enOrden = (CATEGORIAS_RECURSOS as readonly string[]).filter(c => presentes.has(c))
+    const extra = Array.from(presentes).filter(c => !(CATEGORIAS_RECURSOS as readonly string[]).includes(c))
+    return ['todas', ...enOrden, ...extra]
   }, [templates])
 
   const visibles = cat === 'todas' ? templates : templates.filter(t => t.categoria === cat)
@@ -55,12 +60,12 @@ export default function RecursosGaleriaPage() {
         <div className="flex gap-2 flex-wrap mb-6">
           {categorias.map(c => (
             <button key={c} onClick={() => setCat(c)}
-              className={`px-3.5 py-1.5 rounded-full text-xs font-bold capitalize transition-all border ${
+              className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all border ${
                 cat === c
                   ? 'bg-[#D203DD]/20 border-[#D203DD]/50 text-white'
                   : 'bg-white/5 border-white/10 text-white/50 hover:text-white/80'
               }`}>
-              {c}
+              {c === 'todas' ? 'Todas' : c}
             </button>
           ))}
         </div>
@@ -99,7 +104,7 @@ export default function RecursosGaleriaPage() {
             </div>
             <div className="p-2.5">
               <p className="text-xs font-bold text-white truncate">{t.nombre}</p>
-              <p className="text-[10px] text-white/35 capitalize">{t.categoria}</p>
+              <p className="text-[10px] text-white/35">{t.categoria}</p>
             </div>
           </Link>
         ))}

@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { CATEGORIAS_RECURSOS } from '@/lib/recursos'
 
 export default function AdminEditor() {
   const router = useRouter()
@@ -160,7 +161,7 @@ export default function AdminEditor() {
       const r = await fetch('/api/recursos/templates', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          nombre: nombre.trim(), categoria: categoria.trim().toLowerCase(),
+          nombre: nombre.trim(), categoria: categoria.trim(),
           ancho, alto, fondoUrl, thumbUrl: fondoUrl,
           zonas: { photo, texts },
         }),
@@ -222,8 +223,11 @@ export default function AdminEditor() {
           <div className="grid grid-cols-2 gap-2">
             <input value={nombre} onChange={e => setNombre(e.target.value)} placeholder="Nombre"
               className="col-span-2 bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm text-white placeholder-white/30 outline-none focus:border-purple-500/40" />
-            <input value={categoria} onChange={e => setCategoria(e.target.value)} placeholder="Categoría (ej: ventas)"
-              className="col-span-2 bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm text-white placeholder-white/30 outline-none focus:border-purple-500/40" />
+            <select value={categoria} onChange={e => setCategoria(e.target.value)}
+              className="col-span-2 bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm text-white outline-none focus:border-purple-500/40">
+              <option value="" className="bg-[#0d0d15] text-white">Elegí una categoría…</option>
+              {CATEGORIAS_RECURSOS.map(c => <option key={c} value={c} className="bg-[#0d0d15] text-white">{c}</option>)}
+            </select>
           </div>
 
           <div className="flex gap-2">

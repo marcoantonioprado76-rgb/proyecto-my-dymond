@@ -1,5 +1,25 @@
 import { z } from 'zod'
 
+// Categorías (áreas) predefinidas de los flyers. El admin elige de acá al crear,
+// y el usuario filtra por estas mismas en la galería.
+export const CATEGORIAS_RECURSOS = [
+  'Bienvenidos',
+  'Café y negocios',
+  'Club Elite',
+  'Club Influencer',
+  'Convención Internacional',
+  'Cumpleaños',
+  'Distribuidores',
+  'Presentación de negocios',
+  'Lista de precios',
+  'Rangos',
+  'Retiro de liderazgo',
+  'Únete a mi equipo',
+  'Vital Party',
+  'Varios',
+  'Otros',
+] as const
+
 // ── Esquema de "zonas" (hueco de foto + cajas de texto) ──────────────
 const photoZoneSchema = z.object({
   x: z.number(), y: z.number(), w: z.number(), h: z.number(),
