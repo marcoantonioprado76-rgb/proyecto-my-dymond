@@ -59,6 +59,7 @@ function StoreViewContent({ store, products, categories, phone, paymentQrUrl, th
                     totalPoints={totalPoints}
                     totalPrice={totalPrice}
                     cart={cart}
+                    isCartOpen={isCartOpen}
                 />
             )}
             <CartDrawer
@@ -136,7 +137,7 @@ function BannerCarousel({ banners, height = 190, overlay = null }: { banners: st
     )
 }
 
-function CatalogView({ store, products, categories, phone, onOpenCart, totalItems, totalPoints, totalPrice, cart }: any) {
+function CatalogView({ store, products, categories, phone, onOpenCart, totalItems, totalPoints, totalPrice, cart, isCartOpen }: any) {
     const isMLM = store.type === 'NETWORK_MARKETING'
     const [activeCategory, setActiveCategory] = useState('Todos')
     const [searchQuery, setSearchQuery] = useState('')
@@ -324,8 +325,8 @@ function CatalogView({ store, products, categories, phone, onOpenCart, totalItem
                 />
             )}
 
-            {/* ── BARRA FLOTANTE DE PEDIDO (visible cuando hay productos) ── */}
-            {totalItems > 0 && (
+            {/* ── BARRA FLOTANTE DE PEDIDO (visible cuando hay productos y el carrito está cerrado) ── */}
+            {totalItems > 0 && !isCartOpen && (
                 <div style={{
                     position: 'fixed', left: 0, right: 0, bottom: 0, zIndex: 120,
                     padding: '0 12px 12px', display: 'flex', justifyContent: 'center',
