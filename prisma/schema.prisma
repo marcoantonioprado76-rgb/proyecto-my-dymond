@@ -1545,3 +1545,15 @@ model Resource {
   @@index([tipo, activo, categoria])
   @@map("resources")
 }
+
+// Áreas (categorías) de los flyers — el admin elige cuáles aparecen en el menú "Filtrar flyers".
+model FlyerArea {
+  id        String   @id @default(uuid()) @db.Uuid
+  nombre    String   @unique
+  orden     Int      @default(0)
+  activo    Boolean  @default(true)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([activo, orden])
+  @@map("flyer_areas")
+}

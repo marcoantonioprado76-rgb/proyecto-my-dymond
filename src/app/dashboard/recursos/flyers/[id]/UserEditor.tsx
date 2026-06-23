@@ -41,6 +41,7 @@ export default function UserEditor({ templateId }: { templateId: string }) {
   const [expanded, setExpanded] = useState(false)
   // Texto seleccionado en el lienzo → muestra la barra de color/tamaño/fuente
   const [textSel, setTextSel] = useState<{ fill: string; fontSize: number; fontFamily: string } | null>(null)
+  const [fontMenuOpen, setFontMenuOpen] = useState(false)
 
   // 1) Cargar la plantilla
   useEffect(() => {
@@ -150,6 +151,18 @@ export default function UserEditor({ templateId }: { templateId: string }) {
     return () => { clearTimeout(t); window.removeEventListener('keydown', onKey); document.body.style.overflow = prev }
   }, [expanded, availW, win])
 
+  // Cargar fuentes (Google Fonts) para el selector de tipografías — se ven igual en todos los
+  // dispositivos y al descargar el flyer. Se inyecta una sola vez.
+  useEffect(() => {
+    const id = 'flyer-google-fonts'
+    if (document.getElementById(id)) return
+    const link = document.createElement('link')
+    link.id = id
+    link.rel = 'stylesheet'
+    link.href = 'https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&family=Poppins:wght@400;700;900&family=Oswald:wght@400;700&family=Bebas+Neue&family=Anton&family=Playfair+Display:wght@400;700;900&family=Merriweather:wght@400;700&family=Lobster&family=Pacifico&family=Dancing+Script:wght@400;700&family=Caveat:wght@400;700&family=Righteous&family=Permanent+Marker&family=Roboto+Mono:wght@400;700&display=swap'
+    document.head.appendChild(link)
+  }, [])
+
   // 3) Subir foto del usuario → va AL FONDO (detrás del flyer), seleccionable/movible/escalable.
   //    Se procesa en el navegador, NO se sube al servidor.
   function onPhotoChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -206,8 +219,20 @@ export default function UserEditor({ templateId }: { templateId: string }) {
     setTextSel(s => (s ? { ...s, ...props } : s))
   }
 
+  // Elegir fuente: asegura que esté cargada antes de aplicarla (si no, Fabric usa una de respaldo).
+  async function pickFont(font: string) {
+    setFontMenuOpen(false)
+    try { await (document as any).fonts?.load(`24px "${font}"`); await (document as any).fonts?.load(`bold 24px "${font}"`) } catch {}
+    applyText({ fontFamily: font })
+    try { fcanvasRef.current?.renderAll() } catch {}
+  }
+
   // Barra de color/tamaño/fuente (se muestra al seleccionar un texto). Función → JSX nuevo en cada lugar.
-  const FONTS = ['Archivo', 'Arial', 'Impact', 'Georgia', 'Verdana', 'Courier New', 'Times New Roman']
+  const FONTS = [
+    'Archivo', 'Montserrat', 'Poppins', 'Oswald', 'Bebas Neue', 'Anton',
+    'Playfair Display', 'Merriweather', 'Georgia', 'Lobster', 'Pacifico',
+    'Dancing Script', 'Caveat', 'Righteous', 'Permanent Marker', 'Roboto Mono',
+  ]
   const SWATCHES = ['#ffffff', '#000000', '#D203DD', '#0D1E79', '#00FF9D', '#FFD500', '#FF2D55']
   const renderTextToolbar = () => {
     if (!textSel) return null
@@ -236,10 +261,28 @@ export default function UserEditor({ templateId }: { templateId: string }) {
         </div>
         <div className="flex items-center gap-2">
           <span className="text-[10px] text-white/40 w-12 shrink-0">Fuente</span>
-          <select value={textSel.fontFamily} onChange={e => applyText({ fontFamily: e.target.value })}
-            className="flex-1 min-w-0 bg-black/30 border border-white/10 rounded-lg px-2 py-1.5 text-xs text-white outline-none focus:border-[#D203DD]/50">
-            {FONTS.map(f => <option key={f} value={f} className="bg-[#0b0b14]" style={{ fontFamily: f }}>{f}</option>)}
-          </select>
+          <div className="relative flex-1 min-w-0">
+            <button type="button" onClick={() => setFontMenuOpen(o => !o)}
+              style={{ fontFamily: textSel.fontFamily }}
+              className="w-full flex items-center justify-between gap-2 bg-black/30 border border-white/10 rounded-lg px-2.5 py-1.5 text-sm text-white outline-none hover:border-[#D203DD]/50">
+              <span className="truncate">{textSel.fontFamily}</span>
+              <i className="fa-solid fa-chevron-down text-[10px] text-white/40 shrink-0"></i>
+            </button>
+            {fontMenuOpen && (
+              <>
+                <div className="fixed inset-0 z-10" onClick={() => setFontMenuOpen(false)} />
+                <div className="absolute z-20 left-0 right-0 bottom-full mb-1 max-h-60 overflow-auto rounded-lg bg-[#0b0b14] border border-white/15 shadow-2xl">
+                  {FONTS.map(f => (
+                    <button key={f} type="button" onClick={() => pickFont(f)}
+                      style={{ fontFamily: f }}
+                      className={`w-full text-left px-3 py-2 text-[15px] leading-tight hover:bg-white/10 transition-colors ${textSel.fontFamily === f ? 'text-[#D203DD] bg-white/5' : 'text-white'}`}>
+                      {f}
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
         </div>
       </div>
     )

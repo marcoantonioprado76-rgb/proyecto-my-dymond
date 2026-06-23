@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { LayoutTemplate, Plus, Trash2, Eye, EyeOff, Loader2, Lock } from 'lucide-react'
 import RecursosTabs from './RecursosTabs'
+import AreasManager from './AreasManager'
 
 interface T {
   id: string; nombre: string; categoria: string
@@ -59,6 +60,8 @@ export default function AdminRecursosPage() {
         <LayoutTemplate size={20} className="text-purple-400" /> Recursos
       </h1>
       <RecursosTabs />
+
+      <AreasManager />
 
       {/* Header de la pestaña Flyers */}
       <div className="flex items-center justify-between gap-4 mb-6">

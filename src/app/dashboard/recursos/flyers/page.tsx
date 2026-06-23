@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
-import { CATEGORIAS_RECURSOS } from '@/lib/recursos'
 
 interface TemplateItem {
   id: string
@@ -21,6 +20,8 @@ export default function RecursosGaleriaPage() {
   const [error, setError] = useState<string | null>(null)
   // null = mostrar el menú de áreas (en móvil). 'todas' o un área = ver sus flyers.
   const [selected, setSelected] = useState<string | null>(null)
+  // Áreas visibles del menú, gestionadas por el admin (tabla flyer_areas)
+  const [areas, setAreas] = useState<string[]>([])
 
   useEffect(() => {
     fetch('/api/recursos/templates')
@@ -34,17 +35,17 @@ export default function RecursosGaleriaPage() {
       .finally(() => setLoading(false))
   }, [])
 
+  useEffect(() => {
+    fetch('/api/recursos/areas')
+      .then(r => r.json())
+      .then(d => setAreas((d.areas || []).map((a: { nombre: string }) => a.nombre)))
+      .catch(() => { /* si falla, el menú queda solo con "Todas" */ })
+  }, [])
+
   const counts = useMemo(() => {
     const m: Record<string, number> = {}
     for (const t of templates) m[t.categoria] = (m[t.categoria] || 0) + 1
     return m
-  }, [templates])
-
-  // Todas las áreas predefinidas + cualquier categoría vieja con flyers (al final)
-  const areas = useMemo(() => {
-    const base = CATEGORIAS_RECURSOS as readonly string[]
-    const extra = Array.from(new Set(templates.map(t => t.categoria))).filter(c => !base.includes(c))
-    return [...base, ...extra]
   }, [templates])
 
   const activeKey = selected || 'todas'
@@ -85,11 +86,6 @@ export default function RecursosGaleriaPage() {
           <Row value="todas" label="Todas" n={templates.length} />
           {areas.map(a => <Row key={a} value={a} label={a} n={counts[a] || 0} />)}
         </div>
-        {isAdmin && (
-          <Link href="/admin/recursos" className="mt-3 flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl border border-dashed border-white/15 text-xs font-bold text-white/50 hover:text-white hover:border-[#D203DD]/40 transition-all">
-            <i className="fa-solid fa-plus"></i> Subir flyers por área
-          </Link>
-        )}
       </aside>
 
       {/* ── FLYERS DEL ÁREA ── */}

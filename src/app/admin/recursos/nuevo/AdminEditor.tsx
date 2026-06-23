@@ -22,8 +22,17 @@ export default function AdminEditor() {
   const [alto, setAlto] = useState(1350)
   const [nombre, setNombre] = useState('')
   const [categoria, setCategoria] = useState('')
+  const [areas, setAreas] = useState<string[]>([])
   const [hasPhoto, setHasPhoto] = useState(false)
   const [sel, setSel] = useState<any>(null) // objeto seleccionado (para panel de texto)
+
+  // Áreas gestionadas por el admin (tabla flyer_areas). Si falla, se usa la lista fija.
+  useEffect(() => {
+    fetch('/api/recursos/areas')
+      .then(r => r.json())
+      .then(d => setAreas((d.areas || []).map((a: { nombre: string }) => a.nombre)))
+      .catch(() => { /* respaldo: CATEGORIAS_RECURSOS */ })
+  }, [])
 
   // 1) Subir imagen base
   async function onBaseFile(e: React.ChangeEvent<HTMLInputElement>) {
@@ -225,8 +234,8 @@ export default function AdminEditor() {
               className="col-span-2 bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm text-white placeholder-white/30 outline-none focus:border-purple-500/40" />
             <select value={categoria} onChange={e => setCategoria(e.target.value)}
               className="col-span-2 bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm text-white outline-none focus:border-purple-500/40">
-              <option value="" className="bg-[#0d0d15] text-white">Elegí una categoría…</option>
-              {CATEGORIAS_RECURSOS.map(c => <option key={c} value={c} className="bg-[#0d0d15] text-white">{c}</option>)}
+              <option value="" className="bg-[#0d0d15] text-white">Elegí un área…</option>
+              {(areas.length ? areas : (CATEGORIAS_RECURSOS as readonly string[])).map(c => <option key={c} value={c} className="bg-[#0d0d15] text-white">{c}</option>)}
             </select>
           </div>
 
