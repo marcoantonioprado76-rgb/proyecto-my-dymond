@@ -32,6 +32,7 @@ const mobileNavItems = [
   { href: '/dashboard',         iconClass: 'fa-solid fa-house',        label: 'Inicio' },
   { href: '/dashboard/services',iconClass: 'fa-solid fa-th-large',     label: 'Servicios' },
   { href: '/dashboard/academy', iconClass: 'fa-solid fa-graduation-cap', label: 'Academy' },
+  { href: '/dashboard/recursos',iconClass: 'fa-solid fa-wand-magic-sparkles', label: 'Recursos' },
   { href: '/dashboard/store',   iconClass: 'fa-solid fa-bag-shopping', label: 'Shop' },
   { href: '/dashboard/wallet',  iconClass: 'fa-solid fa-wallet',       label: 'Créditos AI' },
 ]

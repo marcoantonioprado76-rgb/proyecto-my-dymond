@@ -30,8 +30,6 @@ export default function UserEditor({ templateId }: { templateId: string }) {
   const photoRef = useRef<any>(null)   // foto del usuario (al fondo)
   const fileRef = useRef<HTMLInputElement>(null)
   const measureRef = useRef<HTMLDivElement>(null)
-  const lastPhotoSrcRef = useRef<string | null>(null) // fuente actual de la foto (para quitar fondo)
-  const originalPhotoSrcRef = useRef<string | null>(null) // foto original subida (para restaurar)
 
   const [template, setTemplate] = useState<Template | null>(null)
   const [loading, setLoading] = useState(true)
@@ -43,9 +41,6 @@ export default function UserEditor({ templateId }: { templateId: string }) {
   const [expanded, setExpanded] = useState(false)
   // Texto seleccionado en el lienzo → muestra la barra de color/tamaño/fuente
   const [textSel, setTextSel] = useState<{ fill: string; fontSize: number; fontFamily: string } | null>(null)
-  const [removingBg, setRemovingBg] = useState(false)
-  const [bgError, setBgError] = useState<string | null>(null)
-  const [bgRemoved, setBgRemoved] = useState(false) // ¿ya se quitó el fondo? → permite restaurar
 
   // 1) Cargar la plantilla
   useEffect(() => {
@@ -157,22 +152,18 @@ export default function UserEditor({ templateId }: { templateId: string }) {
 
   // 3) Subir foto del usuario → va AL FONDO (detrás del flyer), seleccionable/movible/escalable.
   //    Se procesa en el navegador, NO se sube al servidor.
-  // Coloca/reemplaza la foto en el lienzo desde una fuente (dataURL/objURL).
-  // keepTransform: conserva posición/escala/rotación de la foto anterior (para "quitar fondo").
-  async function placePhoto(src: string, keepTransform = false) {
-    const mod: any = await import('fabric')
-    const fabric = mod.fabric || mod.default || mod
-    const fcanvas = fcanvasRef.current
-    if (!fcanvas || !template) return
-    const prev = photoRef.current
-    const t = keepTransform && prev
-      ? { left: prev.left, top: prev.top, scaleX: prev.scaleX, scaleY: prev.scaleY, angle: prev.angle, originX: prev.originX, originY: prev.originY }
-      : null
-    fabric.Image.fromURL(src, (img: any) => {
-      if (photoRef.current) { fcanvas.remove(photoRef.current); photoRef.current = null }
-      if (t) {
-        img.set({ ...t, selectable: true, hasControls: true })
-      } else {
+  function onPhotoChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file || !template) return
+    const reader = new FileReader()
+    reader.onload = async () => {
+      const mod: any = await import('fabric')
+      const fabric = mod.fabric || mod.default || mod
+      const fcanvas = fcanvasRef.current
+      if (!fcanvas) return
+      fabric.Image.fromURL(reader.result as string, (img: any) => {
+        if (photoRef.current) { fcanvas.remove(photoRef.current); photoRef.current = null }
+        // posición/escala inicial: cubrir la zona marcada por el admin (o todo el lienzo)
         const zone = template.zonas?.photo || { x: 0, y: 0, w: template.ancho, h: template.alto }
         const scale = Math.max(zone.w / img.width, zone.h / img.height)
         img.set({
@@ -180,56 +171,16 @@ export default function UserEditor({ templateId }: { templateId: string }) {
           originX: 'center', originY: 'center', scaleX: scale, scaleY: scale,
           selectable: true, hasControls: true,
         })
-      }
-      photoRef.current = img
-      fcanvas.add(img)
-      img.sendToBack()              // ← AL FONDO: el flyer queda encima
-      fcanvas.setActiveObject(img)
-      fcanvas.renderAll()
-      setHasPhoto(true)
-    })
-  }
-
-  function onPhotoChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0]
-    if (!file || !template) return
-    const reader = new FileReader()
-    reader.onload = () => {
-      const src = reader.result as string
-      lastPhotoSrcRef.current = src
-      originalPhotoSrcRef.current = src
-      setBgRemoved(false); setBgError(null)
-      placePhoto(src, false)
+        photoRef.current = img
+        fcanvas.add(img)
+        img.sendToBack()              // ← AL FONDO: el flyer queda encima
+        fcanvas.setActiveObject(img)  // seleccionada para moverla de una
+        fcanvas.renderAll()
+        setHasPhoto(true)
+      })
     }
     reader.readAsDataURL(file)
     e.target.value = ''
-  }
-
-  // Volver a la foto original (deshace el "quitar fondo"), conservando posición/escala.
-  async function restoreOriginal() {
-    if (!originalPhotoSrcRef.current) return
-    lastPhotoSrcRef.current = originalPhotoSrcRef.current
-    setBgRemoved(false); setBgError(null)
-    await placePhoto(originalPhotoSrcRef.current, true)
-  }
-
-  // Quitar el fondo de la foto — 100% en el navegador (la foto NO se sube al servidor).
-  async function removeBg() {
-    if (!lastPhotoSrcRef.current || removingBg) return
-    setRemovingBg(true); setBgError(null)
-    try {
-      const { removeBackground } = await import('@imgly/background-removal')
-      const blob = await removeBackground(lastPhotoSrcRef.current)
-      const url = URL.createObjectURL(blob)
-      lastPhotoSrcRef.current = url
-      await placePhoto(url, true) // mantiene la posición/escala que el usuario ya acomodó
-      setBgRemoved(true)
-    } catch (err: any) {
-      console.error('[flyer] removeBackground error', err)
-      setBgError(String(err?.message || err || 'No se pudo quitar el fondo'))
-    } finally {
-      setRemovingBg(false)
-    }
   }
 
   // 4) Descargar al tamaño real del flyer en JPG o PNG
@@ -358,17 +309,6 @@ export default function UserEditor({ templateId }: { templateId: string }) {
                 style={{ background: 'linear-gradient(135deg,#0D1E79,#D203DD)' }}>
                 <i className="fa-solid fa-image"></i> {hasPhoto ? 'Cambiar foto' : 'Subir foto'}
               </button>
-              {hasPhoto && (bgRemoved ? (
-                <button onClick={restoreOriginal} disabled={removingBg}
-                  className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold text-white/80 bg-white/10 border border-white/15 hover:bg-white/20 transition-all disabled:opacity-60">
-                  <i className="fa-solid fa-rotate-left"></i> Restaurar original
-                </button>
-              ) : (
-                <button onClick={removeBg} disabled={removingBg}
-                  className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold text-white/80 bg-white/10 border border-white/15 hover:bg-white/20 transition-all disabled:opacity-60">
-                  {removingBg ? <><i className="fa-solid fa-spinner fa-spin"></i> Quitando fondo…</> : <><i className="fa-solid fa-eraser"></i> Quitar fondo</>}
-                </button>
-              ))}
               <button onClick={() => download('jpeg')} disabled={!ready}
                 className="flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-black text-black transition-all active:scale-95 disabled:opacity-50"
                 style={{ background: 'linear-gradient(135deg,#00FF9D,#00B4FF)' }}>
@@ -390,28 +330,11 @@ export default function UserEditor({ templateId }: { templateId: string }) {
             <i className="fa-solid fa-image"></i> {hasPhoto ? 'Cambiar foto' : 'Subir foto'}
           </button>
 
-          {hasPhoto && (bgRemoved ? (
-            <button onClick={restoreOriginal} disabled={removingBg}
-              className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold text-white/80 bg-white/5 border border-white/10 hover:bg-white/10 transition-all disabled:opacity-60">
-              <i className="fa-solid fa-rotate-left"></i> Restaurar foto original
-            </button>
-          ) : (
-            <button onClick={removeBg} disabled={removingBg}
-              className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold text-white/80 bg-white/5 border border-white/10 hover:bg-white/10 transition-all disabled:opacity-60">
-              {removingBg
-                ? <><i className="fa-solid fa-spinner fa-spin"></i> Quitando fondo…</>
-                : <><i className="fa-solid fa-eraser"></i> Quitar fondo de la foto</>}
-            </button>
-          ))}
-          {bgRemoved && <p className="text-[11px] text-white/40 leading-snug">¿Se recortó de más? Tocá <b className="text-white/70">Restaurar foto original</b>.</p>}
-          {bgError && <p className="text-[11px] text-red-400 leading-snug break-words">{bgError}</p>}
-
           {renderTextToolbar()}
 
           <div className="rounded-xl bg-white/[0.03] border border-white/10 p-3 text-[11px] text-white/45 leading-relaxed">
             <p className="font-bold text-white/70 mb-1.5"><i className="fa-solid fa-lightbulb text-amber-400 mr-1"></i> Cómo editar</p>
             <p>• Tu foto va <b>detrás</b> del diseño: arrastrala y escalala para acomodarla.</p>
-            <p>• Si tu foto tiene fondo, tocá <b>"Quitar fondo"</b> para dejarla recortada.</p>
             <p>• <b>Doble clic</b> en un texto para escribir el tuyo.</p>
             <p>• <b>Tocá un texto</b> para cambiar su color, tamaño y fuente.</p>
             <p>• Usa <b>Ampliar</b> para editar más grande.</p>
