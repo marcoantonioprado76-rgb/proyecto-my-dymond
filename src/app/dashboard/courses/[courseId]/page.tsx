@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState, useRef, Fragment } from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
 import { PaymentGateway } from '@/components/PaymentGateway'
@@ -8,11 +8,19 @@ import { PaymentGateway } from '@/components/PaymentGateway'
 interface CourseVideo {
   id: string
   title: string
+  kind?: 'supabase' | 'vimeo'
+  playUrl?: string | null
   youtubeUrl: string
   order: number
   unlocked: boolean
   percent: number
   completed: boolean
+  posicionSegundos?: number
+  isPreview?: boolean
+  moduloTitulo?: string | null
+  descripcion?: string | null
+  duracionSegundos?: number | null
+  recursos?: { id: string; titulo: string; archivoUrl: string }[]
 }
 
 interface Enrollment {
@@ -33,12 +41,32 @@ interface Course {
   videos: CourseVideo[]
   locked: boolean
   enrollment: Enrollment | null
+  viewerName?: string
 }
 
 function getVimeoEmbedUrl(url: string): string {
   const match = url.match(/vimeo\.com\/(\d+)/)
   if (match) return `https://player.vimeo.com/video/${match[1]}?badge=0&autopause=0&player_id=0&app_id=58479`
   return url
+}
+
+function fmtTime(sec: number): string {
+  const s = Math.max(0, Math.floor(sec))
+  const m = Math.floor(s / 60)
+  return `${m}:${String(s % 60).padStart(2, '0')}`
+}
+
+function wrapText(ctx: CanvasRenderingContext2D, text: string, x: number, y: number, maxWidth: number, lineHeight: number) {
+  const words = text.split(' ')
+  let line = ''
+  const lines: string[] = []
+  for (const w of words) {
+    const test = line ? `${line} ${w}` : w
+    if (ctx.measureText(test).width > maxWidth && line) { lines.push(line); line = w } else { line = test }
+  }
+  if (line) lines.push(line)
+  const startY = y - ((lines.length - 1) * lineHeight) / 2
+  lines.forEach((l, i) => ctx.fillText(l, x, startY + i * lineHeight))
 }
 
 export default function CourseDetailPage() {
@@ -58,6 +86,10 @@ export default function CourseDetailPage() {
   const vimeoPlayer = useRef<any>(null)
   const reportedRef = useRef<Set<string>>(new Set())
   const [completedVideos, setCompletedVideos] = useState<Set<string>>(new Set())
+  // Reproductor de video propio (Supabase): src fijo al seleccionar (no se reinicia en refrescos silenciosos)
+  const videoElRef = useRef<HTMLVideoElement | null>(null)
+  const lastSaveRef = useRef(0)
+  const [player, setPlayer] = useState<{ id: string; kind: string; src: string | null; pos: number } | null>(null)
 
   // Payment modal state
   const [showModal, setShowModal] = useState(false)
@@ -99,8 +131,12 @@ export default function CourseDetailPage() {
     setCompletedVideos(serverCompleted)
     // Auto-select first unlocked video (only on initial load)
     if (!silent) {
-      const firstUnlocked = (data.course.videos as CourseVideo[]).find(v => v.unlocked)
-      if (firstUnlocked) setSelectedVideoId(firstUnlocked.id)
+      // Continuar donde quedó: el último con avance pero sin completar; si no, el primero desbloqueado
+      const vids = data.course.videos as CourseVideo[]
+      const resume = vids.find(v => v.unlocked && (v.percent ?? 0) > 0 && (v.percent ?? 0) < 95)
+      const firstUnlocked = vids.find(v => v.unlocked)
+      const target = resume || firstUnlocked
+      if (target) selectVideo(target)
     }
     if (!silent) setLoading(false)
   }
@@ -166,20 +202,106 @@ export default function CourseDetailPage() {
     }
   }, [selectedVideoId, course?.enrollment?.status])
 
-  async function reportProgress(videoId: string, percent: number) {
+  async function reportProgress(videoId: string, percent: number, pos?: number) {
+    // Solo se trackea progreso/desbloqueo para inscritos aprobados (no para vistas de preview)
+    if (course?.enrollment?.status !== 'APPROVED') return
     try {
       const res = await fetch(`/api/courses/${courseId}/progress`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ videoId, percent }),
+        body: JSON.stringify({ videoId, percent, posicionSegundos: pos }),
       })
-      if (res.ok) {
+      // Solo al COMPLETAR refrescamos (desbloquea + trae la URL del siguiente). Guardar posición no recarga.
+      if (res.ok && percent >= 95) {
         setCompletedVideos(prev => new Set(prev).add(videoId))
-        // Silent refresh: update playlist without unmounting the video player
         await loadCourse(true)
       }
     } catch {}
   }
+
+  // Selecciona un video: fija el src del reproductor (no se reinicia en refrescos silenciosos)
+  function selectVideo(v: CourseVideo) {
+    if (!v.unlocked) return
+    setSelectedVideoId(v.id)
+    setPlayer({ id: v.id, kind: v.kind ?? 'vimeo', src: v.playUrl ?? v.youtubeUrl ?? null, pos: v.posicionSegundos ?? 0 })
+    reportedRef.current.delete(v.id)
+  }
+
+  // <video> propio: guarda avance (throttle 5s) y posición; marca completado al 95%
+  function handleVideoTime(el: HTMLVideoElement) {
+    if (!el.duration || !player) return
+    const pct = Math.min(100, Math.round((el.currentTime / el.duration) * 100))
+    const now = Date.now()
+    if (now - lastSaveRef.current > 5000) {
+      lastSaveRef.current = now
+      reportProgress(player.id, pct, Math.floor(el.currentTime))
+    }
+    if (pct >= 95 && !reportedRef.current.has(player.id)) {
+      reportedRef.current.add(player.id)
+      reportProgress(player.id, pct, Math.floor(el.currentTime))
+    }
+  }
+  function saveVideoNow(el: HTMLVideoElement | null) {
+    if (!el || !el.duration || !player) return
+    const pct = Math.min(100, Math.round((el.currentTime / el.duration) * 100))
+    reportProgress(player.id, pct, Math.floor(el.currentTime))
+  }
+
+  // Marcar la lección actual como vista (completa y desbloquea la siguiente)
+  function markWatched() {
+    if (!player) return
+    reportedRef.current.add(player.id)
+    setCompletedVideos(prev => new Set(prev).add(player.id))
+    reportProgress(player.id, 100, videoElRef.current ? Math.floor(videoElRef.current.currentTime) : undefined)
+  }
+
+  // Genera y descarga el certificado de finalización (PNG, con el wordmark de MY DIAMOND)
+  async function downloadCertificate() {
+    if (!course) return
+    const W = 1600, H = 1130
+    const canvas = document.createElement('canvas')
+    canvas.width = W; canvas.height = H
+    const ctx = canvas.getContext('2d'); if (!ctx) return
+
+    const g = ctx.createLinearGradient(0, 0, W, H)
+    g.addColorStop(0, '#0D1E79'); g.addColorStop(0.5, '#1a0b2e'); g.addColorStop(1, '#07070d')
+    ctx.fillStyle = g; ctx.fillRect(0, 0, W, H)
+    ctx.strokeStyle = 'rgba(210,3,221,0.6)'; ctx.lineWidth = 4; ctx.strokeRect(40, 40, W - 80, H - 80)
+    ctx.strokeStyle = 'rgba(255,255,255,0.15)'; ctx.lineWidth = 1; ctx.strokeRect(56, 56, W - 112, H - 112)
+
+    const img = new Image(); img.crossOrigin = 'anonymous'
+    await new Promise<void>(res => { img.onload = () => res(); img.onerror = () => res(); img.src = '/wordmark-mydiamond.png' })
+    if (img.width) { const w = 440, h = (w * img.height) / img.width; ctx.drawImage(img, W / 2 - w / 2, 120, w, h) }
+
+    ctx.textAlign = 'center'
+    ctx.fillStyle = 'rgba(255,255,255,0.5)'; ctx.font = '600 30px Archivo, sans-serif'
+    ctx.fillText('CERTIFICADO DE FINALIZACIÓN', W / 2, 360)
+    ctx.fillStyle = 'rgba(255,255,255,0.4)'; ctx.font = '400 26px Archivo, sans-serif'
+    ctx.fillText('Se certifica que', W / 2, 450)
+    ctx.fillStyle = '#ffffff'; ctx.font = '800 66px Archivo, sans-serif'
+    ctx.fillText(course.viewerName || 'Alumno', W / 2, 530)
+    ctx.strokeStyle = 'rgba(210,3,221,0.6)'; ctx.lineWidth = 2
+    ctx.beginPath(); ctx.moveTo(W / 2 - 260, 565); ctx.lineTo(W / 2 + 260, 565); ctx.stroke()
+    ctx.fillStyle = 'rgba(255,255,255,0.4)'; ctx.font = '400 26px Archivo, sans-serif'
+    ctx.fillText('completó exitosamente el curso', W / 2, 645)
+    ctx.fillStyle = '#D203DD'; ctx.font = '700 44px Archivo, sans-serif'
+    wrapText(ctx, course.title, W / 2, 720, 1200, 56)
+    ctx.fillStyle = 'rgba(255,255,255,0.35)'; ctx.font = '400 24px Archivo, sans-serif'
+    ctx.fillText(`MY DIAMOND Academy · ${new Date().toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' })}`, W / 2, 1010)
+
+    const a = document.createElement('a')
+    a.href = canvas.toDataURL('image/png')
+    a.download = `certificado-${course.title.replace(/\s+/g, '-').toLowerCase()}.png`
+    document.body.appendChild(a); a.click(); a.remove()
+  }
+
+  // Guardar la posición al ocultar la pestaña o salir de la página
+  useEffect(() => {
+    const onHide = () => { if (document.visibilityState === 'hidden') saveVideoNow(videoElRef.current) }
+    document.addEventListener('visibilitychange', onHide)
+    return () => { document.removeEventListener('visibilitychange', onHide); saveVideoNow(videoElRef.current) }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [player?.id])
 
   // Manual enroll submit
   async function handleManualEnroll() {
@@ -257,6 +379,11 @@ export default function CourseDetailPage() {
 
   const selectedVideo = course.videos.find(v => v.id === selectedVideoId) ?? null
   const selectedIdx = course.videos.findIndex(v => v.id === selectedVideoId)
+  const isVideoDone = (v: CourseVideo) => completedVideos.has(v.id) || v.completed
+  const doneCount = course.videos.filter(isVideoDone).length
+  const coursePct = course.videos.length ? Math.round((doneCount / course.videos.length) * 100) : 0
+  const prevVideo = selectedIdx > 0 ? course.videos[selectedIdx - 1] : null
+  const nextVideo = selectedIdx >= 0 && selectedIdx < course.videos.length - 1 ? course.videos[selectedIdx + 1] : null
 
   return (
     <div className="px-4 sm:px-6 pt-6 pb-12 max-w-7xl mx-auto" style={{ userSelect: 'none', WebkitUserSelect: 'none' }}>
@@ -344,9 +471,36 @@ export default function CourseDetailPage() {
       {submitError && !showModal && <p style={{ fontSize: 12, color: '#ef4444', marginBottom: 16 }}>{submitError}</p>}
 
       {/* ── PLAYER + PLAYLIST ── */}
-      {isApproved && course.videos.length > 0 && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      {course.videos.length > 0 && (isApproved || course.videos.some(v => v.unlocked)) && (
+        <>
+          {/* Progreso del curso (solo para inscritos) */}
+          {isApproved && (
+          <div style={{ marginBottom: 16 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 6 }}>
+              <span style={{ fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.6)' }}>Tu progreso</span>
+              <span style={{ fontSize: 12, fontWeight: 800, color: coursePct === 100 ? '#00FF88' : '#D203DD' }}>{doneCount} de {course.videos.length} · {coursePct}%</span>
+            </div>
+            <div style={{ height: 7, borderRadius: 7, background: 'rgba(255,255,255,0.08)', overflow: 'hidden' }}>
+              <div style={{ height: '100%', width: `${coursePct}%`, borderRadius: 7, background: coursePct === 100 ? '#00FF88' : 'linear-gradient(90deg,#D203DD,#00FF88)', transition: 'width 0.3s' }} />
+            </div>
+            {coursePct === 100 && (
+              <div style={{ marginTop: 12, padding: '14px 16px', borderRadius: 14, background: 'rgba(0,255,136,0.08)', border: '1px solid rgba(0,255,136,0.25)', display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+                <span style={{ fontSize: 22 }}>🎓</span>
+                <div style={{ flex: 1, minWidth: 160 }}>
+                  <p style={{ fontSize: 14, fontWeight: 800, color: '#00FF88', margin: 0 }}>¡Completaste el curso!</p>
+                  <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', margin: '2px 0 0' }}>Descargá tu certificado de finalización.</p>
+                </div>
+                <button onClick={downloadCertificate} style={{ padding: '10px 18px', borderRadius: 10, fontSize: 13, fontWeight: 700, color: '#000', background: 'linear-gradient(135deg,#00FF88,#D203DD)', border: 'none', cursor: 'pointer' }}>
+                  🎓 Descargar certificado
+                </button>
+              </div>
+            )}
+          </div>
+          )}
 
+          <div className="grid lg:grid-cols-[1fr_360px] gap-4 items-start">
+            {/* Columna: reproductor + navegación */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12, minWidth: 0 }}>
           {/* Player activo */}
           {selectedVideo && (
             <div style={{ borderRadius: 14, overflow: 'hidden', border: '1px solid rgba(255,255,255,0.15)' }}>
@@ -362,23 +516,97 @@ export default function CourseDetailPage() {
                   </span>
                 )}
               </div>
-              {/* iframe */}
+              {/* Aviso "continuá donde quedaste" (video propio, con posición guardada) */}
+              {player?.kind === 'supabase' && (player.pos || 0) > 3 && !(completedVideos.has(selectedVideo.id) || selectedVideo.completed) && (
+                <div style={{ background: 'rgba(210,3,221,0.08)', borderBottom: '1px solid rgba(255,255,255,0.08)', padding: '6px 16px', fontSize: 11, color: '#D203DD', display: 'flex', alignItems: 'center', gap: 6 }}>
+                  ▶ Continuás donde quedaste — {fmtTime(player.pos)}
+                </div>
+              )}
+              {/* Reproductor: <video> propio (Supabase) o iframe de Vimeo */}
               <div style={{ position: 'relative', paddingBottom: '56.25%', background: '#000' }}>
-                <iframe
-                  key={selectedVideoId}
-                  ref={el => { iframeRef.current = el }}
-                  src={getVimeoEmbedUrl(selectedVideo.youtubeUrl)}
-                  title={selectedVideo.title}
-                  allow="autoplay; fullscreen; picture-in-picture"
-                  allowFullScreen
-                  style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 'none' }}
-                />
+                {player?.kind === 'supabase' ? (
+                  <video
+                    key={player.id}
+                    ref={el => { videoElRef.current = el }}
+                    src={player.src ?? undefined}
+                    controls
+                    controlsList="nodownload noremoteplayback"
+                    disablePictureInPicture
+                    playsInline
+                    onContextMenu={e => e.preventDefault()}
+                    onLoadedMetadata={e => {
+                      const el = e.currentTarget
+                      const at = player.pos || 0
+                      if (at > 3 && el.duration && at < el.duration - 5) { try { el.currentTime = at } catch {} }
+                    }}
+                    onTimeUpdate={e => handleVideoTime(e.currentTarget)}
+                    onPause={e => saveVideoNow(e.currentTarget)}
+                    onEnded={e => saveVideoNow(e.currentTarget)}
+                    style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 'none', background: '#000' }}
+                  />
+                ) : (
+                  <iframe
+                    key={selectedVideoId}
+                    ref={el => { iframeRef.current = el }}
+                    src={getVimeoEmbedUrl(selectedVideo.youtubeUrl)}
+                    title={selectedVideo.title}
+                    allow="autoplay; fullscreen; picture-in-picture"
+                    allowFullScreen
+                    style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 'none' }}
+                  />
+                )}
               </div>
             </div>
           )}
 
-          {/* Playlist */}
-          <div style={{ borderRadius: 14, overflow: 'hidden', border: '1px solid rgba(255,255,255,0.15)' }}>
+          {/* Navegación de lecciones */}
+          {selectedVideo && (
+            <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+              <button onClick={() => prevVideo && selectVideo(prevVideo)} disabled={!prevVideo}
+                style={{ flex: 1, padding: '10px', borderRadius: 10, fontSize: 12, fontWeight: 700, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: prevVideo ? 'rgba(255,255,255,0.7)' : 'rgba(255,255,255,0.25)', cursor: prevVideo ? 'pointer' : 'default' }}>
+                ← Anterior
+              </button>
+              {isApproved && !isVideoDone(selectedVideo) && (
+                <button onClick={markWatched}
+                  style={{ padding: '10px 14px', borderRadius: 10, fontSize: 12, fontWeight: 700, background: 'rgba(0,255,136,0.1)', border: '1px solid rgba(0,255,136,0.25)', color: '#00FF88', cursor: 'pointer', whiteSpace: 'nowrap' }}>
+                  ✓ Marcar visto
+                </button>
+              )}
+              <button onClick={() => nextVideo && nextVideo.unlocked && selectVideo(nextVideo)} disabled={!nextVideo || !nextVideo.unlocked}
+                style={{ flex: 1, padding: '10px', borderRadius: 10, fontSize: 12, fontWeight: 700, background: (nextVideo && nextVideo.unlocked) ? 'linear-gradient(135deg,#D203DD,#00FF88)' : 'rgba(255,255,255,0.05)', border: 'none', color: (nextVideo && nextVideo.unlocked) ? '#000' : 'rgba(255,255,255,0.25)', cursor: (nextVideo && nextVideo.unlocked) ? 'pointer' : 'default' }}>
+                {nextVideo && !nextVideo.unlocked ? '🔒 Siguiente' : 'Siguiente →'}
+              </button>
+            </div>
+          )}
+
+          {/* Notas + recursos descargables de la lección */}
+          {selectedVideo && (selectedVideo.descripcion || (selectedVideo.recursos && selectedVideo.recursos.length > 0)) && (
+            <div style={{ borderRadius: 14, border: '1px solid rgba(255,255,255,0.12)', padding: '14px 16px', background: 'rgba(255,255,255,0.02)' }}>
+              {selectedVideo.descripcion && (
+                <div style={{ marginBottom: (selectedVideo.recursos && selectedVideo.recursos.length) ? 14 : 0 }}>
+                  <p style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.06em', margin: '0 0 6px' }}>Notas</p>
+                  <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.7)', lineHeight: 1.6, margin: 0, whiteSpace: 'pre-wrap' }}>{selectedVideo.descripcion}</p>
+                </div>
+              )}
+              {selectedVideo.recursos && selectedVideo.recursos.length > 0 && (
+                <div>
+                  <p style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.06em', margin: '0 0 8px' }}>Recursos descargables</p>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                    {selectedVideo.recursos.map(r => (
+                      <a key={r.id} href={r.archivoUrl} target="_blank" rel="noreferrer" download
+                        style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: '#fff', textDecoration: 'none', background: 'rgba(210,3,221,0.08)', border: '1px solid rgba(210,3,221,0.25)', borderRadius: 10, padding: '10px 12px' }}>
+                        <span>📎</span><span style={{ flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.titulo}</span><span style={{ fontSize: 11, color: '#D203DD', whiteSpace: 'nowrap' }}>Descargar ↓</span>
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+            </div>{/* cierra columna izquierda */}
+
+          {/* Playlist (columna derecha) */}
+          <div style={{ borderRadius: 14, overflow: 'hidden', border: '1px solid rgba(255,255,255,0.15)' }} className="lg:sticky lg:top-4">
             <div style={{ background: 'linear-gradient(135deg, rgba(154,203,255,0.12) 0%, rgba(255,125,224,0.12) 50%, rgba(162,102,255,0.12) 100%)', padding: '10px 16px', borderBottom: '1px solid rgba(255,255,255,0.15)' }}>
               <p style={{ fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.4)', margin: 0, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
                 Contenido del curso
@@ -389,11 +617,18 @@ export default function CourseDetailPage() {
                 const isUnlocked = video.unlocked
                 const isDone = completedVideos.has(video.id) || video.completed
                 const isActive = video.id === selectedVideoId
+                const prevMod = idx > 0 ? course.videos[idx - 1].moduloTitulo : null
+                const showHeader = !!video.moduloTitulo && video.moduloTitulo !== prevMod
 
                 return (
+                  <Fragment key={video.id}>
+                  {showHeader && (
+                    <div style={{ padding: '11px 16px 7px', fontSize: 11, fontWeight: 800, color: '#D203DD', textTransform: 'uppercase', letterSpacing: '0.06em', background: 'rgba(210,3,221,0.05)', borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
+                      {video.moduloTitulo}
+                    </div>
+                  )}
                   <button
-                    key={video.id}
-                    onClick={() => isUnlocked && setSelectedVideoId(video.id)}
+                    onClick={() => selectVideo(video)}
                     disabled={!isUnlocked}
                     style={{
                       display: 'flex', alignItems: 'center', gap: 12,
@@ -420,10 +655,23 @@ export default function CourseDetailPage() {
                       {isDone ? '✓' : !isUnlocked ? '🔒' : idx + 1}
                     </div>
 
-                    {/* Título */}
-                    <span style={{ fontSize: 13, fontWeight: isActive ? 700 : 500, color: isActive ? '#fff' : isUnlocked ? 'rgba(255,255,255,0.75)' : 'rgba(255,255,255,0.3)', flex: 1, lineHeight: 1.4 }}>
-                      {video.title}
-                    </span>
+                    {/* Título + barra de avance */}
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <span style={{ fontSize: 13, fontWeight: isActive ? 700 : 500, color: isActive ? '#fff' : isUnlocked ? 'rgba(255,255,255,0.75)' : 'rgba(255,255,255,0.3)', lineHeight: 1.4, display: 'block' }}>
+                        {video.title}
+                      </span>
+                      {(video.isPreview || video.duracionSegundos) && (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 2 }}>
+                          {video.isPreview && <span style={{ fontSize: 9, fontWeight: 800, color: '#00FF88', letterSpacing: '0.05em' }}>GRATIS</span>}
+                          {video.duracionSegundos ? <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.3)' }}>{fmtTime(video.duracionSegundos)}</span> : null}
+                        </div>
+                      )}
+                      {isUnlocked && !isDone && (video.percent ?? 0) > 0 && (
+                        <div style={{ height: 3, borderRadius: 3, background: 'rgba(255,255,255,0.1)', marginTop: 5, overflow: 'hidden' }}>
+                          <div style={{ height: '100%', width: `${video.percent}%`, background: '#D203DD', borderRadius: 3 }} />
+                        </div>
+                      )}
+                    </div>
 
                     {/* Play icon si está activo */}
                     {isActive && (
@@ -432,11 +680,13 @@ export default function CourseDetailPage() {
                       </svg>
                     )}
                   </button>
+                  </Fragment>
                 )
               })}
             </div>
           </div>
         </div>
+        </>
       )}
 
       {!isApproved && !isPending && !isPendingVerification && !isRejected && !isLocked && (

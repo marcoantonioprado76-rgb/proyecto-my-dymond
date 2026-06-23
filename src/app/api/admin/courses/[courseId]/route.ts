@@ -27,7 +27,7 @@ export async function PATCH(
     if (!await requireAdmin(auth)) return NextResponse.json({ error: 'No autorizado' }, { status: 403 })
 
     const body = await req.json()
-    const { title, description, coverUrl, price, active, freeForPlan, videos } = body
+    const { title, description, coverUrl, price, active, freeForPlan, videos, categoria, nivel } = body
 
     const data: any = {}
     if (title !== undefined) data.title = title
@@ -36,17 +36,29 @@ export async function PATCH(
     if (price !== undefined) data.price = parseFloat(price)
     if (active !== undefined) data.active = active
     if (freeForPlan !== undefined) data.freeForPlan = freeForPlan === true
+    if (categoria !== undefined) data.categoria = categoria || null
+    if (nivel !== undefined) data.nivel = nivel || null
 
     // Replace all videos if provided
     if (Array.isArray(videos)) {
       data.videos = {
         deleteMany: {},
         create: videos
-          .filter((v: any) => v.title && v.youtubeUrl)
+          .filter((v: any) => v.title && (v.youtubeUrl || v.videoUrl))
           .map((v: any, i: number) => ({
             title: v.title,
-            youtubeUrl: v.youtubeUrl,
+            youtubeUrl: v.youtubeUrl || '',
+            videoUrl: v.videoUrl || null,
+            preview: v.preview === true,
+            descripcion: v.descripcion || null,
+            duracionSegundos: typeof v.duracionSegundos === 'number' ? v.duracionSegundos : null,
+            moduloTitulo: v.moduloTitulo || null,
             order: i,
+            recursos: {
+              create: Array.isArray(v.recursos)
+                ? v.recursos.filter((r: any) => r.titulo && r.archivoUrl).map((r: any, j: number) => ({ titulo: r.titulo, archivoUrl: r.archivoUrl, orden: j }))
+                : [],
+            },
           })),
       }
     }

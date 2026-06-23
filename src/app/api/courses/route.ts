@@ -21,6 +21,8 @@ export async function GET() {
         coverUrl: true,
         price: true,
         freeForPlan: true,
+        categoria: true,
+        nivel: true,
         createdAt: true,
         _count: { select: { videos: true } },
         enrollments: {
@@ -37,6 +39,8 @@ export async function GET() {
       coverUrl: c.coverUrl,
       price: Number(c.price),
       freeForPlan: c.freeForPlan,
+      categoria: (c as any).categoria ?? null,
+      nivel: (c as any).nivel ?? null,
       videosCount: c._count.videos,
       createdAt: c.createdAt,
       locked: !hasPlan,

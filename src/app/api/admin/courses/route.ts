@@ -26,7 +26,7 @@ export async function GET() {
     const courses = await prisma.course.findMany({
       orderBy: { createdAt: 'desc' },
       include: {
-        videos: { orderBy: { order: 'asc' } },
+        videos: { orderBy: { order: 'asc' }, include: { recursos: { orderBy: { orden: 'asc' } } } },
         _count: { select: { videos: true, enrollments: true } },
       },
     })
@@ -45,7 +45,7 @@ export async function POST(req: NextRequest) {
     if (!await requireAdmin(auth)) return NextResponse.json({ error: 'No autorizado' }, { status: 403 })
 
     const body = await req.json()
-    const { title, description, coverUrl, price, freeForPlan, videos } = body
+    const { title, description, coverUrl, price, freeForPlan, videos, categoria, nivel } = body
 
     if (!title || !description || price === undefined) {
       return NextResponse.json({ error: 'title, description y price son requeridos' }, { status: 400 })
@@ -63,15 +63,27 @@ export async function POST(req: NextRequest) {
         coverUrl: coverUrl || null,
         price: parsedPrice,
         freeForPlan: freeForPlan === true,
+        categoria: categoria || null,
+        nivel: nivel || null,
         active: true,
         videos: {
           create: Array.isArray(videos)
             ? videos
-                .filter((v: any) => v.title && v.youtubeUrl)
+                .filter((v: any) => v.title && (v.youtubeUrl || v.videoUrl))
                 .map((v: any, i: number) => ({
                   title: v.title,
-                  youtubeUrl: v.youtubeUrl,
+                  youtubeUrl: v.youtubeUrl || '',
+                  videoUrl: v.videoUrl || null,
+                  preview: v.preview === true,
+                  descripcion: v.descripcion || null,
+                  duracionSegundos: typeof v.duracionSegundos === 'number' ? v.duracionSegundos : null,
+                  moduloTitulo: v.moduloTitulo || null,
                   order: i,
+                  recursos: {
+                    create: Array.isArray(v.recursos)
+                      ? v.recursos.filter((r: any) => r.titulo && r.archivoUrl).map((r: any, j: number) => ({ titulo: r.titulo, archivoUrl: r.archivoUrl, orden: j }))
+                      : [],
+                  },
                 }))
             : [],
         },

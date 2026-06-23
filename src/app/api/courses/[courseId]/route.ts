@@ -2,6 +2,10 @@ export const dynamic = 'force-dynamic'
 import { NextRequest, NextResponse } from 'next/server'
 import { getAuthUser } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { supabaseAdmin } from '@/lib/supabase'
+
+const VIDEO_BUCKET = 'course-videos'
+const SIGN_EXPIRY = 60 * 60 * 6 // 6 horas — dura la sesión de visualización
 
 /** GET /api/courses/[courseId] — detalle del curso; incluye videos solo si APPROVED */
 export async function GET(
@@ -15,7 +19,7 @@ export async function GET(
     const course = await prisma.course.findUnique({
       where: { id: params.courseId },
       include: {
-        videos: { orderBy: { order: 'asc' } },
+        videos: { orderBy: { order: 'asc' }, include: { recursos: { orderBy: { orden: 'asc' } } } },
         enrollments: { where: { userId: user.id } },
       },
     })
@@ -28,35 +32,60 @@ export async function GET(
     const enrollment = course.enrollments[0] ?? null
     const approved = enrollment?.status === 'APPROVED'
 
-    // Obtener progreso del usuario para este curso
-    let progressMap: Record<string, number> = {}
+    // Obtener progreso del usuario (porcentaje + posición en segundos)
+    const progressMap: Record<string, { percent: number; pos: number }> = {}
     if (approved && course.videos.length > 0) {
       const progressRows = await (prisma as any).videoProgress.findMany({
         where: { userId: user.id, courseId: params.courseId },
-        select: { videoId: true, percent: true, completed: true },
+        select: { videoId: true, percent: true, posicionSegundos: true },
       })
       for (const row of progressRows) {
-        progressMap[row.videoId] = row.percent
+        progressMap[row.videoId] = { percent: row.percent, pos: row.posicionSegundos ?? 0 }
       }
     }
 
-    // Calcular qué videos están desbloqueados (orden secuencial)
-    // Video 1 siempre desbloqueado, video N desbloqueado si video N-1 está al 95%+
-    const videosWithUnlock = approved
-      ? course.videos.map((v, idx) => {
-          const prevVideo = idx === 0 ? null : course.videos[idx - 1]
-          const unlocked = idx === 0 || (prevVideo ? (progressMap[prevVideo.id] ?? 0) >= 95 : false)
-          return {
-            id: v.id,
-            title: v.title,
-            youtubeUrl: v.youtubeUrl,
-            order: v.order,
-            unlocked,
-            percent: progressMap[v.id] ?? 0,
-            completed: (progressMap[v.id] ?? 0) >= 95,
-          }
-        })
-      : []
+    // Desbloqueo: inscrito → secuencial (video 1 siempre; N si el N-1 está al 95%+).
+    //            sin inscribir → solo las lecciones marcadas como "preview" (gratis).
+    // Para los desbloqueados genera la URL de reproducción (firmada Supabase o Vimeo).
+    const videosWithUnlock = await Promise.all(course.videos.map(async (v: any, idx: number) => {
+      let unlocked: boolean
+      if (approved) {
+        const prevVideo = idx === 0 ? null : course.videos[idx - 1]
+        unlocked = idx === 0 || (prevVideo ? (progressMap[prevVideo.id]?.percent ?? 0) >= 95 : false)
+      } else {
+        unlocked = v.preview === true
+      }
+      const pct = progressMap[v.id]?.percent ?? 0
+      const selfHosted = !!v.videoUrl
+
+      let playUrl: string | null = null
+      if (unlocked) {
+        if (selfHosted) {
+          const { data } = await supabaseAdmin.storage.from(VIDEO_BUCKET).createSignedUrl(v.videoUrl, SIGN_EXPIRY)
+          playUrl = data?.signedUrl ?? null
+        } else {
+          playUrl = v.youtubeUrl || null
+        }
+      }
+
+      return {
+        id: v.id,
+        title: v.title,
+        kind: selfHosted ? 'supabase' : 'vimeo',
+        playUrl,
+        youtubeUrl: v.youtubeUrl,
+        order: v.order,
+        unlocked,
+        isPreview: v.preview === true,
+        moduloTitulo: v.moduloTitulo ?? null,
+        descripcion: v.descripcion ?? null,
+        duracionSegundos: v.duracionSegundos ?? null,
+        recursos: unlocked ? (v.recursos ?? []).map((r: any) => ({ id: r.id, titulo: r.titulo, archivoUrl: r.archivoUrl })) : [],
+        percent: pct,
+        completed: pct >= 95,
+        posicionSegundos: progressMap[v.id]?.pos ?? 0,
+      }
+    }))
 
     return NextResponse.json({
       course: {
@@ -71,6 +100,7 @@ export async function GET(
         videosCount: course.videos.length,
         locked: !hasPlan,
         enrollment,
+        viewerName: user.fullName || user.username || 'Alumno',
       },
     })
   } catch (err) {

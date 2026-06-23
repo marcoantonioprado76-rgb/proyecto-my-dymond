@@ -5,10 +5,17 @@ import { BookOpen, Plus, Edit2, Trash2, Check, X, Loader2, RefreshCw, ExternalLi
 
 //  Types 
 
+interface LessonResource { id?: string; titulo: string; archivoUrl: string }
 interface CourseVideo {
   id?: string
   title: string
   youtubeUrl: string
+  videoUrl?: string | null  // video propio en Supabase (path en bucket course-videos)
+  preview?: boolean         // lección de muestra (gratis sin inscribirse)
+  descripcion?: string | null
+  duracionSegundos?: number | null
+  moduloTitulo?: string | null  // sección/módulo (las que comparten nombre se agrupan)
+  recursos?: LessonResource[]
 }
 
 interface Course {
@@ -18,6 +25,8 @@ interface Course {
   coverUrl: string | null
   price: number
   freeForPlan: boolean
+  categoria: string | null
+  nivel: string | null
   active: boolean
   createdAt: string
   videos: CourseVideo[]
@@ -43,6 +52,8 @@ interface CourseModalData {
   coverUrl: string
   price: string
   freeForPlan: boolean
+  categoria: string
+  nivel: string
   videos: CourseVideo[]
 }
 
@@ -71,7 +82,7 @@ const STATUS_LABEL: Record<string, string> = {
   REJECTED: 'Rechazado',
 }
 
-const EMPTY_COURSE: CourseModalData = { title: '', description: '', coverUrl: '', price: '', freeForPlan: false, videos: [{ title: '', youtubeUrl: '' }] }
+const EMPTY_COURSE: CourseModalData = { title: '', description: '', coverUrl: '', price: '', freeForPlan: false, categoria: '', nivel: '', videos: [{ title: '', youtubeUrl: '' }] }
 
 //  Main component 
 
@@ -94,6 +105,8 @@ export default function AdminCoursesPage() {
   const [courseModal, setCourseModal] = useState<CourseModalState | null>(null)
   const [saving, setSaving] = useState(false)
   const [saveError, setSaveError] = useState<string | null>(null)
+  // Subida de video a Supabase: { índice del video, % subido } | null
+  const [vidUpload, setVidUpload] = useState<{ idx: number; pct: number } | null>(null)
   const [uploadingCover, setUploadingCover] = useState(false)
   const coverInputRef = useRef<HTMLInputElement>(null)
 
@@ -149,8 +162,10 @@ export default function AdminCoursesPage() {
     setSaving(true)
     setSaveError(null)
 
-    const videos = data.videos.filter(v => v.title.trim() && v.youtubeUrl.trim())
-    const body = { title: data.title, description: data.description, coverUrl: data.coverUrl || null, price: data.price, freeForPlan: data.freeForPlan, videos }
+    const videos = data.videos
+      .filter(v => v.title.trim() && (v.youtubeUrl.trim() || v.videoUrl))
+      .map(v => ({ ...v, youtubeUrl: v.youtubeUrl.trim(), videoUrl: v.videoUrl || null }))
+    const body = { title: data.title, description: data.description, coverUrl: data.coverUrl || null, price: data.price, freeForPlan: data.freeForPlan, categoria: data.categoria || null, nivel: data.nivel || null, videos }
 
     const res = mode === 'create'
       ? await fetch('/api/admin/courses', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
@@ -188,7 +203,7 @@ export default function AdminCoursesPage() {
   }
 
   //  Video helpers in modal 
-  function setVideo(idx: number, field: keyof CourseVideo, value: string) {
+  function setVideo(idx: number, field: keyof CourseVideo, value: any) {
     if (!courseModal) return
     const videos = [...courseModal.data.videos]
     videos[idx] = { ...videos[idx], [field]: value }
@@ -204,6 +219,66 @@ export default function AdminCoursesPage() {
     if (!courseModal) return
     const videos = courseModal.data.videos.filter((_, i) => i !== idx)
     setCourseModal({ ...courseModal, data: { ...courseModal.data, videos: videos.length ? videos : [{ title: '', youtubeUrl: '' }] } })
+  }
+
+  // Lee la duración (segundos) de un archivo de video local
+  function readVideoDuration(file: File): Promise<number> {
+    return new Promise(resolve => {
+      const url = URL.createObjectURL(file)
+      const v = document.createElement('video')
+      v.preload = 'metadata'
+      v.onloadedmetadata = () => { URL.revokeObjectURL(url); resolve(Math.round(v.duration) || 0) }
+      v.onerror = () => { URL.revokeObjectURL(url); resolve(0) }
+      v.src = url
+    })
+  }
+
+  // Subir un video directo a Supabase (URL firmada → PUT con progreso). Guarda el path en videoUrl.
+  async function uploadVideo(idx: number, file: File) {
+    setSaveError(null)
+    const dur = await readVideoDuration(file).catch(() => 0)
+    try {
+      const r = await fetch('/api/admin/courses/video-upload-url', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ filename: file.name }),
+      })
+      const d = await r.json()
+      if (!r.ok) throw new Error(d.error || 'No se pudo preparar la subida')
+
+      setVidUpload({ idx, pct: 0 })
+      await new Promise<void>((resolve, reject) => {
+        const xhr = new XMLHttpRequest()
+        xhr.open('PUT', d.signedUrl)
+        xhr.setRequestHeader('content-type', file.type || 'video/mp4')
+        xhr.upload.onprogress = e => { if (e.lengthComputable) setVidUpload({ idx, pct: Math.round((e.loaded / e.total) * 100) }) }
+        xhr.onload = () => (xhr.status >= 200 && xhr.status < 300) ? resolve() : reject(new Error(`Error ${xhr.status} al subir (¿el video supera el límite de Supabase?)`))
+        xhr.onerror = () => reject(new Error('Error de red al subir el video'))
+        xhr.send(file)
+      })
+      setCourseModal(prev => prev ? { ...prev, data: { ...prev.data, videos: prev.data.videos.map((vv, i) => i === idx ? { ...vv, videoUrl: d.path, duracionSegundos: dur || vv.duracionSegundos } : vv) } } : prev)
+    } catch (e: any) {
+      setSaveError(e?.message || 'Error al subir el video')
+    } finally {
+      setVidUpload(null)
+    }
+  }
+
+  // Subir un archivo de recurso (PDF, etc.) y agregarlo a la lección
+  async function uploadResource(idx: number, file: File) {
+    setSaveError(null)
+    try {
+      const fd = new FormData(); fd.append('file', file)
+      const r = await fetch('/api/admin/courses/resource-upload', { method: 'POST', body: fd })
+      const d = await r.json()
+      if (!r.ok) throw new Error(d.error || 'No se pudo subir el recurso')
+      const nuevo: LessonResource = { titulo: file.name.replace(/\.[^.]+$/, ''), archivoUrl: d.url }
+      setCourseModal(prev => prev ? { ...prev, data: { ...prev.data, videos: prev.data.videos.map((vv, i) => i === idx ? { ...vv, recursos: [...(vv.recursos || []), nuevo] } : vv) } } : prev)
+    } catch (e: any) {
+      setSaveError(e?.message || 'Error al subir el recurso')
+    }
+  }
+  function removeResource(vidIdx: number, resIdx: number) {
+    setCourseModal(prev => prev ? { ...prev, data: { ...prev.data, videos: prev.data.videos.map((vv, i) => i === vidIdx ? { ...vv, recursos: (vv.recursos || []).filter((_, j) => j !== resIdx) } : vv) } } : prev)
   }
 
   // 
@@ -286,8 +361,10 @@ export default function AdminCoursesPage() {
                         coverUrl: c.coverUrl ?? '',
                         price: String(Number(c.price)),
                         freeForPlan: c.freeForPlan,
+                        categoria: c.categoria ?? '',
+                        nivel: c.nivel ?? '',
                         videos: c.videos.length > 0
-                          ? c.videos.map(v => ({ id: v.id, title: v.title, youtubeUrl: v.youtubeUrl }))
+                          ? c.videos.map(v => ({ id: v.id, title: v.title, youtubeUrl: v.youtubeUrl, videoUrl: v.videoUrl, preview: v.preview, descripcion: v.descripcion, duracionSegundos: v.duracionSegundos, moduloTitulo: v.moduloTitulo, recursos: v.recursos || [] }))
                           : [{ title: '', youtubeUrl: '' }],
                       }
                     })
@@ -488,6 +565,38 @@ export default function AdminCoursesPage() {
               )}
             </div>
 
+            {/* Categoría + Nivel */}
+            <div style={{ display: 'flex', gap: 10, marginBottom: 14 }}>
+              <div style={{ flex: 1 }}>
+                <label style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', display: 'block', marginBottom: 5 }}>Categoría</label>
+                <input
+                  type="text"
+                  list="course-categorias"
+                  value={courseModal.data.categoria}
+                  onChange={e => setCourseModal({ ...courseModal, data: { ...courseModal.data, categoria: e.target.value } })}
+                  placeholder="Ej. Ventas, Mindset, Producto"
+                  style={{ width: '100%', padding: '9px 12px', borderRadius: 10, fontSize: 13, color: '#fff',
+                    background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', outline: 'none', boxSizing: 'border-box' }}
+                />
+                <datalist id="course-categorias">
+                  {Array.from(new Set(courses.map(c => c.categoria).filter(Boolean))).map(cat => <option key={cat as string} value={cat as string} />)}
+                </datalist>
+              </div>
+              <div style={{ width: 150 }}>
+                <label style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', display: 'block', marginBottom: 5 }}>Nivel</label>
+                <select
+                  value={courseModal.data.nivel}
+                  onChange={e => setCourseModal({ ...courseModal, data: { ...courseModal.data, nivel: e.target.value } })}
+                  style={{ width: '100%', padding: '9px 12px', borderRadius: 10, fontSize: 13, color: '#fff',
+                    background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', outline: 'none', boxSizing: 'border-box' }}>
+                  <option value="" style={{ background: '#1a1a1a' }}>—</option>
+                  <option value="Principiante" style={{ background: '#1a1a1a' }}>Principiante</option>
+                  <option value="Intermedio" style={{ background: '#1a1a1a' }}>Intermedio</option>
+                  <option value="Avanzado" style={{ background: '#1a1a1a' }}>Avanzado</option>
+                </select>
+              </div>
+            </div>
+
             {/* Free for plan toggle */}
             <div style={{ marginBottom: 16 }}>
               <button
@@ -519,30 +628,88 @@ export default function AdminCoursesPage() {
             {/* Videos */}
             <div style={{ marginBottom: 14 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-                <label style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)' }}>Videos (Vimeo)</label>
+                <label style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)' }}>Videos del curso</label>
                 <button onClick={addVideo}
                   style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 11, color: '#D203DD', background: 'none', border: 'none', cursor: 'pointer' }}>
                   <Plus size={12} /> Agregar
                 </button>
               </div>
-              {courseModal.data.videos.map((v, idx) => (
-                <div key={idx} style={{ display: 'flex', gap: 8, marginBottom: 8, alignItems: 'flex-start' }}>
-                  <div style={{ flex: 1 }}>
-                    <input type="text" value={v.title} onChange={e => setVideo(idx, 'title', e.target.value)}
-                      placeholder="Título del video"
-                      style={{ width: '100%', padding: '8px 10px', borderRadius: 8, fontSize: 12, color: '#fff',
-                        background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', outline: 'none', marginBottom: 5, boxSizing: 'border-box' }} />
-                    <input type="text" value={v.youtubeUrl} onChange={e => setVideo(idx, 'youtubeUrl', e.target.value)}
-                      placeholder="https://vimeo.com/123456789"
-                      style={{ width: '100%', padding: '8px 10px', borderRadius: 8, fontSize: 12, color: '#fff',
-                        background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', outline: 'none', boxSizing: 'border-box' }} />
+              {courseModal.data.videos.map((v, idx) => {
+                const up = vidUpload?.idx === idx ? vidUpload.pct : null
+                const hasVideo = !!v.videoUrl
+                return (
+                  <div key={idx} style={{ display: 'flex', gap: 8, marginBottom: 10, alignItems: 'flex-start', padding: 8, borderRadius: 10, background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)' }}>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <input type="text" value={v.title} onChange={e => setVideo(idx, 'title', e.target.value)}
+                        placeholder="Título del video"
+                        style={{ width: '100%', padding: '8px 10px', borderRadius: 8, fontSize: 12, color: '#fff',
+                          background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', outline: 'none', marginBottom: 6, boxSizing: 'border-box' }} />
+                      <input type="text" value={v.moduloTitulo || ''} onChange={e => setVideo(idx, 'moduloTitulo', e.target.value)}
+                        placeholder="Sección / Módulo (opcional, ej. Introducción)"
+                        style={{ width: '100%', padding: '7px 10px', borderRadius: 8, fontSize: 11, color: 'rgba(255,255,255,0.85)', marginBottom: 6,
+                          background: 'rgba(210,3,221,0.05)', border: '1px solid rgba(210,3,221,0.2)', outline: 'none', boxSizing: 'border-box' }} />
+                      <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, color: v.preview ? '#00FF88' : 'rgba(255,255,255,0.5)', cursor: 'pointer', marginBottom: 6 }}>
+                        <input type="checkbox" checked={!!v.preview} onChange={e => setVideo(idx, 'preview', e.target.checked)} />
+                        🎁 Gratis (preview) — se puede ver sin inscribirse
+                      </label>
+
+                      {/* Subir video propio a Supabase */}
+                      {hasVideo ? (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, color: '#00FF88', background: 'rgba(0,255,136,0.08)', border: '1px solid rgba(0,255,136,0.2)', borderRadius: 8, padding: '8px 10px' }}>
+                          <Check size={13} /> <span style={{ flex: 1 }}>Video subido</span>
+                          <button onClick={() => setVideo(idx, 'videoUrl', '')} style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}>cambiar</button>
+                        </div>
+                      ) : up !== null ? (
+                        <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.6)', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 8, padding: '8px 10px' }}>
+                          Subiendo… {up}%
+                          <div style={{ height: 4, borderRadius: 4, background: 'rgba(255,255,255,0.1)', marginTop: 6, overflow: 'hidden' }}>
+                            <div style={{ height: '100%', width: `${up}%`, background: 'linear-gradient(90deg,#D203DD,#00FF88)', transition: 'width 0.2s' }} />
+                          </div>
+                        </div>
+                      ) : (
+                        <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, fontSize: 12, fontWeight: 600, color: '#D203DD', background: 'rgba(210,3,221,0.06)', border: '1px dashed rgba(210,3,221,0.35)', borderRadius: 8, padding: '9px 10px', cursor: 'pointer' }}>
+                          <Upload size={14} /> Subir video
+                          <input type="file" accept="video/*" style={{ display: 'none' }}
+                            onChange={e => { const f = e.target.files?.[0]; if (f) uploadVideo(idx, f); e.target.value = '' }} />
+                        </label>
+                      )}
+
+                      {/* Alternativa: link de Vimeo (solo si no subió video propio) */}
+                      {!hasVideo && (
+                        <input type="text" value={v.youtubeUrl} onChange={e => setVideo(idx, 'youtubeUrl', e.target.value)}
+                          placeholder="o pegá un link de Vimeo (opcional)"
+                          style={{ width: '100%', padding: '8px 10px', borderRadius: 8, fontSize: 12, color: '#fff', marginTop: 6,
+                            background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', outline: 'none', boxSizing: 'border-box' }} />
+                      )}
+
+                      {/* Notas de la lección */}
+                      <textarea value={v.descripcion || ''} onChange={e => setVideo(idx, 'descripcion', e.target.value)}
+                        placeholder="Notas de la lección (opcional)" rows={2}
+                        style={{ width: '100%', padding: '8px 10px', borderRadius: 8, fontSize: 12, color: '#fff', marginTop: 6,
+                          background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', outline: 'none', boxSizing: 'border-box', resize: 'vertical' }} />
+
+                      {/* Recursos descargables */}
+                      <div style={{ marginTop: 6 }}>
+                        {(v.recursos || []).map((r, j) => (
+                          <div key={j} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, color: 'rgba(255,255,255,0.7)', background: 'rgba(255,255,255,0.04)', borderRadius: 6, padding: '5px 8px', marginBottom: 4 }}>
+                            <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>📎 {r.titulo}</span>
+                            <button onClick={() => removeResource(idx, j)} style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', fontSize: 12 }}>✕</button>
+                          </div>
+                        ))}
+                        <label style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: 11, color: '#D203DD', cursor: 'pointer' }}>
+                          <Plus size={11} /> Agregar recurso (PDF, etc.)
+                          <input type="file" style={{ display: 'none' }} onChange={e => { const f = e.target.files?.[0]; if (f) uploadResource(idx, f); e.target.value = '' }} />
+                        </label>
+                      </div>
+                    </div>
+                    <button onClick={() => removeVideo(idx)}
+                      style={{ padding: '6px', borderRadius: 8, background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.15)', cursor: 'pointer', marginTop: 2 }}>
+                      <X size={13} className="text-red-400" />
+                    </button>
                   </div>
-                  <button onClick={() => removeVideo(idx)}
-                    style={{ padding: '6px', borderRadius: 8, background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.15)', cursor: 'pointer', marginTop: 2 }}>
-                    <X size={13} className="text-red-400" />
-                  </button>
-                </div>
-              ))}
+                )
+              })}
+              <p style={{ fontSize: 10.5, color: 'rgba(255,255,255,0.3)', marginTop: 2 }}>Subí el video (queda en tu Supabase) o pegá un Vimeo. Si el video es muy pesado, comprimilo a 1080p.</p>
             </div>
 
             {saveError && <p style={{ fontSize: 12, color: '#ef4444', marginBottom: 10 }}>{saveError}</p>}

@@ -14,10 +14,18 @@ interface Course {
   coverUrl: string | null
   price: number
   freeForPlan: boolean
+  categoria: string | null
+  nivel: string | null
   videosCount: number
   createdAt: string
   locked: boolean
   enrollment: Enrollment | null
+}
+
+const NIVEL_COLOR: Record<string, string> = {
+  Principiante: '#00FF88',
+  Intermedio: '#F5A623',
+  Avanzado: '#FF2DF7',
 }
 
 const STATUS_BADGE: Record<string, { label: string; style: React.CSSProperties }> = {
@@ -44,6 +52,7 @@ export default function CoursesPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [search, setSearch] = useState('')
+  const [activeCat, setActiveCat] = useState<string>('Todos')
 
   useEffect(() => {
     fetch('/api/courses')
@@ -56,8 +65,11 @@ export default function CoursesPage() {
       .catch(() => { setError('Error al cargar cursos'); setLoading(false) })
   }, [])
 
+  const categorias = ['Todos', ...Array.from(new Set(courses.map(c => c.categoria).filter(Boolean) as string[]))]
+
   const filtered = courses.filter(c =>
-    c.title.toLowerCase().includes(search.toLowerCase())
+    c.title.toLowerCase().includes(search.toLowerCase()) &&
+    (activeCat === 'Todos' || c.categoria === activeCat)
   )
 
   if (loading) {
@@ -85,6 +97,23 @@ export default function CoursesPage() {
           <h1 className="text-xl font-bold text-white uppercase tracking-widest">MY DIAMOND Academy</h1>
           <div className="h-px w-20 mt-2 rounded-full" style={{ background: 'linear-gradient(90deg, transparent, #D203DD, #FF2DF7, transparent)' }} />
           <p className="text-xs text-white/30 mt-2">Accede a cursos exclusivos de MY DIAMOND.</p>
+          {courses.length > 0 && (
+            <div className="flex flex-wrap gap-x-4 gap-y-1 mt-3">
+              <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)' }}>
+                <b style={{ color: '#fff' }}>{courses.length}</b> curso{courses.length !== 1 ? 's' : ''}
+              </span>
+              {courses.some(c => c.enrollment?.status === 'APPROVED') && (
+                <span style={{ fontSize: 11, color: 'rgba(0,255,136,0.7)' }}>
+                  <b style={{ color: '#00FF88' }}>{courses.filter(c => c.enrollment?.status === 'APPROVED').length}</b> con acceso
+                </span>
+              )}
+              {courses.some(c => c.freeForPlan) && (
+                <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)' }}>
+                  <b style={{ color: '#D203DD' }}>{courses.filter(c => c.freeForPlan).length}</b> gratis con tu plan
+                </span>
+              )}
+            </div>
+          )}
         </div>
         <Link
           href="/dashboard/courses/my-enrollments"
@@ -126,6 +155,29 @@ export default function CoursesPage() {
         )}
       </div>
 
+      {/* Filtro por categoría */}
+      {categorias.length > 1 && (
+        <div className="flex gap-2 mb-6 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none' }}>
+          {categorias.map(cat => {
+            const active = activeCat === cat
+            return (
+              <button
+                key={cat}
+                onClick={() => setActiveCat(cat)}
+                className="shrink-0 whitespace-nowrap transition-colors"
+                style={{
+                  fontSize: 12, fontWeight: 700, padding: '7px 14px', borderRadius: 999,
+                  color: active ? '#fff' : 'rgba(255,255,255,0.45)',
+                  background: active ? 'linear-gradient(135deg, #D203DD, #FF2DF7)' : 'rgba(255,255,255,0.04)',
+                  border: `1px solid ${active ? 'transparent' : 'rgba(255,255,255,0.1)'}`,
+                }}>
+                {cat}
+              </button>
+            )
+          })}
+        </div>
+      )}
+
       {courses.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-24 text-center">
           <div className="w-14 h-14 rounded-2xl flex items-center justify-center mb-4"
@@ -138,8 +190,10 @@ export default function CoursesPage() {
         </div>
       ) : filtered.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20 text-center">
-          <p className="text-sm text-white/30">Sin resultados para <span className="text-white/60">"{search}"</span></p>
-          <button onClick={() => setSearch('')} className="mt-3 text-xs text-cyan-400 hover:underline">Limpiar búsqueda</button>
+          <p className="text-sm text-white/30">
+            Sin resultados{search ? <> para <span className="text-white/60">"{search}"</span></> : activeCat !== 'Todos' ? <> en <span className="text-white/60">{activeCat}</span></> : ''}
+          </p>
+          <button onClick={() => { setSearch(''); setActiveCat('Todos') }} className="mt-3 text-xs text-cyan-400 hover:underline">Limpiar filtros</button>
         </div>
       ) : (
         <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
@@ -209,6 +263,20 @@ export default function CoursesPage() {
 
                 {/* Content — flex grow to equalize height */}
                 <div style={{ padding: '12px 14px 14px', display: 'flex', flexDirection: 'column', flex: 1 }}>
+                  {(course.categoria || course.nivel) && (
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5, marginBottom: 7 }}>
+                      {course.categoria && (
+                        <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.04em', textTransform: 'uppercase', padding: '2px 7px', borderRadius: 5, color: 'rgba(255,255,255,0.55)', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)' }}>
+                          {course.categoria}
+                        </span>
+                      )}
+                      {course.nivel && (
+                        <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.04em', textTransform: 'uppercase', padding: '2px 7px', borderRadius: 5, color: NIVEL_COLOR[course.nivel] ?? 'rgba(255,255,255,0.55)', background: 'rgba(255,255,255,0.04)', border: `1px solid ${(NIVEL_COLOR[course.nivel] ?? 'rgba(255,255,255,0.2)')}40` }}>
+                          {course.nivel}
+                        </span>
+                      )}
+                    </div>
+                  )}
                   <p style={{ fontWeight: 700, fontSize: 13, color: isLocked ? 'rgba(255,255,255,0.4)' : '#fff', marginBottom: 6, lineHeight: 1.35 }}>
                     {course.title}
                   </p>
