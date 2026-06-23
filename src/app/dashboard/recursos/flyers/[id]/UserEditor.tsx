@@ -30,6 +30,8 @@ export default function UserEditor({ templateId }: { templateId: string }) {
   const photoRef = useRef<any>(null)   // foto del usuario (al fondo)
   const fileRef = useRef<HTMLInputElement>(null)
   const measureRef = useRef<HTMLDivElement>(null)
+  const lastPhotoSrcRef = useRef<string | null>(null) // fuente actual de la foto (para quitar fondo)
+  const originalPhotoSrcRef = useRef<string | null>(null) // foto original subida (para restaurar)
 
   const [template, setTemplate] = useState<Template | null>(null)
   const [loading, setLoading] = useState(true)
@@ -39,6 +41,11 @@ export default function UserEditor({ templateId }: { templateId: string }) {
   const [availW, setAvailW] = useState(360)
   const [win, setWin] = useState({ w: 1200, h: 800 })
   const [expanded, setExpanded] = useState(false)
+  // Texto seleccionado en el lienzo → muestra la barra de color/tamaño/fuente
+  const [textSel, setTextSel] = useState<{ fill: string; fontSize: number; fontFamily: string } | null>(null)
+  const [removingBg, setRemovingBg] = useState(false)
+  const [bgError, setBgError] = useState<string | null>(null)
+  const [bgRemoved, setBgRemoved] = useState(false) // ¿ya se quitó el fondo? → permite restaurar
 
   // 1) Cargar la plantilla
   useEffect(() => {
@@ -66,6 +73,19 @@ export default function UserEditor({ templateId }: { templateId: string }) {
         width: W, height: H, backgroundColor: '#0b0b16', preserveObjectStacking: true,
       })
       fcanvasRef.current = fcanvas
+
+      // Mostrar la barra de texto cuando se selecciona un texto (Textbox)
+      const syncSel = () => {
+        const o = fcanvas.getActiveObject()
+        if (o && o.type === 'textbox') {
+          setTextSel({ fill: (o.fill as string) || '#ffffff', fontSize: Math.round((o.fontSize as number) || 48), fontFamily: (o.fontFamily as string) || 'Archivo' })
+        } else {
+          setTextSel(null)
+        }
+      }
+      fcanvas.on('selection:created', syncSel)
+      fcanvas.on('selection:updated', syncSel)
+      fcanvas.on('selection:cleared', () => setTextSel(null))
 
       // El tamaño visual lo controla el CSS (.rec-canvas-wrap → proporcional y compacto).
       // Solo recalculamos el offset para que el puntero mapee bien sobre el lienzo escalado.
@@ -137,18 +157,22 @@ export default function UserEditor({ templateId }: { templateId: string }) {
 
   // 3) Subir foto del usuario → va AL FONDO (detrás del flyer), seleccionable/movible/escalable.
   //    Se procesa en el navegador, NO se sube al servidor.
-  function onPhotoChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0]
-    if (!file || !template) return
-    const reader = new FileReader()
-    reader.onload = async () => {
-      const mod: any = await import('fabric')
-      const fabric = mod.fabric || mod.default || mod
-      const fcanvas = fcanvasRef.current
-      if (!fcanvas) return
-      fabric.Image.fromURL(reader.result as string, (img: any) => {
-        if (photoRef.current) { fcanvas.remove(photoRef.current); photoRef.current = null }
-        // posición/escala inicial: cubrir la zona marcada por el admin (o todo el lienzo)
+  // Coloca/reemplaza la foto en el lienzo desde una fuente (dataURL/objURL).
+  // keepTransform: conserva posición/escala/rotación de la foto anterior (para "quitar fondo").
+  async function placePhoto(src: string, keepTransform = false) {
+    const mod: any = await import('fabric')
+    const fabric = mod.fabric || mod.default || mod
+    const fcanvas = fcanvasRef.current
+    if (!fcanvas || !template) return
+    const prev = photoRef.current
+    const t = keepTransform && prev
+      ? { left: prev.left, top: prev.top, scaleX: prev.scaleX, scaleY: prev.scaleY, angle: prev.angle, originX: prev.originX, originY: prev.originY }
+      : null
+    fabric.Image.fromURL(src, (img: any) => {
+      if (photoRef.current) { fcanvas.remove(photoRef.current); photoRef.current = null }
+      if (t) {
+        img.set({ ...t, selectable: true, hasControls: true })
+      } else {
         const zone = template.zonas?.photo || { x: 0, y: 0, w: template.ancho, h: template.alto }
         const scale = Math.max(zone.w / img.width, zone.h / img.height)
         img.set({
@@ -156,16 +180,56 @@ export default function UserEditor({ templateId }: { templateId: string }) {
           originX: 'center', originY: 'center', scaleX: scale, scaleY: scale,
           selectable: true, hasControls: true,
         })
-        photoRef.current = img
-        fcanvas.add(img)
-        img.sendToBack()              // ← AL FONDO: el flyer queda encima
-        fcanvas.setActiveObject(img)  // seleccionada para moverla de una
-        fcanvas.renderAll()
-        setHasPhoto(true)
-      })
+      }
+      photoRef.current = img
+      fcanvas.add(img)
+      img.sendToBack()              // ← AL FONDO: el flyer queda encima
+      fcanvas.setActiveObject(img)
+      fcanvas.renderAll()
+      setHasPhoto(true)
+    })
+  }
+
+  function onPhotoChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file || !template) return
+    const reader = new FileReader()
+    reader.onload = () => {
+      const src = reader.result as string
+      lastPhotoSrcRef.current = src
+      originalPhotoSrcRef.current = src
+      setBgRemoved(false); setBgError(null)
+      placePhoto(src, false)
     }
     reader.readAsDataURL(file)
     e.target.value = ''
+  }
+
+  // Volver a la foto original (deshace el "quitar fondo"), conservando posición/escala.
+  async function restoreOriginal() {
+    if (!originalPhotoSrcRef.current) return
+    lastPhotoSrcRef.current = originalPhotoSrcRef.current
+    setBgRemoved(false); setBgError(null)
+    await placePhoto(originalPhotoSrcRef.current, true)
+  }
+
+  // Quitar el fondo de la foto — 100% en el navegador (la foto NO se sube al servidor).
+  async function removeBg() {
+    if (!lastPhotoSrcRef.current || removingBg) return
+    setRemovingBg(true); setBgError(null)
+    try {
+      const { removeBackground } = await import('@imgly/background-removal')
+      const blob = await removeBackground(lastPhotoSrcRef.current)
+      const url = URL.createObjectURL(blob)
+      lastPhotoSrcRef.current = url
+      await placePhoto(url, true) // mantiene la posición/escala que el usuario ya acomodó
+      setBgRemoved(true)
+    } catch (err: any) {
+      console.error('[flyer] removeBackground error', err)
+      setBgError(String(err?.message || err || 'No se pudo quitar el fondo'))
+    } finally {
+      setRemovingBg(false)
+    }
   }
 
   // 4) Descargar al tamaño real del flyer en JPG o PNG
@@ -179,6 +243,55 @@ export default function UserEditor({ templateId }: { templateId: string }) {
     a.href = dataUrl
     a.download = `${template.nombre.replace(/\s+/g, '-').toLowerCase()}.${format === 'jpeg' ? 'jpg' : 'png'}`
     document.body.appendChild(a); a.click(); a.remove()
+  }
+
+  // Aplica color / tamaño / fuente al texto seleccionado
+  function applyText(props: Partial<{ fill: string; fontSize: number; fontFamily: string }>) {
+    const fc = fcanvasRef.current
+    const o = fc?.getActiveObject()
+    if (!fc || !o || o.type !== 'textbox') return
+    o.set(props as any)
+    fc.renderAll()
+    setTextSel(s => (s ? { ...s, ...props } : s))
+  }
+
+  // Barra de color/tamaño/fuente (se muestra al seleccionar un texto). Función → JSX nuevo en cada lugar.
+  const FONTS = ['Archivo', 'Arial', 'Impact', 'Georgia', 'Verdana', 'Courier New', 'Times New Roman']
+  const SWATCHES = ['#ffffff', '#000000', '#D203DD', '#0D1E79', '#00FF9D', '#FFD500', '#FF2D55']
+  const renderTextToolbar = () => {
+    if (!textSel) return null
+    return (
+      <div className="w-full rounded-xl bg-white/[0.05] border border-[#D203DD]/30 p-3 space-y-2.5">
+        <p className="text-[11px] font-black text-white/70 flex items-center gap-1.5"><i className="fa-solid fa-font text-[#D203DD]"></i> Texto seleccionado</p>
+        <div className="flex items-center gap-1.5 flex-wrap">
+          {SWATCHES.map(c => (
+            <button key={c} type="button" onClick={() => applyText({ fill: c })}
+              className={`w-6 h-6 rounded-full border-2 transition-all ${textSel.fill?.toLowerCase() === c ? 'border-white scale-110' : 'border-white/25'}`}
+              style={{ background: c }} aria-label={`color ${c}`} />
+          ))}
+          <label className="w-6 h-6 rounded-full border-2 border-white/25 relative cursor-pointer flex items-center justify-center" title="Color personalizado">
+            <input type="color" value={textSel.fill} onChange={e => applyText({ fill: e.target.value })}
+              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
+            <i className="fa-solid fa-eye-dropper text-[9px] text-white/70"></i>
+          </label>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-[10px] text-white/40 w-12 shrink-0">Tamaño</span>
+          <button type="button" onClick={() => applyText({ fontSize: Math.max(8, textSel.fontSize - 4) })}
+            className="w-7 h-7 rounded-lg bg-white/10 text-white font-black hover:bg-white/20 transition-all">−</button>
+          <span className="text-xs font-bold text-white w-9 text-center">{textSel.fontSize}</span>
+          <button type="button" onClick={() => applyText({ fontSize: Math.min(400, textSel.fontSize + 4) })}
+            className="w-7 h-7 rounded-lg bg-white/10 text-white font-black hover:bg-white/20 transition-all">+</button>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-[10px] text-white/40 w-12 shrink-0">Fuente</span>
+          <select value={textSel.fontFamily} onChange={e => applyText({ fontFamily: e.target.value })}
+            className="flex-1 min-w-0 bg-black/30 border border-white/10 rounded-lg px-2 py-1.5 text-xs text-white outline-none focus:border-[#D203DD]/50">
+            {FONTS.map(f => <option key={f} value={f} className="bg-[#0b0b14]" style={{ fontFamily: f }}>{f}</option>)}
+          </select>
+        </div>
+      </div>
+    )
   }
 
   if (loading) {
@@ -196,7 +309,8 @@ export default function UserEditor({ templateId }: { templateId: string }) {
   // Tamaño visible del lienzo. Inline: compacto (como pediste). Ampliado: lo más grande que entre en pantalla.
   const ratio = template ? template.ancho / template.alto : 0.8
   const inlineW = Math.min(340, Math.max(220, availW - 24))
-  const expandedW = Math.min(win.w - 32, Math.round((win.h - 150) * ratio), 1200)
+  // Reserva vertical para la barra superior, botones y (si hay) la barra de texto, así nada queda cortado.
+  const expandedW = Math.min(win.w - 32, Math.round((win.h - (textSel ? 330 : 200)) * ratio), 1200)
   const canvasW = expanded ? Math.max(260, expandedW) : inlineW
 
   return (
@@ -220,7 +334,7 @@ export default function UserEditor({ templateId }: { templateId: string }) {
       <div className="flex flex-col md:flex-row md:items-start gap-6">
         {/* Lienzo — el marco abraza el lienzo (sin recuadro negro). Al ampliar pasa a pantalla completa. */}
         <div className={expanded
-          ? 'fixed inset-0 z-[80] bg-[#07070d]/98 backdrop-blur-sm flex flex-col items-center justify-center gap-3 p-3'
+          ? 'fixed inset-0 z-[80] bg-[#07070d]/98 backdrop-blur-sm flex flex-col items-center justify-center gap-3 p-3 overflow-y-auto'
           : 'rounded-2xl border border-white/10 bg-black/30 p-3 w-fit max-w-full mx-auto md:mx-0'}>
           {expanded && (
             <div className="w-full max-w-3xl flex items-center justify-between gap-3 shrink-0">
@@ -234,6 +348,9 @@ export default function UserEditor({ templateId }: { templateId: string }) {
           <div className="rec-canvas-wrap" style={{ width: canvasW, maxWidth: '100%', aspectRatio: `${template?.ancho} / ${template?.alto}` }}>
             <canvas ref={canvasElRef} className="rounded-lg" style={{ touchAction: 'none' }} />
           </div>
+          {expanded && textSel && (
+            <div className="w-full max-w-sm shrink-0">{renderTextToolbar()}</div>
+          )}
           {expanded && (
             <div className="flex items-center gap-2 flex-wrap justify-center shrink-0">
               <button onClick={() => fileRef.current?.click()} disabled={!ready}
@@ -241,6 +358,17 @@ export default function UserEditor({ templateId }: { templateId: string }) {
                 style={{ background: 'linear-gradient(135deg,#0D1E79,#D203DD)' }}>
                 <i className="fa-solid fa-image"></i> {hasPhoto ? 'Cambiar foto' : 'Subir foto'}
               </button>
+              {hasPhoto && (bgRemoved ? (
+                <button onClick={restoreOriginal} disabled={removingBg}
+                  className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold text-white/80 bg-white/10 border border-white/15 hover:bg-white/20 transition-all disabled:opacity-60">
+                  <i className="fa-solid fa-rotate-left"></i> Restaurar original
+                </button>
+              ) : (
+                <button onClick={removeBg} disabled={removingBg}
+                  className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold text-white/80 bg-white/10 border border-white/15 hover:bg-white/20 transition-all disabled:opacity-60">
+                  {removingBg ? <><i className="fa-solid fa-spinner fa-spin"></i> Quitando fondo…</> : <><i className="fa-solid fa-eraser"></i> Quitar fondo</>}
+                </button>
+              ))}
               <button onClick={() => download('jpeg')} disabled={!ready}
                 className="flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-black text-black transition-all active:scale-95 disabled:opacity-50"
                 style={{ background: 'linear-gradient(135deg,#00FF9D,#00B4FF)' }}>
@@ -255,17 +383,37 @@ export default function UserEditor({ templateId }: { templateId: string }) {
         </div>
 
         {/* Controles (modo en línea) */}
-        <div className="w-full md:w-64 md:shrink-0 space-y-3">
+        <div className={`w-full md:w-64 md:shrink-0 space-y-3 ${expanded ? 'hidden' : ''}`}>
           <button onClick={() => fileRef.current?.click()} disabled={!ready}
             className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold text-white transition-all active:scale-95 disabled:opacity-50"
             style={{ background: 'linear-gradient(135deg,#0D1E79,#D203DD)' }}>
             <i className="fa-solid fa-image"></i> {hasPhoto ? 'Cambiar foto' : 'Subir foto'}
           </button>
 
+          {hasPhoto && (bgRemoved ? (
+            <button onClick={restoreOriginal} disabled={removingBg}
+              className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold text-white/80 bg-white/5 border border-white/10 hover:bg-white/10 transition-all disabled:opacity-60">
+              <i className="fa-solid fa-rotate-left"></i> Restaurar foto original
+            </button>
+          ) : (
+            <button onClick={removeBg} disabled={removingBg}
+              className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold text-white/80 bg-white/5 border border-white/10 hover:bg-white/10 transition-all disabled:opacity-60">
+              {removingBg
+                ? <><i className="fa-solid fa-spinner fa-spin"></i> Quitando fondo…</>
+                : <><i className="fa-solid fa-eraser"></i> Quitar fondo de la foto</>}
+            </button>
+          ))}
+          {bgRemoved && <p className="text-[11px] text-white/40 leading-snug">¿Se recortó de más? Tocá <b className="text-white/70">Restaurar foto original</b>.</p>}
+          {bgError && <p className="text-[11px] text-red-400 leading-snug break-words">{bgError}</p>}
+
+          {renderTextToolbar()}
+
           <div className="rounded-xl bg-white/[0.03] border border-white/10 p-3 text-[11px] text-white/45 leading-relaxed">
             <p className="font-bold text-white/70 mb-1.5"><i className="fa-solid fa-lightbulb text-amber-400 mr-1"></i> Cómo editar</p>
             <p>• Tu foto va <b>detrás</b> del diseño: arrastrala y escalala para acomodarla.</p>
+            <p>• Si tu foto tiene fondo, tocá <b>"Quitar fondo"</b> para dejarla recortada.</p>
             <p>• <b>Doble clic</b> en un texto para escribir el tuyo.</p>
+            <p>• <b>Tocá un texto</b> para cambiar su color, tamaño y fuente.</p>
             <p>• Usa <b>Ampliar</b> para editar más grande.</p>
             <p>• Tu foto se procesa en tu navegador (no se sube).</p>
           </div>
