@@ -366,13 +366,16 @@ async function handleMessage(
     const aiModel = (bot as any).aiModel || 'gpt-4o'
     let response: Awaited<ReturnType<typeof chatWithUsage>>['response']
     try {
-        const result = await chatWithUsage(systemPrompt, chatHistory, openaiKey, aiModel)
+        // conn.botId como cacheKey: agrupa las llamadas del mismo bot para reaprovechar el
+        // caché del prefijo estable (catálogo + flujo) entre conversaciones.
+        const result = await chatWithUsage(systemPrompt, chatHistory, openaiKey, aiModel, conn.botId)
         response = result.response
         // Cobrar tokens reales SOLO si usamos admin key. Fire-and-forget: si falla el cobro,
-        // se loguea pero NO bloquea la respuesta al cliente.
+        // se loguea pero NO bloquea la respuesta al cliente. Pasamos cachedTokens para que el
+        // descuento del caché se refleje en el saldo del usuario.
         if (keySource === 'admin' && botStatus.userId) {
             const { chargeForChatUsage } = await import('./ai-credits')
-            chargeForChatUsage(botStatus.userId, aiModel, result.promptTokens, result.completionTokens, 'baileys.message', { botId: conn.botId })
+            chargeForChatUsage(botStatus.userId, aiModel, result.promptTokens, result.completionTokens, 'baileys.message', { botId: conn.botId }, result.cachedTokens)
                 .catch(e => console.error('[BAILEYS] chargeForChatUsage error:', e))
         }
     } catch (aiErr: any) {

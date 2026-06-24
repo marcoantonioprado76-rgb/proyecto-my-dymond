@@ -158,10 +158,16 @@ export function buildSystemPrompt(
       const currency = (p.currency as string | undefined) ?? 'USD'
       const sym = currencySymbols[currency] ?? currency
 
-      // Smart filter: si se detectaron productos, los no mencionados van con info mínima (sin URLs)
-      if (identifiedProductIds?.length && !identifiedProductIds.includes(p.id as string)) {
+      // Smart filter (modo MÍNIMO POR DEFECTO): solo el producto YA identificado lleva ficha
+      // completa. Todos los demás —y TODOS al inicio, antes de que el cliente elija— van con
+      // info mínima (nombre + categoría + precios). Así no se mandan las fichas completas de
+      // todo el catálogo en cada mensaje (ahorra ~70% de tokens al inicio de la conversación,
+      // que es donde más se gasta). No pierde calidad: cuando el cliente menciona un producto,
+      // su ficha completa aparece automáticamente en ese turno.
+      if (!identifiedProductIds?.includes(p.id as string)) {
         return [
           `### PRODUCTO: ${p.name}`,
+          p.category    ? `- Categoría: ${p.category}` : '',
           p.priceUnit   ? `- Precio unitario: ${sym}${p.priceUnit} (${currency})` : '',
           p.pricePromo2 ? `- Precio promo ×2: ${sym}${p.pricePromo2} (${currency})` : '',
           p.priceSuper6 ? `- Precio súper ×6: ${sym}${p.priceSuper6} (${currency})` : '',
@@ -251,19 +257,13 @@ ${sentUrls.map(u => `- ${u}`).join('\n')}` : ''
 - mensaje2: ${maxM2 ? `máx. ${maxM2} caracteres.` : 'sin límite.'}
 - mensaje3: ${maxM3 ? `máx. ${maxM3} caracteres.` : 'sin límite.'}` : ''
 
+    // ORDEN OPTIMIZADO PARA CACHÉ DE PROMPT (OpenAI cachea el prefijo común).
+    // Primero va TODO lo estable (flujo del bot + catálogo + formato de salida) — idéntico en
+    // todas las conversaciones de este bot, así OpenAI lo cachea y esos tokens cuestan ~la mitad.
+    // El contexto VARIABLE (cliente, límites según welcomeSent, URLs ya enviadas) va al FINAL,
+    // justo antes de la conversación, para no romper el prefijo cacheable.
     return `
-# 👤 CLIENTE ACTUAL
-
-- Nombre: ${nameToUse}
-- Género: detectar por el nombre y usar el trato correspondiente del prompt (señorita/casera si mujer, estimado/amigo si hombre). Si el nombre es genérico o desconocido, usar trato neutro.
-- Teléfono: ${userPhone ? userPhone.replace(/^\+/, '') : 'desconocido'}
-- Primer mensaje del producto: ${welcomeSent ? 'YA FUE ENVIADO — NO repetirlo ni la foto principal' : 'AÚN NO enviado — cuando identifiques el producto, copia y envía su texto COMPLETO y EXACTO en mensaje1, sin resumir ni recortar, aunque tenga 600+ caracteres. El límite de caracteres NO aplica para este primer mensaje.'}
-
----
-
 ${customPrompt}
-${charLimitsSection}
-${sentUrlsBlock}
 
 ---
 
@@ -293,6 +293,17 @@ Regla de mensajes:
   "reporte": ""
 }
 \`\`\`
+
+---
+
+# 👤 CLIENTE ACTUAL
+
+- Nombre: ${nameToUse}
+- Género: detectar por el nombre y usar el trato correspondiente del prompt (señorita/casera si mujer, estimado/amigo si hombre). Si el nombre es genérico o desconocido, usar trato neutro.
+- Teléfono: ${userPhone ? userPhone.replace(/^\+/, '') : 'desconocido'}
+- Primer mensaje del producto: ${welcomeSent ? 'YA FUE ENVIADO — NO repetirlo ni la foto principal' : 'AÚN NO enviado — cuando identifiques el producto, copia y envía su texto COMPLETO y EXACTO en mensaje1, sin resumir ni recortar, aunque tenga 600+ caracteres. El límite de caracteres NO aplica para este primer mensaje.'}
+${charLimitsSection}
+${sentUrlsBlock}
 `.trim()
   }
 

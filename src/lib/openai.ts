@@ -238,7 +238,8 @@ async function callChatCompletionWithUsage(
   messages: Array<{ role: string; content: string }>,
   apiKey: string,
   model: string = 'gpt-5.1',
-): Promise<{ content: string; promptTokens: number; completionTokens: number }> {
+  cacheKey?: string,
+): Promise<{ content: string; promptTokens: number; completionTokens: number; cachedTokens: number }> {
   const controller = new AbortController()
   const timeout = setTimeout(() => controller.abort(), 60000)
 
@@ -255,6 +256,9 @@ async function callChatCompletionWithUsage(
         response_format: { type: 'json_object' },
         messages,
         temperature: 0.6,
+        // prompt_cache_key agrupa las llamadas del mismo bot para que OpenAI reutilice
+        // el caché del prefijo estable (catálogo + flujo) entre conversaciones.
+        ...(cacheKey ? { prompt_cache_key: cacheKey } : {}),
       }),
     })
 
@@ -268,6 +272,8 @@ async function callChatCompletionWithUsage(
       content: (data.choices?.[0]?.message?.content as string) || '{}',
       promptTokens: (data.usage?.prompt_tokens as number) ?? 0,
       completionTokens: (data.usage?.completion_tokens as number) ?? 0,
+      // Tokens del prompt que OpenAI sirvió desde caché (se cobran más barato).
+      cachedTokens: (data.usage?.prompt_tokens_details?.cached_tokens as number) ?? 0,
     }
   } finally {
     clearTimeout(timeout)
@@ -278,6 +284,7 @@ export interface ChatWithUsageResult {
   response: BotJsonResponse
   promptTokens: number
   completionTokens: number
+  cachedTokens: number
 }
 
 export async function chatWithUsage(
@@ -285,15 +292,17 @@ export async function chatWithUsage(
   history: ChatMessage[],
   apiKey: string,
   model: string = 'gpt-4o',
+  cacheKey?: string,
 ): Promise<ChatWithUsageResult> {
   const messages: Array<{ role: string; content: string }> = [
     { role: 'system', content: systemPrompt },
     ...history,
   ]
 
-  let result = await callChatCompletionWithUsage(messages, apiKey, model)
+  let result = await callChatCompletionWithUsage(messages, apiKey, model, cacheKey)
   let totalPrompt = result.promptTokens
   let totalCompletion = result.completionTokens
+  let totalCached = result.cachedTokens
 
   let parsed: Record<string, unknown>
   try {
@@ -303,9 +312,10 @@ export async function chatWithUsage(
       { role: 'assistant', content: result.content },
       { role: 'user', content: 'El JSON no es válido. Devuelve SOLO JSON con el schema exacto indicado.' },
     )
-    result = await callChatCompletionWithUsage(messages, apiKey, model)
+    result = await callChatCompletionWithUsage(messages, apiKey, model, cacheKey)
     totalPrompt += result.promptTokens
     totalCompletion += result.completionTokens
+    totalCached += result.cachedTokens
     parsed = JSON.parse(result.content)
   }
 
@@ -320,6 +330,7 @@ export async function chatWithUsage(
     },
     promptTokens: totalPrompt,
     completionTokens: totalCompletion,
+    cachedTokens: totalCached,
   }
 }
 

@@ -48,6 +48,12 @@ const LOW_BALANCE_THROTTLE_MS = 24 * 60 * 60 * 1000
 //
 // Para modelos NO listados acá, el fallback es gpt-4o-mini.
 export interface TokenPricing { input: number; output: number }
+
+// Factor de precio para los tokens de prompt servidos desde el caché de OpenAI.
+// OpenAI factura los tokens cacheados más barato; usamos 0.5 (mitad de precio) de forma
+// conservadora para la familia GPT-4o/GPT-5. Si el admin afina las tarifas, puede ajustarlo.
+export const CACHED_INPUT_MULTIPLIER = 0.5
+
 export const DEFAULT_TOKEN_PRICING: Record<string, TokenPricing> = {
     // Modelos GPT-4
     'gpt-4o':           { input: 2.50,  output: 10.00 },
@@ -233,15 +239,23 @@ export async function chargeForChatUsage(
     completionTokens: number,
     reason: string,
     metadata?: Record<string, any>,
+    cachedTokens: number = 0,
 ): Promise<ChargeResult> {
     const pricing = await getTokenPricingFor(model)
-    const inputUsd  = (promptTokens     / 1_000_000) * pricing.input
+    // Tokens del prompt servidos desde el caché de OpenAI: se cobran a mitad de precio
+    // (OpenAI los factura más barato). Reflejarlo aquí hace que el ahorro del caché llegue
+    // al saldo del usuario, no solo a la factura del admin.
+    const cached    = Math.min(Math.max(0, cachedTokens), promptTokens)
+    const uncached  = promptTokens - cached
+    const inputUsd  = ((uncached / 1_000_000) * pricing.input)
+                    + ((cached   / 1_000_000) * pricing.input * CACHED_INPUT_MULTIPLIER)
     const outputUsd = (completionTokens / 1_000_000) * pricing.output
     const totalUsd  = Math.max(0, inputUsd + outputUsd)
     return chargeAtomic(userId, totalUsd, model, reason, {
         ...metadata,
         promptTokens,
         completionTokens,
+        cachedTokens: cached,
     })
 }
 
