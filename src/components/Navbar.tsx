@@ -17,11 +17,6 @@ const serviceItems = [
   { href: '/dashboard/crm',                    iconClass: 'fa-solid fa-users-gear',   label: 'CRM Broadcast' },
 ]
 
-const academyItems = [
-  { href: '/dashboard/courses',  iconClass: 'fa-solid fa-book-open',  label: 'Cursos' },
-  { href: '/dashboard/podcasts', iconClass: 'fa-solid fa-microphone', label: 'Podcasts' },
-]
-
 const mainItemsBottom = [
   { href: '/dashboard/recursos', iconClass: 'fa-solid fa-wand-magic-sparkles', label: 'Recursos' },
   { href: '/dashboard/store',  iconClass: 'fa-solid fa-bag-shopping', label: 'Shop' },
@@ -48,7 +43,6 @@ export default function Navbar() {
   const isInAcademy  = pathname.startsWith('/dashboard/courses') || pathname.startsWith('/dashboard/podcasts') || pathname === '/dashboard/academy'
 
   const [servicesOpen, setServicesOpen] = useState(isInServices)
-  const [academyOpen,  setAcademyOpen]  = useState(isInAcademy)
 
   return (
     <>
@@ -101,34 +95,12 @@ export default function Navbar() {
             </div>
           )}
 
-          {/* Academy colapsable */}
-          <button
-            onClick={() => setAcademyOpen(o => !o)}
-            className={`nav-item ${isInAcademy ? 'nav-item--active' : ''}`}
-            style={{ width: '100%', background: 'none', border: 'none', cursor: 'pointer' }}
-          >
+          {/* Academy — enlace directo a la página con los botones-imagen */}
+          <Link href="/dashboard/academy" className={`nav-item ${isInAcademy ? 'nav-item--active' : ''}`}>
             <span className="nav-item__icon"><i className="fa-solid fa-graduation-cap"></i></span>
             <span className="nav-item__label">Academy</span>
-            <i className="fa-solid fa-chevron-down" style={{
-              fontSize: '0.65rem', color: 'rgba(255,255,255,0.35)', marginLeft: 'auto',
-              transition: 'transform 0.2s ease',
-              transform: academyOpen ? 'rotate(180deg)' : 'rotate(0deg)',
-            }}></i>
-          </button>
-          {academyOpen && (
-            <div style={{ paddingLeft: 10 }}>
-              {academyItems.map(item => {
-                const isActive = pathname === item.href || pathname.startsWith(item.href)
-                return (
-                  <Link key={item.href} href={item.href} className={`nav-item ${isActive ? 'nav-item--active' : ''}`} style={{ fontSize: '0.78rem', padding: '8px 10px' }}>
-                    <span className="nav-item__icon" style={{ width: 26, height: 26, fontSize: '0.72rem' }}><i className={item.iconClass}></i></span>
-                    <span className="nav-item__label">{item.label}</span>
-                    <span className="nav-item__dot"></span>
-                  </Link>
-                )
-              })}
-            </div>
-          )}
+            <span className="nav-item__dot"></span>
+          </Link>
 
           {/* Shop / Wallet */}
           {mainItemsBottom.map(item => {
