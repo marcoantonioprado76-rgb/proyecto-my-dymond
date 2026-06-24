@@ -20,7 +20,6 @@ const serviceItems = [
 const mainItemsBottom = [
   { href: '/dashboard/recursos', iconClass: 'fa-solid fa-wand-magic-sparkles', label: 'Recursos' },
   { href: '/dashboard/store',  iconClass: 'fa-solid fa-bag-shopping', label: 'Shop' },
-  { href: '/dashboard/wallet', iconClass: 'fa-solid fa-wallet',       label: 'Créditos AI' },
 ]
 
 const mobileNavItems = [
@@ -29,7 +28,7 @@ const mobileNavItems = [
   { href: '/dashboard/academy', iconClass: 'fa-solid fa-graduation-cap', label: 'Academy' },
   { href: '/dashboard/recursos',iconClass: 'fa-solid fa-wand-magic-sparkles', label: 'Recursos' },
   { href: '/dashboard/store',   iconClass: 'fa-solid fa-bag-shopping', label: 'Shop' },
-  { href: '/dashboard/wallet',  iconClass: 'fa-solid fa-wallet',       label: 'Créditos AI' },
+  { href: '/dashboard/settings',iconClass: 'fa-solid fa-gear',         label: 'Ajustes' },
 ]
 
 async function logout() {
