@@ -11,7 +11,7 @@ const SECTIONS = [
     icon: 'fa-book-open',
     label: 'Cursos',
     desc: 'Aprende paso a paso con cursos exclusivos. Desbloquea cada lección completando la anterior.',
-    badge: 'Más popular',
+    badge: null as string | null,
     accent: '#C026D3',
     iconBg: 'rgba(160,32,240,0.18)',
     iconBorder: 'rgba(192,38,211,0.55)',
