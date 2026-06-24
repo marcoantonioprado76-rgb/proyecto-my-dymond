@@ -53,6 +53,17 @@ export default function PodcastsPage() {
   return (
     <div className="px-4 sm:px-6 pt-6 pb-24 max-w-6xl mx-auto">
 
+      {/* Volver a Academy */}
+      <Link href="/dashboard/academy" className="academy-back" style={{ display: 'inline-flex', alignItems: 'center', gap: 10, marginBottom: 16, textDecoration: 'none' }}>
+        <span style={{
+          display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 30, height: 30, borderRadius: 9,
+          background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.12)', color: 'rgba(255,255,255,0.7)',
+        }}>
+          <i className="fa-solid fa-arrow-left" style={{ fontSize: 12 }} />
+        </span>
+        <span style={{ fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.6)' }}>Volver a Academy</span>
+      </Link>
+
       {/* Header */}
       <div className="mb-6 flex items-start justify-between gap-3 flex-wrap">
         <div className="min-w-0">
