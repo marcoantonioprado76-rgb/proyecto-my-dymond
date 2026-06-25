@@ -6,7 +6,8 @@ import Link from 'next/link'
 import {
     ArrowLeft, Upload, X, Loader2, AlertCircle, CheckCircle2,
     Clock, Calendar, Users, Sparkles, Image as ImageIcon,
-    Pencil, Trash2, Plus, Phone, FileText, ChevronDown
+    Pencil, Trash2, Plus, Phone, FileText, ChevronDown,
+    RefreshCw, ShieldCheck, MessageCircle
 } from 'lucide-react'
 
 interface ContactEntry {
@@ -37,6 +38,11 @@ export default function NewCrmCampaignPage() {
     })
 
     const [mediaFiles, setMediaFiles] = useState<{ file: File; preview: string }[]>([])
+
+    // Remarketing recurrente (opcional)
+    const [recurring, setRecurring] = useState(false)
+    const [recDays, setRecDays] = useState<number[]>([])
+    const [recTime, setRecTime] = useState('09:00')
 
     // Contacts
     const [contacts, setContacts] = useState<ContactEntry[]>([])
@@ -229,6 +235,15 @@ export default function NewCrmCampaignPage() {
                 }
             }
 
+            // Remarketing recurrente (opcional): se configura tras crear la campaña
+            if (recurring && recDays.length > 0 && recTime) {
+                await fetch(`/api/crm/campaigns/${campaignId}/recurrence`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ recurring: true, days: recDays, time: recTime }),
+                }).catch(() => {})
+            }
+
             router.push(`/dashboard/crm/${campaignId}`)
         } catch { setError('Error de conexión') }
         finally { setLoading(false); setUploadingImg(false) }
@@ -237,10 +252,14 @@ export default function NewCrmCampaignPage() {
     return (
         <div className="px-4 md:px-6 pt-6 max-w-2xl mx-auto pb-24 text-white">
             {/* Header */}
-            <div className="flex items-center gap-4 mb-8">
-                <Link href="/dashboard/crm" className="w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-all">
+            <div className="flex items-center gap-3 mb-8">
+                <Link href="/dashboard/crm" className="w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-all shrink-0">
                     <ArrowLeft size={16} />
                 </Link>
+                <div className="w-11 h-11 rounded-2xl flex items-center justify-center shrink-0"
+                    style={{ background: 'linear-gradient(135deg, #25D366, #128C7E)', boxShadow: '0 4px 16px rgba(37,211,102,0.3)' }}>
+                    <MessageCircle size={20} className="text-white" />
+                </div>
                 <div>
                     <h1 className="text-xl font-black uppercase tracking-tighter">Nueva campaña</h1>
                     <p className="text-white/30 text-xs mt-0.5">CRM Broadcast WhatsApp</p>
@@ -397,6 +416,9 @@ export default function NewCrmCampaignPage() {
                     <p className="text-[11px] text-white/25 mt-2">
                         Recomendado: mínimo 30 segundos para evitar bloqueos de WhatsApp
                     </p>
+                    <p className="text-[11px] mt-2 flex items-start gap-1.5" style={{ color: 'rgba(74,222,128,0.7)' }}>
+                        <ShieldCheck size={12} className="shrink-0 mt-0.5" /> Anti-ban activo: cada envío usa un retardo aleatorio y un tope diario para cuidar tu número.
+                    </p>
                 </div>
 
                 {/* Programar */}
@@ -412,6 +434,48 @@ export default function NewCrmCampaignPage() {
                         className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-purple-500/50"
                         style={{ colorScheme: 'dark' }}
                     />
+                </div>
+
+                {/* Remarketing recurrente */}
+                <div className="rounded-2xl p-5 border transition-all"
+                    style={{ background: recurring ? 'rgba(168,85,247,0.06)' : 'rgba(255,255,255,0.03)', borderColor: recurring ? 'rgba(168,85,247,0.3)' : 'rgba(255,255,255,0.08)' }}>
+                    <div className="flex items-center justify-between gap-3">
+                        <label className="text-xs font-black uppercase tracking-widest text-white/40 flex items-center gap-2">
+                            <RefreshCw size={12} /> Remarketing recurrente <span className="text-white/20 normal-case font-normal">(opcional)</span>
+                        </label>
+                        <button type="button" onClick={() => setRecurring(v => !v)} role="switch" aria-checked={recurring}
+                            className="relative w-12 h-6 rounded-full transition-all shrink-0"
+                            style={{ background: recurring ? 'linear-gradient(135deg,#6d28d9,#a855f7)' : 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.15)' }}>
+                            <span className="absolute top-0.5 w-5 h-5 rounded-full bg-white transition-all duration-200" style={{ left: recurring ? '24px' : '2px' }} />
+                        </button>
+                    </div>
+                    <p className="text-[11px] text-white/25 mt-1">Re-envía a TODA la lista los días que elijas, en automático. Respeta a quien responde <b className="text-white/40">BAJA</b>.</p>
+
+                    {recurring && (
+                        <div className="mt-4 space-y-3">
+                            <div>
+                                <p className="text-[10px] text-white/40 uppercase font-black tracking-widest mb-1.5">Días</p>
+                                <div className="flex gap-1.5 flex-wrap">
+                                    {['D', 'L', 'M', 'M', 'J', 'V', 'S'].map((lbl, d) => {
+                                        const on = recDays.includes(d)
+                                        return (
+                                            <button key={d} type="button"
+                                                onClick={() => setRecDays(prev => on ? prev.filter(x => x !== d) : [...prev, d])}
+                                                className="w-9 h-9 rounded-lg text-xs font-black transition-all"
+                                                style={{ background: on ? 'linear-gradient(135deg,#6d28d9,#a855f7)' : 'rgba(255,255,255,0.05)', color: on ? '#fff' : 'rgba(255,255,255,0.4)', border: `1px solid ${on ? 'transparent' : 'rgba(255,255,255,0.1)'}` }}>
+                                                {lbl}
+                                            </button>
+                                        )
+                                    })}
+                                </div>
+                            </div>
+                            <div>
+                                <p className="text-[10px] text-white/40 uppercase font-black tracking-widest mb-1.5">Hora (Bolivia)</p>
+                                <input type="time" value={recTime} onChange={e => setRecTime(e.target.value)}
+                                    className="w-40 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-purple-500/50" style={{ colorScheme: 'dark' }} />
+                            </div>
+                        </div>
+                    )}
                 </div>
 
                 {/* Contactos */}
