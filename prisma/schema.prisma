@@ -1473,6 +1473,12 @@ model BroadcastCampaign {
   totalContacts  Int             @default(0) @map("total_contacts")
   sentCount      Int             @default(0) @map("sent_count")
   failedCount    Int             @default(0) @map("failed_count")
+  // Fase 3 — remarketing recurrente
+  recurring         Boolean   @default(false)
+  recurrenceDays    String?   @map("recurrence_days")        // CSV de días 0-6 (0=domingo), hora Bolivia
+  recurrenceTime    String?   @map("recurrence_time")        // "HH:mm" hora Bolivia
+  recurrenceImageId String?   @map("recurrence_image_id") @db.Uuid
+  nextRunAt         DateTime? @map("next_run_at")
   createdAt      DateTime        @default(now()) @map("created_at")
   updatedAt      DateTime        @updatedAt @map("updated_at")
 
@@ -1508,6 +1514,9 @@ model BroadcastContact {
   status     BroadcastLogStatus @default(PENDING)
   sentAt     DateTime?          @map("sent_at")
   error      String?
+  // Fase 4 — opt-out (BAJA)
+  optedOut   Boolean            @default(false) @map("opted_out")
+  optedOutAt DateTime?          @map("opted_out_at")
   createdAt  DateTime           @default(now()) @map("created_at")
 
   campaign BroadcastCampaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)

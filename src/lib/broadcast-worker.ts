@@ -105,6 +105,24 @@ function startOfToday(): Date {
     return d
 }
 
+// Próxima fecha de envío recurrente. daysCSV = días 0-6 (0=domingo) en hora
+// Bolivia (UTC-4), hhmm = "HH:mm". Devuelve el próximo instante UTC > from.
+const BOLIVIA_OFFSET = 4 * 60 * 60 * 1000
+export function computeNextRun(daysCSV: string | null, hhmm: string | null, from: Date): Date | null {
+    if (!daysCSV || !hhmm) return null
+    const days = daysCSV.split(',').map(s => parseInt(s.trim(), 10)).filter(n => n >= 0 && n <= 6)
+    if (!days.length) return null
+    const [h, m] = hhmm.split(':').map(n => parseInt(n, 10))
+    if (isNaN(h) || isNaN(m)) return null
+    for (let i = 0; i < 8; i++) {
+        const bNow = new Date(from.getTime() - BOLIVIA_OFFSET)
+        const cand = new Date(Date.UTC(bNow.getUTCFullYear(), bNow.getUTCMonth(), bNow.getUTCDate() + i, h, m, 0, 0))
+        const candUtc = new Date(cand.getTime() + BOLIVIA_OFFSET)
+        if (days.includes(cand.getUTCDay()) && candUtc.getTime() > from.getTime()) return candUtc
+    }
+    return null
+}
+
 // Guard de concurrencia: campañas que se están ejecutando AHORA en este proceso.
 // Evita doble envío si la misma campaña la disparan a la vez el scheduler, el
 // reanude de arranque y/o un /execute manual.
@@ -128,7 +146,7 @@ async function _runBroadcast(campaignId: string) {
         where: { id: campaignId },
         include: {
             images: { orderBy: { order: 'asc' } },
-            contacts: { where: { status: 'PENDING' }, orderBy: { createdAt: 'asc' } },
+            contacts: { where: { status: 'PENDING', optedOut: false }, orderBy: { createdAt: 'asc' } },
             bot: { select: { systemPromptTemplate: true } },
         },
     })
@@ -162,6 +180,12 @@ async function _runBroadcast(campaignId: string) {
     const images: any[] = campaign.images || []
     let imageIndex: number = campaign.imageIndex || 0
     const delayBetween = delayMs(campaign.delayValue, campaign.delayUnit)
+
+    // Imagen fija para este envío (recurrencia con imagen elegida). Si está,
+    // se manda LA MISMA a todos (sin rotar). Si no, se rota como siempre.
+    const fixedImage = campaign.recurrenceImageId
+        ? images.find((im: any) => im.id === campaign.recurrenceImageId) || null
+        : null
 
     // Tope diario anti-ban: cuántos ya se enviaron hoy en esta campaña.
     let sentToday = await (prisma as any).broadcastLog.count({
@@ -236,19 +260,21 @@ async function _runBroadcast(campaignId: string) {
                 generated = campaign.messageExample?.trim() || campaign.prompt?.trim() || ''
             }
 
-            const nextIndex = images.length > 0 ? (imageIndex + 1) % images.length : 0
+            // Con imagen fija no se rota; sin ella, se rota como siempre
+            const nextIndex = (!fixedImage && images.length > 0) ? (imageIndex + 1) % images.length : imageIndex
             let logImageUrl: string | null = null
 
-            // Enviar imagen si hay
-            if (images.length > 0) {
-                const img = images[imageIndex % images.length]
-                logImageUrl = img.url
-                await BaileysManager.sendImage(campaign.botId, contact.phone, img.url).catch(() => {})
+            // Enviar imagen: la fija (recurrencia) o la rotativa
+            const imgToSend = fixedImage || (images.length > 0 ? images[imageIndex % images.length] : null)
+            if (imgToSend) {
+                logImageUrl = imgToSend.url
+                await BaileysManager.sendImage(campaign.botId, contact.phone, imgToSend.url).catch(() => {})
                 await new Promise(r => setTimeout(r, 1500))
             }
 
-            // Enviar texto
-            const sent = await BaileysManager.sendText(campaign.botId, contact.phone, generated)
+            // Enviar texto con pie de baja (opt-out — reduce reportes de spam)
+            const finalText = `${generated}\n\n_Respondé *BAJA* para no recibir más mensajes._`
+            const sent = await BaileysManager.sendText(campaign.botId, contact.phone, finalText)
             if (!sent) throw new Error('sendText retornó false')
 
             await (prisma as any).broadcastContact.update({
@@ -307,7 +333,40 @@ async function _runBroadcast(campaignId: string) {
     }
 }
 
-// Scheduler — revisa cada minuto campañas programadas
+// Dispara las campañas RECURRENTES cuyo próximo envío ya llegó: resetea la
+// lista (sin tocar los dados de baja) y la reejecuta, y agenda la siguiente.
+export async function runRecurringDue() {
+    const now = new Date()
+    const due = await (prisma as any).broadcastCampaign.findMany({
+        where: { recurring: true, nextRunAt: { lte: now }, status: { not: 'RUNNING' } },
+        select: { id: true, recurrenceDays: true, recurrenceTime: true },
+    })
+    for (const c of due) {
+        try {
+            // Reutiliza la MISMA lista: todo a PENDING menos los dados de baja
+            await (prisma as any).broadcastContact.updateMany({
+                where: { campaignId: c.id, optedOut: false },
+                data: { status: 'PENDING', error: null, sentAt: null },
+            })
+            // Agenda la próxima ocurrencia ya (evita re-disparo); si no hay, corta la recurrencia
+            const next = computeNextRun(c.recurrenceDays, c.recurrenceTime, now)
+            await (prisma as any).broadcastCampaign.update({
+                where: { id: c.id },
+                data: {
+                    status: 'DRAFT', sentCount: 0, failedCount: 0, completedAt: null,
+                    nextRunAt: next, recurring: !!next,
+                },
+            })
+            executeBroadcast(c.id).catch(err =>
+                console.error(`[BROADCAST] Error en recurrente ${c.id}:`, err),
+            )
+        } catch (e) {
+            console.error(`[BROADCAST] runRecurringDue error en ${c.id}:`, e)
+        }
+    }
+}
+
+// Scheduler — revisa cada minuto campañas programadas y recurrentes
 declare global { var __broadcast_scheduler_started: boolean | undefined }
 
 export function startBroadcastScheduler() {
@@ -325,6 +384,7 @@ export function startBroadcastScheduler() {
                     console.error(`[BROADCAST] Error ejecutando campaña ${c.id}:`, err)
                 )
             }
+            await runRecurringDue()
         } catch (err) {
             console.error('[BROADCAST] Scheduler error:', err)
         }

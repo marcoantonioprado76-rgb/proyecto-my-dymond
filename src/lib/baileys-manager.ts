@@ -225,6 +225,26 @@ async function handleMessage(
 
     if (!content.trim()) return
 
+    // Opt-out de difusión (CRM): si responde "BAJA" (o similar), se da de baja
+    // en las campañas de remarketing del dueño y no se le vuelve a escribir.
+    if (msgType === 'text' && botStatus.userId) {
+        const norm = content.trim().toLowerCase().replace(/[.,!¡¿?*_-]/g, '').trim()
+        const optOutWords = ['baja', 'stop', 'cancelar', 'darme de baja', 'no molestar', 'no quiero recibir', 'eliminar']
+        if (norm === 'baja' || optOutWords.includes(norm)) {
+            try {
+                const last8 = userPhone.replace(/\D/g, '').slice(-8)
+                await (prisma as any).broadcastContact.updateMany({
+                    where: { phone: { contains: last8 }, campaign: { userId: botStatus.userId } },
+                    data: { optedOut: true, optedOutAt: new Date() },
+                })
+                await BaileysManager.sendText(conn.botId, userPhone, 'Listo ✅ No volverás a recibir mensajes de difusión. ¡Gracias!').catch(() => {})
+            } catch (e) {
+                console.error('[BAILEYS] opt-out (BAJA) error:', e)
+            }
+            return
+        }
+    }
+
     // Verificar si ya compró o si el bot está desactivado para este chat
     const existingConv = await prisma.conversation.findUnique({
         where: { botId_userPhone: { botId: conn.botId, userPhone } },

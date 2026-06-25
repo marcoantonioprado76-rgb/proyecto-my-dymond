@@ -45,6 +45,12 @@ export default function CrmCampaignDetailPage() {
     const [togglingAi, setTogglingAi] = useState(false)
     const [activeBotId, setActiveBotId] = useState<string | null>(null)
 
+    // Remarketing recurrente
+    const [recDays, setRecDays] = useState<number[]>([])
+    const [recTime, setRecTime] = useState('09:00')
+    const [recImageId, setRecImageId] = useState<string>('')
+    const [savingRec, setSavingRec] = useState(false)
+
     // Gestión de contactos
     const [showAddContact, setShowAddContact] = useState(false)
     const [newPhone, setNewPhone] = useState('')
@@ -347,6 +353,32 @@ export default function CrmCampaignDetailPage() {
             fetchCampaign()
         } finally { setActionLoading(false) }
     }
+
+    async function saveRecurrence(enable: boolean) {
+        if (enable && (recDays.length === 0 || !recTime)) { setError('Elegí al menos un día y una hora'); return }
+        setSavingRec(true); setError(null)
+        try {
+            const body = enable
+                ? { recurring: true, days: recDays, time: recTime, imageId: recImageId || null }
+                : { recurring: false }
+            const res = await fetch(`/api/crm/campaigns/${id}/recurrence`, {
+                method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
+            })
+            const data = await res.json()
+            if (!res.ok) { setError(data.error); return }
+            setSuccessMsg(enable ? 'Remarketing recurrente activado ✓' : 'Recurrencia desactivada')
+            fetchCampaign()
+        } finally { setSavingRec(false) }
+    }
+
+    // Inicializar la config de recurrencia desde la campaña (al cargar)
+    useEffect(() => {
+        if (!campaign) return
+        if (campaign.recurrenceDays) setRecDays(String(campaign.recurrenceDays).split(',').map(Number).filter((n: number) => !isNaN(n)))
+        if (campaign.recurrenceTime) setRecTime(campaign.recurrenceTime)
+        if (campaign.recurrenceImageId) setRecImageId(campaign.recurrenceImageId)
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [campaign?.id])
 
     if (loading) return (
         <div className="flex items-center justify-center min-h-[60vh]">
@@ -793,6 +825,67 @@ export default function CrmCampaignDetailPage() {
                             {duplicating ? <Loader2 size={12} className="animate-spin" /> : <Copy size={12} />}
                             Duplicar campaña
                         </button>
+                    </div>
+
+                    {/* Remarketing recurrente */}
+                    <div className="bg-white/[0.03] border border-white/8 rounded-2xl p-5 space-y-3">
+                        <div className="flex items-center gap-2">
+                            <RefreshCw size={13} className="text-purple-400" />
+                            <p className="text-xs font-black uppercase tracking-widest text-white/30">Remarketing recurrente</p>
+                        </div>
+                        {campaign.recurring && campaign.nextRunAt && (
+                            <div className="text-[11px] text-green-400 bg-green-500/10 border border-green-500/20 rounded-lg px-3 py-2">
+                                Activo · próximo envío: {new Date(campaign.nextRunAt).toLocaleString('es-BO', { timeZone: 'America/La_Paz', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}
+                            </div>
+                        )}
+                        <div>
+                            <p className="text-[10px] text-white/40 uppercase font-black tracking-widest mb-1.5">Días</p>
+                            <div className="flex gap-1.5 flex-wrap">
+                                {['D', 'L', 'M', 'M', 'J', 'V', 'S'].map((lbl, d) => {
+                                    const on = recDays.includes(d)
+                                    return (
+                                        <button key={d} type="button"
+                                            onClick={() => setRecDays(prev => on ? prev.filter(x => x !== d) : [...prev, d])}
+                                            className="w-8 h-8 rounded-lg text-xs font-black transition-all"
+                                            style={{ background: on ? 'linear-gradient(135deg,#6d28d9,#a855f7)' : 'rgba(255,255,255,0.05)', color: on ? '#fff' : 'rgba(255,255,255,0.4)', border: `1px solid ${on ? 'transparent' : 'rgba(255,255,255,0.1)'}` }}>
+                                            {lbl}
+                                        </button>
+                                    )
+                                })}
+                            </div>
+                        </div>
+                        <div className="flex gap-2">
+                            <div className="flex-1">
+                                <p className="text-[10px] text-white/40 uppercase font-black tracking-widest mb-1.5">Hora (Bolivia)</p>
+                                <input type="time" value={recTime} onChange={e => setRecTime(e.target.value)}
+                                    className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-500/50" style={{ colorScheme: 'dark' }} />
+                            </div>
+                            {visualFiles.length > 0 && (
+                                <div className="flex-1">
+                                    <p className="text-[10px] text-white/40 uppercase font-black tracking-widest mb-1.5">Imagen</p>
+                                    <select value={recImageId} onChange={e => setRecImageId(e.target.value)}
+                                        className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-500/50">
+                                        <option value="">Rotar todas</option>
+                                        {visualFiles.map((img: any, i: number) => <option key={img.id} value={img.id}>Imagen {i + 1}</option>)}
+                                    </select>
+                                </div>
+                            )}
+                        </div>
+                        <div className="flex gap-2">
+                            <button onClick={() => saveRecurrence(true)} disabled={savingRec}
+                                className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-white font-black text-xs transition-all disabled:opacity-50"
+                                style={{ background: 'linear-gradient(135deg,#6d28d9,#a855f7)' }}>
+                                {savingRec ? <Loader2 size={12} className="animate-spin" /> : <RefreshCw size={12} />}
+                                {campaign.recurring ? 'Actualizar' : 'Activar'}
+                            </button>
+                            {campaign.recurring && (
+                                <button onClick={() => saveRecurrence(false)} disabled={savingRec}
+                                    className="px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-white/50 text-xs font-black transition-all border border-white/10 disabled:opacity-50">
+                                    Desactivar
+                                </button>
+                            )}
+                        </div>
+                        <p className="text-[10px] text-white/25 leading-snug">Re-envía a TODA la lista esos días a esa hora. Respeta a quien respondió BAJA.</p>
                     </div>
 
                     {/* Config */}
