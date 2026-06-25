@@ -88,6 +88,23 @@ function delayMs(value: number, unit: string): number {
     return value * 1000
 }
 
+// Jitter anti-ban: aleatoriza el delay ±40% para que el envío no tenga un
+// patrón fijo (cada 30s exactos) que WhatsApp pueda detectar.
+function jitter(baseMs: number): number {
+    const factor = 0.6 + Math.random() * 0.8 // 0.6 .. 1.4
+    return Math.round(baseMs * factor)
+}
+
+// Tope de envíos por día por campaña (anti-ban). Al alcanzarlo la campaña se
+// pausa; continúa al reanudarla (o el día siguiente con recurrencia).
+const DAILY_CAP = 300
+
+function startOfToday(): Date {
+    const d = new Date()
+    d.setHours(0, 0, 0, 0)
+    return d
+}
+
 // Guard de concurrencia: campañas que se están ejecutando AHORA en este proceso.
 // Evita doble envío si la misma campaña la disparan a la vez el scheduler, el
 // reanude de arranque y/o un /execute manual.
@@ -146,6 +163,11 @@ async function _runBroadcast(campaignId: string) {
     let imageIndex: number = campaign.imageIndex || 0
     const delayBetween = delayMs(campaign.delayValue, campaign.delayUnit)
 
+    // Tope diario anti-ban: cuántos ya se enviaron hoy en esta campaña.
+    let sentToday = await (prisma as any).broadcastLog.count({
+        where: { campaignId, status: 'SENT', sentAt: { gte: startOfToday() } },
+    })
+
     for (const contact of campaign.contacts) {
         // Verificar si la campaña fue pausada/cancelada
         const fresh = await (prisma as any).broadcastCampaign.findUnique({
@@ -160,6 +182,15 @@ async function _runBroadcast(campaignId: string) {
             select: { id: true, status: true },
         })
         if (!stillExists || stillExists.status !== 'PENDING') continue
+
+        // Tope diario anti-ban: si se alcanzó, pausar (continúa al reanudar / próximo día)
+        if (sentToday >= DAILY_CAP) {
+            await (prisma as any).broadcastCampaign.update({
+                where: { id: campaignId }, data: { status: 'PAUSED' },
+            })
+            console.warn(`[BROADCAST] Tope diario (${DAILY_CAP}) alcanzado en campaña ${campaignId}. Pausada.`)
+            break
+        }
 
         try {
             const conn = BaileysManager.getStatus(campaign.botId)
@@ -195,14 +226,14 @@ async function _runBroadcast(campaignId: string) {
                 } catch (e) {
                     // Fallback al prompt fijo si la llamada falla. Sin pre-cobro no hay refund.
                     console.warn(`[BROADCAST] AI falló para ${contact.phone}, usando prompt fijo:`, (e as any)?.message)
-                    generated = campaign.prompt?.trim() || campaign.messageExample?.trim() || ''
+                    generated = campaign.messageExample?.trim() || campaign.prompt?.trim() || ''
                 }
             } else {
                 // Sin saldo o sin key → enviar el prompt fijo en lugar de IA personalizada
                 if (resolved.error === 'NO_CREDITS') {
                     console.warn(`[BROADCAST] Sin saldo IA para usuario ${campaign.userId} — enviando prompt fijo`)
                 }
-                generated = campaign.prompt?.trim() || campaign.messageExample?.trim() || ''
+                generated = campaign.messageExample?.trim() || campaign.prompt?.trim() || ''
             }
 
             const nextIndex = images.length > 0 ? (imageIndex + 1) % images.length : 0
@@ -239,6 +270,7 @@ async function _runBroadcast(campaignId: string) {
                 data: { sentCount: { increment: 1 }, imageIndex: nextIndex },
             })
             imageIndex = nextIndex
+            sentToday++
         } catch (err: any) {
             await (prisma as any).broadcastContact.update({
                 where: { id: contact.id },
@@ -260,7 +292,7 @@ async function _runBroadcast(campaignId: string) {
             })
         }
 
-        await new Promise(r => setTimeout(r, delayBetween))
+        await new Promise(r => setTimeout(r, jitter(delayBetween)))
     }
 
     const finalCampaign = await (prisma as any).broadcastCampaign.findUnique({

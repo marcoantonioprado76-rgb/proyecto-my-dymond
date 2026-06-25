@@ -335,6 +335,19 @@ export default function CrmCampaignDetailPage() {
         } finally { setActionLoading(false) }
     }
 
+    async function resend() {
+        if (!confirm('¿Reenviar a TODA la lista de contactos otra vez? Se volverá a mandar a todos.')) return
+        setActionLoading(true)
+        setError(null)
+        try {
+            const res = await fetch(`/api/crm/campaigns/${id}/resend`, { method: 'POST' })
+            const data = await res.json()
+            if (!res.ok) { setError(data.error); return }
+            setCampaign((prev: any) => prev ? { ...prev, status: 'RUNNING' } : prev)
+            fetchCampaign()
+        } finally { setActionLoading(false) }
+    }
+
     if (loading) return (
         <div className="flex items-center justify-center min-h-[60vh]">
             <Loader2 className="animate-spin text-purple-400" size={32} />
@@ -758,6 +771,16 @@ export default function CrmCampaignDetailPage() {
                             >
                                 {actionLoading ? <Loader2 size={14} className="animate-spin" /> : <Play size={14} />}
                                 {campaign.status === 'PAUSED' ? 'Reanudar envío' : campaign.status === 'FAILED' ? 'Reintentar envío' : 'Iniciar envío ahora'}
+                            </button>
+                        ) : campaign.status === 'COMPLETED' ? (
+                            <button
+                                onClick={resend}
+                                disabled={actionLoading}
+                                className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-white font-black text-sm transition-all disabled:opacity-50"
+                                style={{ background: 'linear-gradient(135deg, #6d28d9, #a855f7)' }}
+                            >
+                                {actionLoading ? <Loader2 size={14} className="animate-spin" /> : <RefreshCw size={14} />}
+                                Reenviar a esta lista
                             </button>
                         ) : null}
 
