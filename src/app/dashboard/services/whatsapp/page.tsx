@@ -1213,9 +1213,6 @@ function CredentialsTab({ bot, onStatusChange }: { bot: Bot; onStatusChange: (st
           Guardar modelo
         </button>
       </div>
-
-      {/* Nota de voz (TTS) */}
-      <VoiceCard bot={bot} />
     </div>
   )
 }
@@ -1534,6 +1531,7 @@ function PromptTab({ bot, onSaved }: { bot: Bot; onSaved: (updated: Partial<Bot>
   }
 
   return (
+    <div className="space-y-6">
     <form onSubmit={handleSave} className="space-y-6">
       <div className="glass-panel p-6 rounded-2xl space-y-5">
         <h3 className="text-sm font-bold text-white flex items-center gap-2">
@@ -1616,6 +1614,10 @@ function PromptTab({ bot, onSaved }: { bot: Bot; onSaved: (updated: Partial<Bot>
         </button>
       </div>
     </form>
+
+      {/* Nota de voz (TTS) — vive en la pestaña Plantilla */}
+      <VoiceCard bot={bot} />
+    </div>
   )
 }
 
