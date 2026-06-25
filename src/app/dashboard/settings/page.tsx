@@ -5,7 +5,7 @@ import Link from 'next/link'
 import {
   Settings, User, Camera, Pencil, Check, X, Loader2, Trash2, UserCircle,
   Mail, AtSign, Gem, Plus, History, BarChart3, Activity, Calendar, Info,
-  KeyRound, RefreshCw, ShieldCheck, Key, CheckCircle, XCircle, Eye, EyeOff,
+  KeyRound, ShieldCheck, Key, CheckCircle, XCircle, Eye, EyeOff,
 } from 'lucide-react'
 
 interface ProfileData {
@@ -23,32 +23,18 @@ interface CreditsInfo {
   followupsEnabled: boolean
   adminHasKey: boolean
   ownKey: { model: string; isValid: boolean; apiKeyMasked: string } | null
+  purchases: Array<{ amountUsd: number; createdAt: string; paymentMethod: string; status: string }>
+  movements: Array<{ reason: string; model: string; costUsd: number; createdAt: string }>
 }
 
 const CARD_BG = 'linear-gradient(135deg, rgba(154,203,255,0.12) 0%, rgba(255,125,224,0.12) 50%, rgba(162,102,255,0.12) 100%)'
-
-/** Interruptor estilo switch premium */
-function Switch({ on, onClick, disabled }: { on: boolean; onClick: () => void; disabled?: boolean }) {
-  return (
-    <button onClick={onClick} disabled={disabled} role="switch" aria-checked={on}
-      className="relative w-12 h-6 rounded-full transition-all shrink-0 disabled:opacity-60 active:scale-95"
-      style={{
-        background: on ? 'linear-gradient(135deg,#9B00FF,#D203DD)' : 'rgba(255,255,255,0.10)',
-        border: '1px solid rgba(255,255,255,0.15)',
-        boxShadow: on ? '0 0 12px rgba(210,3,221,0.4)' : 'none',
-      }}>
-      <span className="absolute top-0.5 w-5 h-5 rounded-full bg-white transition-all duration-200"
-        style={{ left: on ? '24px' : '2px', boxShadow: '0 1px 4px rgba(0,0,0,0.4)' }} />
-    </button>
-  )
-}
 
 export default function SettingsPage() {
   const [profile, setProfile] = useState<ProfileData | null>(null)
   const [loadingProfile, setLoadingProfile] = useState(true)
   const [credits, setCredits] = useState<CreditsInfo | null>(null)
   const [togglingPref, setTogglingPref] = useState(false)
-  const [togglingFollow, setTogglingFollow] = useState(false)
+  const [modal, setModal] = useState<null | 'history' | 'movements'>(null)
 
   // Edit nombre
   const [editingName, setEditingName] = useState(false)
@@ -92,6 +78,10 @@ export default function SettingsPage() {
       followupsEnabled: c.followupsEnabled !== false,
       adminHasKey: !!c.adminHasKey,
       ownKey: c.ownKey ? { model: c.ownKey.model, isValid: !!c.ownKey.isValid, apiKeyMasked: c.ownKey.apiKeyMasked } : null,
+      purchases: list.map((x: any) => ({ amountUsd: Number(x.amountUsd ?? 0), createdAt: x.createdAt, paymentMethod: x.paymentMethod, status: x.status })),
+      movements: Array.isArray(c.recentUsage)
+        ? c.recentUsage.map((u: any) => ({ reason: u.reason, model: u.model, costUsd: Number(u.costUsd ?? 0), createdAt: u.createdAt }))
+        : [],
     })
     if (c.ownKey?.model) setModel(c.ownKey.model)
   }
@@ -206,19 +196,6 @@ export default function SettingsPage() {
   }
 
   // ── Configuración de IA ──
-  async function toggleFollowups() {
-    if (!credits || togglingFollow) return
-    setTogglingFollow(true)
-    try {
-      const res = await fetch('/api/credits', {
-        method: 'PUT', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ followupsEnabled: !credits.followupsEnabled }),
-      })
-      if (res.ok) await loadCredits()
-      else flashMsg('err', 'No se pudo cambiar')
-    } catch { flashMsg('err', 'Error de red') } finally { setTogglingFollow(false) }
-  }
-
   /** Cambia la fuente de IA (admin key ↔ propia key). next = preferOwnKey deseado */
   async function setPreferOwnKey(next: boolean) {
     if (!credits || togglingPref || credits.preferOwnKey === next) return
@@ -487,16 +464,16 @@ export default function SettingsPage() {
                 style={{ background: 'linear-gradient(135deg, #9B00FF, #D203DD)', boxShadow: '0 4px 16px rgba(155,0,255,0.3)', textDecoration: 'none' }}>
                 <Plus className="w-4 h-4" /> Recargar
               </Link>
-              <Link href="/dashboard/wallet"
+              <button type="button" onClick={() => setModal('history')}
                 className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold transition-all active:scale-[0.97] hover:bg-white/[0.04]"
-                style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.12)', color: 'rgba(255,255,255,0.75)', textDecoration: 'none' }}>
+                style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.12)', color: 'rgba(255,255,255,0.75)' }}>
                 <History className="w-3.5 h-3.5" /> Ver historial
-              </Link>
-              <Link href="/dashboard/wallet"
+              </button>
+              <button type="button" onClick={() => setModal('movements')}
                 className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold transition-all active:scale-[0.97] hover:bg-white/[0.04]"
-                style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.12)', color: 'rgba(255,255,255,0.75)', textDecoration: 'none' }}>
+                style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.12)', color: 'rgba(255,255,255,0.75)' }}>
                 <BarChart3 className="w-3.5 h-3.5" /> Movimientos
-              </Link>
+              </button>
             </div>
           </div>
         </div>
@@ -620,21 +597,6 @@ export default function SettingsPage() {
           )}
         </div>
 
-        {/* Seguimientos automáticos */}
-        <div className="mt-3 flex items-center justify-between gap-3 px-4 py-3.5 rounded-xl"
-          style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
-          <div className="flex items-center gap-3 min-w-0">
-            <RefreshCw className="w-4 h-4 shrink-0" style={{ color: '#D203DD' }} />
-            <div className="min-w-0">
-              <p className="text-xs font-bold text-white">Seguimientos automáticos {credits ? (credits.followupsEnabled ? '· Activados' : '· Pausados') : ''}</p>
-              <p className="text-[10px] leading-snug" style={{ color: 'rgba(255,255,255,0.4)' }}>
-                El bot reescribe solo a quien no responde (15 min y 3 días). Cada seguimiento consume IA.
-              </p>
-            </div>
-          </div>
-          <Switch on={!!credits?.followupsEnabled} onClick={toggleFollowups} disabled={!credits || togglingFollow} />
-        </div>
-
         {/* Mi API Key de OpenAI — formulario */}
         <div className="mt-3 rounded-xl p-4 space-y-3.5"
           style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
@@ -729,6 +691,84 @@ export default function SettingsPage() {
           </div>
         </div>
       </div>
+
+      {/* ── MODAL: Historial de recargas / Movimientos ── */}
+      {modal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md" onClick={() => setModal(null)}>
+          <div className="w-full max-w-md max-h-[85vh] overflow-y-auto rounded-3xl p-5 sm:p-6 space-y-4 relative"
+            style={{ background: 'linear-gradient(180deg, rgba(20,24,48,0.97) 0%, rgba(14,16,34,0.97) 100%)', border: '1px solid rgba(255,255,255,0.12)', boxShadow: '0 30px 60px -22px rgba(0,0,0,0.82)' }}
+            onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center"
+                  style={{ background: 'rgba(210,3,221,0.15)', border: '1px solid rgba(210,3,221,0.35)' }}>
+                  {modal === 'history' ? <History className="w-5 h-5" style={{ color: '#E879F9' }} /> : <BarChart3 className="w-5 h-5" style={{ color: '#E879F9' }} />}
+                </div>
+                <div>
+                  <h2 className="text-base font-black text-white leading-tight">{modal === 'history' ? 'Historial de recargas' : 'Movimientos recientes'}</h2>
+                  <p className="text-[10px]" style={{ color: 'rgba(255,255,255,0.35)' }}>{modal === 'history' ? 'Tus solicitudes de recarga de saldo' : 'Consumos y recargas de tu saldo IA'}</p>
+                </div>
+              </div>
+              <button onClick={() => setModal(null)} className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-white/5 transition-colors">
+                <X className="w-4 h-4 text-white/40" />
+              </button>
+            </div>
+
+            {modal === 'history' ? (
+              (credits?.purchases?.length ?? 0) === 0
+                ? <p className="text-center text-sm py-8" style={{ color: 'rgba(255,255,255,0.4)' }}>Sin solicitudes de recarga todavía.</p>
+                : <div className="space-y-2">
+                    {credits!.purchases.map((p, i) => {
+                      const st = p.status === 'APPROVED' ? { c: '#34d399', bg: 'rgba(52,211,153,0.1)', b: 'rgba(52,211,153,0.25)', l: 'Aprobada' }
+                        : p.status === 'REJECTED' ? { c: '#f87171', bg: 'rgba(248,113,113,0.1)', b: 'rgba(248,113,113,0.25)', l: 'Rechazada' }
+                        : { c: '#fbbf24', bg: 'rgba(251,191,36,0.1)', b: 'rgba(251,191,36,0.25)', l: 'Pendiente' }
+                      return (
+                        <div key={i} className="flex items-center justify-between gap-3 px-4 py-3 rounded-xl"
+                          style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
+                          <div className="min-w-0">
+                            <p className="text-sm font-bold text-white">+${p.amountUsd.toFixed(2)} USD</p>
+                            <p className="text-[10px]" style={{ color: 'rgba(255,255,255,0.4)' }}>
+                              {new Date(p.createdAt).toLocaleDateString('es-BO')} · {p.paymentMethod === 'MANUAL' ? 'Transferencia' : p.paymentMethod}
+                            </p>
+                          </div>
+                          <span className="text-[9px] font-black uppercase tracking-widest px-2 py-1 rounded-full shrink-0"
+                            style={{ color: st.c, background: st.bg, border: `1px solid ${st.b}` }}>{st.l}</span>
+                        </div>
+                      )
+                    })}
+                  </div>
+            ) : (
+              (credits?.movements?.length ?? 0) === 0
+                ? <p className="text-center text-sm py-8" style={{ color: 'rgba(255,255,255,0.4)' }}>Sin movimientos todavía.</p>
+                : <div className="space-y-1.5">
+                    {credits!.movements.map((u, i) => {
+                      const isRecharge = u.costUsd < 0
+                      return (
+                        <div key={i} className="flex items-center justify-between gap-3 px-4 py-2.5 rounded-xl"
+                          style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
+                          <div className="min-w-0">
+                            <p className="text-xs font-bold text-white truncate">{isRecharge ? 'Recarga aprobada' : u.reason}</p>
+                            <p className="text-[10px]" style={{ color: 'rgba(255,255,255,0.4)' }}>
+                              {u.model ? u.model + ' · ' : ''}{new Date(u.createdAt).toLocaleString('es-BO')}
+                            </p>
+                          </div>
+                          <span className="text-xs font-black shrink-0" style={{ color: isRecharge ? '#34d399' : '#f87171' }}>
+                            {isRecharge ? '+' : '−'}${Math.abs(u.costUsd).toFixed(4)}
+                          </span>
+                        </div>
+                      )
+                    })}
+                  </div>
+            )}
+
+            <button onClick={() => setModal(null)}
+              className="w-full py-2.5 rounded-xl text-xs font-bold transition-all active:scale-[0.98]"
+              style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)', color: 'rgba(255,255,255,0.7)' }}>
+              Cerrar
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Feedback global */}
       {msg && (
