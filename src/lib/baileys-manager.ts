@@ -17,6 +17,8 @@ import path from 'path'
 import fs from 'fs'
 import { prisma } from '@/lib/prisma'
 import { chatWithUsage } from '@/lib/openai'
+import { synthesizeVoiceNote } from '@/lib/tts'
+import { shouldSpeak, voiceTextFromResponse } from '@/lib/voice-reply'
 import { decrypt } from '@/lib/crypto'
 import { toDataURL } from 'qrcode'
 import { processFollowUps } from './follow-up-worker'
@@ -434,7 +436,25 @@ async function handleMessage(
         await sock.sendMessage(jid, { text })
     }
 
-    if (response.mensaje1) await sendMsg(response.mensaje1)
+    // ¿Responder con NOTA DE VOZ? Si la voz se genera, se manda SOLO la voz (sin el texto
+    // repetido). Las fotos/videos se siguen enviando igual. A PRUEBA DE FALLOS: si la voz
+    // falla (sin saldo/key, error, formato inválido) → voiceSent=false → cae a texto.
+    const customerSentAudio = bufferedMsgs.some((m: { type: string }) => m.type === 'audio')
+    let voiceSent = false
+    if (shouldSpeak(bot, customerSentAudio)) {
+        try {
+            const ogg = await synthesizeVoiceNote(voiceTextFromResponse(response), bot.voiceId)
+            if (ogg) {
+                await sock.sendPresenceUpdate('recording', jid)
+                await sleep(Math.floor(Math.random() * 800) + 700)
+                await sock.sendMessage(jid, { audio: ogg, mimetype: 'audio/ogg; codecs=opus', ptt: true }).catch(() => { })
+                voiceSent = true
+                console.log(`[BAILEYS] 🎙️ nota de voz enviada a ${userPhone}`)
+            }
+        } catch (e) { console.error('[BAILEYS] voz (omitida):', e instanceof Error ? e.message : e) }
+    }
+
+    if (!voiceSent && response.mensaje1) await sendMsg(response.mensaje1)
     for (const photoUrl of response.fotos_mensaje1) {
         if (photoUrl.startsWith('https://')) {
             await sock.sendPresenceUpdate('composing', jid)
@@ -450,8 +470,8 @@ async function handleMessage(
         await sleep(800)
         await sock.sendMessage(jid, { video: { url: videoUrl } }).catch(() => { })
     }
-    if (response.mensaje2) await sendMsg(response.mensaje2)
-    if (response.mensaje3) await sendMsg(response.mensaje3)
+    if (!voiceSent && response.mensaje2) await sendMsg(response.mensaje2)
+    if (!voiceSent && response.mensaje3) await sendMsg(response.mensaje3)
 
     // reportPhone FRESCO de BD: si el dueño lo cambió en Credenciales, el socket vivo
     // sigue con el viejo en memoria. Preferimos el de BD y caemos al de memoria.

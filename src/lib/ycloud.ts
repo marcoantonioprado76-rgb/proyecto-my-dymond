@@ -98,3 +98,25 @@ export async function sendVideo(
     apiKey,
   )
 }
+
+/**
+ * Sends a voice note (audio) using a public HTTPS URL (OGG/Opus).
+ * WhatsApp renderiza el OGG/Opus como nota de voz automáticamente.
+ */
+export async function sendAudio(
+  from: string,
+  to: string,
+  audioUrl: string,
+  apiKey: string,
+): Promise<void> {
+  await ycloudRequest(
+    '/whatsapp/messages',
+    {
+      from,
+      to,
+      type: 'audio',
+      audio: { link: audioUrl },
+    },
+    apiKey,
+  )
+}

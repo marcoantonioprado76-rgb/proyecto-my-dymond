@@ -3,6 +3,10 @@ import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import { prisma } from '@/lib/prisma'
 import { verifyToken } from '@/lib/auth'
+import { BOT_VOICES } from '@/lib/voices'
+
+const VALID_VOICE_IDS = new Set(BOT_VOICES.map(v => v.id))
+const VALID_VOICE_MODES = new Set(['off', 'audio_in', 'always'])
 
 function getAuth() {
   const cookieStore = cookies()
@@ -52,7 +56,8 @@ export async function PATCH(
     if (!bot) return NextResponse.json({ error: 'Bot no encontrado' }, { status: 404 })
 
     const body = await request.json().catch(() => ({}))
-    const { name, status, systemPromptTemplate, maxCharsMensaje1, maxCharsMensaje2, maxCharsMensaje3, followUp1Delay, followUp2Delay, aiModel } =
+    const { name, status, systemPromptTemplate, maxCharsMensaje1, maxCharsMensaje2, maxCharsMensaje3, followUp1Delay, followUp2Delay, aiModel,
+      voiceEnabled, voiceMode, voiceId } =
       body as Record<string, unknown>
 
     const VALID_MODELS = ['gpt-5.2', 'gpt-5.1', 'gpt-4o', 'gpt-4o-mini']
@@ -75,6 +80,12 @@ export async function PATCH(
         ...(typeof followUp1Delay === 'number' ? { followUp1Delay } : {}),
         ...(typeof followUp2Delay === 'number' ? { followUp2Delay } : {}),
         ...(typeof aiModel === 'string' && VALID_MODELS.includes(aiModel) ? { aiModel } : {}),
+        // Nota de voz (TTS)
+        ...(typeof voiceEnabled === 'boolean' ? { voiceEnabled } : {}),
+        ...(typeof voiceMode === 'string' && VALID_VOICE_MODES.has(voiceMode) ? { voiceMode } : {}),
+        ...(voiceId === null ? { voiceId: null }
+          : typeof voiceId === 'string' && VALID_VOICE_IDS.has(voiceId) ? { voiceId }
+          : {}),
       },
     })
 

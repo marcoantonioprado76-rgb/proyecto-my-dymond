@@ -16,7 +16,9 @@ import { prisma } from './prisma'
 import { decrypt } from './crypto'
 import { transcribeAudio, analyzeImageWithUsage, chatWithUsage, ChatMessage } from './openai'
 import { resolveOpenAIKey, chargeForChatUsage, chargeForWhisperSeconds } from './ai-credits'
-import { markAsRead, sendText, sendImage, sendVideo } from './ycloud'
+import { markAsRead, sendText, sendImage, sendVideo, sendAudio } from './ycloud'
+import { synthesizeVoiceNote, uploadVoiceNote } from './tts'
+import { shouldSpeak, voiceTextFromResponse } from './voice-reply'
 import { createNotification } from './notifications'
 import { sendBotSaleReportEmail } from './email'
 
@@ -1015,7 +1017,28 @@ export class BotEngine {
     console.log(`[BOT] Enviando respuesta → from=${from} to=${toPhone}`)
     console.log(`[BOT] mensaje1: ${response.mensaje1?.slice(0, 60)}`)
 
-    if (response.mensaje1) {
+    // ¿Responder con NOTA DE VOZ? Si la voz se genera y sube, se manda SOLO la voz (sin el
+    // texto repetido); fotos/videos se siguen enviando. A PRUEBA DE FALLOS: si la voz falla
+    // (sin saldo/key, error, upload fallido) → voiceSent=false → cae a texto.
+    const customerSentAudio = (bufferedMsgs as Array<{ type: string }>).some(m => m.type === 'audio')
+    let voiceSent = false
+    if (shouldSpeak(bot, customerSentAudio)) {
+      try {
+        const ogg = await synthesizeVoiceNote(voiceTextFromResponse(response), bot.voiceId)
+        if (ogg) {
+          const audioUrl = await uploadVoiceNote(ogg, bot.userId || botId)
+          if (audioUrl) {
+            await sendAudio(from, toPhone, audioUrl, apiKey).catch(e =>
+              console.error('[BOT] sendAudio ERROR:', e.message),
+            )
+            voiceSent = true
+            console.log(`[BOT] 🎙️ nota de voz enviada a ${userPhone}`)
+          }
+        }
+      } catch (e) { console.error('[BOT] voz (omitida):', e instanceof Error ? e.message : e) }
+    }
+
+    if (!voiceSent && response.mensaje1) {
       await sendText(from, toPhone, response.mensaje1, apiKey).catch(e =>
         console.error('[BOT] sendText m1 ERROR:', e.message),
       )
@@ -1042,14 +1065,14 @@ export class BotEngine {
       await sleep(1200)
     }
 
-    if (response.mensaje2) {
+    if (!voiceSent && response.mensaje2) {
       await sendText(from, toPhone, response.mensaje2, apiKey).catch(e =>
         console.error('[BOT] sendText m2 ERROR:', e.message),
       )
       await sleep(Math.floor(Math.random() * 1000) + 1000) // Retardo humano 1-2s
     }
 
-    if (response.mensaje3) {
+    if (!voiceSent && response.mensaje3) {
       await sendText(from, toPhone, response.mensaje3, apiKey).catch(e =>
         console.error('[BOT] sendText m3 ERROR:', e.message),
       )

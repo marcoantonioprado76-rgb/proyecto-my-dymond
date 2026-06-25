@@ -101,6 +101,10 @@ model Bot {
   followUp1Delay       Int            @default(15) @map("follow_up_1_delay")
   followUp2Delay       Int            @default(4320) @map("follow_up_2_delay")
   aiModel              String         @default("gpt-5.1") @map("ai_model")
+  // Nota de voz (TTS) — aditivo, default OFF: los bots actuales no cambian
+  voiceEnabled         Boolean        @default(false) @map("voice_enabled")
+  voiceMode            String         @default("off") @map("voice_mode")
+  voiceId              String?        @map("voice_id")
   createdAt            DateTime       @default(now()) @map("created_at")
   updatedAt            DateTime       @updatedAt @map("updated_at")
   secret               BotSecret?

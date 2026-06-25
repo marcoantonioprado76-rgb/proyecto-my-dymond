@@ -41,7 +41,10 @@ import {
   MessageSquare,
   Share2,
   UserCheck,
+  Volume2,
+  Play,
 } from 'lucide-react'
+import { BOT_VOICES, DEFAULT_VOICE_ID } from '@/lib/voices'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -59,6 +62,9 @@ interface Bot {
   followUp1Delay: number
   followUp2Delay: number
   aiModel: string
+  voiceEnabled?: boolean
+  voiceMode?: string
+  voiceId?: string | null
   createdAt: string
   secret?: { whatsappInstanceNumber: string; reportPhone: string } | null
   _count?: { assignedProducts: number; conversations: number }
@@ -1207,6 +1213,146 @@ function CredentialsTab({ bot, onStatusChange }: { bot: Bot; onStatusChange: (st
           Guardar modelo
         </button>
       </div>
+
+      {/* Nota de voz (TTS) */}
+      <VoiceCard bot={bot} />
+    </div>
+  )
+}
+
+// ─── Voz del agente (nota de voz / TTS) ─────────────────────────────────────────
+
+function VoiceCard({ bot }: { bot: Bot }) {
+  const [voiceEnabled, setVoiceEnabled] = useState(bot.voiceEnabled ?? false)
+  const [voiceId, setVoiceId] = useState(bot.voiceId || DEFAULT_VOICE_ID)
+  const [voiceMode, setVoiceMode] = useState(bot.voiceMode && bot.voiceMode !== 'off' ? bot.voiceMode : 'audio_in')
+  const [savingVoice, setSavingVoice] = useState(false)
+  const [previewVoice, setPreviewVoice] = useState<string | null>(null)
+  const previewAudioRef = useRef<HTMLAudioElement | null>(null)
+  const [msg, setMsg] = useState<{ type: 'error' | 'success'; text: string } | null>(null)
+
+  const playPreview = (id: string) => {
+    setPreviewVoice(id)
+    try {
+      if (previewAudioRef.current) previewAudioRef.current.pause()
+      const a = new Audio(`/api/tts/preview?voice=${id}`)
+      previewAudioRef.current = a
+      a.onended = () => setPreviewVoice(null)
+      a.onerror = () => { setPreviewVoice(null); setMsg({ type: 'error', text: 'No se pudo reproducir (¿voz configurada en el servidor?)' }) }
+      a.play().catch(() => setPreviewVoice(null))
+    } catch { setPreviewVoice(null) }
+  }
+
+  return (
+    <div className="glass-panel p-6 rounded-2xl space-y-4">
+      {msg && (
+        <div className={`text-xs px-3 py-2 rounded-lg border ${msg.type === 'success' ? 'border-neon-green/40 bg-neon-green/10 text-neon-green' : 'border-red-500/40 bg-red-500/10 text-red-300'}`}>
+          {msg.text}
+        </div>
+      )}
+      <h3 className="text-sm font-bold text-white flex items-center gap-2">
+        <Volume2 className="w-4 h-4 text-neon-blue" />
+        Voz del agente
+        <span className="text-xs font-normal text-dark-400 ml-1">— responde con notas de voz</span>
+      </h3>
+
+      <button
+        type="button"
+        onClick={() => setVoiceEnabled(v => !v)}
+        className="w-full flex items-center justify-between px-4 py-3 rounded-xl border border-white/10 bg-dark-900/30 text-left"
+      >
+        <div>
+          <span className="text-sm font-semibold text-white">Activar voz</span>
+          <p className="text-xs text-dark-400 mt-0.5">Notas de voz reales con IA (voces en español).</p>
+        </div>
+        {voiceEnabled
+          ? <ToggleRight className="w-7 h-7 text-neon-blue shrink-0" />
+          : <ToggleLeft className="w-7 h-7 text-dark-400 shrink-0" />}
+      </button>
+
+      {voiceEnabled && (
+        <>
+          <div className="space-y-2">
+            <p className="text-xs font-semibold text-dark-400">¿Cuándo responde con voz?</p>
+            {[
+              { id: 'audio_in', label: 'Solo si el cliente manda audio', desc: 'Recomendado · natural y ahorra costo' },
+              { id: 'always',   label: 'Siempre con voz',                 desc: 'Cada respuesta también en nota de voz' },
+            ].map(m => (
+              <button
+                key={m.id}
+                type="button"
+                onClick={() => setVoiceMode(m.id)}
+                className={`w-full flex items-center justify-between px-4 py-2.5 rounded-xl border text-left transition-all ${
+                  voiceMode === m.id ? 'border-neon-blue/60 bg-neon-blue/10' : 'border-white/10 bg-dark-900/30 hover:border-white/20'
+                }`}
+              >
+                <div>
+                  <span className={`text-sm font-semibold ${voiceMode === m.id ? 'text-neon-blue' : 'text-white'}`}>{m.label}</span>
+                  <p className="text-xs text-dark-400 mt-0.5">{m.desc}</p>
+                </div>
+                {voiceMode === m.id && <CheckCircle2 className="w-4 h-4 text-neon-blue shrink-0" />}
+              </button>
+            ))}
+          </div>
+
+          <div className="space-y-2">
+            <p className="text-xs font-semibold text-dark-400">Elige la voz <span className="text-dark-500">(toca ▶ para escuchar)</span></p>
+            {BOT_VOICES.map(v => (
+              <div
+                key={v.id}
+                className={`w-full flex items-center justify-between px-4 py-2.5 rounded-xl border transition-all ${
+                  voiceId === v.id ? 'border-neon-blue/60 bg-neon-blue/10' : 'border-white/10 bg-dark-900/30'
+                }`}
+              >
+                <button type="button" onClick={() => setVoiceId(v.id)} className="flex items-center gap-3 text-left flex-1 min-w-0">
+                  {voiceId === v.id
+                    ? <CheckCircle2 className="w-4 h-4 text-neon-blue shrink-0" />
+                    : <span className="w-4 h-4 rounded-full border border-white/20 shrink-0" />}
+                  <span className="min-w-0">
+                    <span className={`text-sm font-semibold ${voiceId === v.id ? 'text-neon-blue' : 'text-white'}`}>{v.name}</span>
+                    <span className="block text-xs text-dark-400 truncate">{v.desc}</span>
+                  </span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => playPreview(v.id)}
+                  title="Escuchar"
+                  className="ml-2 shrink-0 w-8 h-8 rounded-lg bg-white/5 border border-white/10 hover:border-neon-blue/40 flex items-center justify-center"
+                >
+                  {previewVoice === v.id
+                    ? <Loader2 className="w-3.5 h-3.5 text-neon-blue animate-spin" />
+                    : <Play className="w-3.5 h-3.5 text-dark-400" />}
+                </button>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+
+      <button
+        type="button"
+        disabled={savingVoice}
+        onClick={async () => {
+          setSavingVoice(true)
+          setMsg(null)
+          try {
+            const res = await fetch(`/api/bots/${bot.id}`, {
+              method: 'PATCH',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ voiceEnabled, voiceId, voiceMode }),
+            })
+            setMsg(res.ok ? { type: 'success', text: 'Voz guardada' } : { type: 'error', text: 'No se pudo guardar la voz' })
+          } catch {
+            setMsg({ type: 'error', text: 'No se pudo guardar la voz' })
+          } finally {
+            setSavingVoice(false)
+          }
+        }}
+        className="w-full py-2.5 bg-dark-800 border border-white/10 text-white text-sm font-semibold rounded-xl hover:border-neon-blue/40 disabled:opacity-50 flex items-center justify-center gap-2 transition-colors"
+      >
+        {savingVoice ? <Spinner /> : <Save className="w-4 h-4" />}
+        Guardar voz
+      </button>
     </div>
   )
 }
