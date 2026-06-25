@@ -6,15 +6,15 @@ import { usePathname } from 'next/navigation'
 import NotificationBell from './NotificationBell'
 
 const serviceItems = [
-  { href: '/dashboard/services/ads/meta',      iconClass: 'fa-brands fa-meta',        label: 'Meta Ads' },
+  { href: '/dashboard/services/ads/meta',      iconClass: 'fa-brands fa-meta',        label: 'Meta Ads',      grad: 'linear-gradient(145deg, #4f8dff, #1d4ed8)' },
   // { href: '/dashboard/services/ads/tiktok',    iconClass: 'fa-brands fa-tiktok',      label: 'TikTok Ads' }, // oculto temporalmente
   // { href: '/dashboard/services/ads/google',    iconClass: 'fa-brands fa-google',      label: 'Google Ads' }, // oculto temporalmente
-  { href: '/dashboard/services/whatsapp',      iconClass: 'fa-brands fa-whatsapp',    label: 'Agentes de AI' },
-  { href: '/dashboard/services/social',        iconClass: 'fa-solid fa-share-nodes',  label: 'Social' },
-  { href: '/dashboard/services/landing-pages', iconClass: 'fa-solid fa-file',         label: 'Landing' },
-  { href: '/dashboard/services/virtual-store', iconClass: 'fa-solid fa-shop',         label: 'Tienda' },
+  { href: '/dashboard/services/whatsapp',      iconClass: 'fa-solid fa-robot',        label: 'Agentes de AI', grad: 'linear-gradient(145deg, #22d3ee, #0891b2)' },
+  { href: '/dashboard/services/social',        iconClass: 'fa-solid fa-share-nodes',  label: 'Social',        grad: 'linear-gradient(145deg, #c084fc, #9333ea)' },
+  { href: '/dashboard/services/landing-pages', iconClass: 'fa-solid fa-file-lines',   label: 'Landing',       grad: 'linear-gradient(145deg, #fbbf24, #d97706)' },
+  { href: '/dashboard/services/virtual-store', iconClass: 'fa-solid fa-shop',         label: 'Tienda',        grad: 'linear-gradient(145deg, #a3e635, #4d7c0f)' },
   // { href: '/dashboard/services/clipping',      iconClass: 'fa-solid fa-newspaper',    label: 'Clipping' }, // oculto temporalmente
-  { href: '/dashboard/crm',                    iconClass: 'fa-solid fa-users-gear',   label: 'CRM Broadcast' },
+  { href: '/dashboard/crm',                    iconClass: 'fa-solid fa-users-gear',   label: 'CRM Broadcast', grad: 'linear-gradient(145deg, #fb923c, #ea580c)' },
 ]
 
 const mainItemsBottom = [
@@ -85,7 +85,11 @@ export default function Navbar() {
                 const isActive = pathname === item.href || pathname.startsWith(item.href)
                 return (
                   <Link key={item.href} href={item.href} className={`nav-item ${isActive ? 'nav-item--active' : ''}`} style={{ fontSize: '0.78rem', padding: '8px 10px' }}>
-                    <span className="nav-item__icon" style={{ width: 26, height: 26, fontSize: '0.72rem' }}><i className={item.iconClass}></i></span>
+                    <span className="nav-item__icon" style={{
+                      width: 30, height: 30, fontSize: '0.78rem', color: '#fff',
+                      background: item.grad,
+                      boxShadow: 'inset 0 1.5px 0 rgba(255,255,255,0.4), inset 0 -2px 4px rgba(0,0,0,0.22), 0 3px 8px rgba(0,0,0,0.4)',
+                    }}><i className={item.iconClass}></i></span>
                     <span className="nav-item__label">{item.label}</span>
                     <span className="nav-item__dot"></span>
                   </Link>
