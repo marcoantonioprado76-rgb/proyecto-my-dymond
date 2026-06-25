@@ -5,6 +5,7 @@ import Link from 'next/link'
 import {
   Settings, User, Camera, Pencil, Check, X, Loader2, Trash2, UserCircle,
   Mail, AtSign, Gem, Plus, History, BarChart3, Activity, Calendar, Info,
+  KeyRound, RefreshCw, ShieldCheck, Key, CheckCircle, XCircle, Eye, EyeOff,
 } from 'lucide-react'
 
 interface ProfileData {
@@ -18,14 +19,36 @@ interface CreditsInfo {
   aiBalanceUsd: number
   spent30dUsd: number
   lastRecharge: { amountUsd: number; date: string } | null
+  preferOwnKey: boolean
+  followupsEnabled: boolean
+  adminHasKey: boolean
+  ownKey: { model: string; isValid: boolean; apiKeyMasked: string } | null
 }
 
 const CARD_BG = 'linear-gradient(135deg, rgba(154,203,255,0.12) 0%, rgba(255,125,224,0.12) 50%, rgba(162,102,255,0.12) 100%)'
+
+/** Interruptor estilo switch premium */
+function Switch({ on, onClick, disabled }: { on: boolean; onClick: () => void; disabled?: boolean }) {
+  return (
+    <button onClick={onClick} disabled={disabled} role="switch" aria-checked={on}
+      className="relative w-12 h-6 rounded-full transition-all shrink-0 disabled:opacity-60 active:scale-95"
+      style={{
+        background: on ? 'linear-gradient(135deg,#9B00FF,#D203DD)' : 'rgba(255,255,255,0.10)',
+        border: '1px solid rgba(255,255,255,0.15)',
+        boxShadow: on ? '0 0 12px rgba(210,3,221,0.4)' : 'none',
+      }}>
+      <span className="absolute top-0.5 w-5 h-5 rounded-full bg-white transition-all duration-200"
+        style={{ left: on ? '24px' : '2px', boxShadow: '0 1px 4px rgba(0,0,0,0.4)' }} />
+    </button>
+  )
+}
 
 export default function SettingsPage() {
   const [profile, setProfile] = useState<ProfileData | null>(null)
   const [loadingProfile, setLoadingProfile] = useState(true)
   const [credits, setCredits] = useState<CreditsInfo | null>(null)
+  const [togglingPref, setTogglingPref] = useState(false)
+  const [togglingFollow, setTogglingFollow] = useState(false)
 
   // Edit nombre
   const [editingName, setEditingName] = useState(false)
@@ -36,12 +59,41 @@ export default function SettingsPage() {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [uploadingAvatar, setUploadingAvatar] = useState(false)
 
+  // API Key propia (formulario)
+  const [apiKeyInput, setApiKeyInput] = useState('')
+  const [showKey, setShowKey] = useState(false)
+  const [model, setModel] = useState('gpt-4o')
+  const [savingKey, setSavingKey] = useState(false)
+  const [deletingKey, setDeletingKey] = useState(false)
+
   // Feedback global
   const [msg, setMsg] = useState<{ type: 'ok' | 'err'; text: string } | null>(null)
 
   function flashMsg(type: 'ok' | 'err', text: string) {
     setMsg({ type, text })
-    setTimeout(() => setMsg(null), 2800)
+    setTimeout(() => setMsg(null), 3200)
+  }
+
+  async function loadCredits() {
+    const [c, p] = await Promise.all([
+      fetch('/api/credits').then(r => r.ok ? r.json() : null).catch(() => null),
+      fetch('/api/credits/purchase').then(r => r.ok ? r.json() : null).catch(() => null),
+    ])
+    if (!c) return
+    const list: any[] = Array.isArray(p) ? p : (Array.isArray(p?.purchases) ? p.purchases : [])
+    const lastApproved = list.find(x => x?.status === 'APPROVED') ?? null
+    setCredits({
+      aiBalanceUsd: Number(c.aiBalanceUsd ?? 0),
+      spent30dUsd: Number(c.spent30dUsd ?? 0),
+      lastRecharge: lastApproved
+        ? { amountUsd: Number(lastApproved.amountUsd ?? 0), date: lastApproved.reviewedAt || lastApproved.createdAt }
+        : null,
+      preferOwnKey: !!c.preferOwnKey,
+      followupsEnabled: c.followupsEnabled !== false,
+      adminHasKey: !!c.adminHasKey,
+      ownKey: c.ownKey ? { model: c.ownKey.model, isValid: !!c.ownKey.isValid, apiKeyMasked: c.ownKey.apiKeyMasked } : null,
+    })
+    if (c.ownKey?.model) setModel(c.ownKey.model)
   }
 
   useEffect(() => {
@@ -50,23 +102,7 @@ export default function SettingsPage() {
       .then(d => { if (d?.user) setProfile(d.user) })
       .catch(() => {})
       .finally(() => setLoadingProfile(false))
-
-    // Datos reales de créditos: saldo, uso 30 días y última recarga
-    Promise.all([
-      fetch('/api/credits').then(r => r.ok ? r.json() : null).catch(() => null),
-      fetch('/api/credits/purchase').then(r => r.ok ? r.json() : null).catch(() => null),
-    ]).then(([c, p]) => {
-      if (!c) return
-      const list: any[] = Array.isArray(p) ? p : (Array.isArray(p?.purchases) ? p.purchases : [])
-      const lastApproved = list.find(x => x?.status === 'APPROVED') ?? null
-      setCredits({
-        aiBalanceUsd: Number(c.aiBalanceUsd ?? 0),
-        spent30dUsd: Number(c.spent30dUsd ?? 0),
-        lastRecharge: lastApproved
-          ? { amountUsd: Number(lastApproved.amountUsd ?? 0), date: lastApproved.reviewedAt || lastApproved.createdAt }
-          : null,
-      })
-    }).catch(() => {})
+    loadCredits().catch(() => {})
   }, [])
 
   function startEditName() {
@@ -169,11 +205,75 @@ export default function SettingsPage() {
     }
   }
 
+  // ── Configuración de IA ──
+  async function toggleFollowups() {
+    if (!credits || togglingFollow) return
+    setTogglingFollow(true)
+    try {
+      const res = await fetch('/api/credits', {
+        method: 'PUT', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ followupsEnabled: !credits.followupsEnabled }),
+      })
+      if (res.ok) await loadCredits()
+      else flashMsg('err', 'No se pudo cambiar')
+    } catch { flashMsg('err', 'Error de red') } finally { setTogglingFollow(false) }
+  }
+
+  /** Cambia la fuente de IA (admin key ↔ propia key). next = preferOwnKey deseado */
+  async function setPreferOwnKey(next: boolean) {
+    if (!credits || togglingPref || credits.preferOwnKey === next) return
+    setTogglingPref(true)
+    try {
+      const res = await fetch('/api/credits', {
+        method: 'PUT', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ preferOwnKey: next }),
+      })
+      if (res.ok) await loadCredits()
+      else flashMsg('err', 'No se pudo cambiar')
+    } catch { flashMsg('err', 'Error de red') } finally { setTogglingPref(false) }
+  }
+
+  async function saveKey() {
+    if (!apiKeyInput.trim() || savingKey) return
+    setSavingKey(true)
+    try {
+      const res = await fetch('/api/credits', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ apiKey: apiKeyInput.trim(), model }),
+      })
+      const d = await res.json().catch(() => ({}))
+      if (!res.ok) {
+        flashMsg('err', d.error || 'Error al guardar la key')
+      } else {
+        flashMsg('ok', d.isValid ? '¡API Key guardada y validada! ✓' : 'Key guardada pero no se pudo validar. Verificá que sea correcta.')
+        setApiKeyInput('')
+        await loadCredits()
+      }
+    } catch {
+      flashMsg('err', 'Error de red')
+    } finally { setSavingKey(false) }
+  }
+
+  async function deleteKey() {
+    if (!confirm('¿Eliminar tu API Key de OpenAI?')) return
+    setDeletingKey(true)
+    try {
+      const res = await fetch('/api/credits', { method: 'DELETE' })
+      if (res.ok) { flashMsg('ok', 'API Key eliminada'); await loadCredits() }
+      else flashMsg('err', 'No se pudo eliminar')
+    } catch { flashMsg('err', 'Error de red') } finally { setDeletingKey(false) }
+  }
+
   const fmtDate = (d: string) => {
     try {
       return new Date(d).toLocaleDateString('es-BO', { day: '2-digit', month: '2-digit', year: 'numeric' })
     } catch { return '—' }
   }
+
+  // Derivados de la fuente de IA
+  const hasOwnKey = !!credits?.ownKey
+  const usingAdmin = !credits?.preferOwnKey
+  const canUseAdminKey = !!credits?.adminHasKey
 
   return (
     <div className="px-4 sm:px-6 pt-6 max-w-4xl mx-auto pb-20 space-y-6">
@@ -200,7 +300,6 @@ export default function SettingsPage() {
         <div className="absolute top-0 left-0 right-0 h-px"
           style={{ background: 'linear-gradient(90deg, transparent, #D203DD60, #FF2DF740, transparent)' }} />
 
-        {/* Cabecera de la tarjeta */}
         <div className="flex items-center justify-between gap-3 mb-6">
           <div className="flex items-center gap-2.5">
             <div className="w-7 h-7 rounded-lg flex items-center justify-center"
@@ -305,7 +404,6 @@ export default function SettingsPage() {
                   </div>
                 )}
 
-                {/* Usuario + email con íconos */}
                 {!editingName && (
                   <div className="flex items-center justify-center sm:justify-start gap-x-5 gap-y-1.5 flex-wrap mt-3">
                     <span className="inline-flex items-center gap-1.5 text-sm" style={{ color: 'rgba(255,255,255,0.55)' }}>
@@ -321,7 +419,6 @@ export default function SettingsPage() {
               </div>
             </div>
 
-            {/* Divisor + acciones de foto */}
             {!editingName && (
               <>
                 <div className="h-px w-full my-5" style={{ background: 'rgba(255,255,255,0.08)' }} />
@@ -343,17 +440,6 @@ export default function SettingsPage() {
             )}
           </>
         )}
-
-        {msg && (
-          <div className="mt-4 py-2 px-3 rounded-lg text-[11px] font-medium text-center"
-            style={{
-              background: msg.type === 'ok' ? 'rgba(0,255,136,0.10)' : 'rgba(239,68,68,0.10)',
-              border: `1px solid ${msg.type === 'ok' ? 'rgba(0,255,136,0.30)' : 'rgba(239,68,68,0.30)'}`,
-              color: msg.type === 'ok' ? '#00FF88' : '#fca5a5',
-            }}>
-            {msg.text}
-          </div>
-        )}
       </div>
 
       {/* ── CRÉDITOS IA ─────────────────────────────────────────────── */}
@@ -371,7 +457,7 @@ export default function SettingsPage() {
           <div>
             <p className="text-sm font-bold text-white">Créditos IA</p>
             <p className="text-[11px] font-light" style={{ color: 'rgba(255,255,255,0.4)' }}>
-              Consulta tu saldo, recarga y mira tu historial de uso
+              Consulta tu saldo, recarga y configura cómo paga la IA
             </p>
           </div>
         </div>
@@ -446,7 +532,215 @@ export default function SettingsPage() {
             </p>
           </div>
         </div>
+
+        {/* ── CONFIGURACIÓN DE IA: fuente de pago ── */}
+        <div className="mt-6 pt-5" style={{ borderTop: '1px solid rgba(255,255,255,0.08)' }}>
+          <p className="text-[10px] font-black uppercase tracking-[0.25em] mb-1" style={{ color: 'rgba(255,255,255,0.45)' }}>
+            ¿Cómo querés pagar la IA?
+          </p>
+          <p className="text-[11px] mb-3 leading-relaxed" style={{ color: 'rgba(255,255,255,0.4)' }}>
+            Elegí la fuente. La opción activa se usa en todos tus servicios (Bots, Ads, Broadcast).
+          </p>
+
+          <div className="space-y-2.5">
+            {/* Key del Administrador — paga con saldo */}
+            <button
+              onClick={() => setPreferOwnKey(false)}
+              disabled={!canUseAdminKey || togglingPref}
+              className="w-full flex items-center gap-3.5 p-4 rounded-xl transition-all text-left"
+              style={{
+                background: usingAdmin && canUseAdminKey ? 'rgba(162,102,255,0.18)' : 'rgba(255,255,255,0.04)',
+                border: `1px solid ${usingAdmin && canUseAdminKey ? 'rgba(162,102,255,0.50)' : 'rgba(255,255,255,0.10)'}`,
+                opacity: !canUseAdminKey ? 0.5 : 1,
+                cursor: !canUseAdminKey ? 'not-allowed' : 'pointer',
+                boxShadow: usingAdmin && canUseAdminKey ? '0 0 18px -6px rgba(162,102,255,0.45)' : 'none',
+              }}>
+              <div className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0"
+                style={{ background: 'rgba(162,102,255,0.18)', border: '1px solid rgba(162,102,255,0.35)' }}>
+                <ShieldCheck className="w-4 h-4 text-violet-400" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <p className="text-sm font-black text-white">Key del Administrador</p>
+                  <span className="text-[8.5px] font-black uppercase tracking-[0.14em] px-1.5 py-0.5 rounded-full"
+                    style={{ background: 'rgba(162,102,255,0.18)', border: '1px solid rgba(162,102,255,0.30)', color: '#c4b5fd' }}>
+                    Pagás con saldo
+                  </span>
+                </div>
+                <p className="text-[11px] mt-1 leading-relaxed" style={{ color: 'rgba(255,255,255,0.50)' }}>
+                  {canUseAdminKey
+                    ? <>Cada uso descuenta del saldo USD. <b className="text-white/80">Tenés ${(credits?.aiBalanceUsd ?? 0).toFixed(2)} disponibles</b>.</>
+                    : 'El administrador aún no configuró una key global.'}
+                </p>
+              </div>
+              <div className={`w-5 h-5 rounded-full border-2 shrink-0 flex items-center justify-center ${usingAdmin && canUseAdminKey ? 'border-violet-400 bg-violet-400' : 'border-white/20'}`}>
+                {usingAdmin && canUseAdminKey && <CheckCircle className="w-3 h-3 text-white" />}
+              </div>
+            </button>
+
+            {/* Mi Propia API Key — OpenAI factura directo */}
+            <button
+              onClick={() => setPreferOwnKey(true)}
+              disabled={!hasOwnKey || togglingPref}
+              className="w-full flex items-center gap-3.5 p-4 rounded-xl transition-all text-left"
+              style={{
+                background: !usingAdmin && hasOwnKey ? 'rgba(125,211,252,0.15)' : 'rgba(255,255,255,0.04)',
+                border: `1px solid ${!usingAdmin && hasOwnKey ? 'rgba(125,211,252,0.45)' : 'rgba(255,255,255,0.10)'}`,
+                opacity: !hasOwnKey ? 0.5 : 1,
+                cursor: !hasOwnKey ? 'not-allowed' : 'pointer',
+                boxShadow: !usingAdmin && hasOwnKey ? '0 0 18px -6px rgba(125,211,252,0.45)' : 'none',
+              }}>
+              <div className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0"
+                style={{ background: 'rgba(125,211,252,0.15)', border: '1px solid rgba(125,211,252,0.35)' }}>
+                <Key className="w-4 h-4 text-sky-400" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <p className="text-sm font-black text-white">Mi Propia API Key</p>
+                  <span className="text-[8.5px] font-black uppercase tracking-[0.14em] px-1.5 py-0.5 rounded-full"
+                    style={{ background: 'rgba(125,211,252,0.15)', border: '1px solid rgba(125,211,252,0.30)', color: '#7dd3fc' }}>
+                    No usa saldo
+                  </span>
+                </div>
+                <p className="text-[11px] mt-1 leading-relaxed" style={{ color: 'rgba(255,255,255,0.50)' }}>
+                  {hasOwnKey
+                    ? <>OpenAI te factura directo. <b className="text-white/80">{credits?.ownKey?.apiKeyMasked}</b> · {credits?.ownKey?.model}</>
+                    : 'Configurá tu key de OpenAI abajo (cifrada AES-256). Los costos van a tu cuenta de OpenAI.'}
+                </p>
+              </div>
+              <div className={`w-5 h-5 rounded-full border-2 shrink-0 flex items-center justify-center ${!usingAdmin && hasOwnKey ? 'border-sky-400 bg-sky-400' : 'border-white/20'}`}>
+                {!usingAdmin && hasOwnKey && <CheckCircle className="w-3 h-3 text-white" />}
+              </div>
+            </button>
+          </div>
+          {togglingPref && (
+            <div className="flex items-center gap-2 mt-2.5 text-xs" style={{ color: 'rgba(255,255,255,0.4)' }}>
+              <Loader2 className="w-3 h-3 animate-spin" /> Guardando preferencia...
+            </div>
+          )}
+        </div>
+
+        {/* Seguimientos automáticos */}
+        <div className="mt-3 flex items-center justify-between gap-3 px-4 py-3.5 rounded-xl"
+          style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
+          <div className="flex items-center gap-3 min-w-0">
+            <RefreshCw className="w-4 h-4 shrink-0" style={{ color: '#D203DD' }} />
+            <div className="min-w-0">
+              <p className="text-xs font-bold text-white">Seguimientos automáticos {credits ? (credits.followupsEnabled ? '· Activados' : '· Pausados') : ''}</p>
+              <p className="text-[10px] leading-snug" style={{ color: 'rgba(255,255,255,0.4)' }}>
+                El bot reescribe solo a quien no responde (15 min y 3 días). Cada seguimiento consume IA.
+              </p>
+            </div>
+          </div>
+          <Switch on={!!credits?.followupsEnabled} onClick={toggleFollowups} disabled={!credits || togglingFollow} />
+        </div>
+
+        {/* Mi API Key de OpenAI — formulario */}
+        <div className="mt-3 rounded-xl p-4 space-y-3.5"
+          style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
+          <div className="flex items-center gap-2">
+            <KeyRound className="w-4 h-4 text-sky-400" />
+            <p className="text-[10px] font-black uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.45)' }}>
+              Mi API Key de OpenAI
+            </p>
+          </div>
+
+          {/* Estado de la key actual */}
+          {credits?.ownKey && (
+            <div className="flex items-center gap-3 p-3 rounded-xl"
+              style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}>
+              <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
+                style={{
+                  background: credits.ownKey.isValid ? 'rgba(0,255,136,0.1)' : 'rgba(239,68,68,0.1)',
+                  border: `1px solid ${credits.ownKey.isValid ? 'rgba(0,255,136,0.3)' : 'rgba(239,68,68,0.3)'}`,
+                }}>
+                {credits.ownKey.isValid
+                  ? <CheckCircle className="w-4 h-4 text-green-400" />
+                  : <XCircle className="w-4 h-4 text-red-400" />}
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-mono text-white truncate">{credits.ownKey.apiKeyMasked}</p>
+                <p className="text-[10px] mt-0.5" style={{ color: 'rgba(255,255,255,0.3)' }}>
+                  {credits.ownKey.isValid ? `Válida · ${credits.ownKey.model}` : 'No válida — actualizá la key'}
+                </p>
+              </div>
+              <button onClick={deleteKey} disabled={deletingKey}
+                className="w-8 h-8 rounded-lg flex items-center justify-center transition-colors shrink-0"
+                style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)' }}
+                title="Eliminar key">
+                {deletingKey ? <Loader2 className="w-3.5 h-3.5 text-red-400 animate-spin" /> : <Trash2 className="w-3.5 h-3.5 text-red-400" />}
+              </button>
+            </div>
+          )}
+
+          {/* Form agregar/actualizar */}
+          <div className="space-y-3">
+            <div>
+              <label className="text-[10px] font-bold uppercase tracking-widest mb-1.5 block" style={{ color: 'rgba(255,255,255,0.35)' }}>
+                {credits?.ownKey ? 'Actualizar API Key' : 'Agregar API Key de OpenAI'}
+              </label>
+              <div className="relative">
+                <input
+                  type={showKey ? 'text' : 'password'}
+                  placeholder="sk-proj-..."
+                  value={apiKeyInput}
+                  onChange={e => setApiKeyInput(e.target.value)}
+                  className="w-full rounded-xl px-4 py-3 pr-11 text-sm font-mono text-white placeholder-white/20 outline-none transition-all"
+                  style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)' }}
+                  onFocus={e => (e.currentTarget.style.borderColor = 'rgba(154,203,255,0.4)')}
+                  onBlur={e => (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)')}
+                />
+                <button type="button" onClick={() => setShowKey(v => !v)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2" style={{ color: 'rgba(255,255,255,0.3)' }}>
+                  {showKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+            </div>
+
+            <div>
+              <label className="text-[10px] font-bold uppercase tracking-widest mb-1.5 block" style={{ color: 'rgba(255,255,255,0.35)' }}>Modelo</label>
+              <select value={model} onChange={e => setModel(e.target.value)}
+                className="w-full rounded-xl px-4 py-2.5 text-sm text-white outline-none"
+                style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)' }}>
+                <option value="gpt-4o">GPT-4o (Recomendado)</option>
+                <option value="gpt-4o-mini">GPT-4o Mini (Económico)</option>
+                <option value="gpt-4-turbo">GPT-4 Turbo</option>
+                <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
+              </select>
+            </div>
+
+            <button onClick={saveKey} disabled={savingKey || !apiKeyInput.trim()}
+              className="w-full py-3 rounded-xl font-bold text-sm transition-all active:scale-[0.98] disabled:opacity-40"
+              style={{ background: 'linear-gradient(135deg, rgba(154,203,255,0.25), rgba(162,102,255,0.25))', border: '1px solid rgba(255,255,255,0.2)', color: '#fff' }}>
+              {savingKey
+                ? <span className="flex items-center justify-center gap-2"><Loader2 className="w-4 h-4 animate-spin" /> Validando y guardando...</span>
+                : (credits?.ownKey ? 'Actualizar API Key' : 'Guardar API Key')}
+            </button>
+          </div>
+
+          {/* Nota */}
+          <div className="flex items-start gap-2 p-3 rounded-xl"
+            style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
+            <Info className="w-3.5 h-3.5 mt-0.5 shrink-0" style={{ color: 'rgba(255,255,255,0.3)' }} />
+            <p className="text-[11px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.3)' }}>
+              Tu API Key se guarda cifrada con AES-256. Conseguila en{' '}
+              <span className="text-sky-400">platform.openai.com/api-keys</span>. Al usar tu propia key, los costos van directo a tu cuenta de OpenAI.
+            </p>
+          </div>
+        </div>
       </div>
+
+      {/* Feedback global */}
+      {msg && (
+        <div className="py-2.5 px-4 rounded-xl text-xs font-medium text-center"
+          style={{
+            background: msg.type === 'ok' ? 'rgba(0,255,136,0.10)' : 'rgba(239,68,68,0.10)',
+            border: `1px solid ${msg.type === 'ok' ? 'rgba(0,255,136,0.30)' : 'rgba(239,68,68,0.30)'}`,
+            color: msg.type === 'ok' ? '#00FF88' : '#fca5a5',
+          }}>
+          {msg.text}
+        </div>
+      )}
 
       <p className="text-center text-[10px] font-light" style={{ color: 'rgba(255,255,255,0.12)' }}>
         MY DIAMOND © 2026 &bull; Build 20260217

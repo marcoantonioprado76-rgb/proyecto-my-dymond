@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import Link from 'next/link'
 import {
   Cpu,
   Key,
@@ -23,6 +24,8 @@ import {
   ArrowDownLeft,
   ArrowUpRight,
   ExternalLink,
+  Settings,
+  ChevronRight,
 } from 'lucide-react'
 import { PaymentGateway } from '@/components/PaymentGateway'
 
@@ -394,266 +397,26 @@ export default function CreditsPage() {
         </div>
       )}
 
-      {/* Key source preference — selector usa saldo vs propia key */}
-      <div className="relative rounded-2xl p-5 overflow-hidden"
-        style={{
-          background: 'linear-gradient(135deg, rgba(154,203,255,0.12) 0%, rgba(255,125,224,0.12) 50%, rgba(162,102,255,0.12) 100%)',
-          border: '1px solid rgba(255,255,255,0.15)',
-          backdropFilter: 'blur(16px)',
-        }}>
-        <div className="flex items-center justify-between mb-1">
-          <p className="text-[10px] font-black uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.4)' }}>
-            ¿Cómo querés pagar la IA?
-          </p>
-          <span className="text-[9px] font-black uppercase tracking-[0.18em] px-2 py-0.5 rounded-full"
-            style={{
-              background: usingOwn ? 'rgba(125,211,252,0.15)' : usingAdmin ? 'rgba(167,139,250,0.15)' : 'rgba(248,113,113,0.10)',
-              border: `1px solid ${usingOwn ? 'rgba(125,211,252,0.35)' : usingAdmin ? 'rgba(167,139,250,0.35)' : 'rgba(248,113,113,0.30)'}`,
-              color: usingOwn ? '#7dd3fc' : usingAdmin ? '#a78bfa' : '#fca5a5',
-            }}>
-            {usingOwn ? 'Mi key' : usingAdmin ? 'Saldo USD' : 'Sin fuente'}
-          </span>
-        </div>
-        <p className="text-[11px] mb-4 leading-relaxed" style={{ color: 'rgba(255,255,255,0.40)' }}>
-          Elegí la fuente de IA. Podés cambiar cuando quieras — la opción activa se usará en todos los servicios (Ads, Bots, Broadcast).
-        </p>
-
-        <div className="space-y-3">
-          {/* Admin key option — paga con saldo USD */}
-          <button
-            onClick={() => data?.preferOwnKey && togglePreference()}
-            disabled={!canUseAdminKey || togglingPref}
-            className="w-full flex items-center gap-4 p-4 rounded-xl transition-all duration-200 text-left"
-            style={{
-              background: usingAdmin && canUseAdminKey ? 'rgba(162,102,255,0.18)' : 'rgba(255,255,255,0.04)',
-              border: `1px solid ${usingAdmin && canUseAdminKey ? 'rgba(162,102,255,0.50)' : 'rgba(255,255,255,0.10)'}`,
-              opacity: !canUseAdminKey ? 0.5 : 1,
-              cursor: !canUseAdminKey ? 'not-allowed' : 'pointer',
-              boxShadow: usingAdmin && canUseAdminKey ? '0 0 18px -6px rgba(162,102,255,0.45)' : 'none',
-            }}>
-            <div className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0"
-              style={{ background: 'rgba(162,102,255,0.18)', border: '1px solid rgba(162,102,255,0.35)' }}>
-              <ShieldCheck className="w-4 h-4 text-violet-400" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 flex-wrap">
-                <p className="text-sm font-black text-white">Key del Administrador</p>
-                <span className="text-[8.5px] font-black uppercase tracking-[0.14em] px-1.5 py-0.5 rounded-full"
-                  style={{ background: 'rgba(162,102,255,0.18)', border: '1px solid rgba(162,102,255,0.30)', color: '#c4b5fd' }}>
-                  Pagás con saldo
-                </span>
-              </div>
-              <p className="text-[11px] mt-1 leading-relaxed" style={{ color: 'rgba(255,255,255,0.50)' }}>
-                {canUseAdminKey
-                  ? <>Cada uso descuenta del saldo USD. <b className="text-white/80">Tenés ${(data?.aiBalanceUsd ?? 0).toFixed(2)} disponibles</b>.</>
-                  : 'El administrador aún no configuró una key global.'}
-              </p>
-            </div>
-            <div className={`w-5 h-5 rounded-full border-2 shrink-0 flex items-center justify-center ${usingAdmin && canUseAdminKey ? 'border-violet-400 bg-violet-400' : 'border-white/20'}`}>
-              {usingAdmin && canUseAdminKey && <CheckCircle className="w-3 h-3 text-white" />}
-            </div>
-          </button>
-
-          {/* Own key option — OpenAI factura directo */}
-          <button
-            onClick={() => !data?.preferOwnKey && togglePreference()}
-            disabled={!hasOwnKey || togglingPref}
-            className="w-full flex items-center gap-4 p-4 rounded-xl transition-all duration-200 text-left"
-            style={{
-              background: !usingAdmin && hasOwnKey ? 'rgba(125,211,252,0.15)' : 'rgba(255,255,255,0.04)',
-              border: `1px solid ${!usingAdmin && hasOwnKey ? 'rgba(125,211,252,0.45)' : 'rgba(255,255,255,0.10)'}`,
-              opacity: !hasOwnKey ? 0.5 : 1,
-              cursor: !hasOwnKey ? 'not-allowed' : 'pointer',
-              boxShadow: !usingAdmin && hasOwnKey ? '0 0 18px -6px rgba(125,211,252,0.45)' : 'none',
-            }}>
-            <div className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0"
-              style={{ background: 'rgba(125,211,252,0.15)', border: '1px solid rgba(125,211,252,0.35)' }}>
-              <Key className="w-4 h-4 text-sky-400" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 flex-wrap">
-                <p className="text-sm font-black text-white">Mi Propia API Key</p>
-                <span className="text-[8.5px] font-black uppercase tracking-[0.14em] px-1.5 py-0.5 rounded-full"
-                  style={{ background: 'rgba(125,211,252,0.15)', border: '1px solid rgba(125,211,252,0.30)', color: '#7dd3fc' }}>
-                  No usa saldo
-                </span>
-              </div>
-              <p className="text-[11px] mt-1 leading-relaxed" style={{ color: 'rgba(255,255,255,0.50)' }}>
-                {hasOwnKey
-                  ? <>OpenAI te factura directo a tu cuenta. <b className="text-white/80">{data?.ownKey?.apiKeyMasked}</b> · {data?.ownKey?.model}</>
-                  : <>Configurá tu key de OpenAI abajo (cifrada AES-256). Los costos van a tu cuenta de OpenAI, no a tu saldo.</>}
-              </p>
-            </div>
-            <div className={`w-5 h-5 rounded-full border-2 shrink-0 flex items-center justify-center ${!usingAdmin && hasOwnKey ? 'border-sky-400 bg-sky-400' : 'border-white/20'}`}>
-              {!usingAdmin && hasOwnKey && <CheckCircle className="w-3 h-3 text-white" />}
-            </div>
-          </button>
-        </div>
-
-        {togglingPref && (
-          <div className="flex items-center gap-2 mt-3 text-xs" style={{ color: 'rgba(255,255,255,0.4)' }}>
-            <Loader2 className="w-3 h-3 animate-spin" /> Guardando preferencia...
+      {/* Configuración de IA — vive en Configuración para no duplicar */}
+      <Link href="/dashboard/settings"
+        className="relative rounded-2xl p-5 overflow-hidden flex items-center justify-between gap-4 transition-all group"
+        style={{ background: "linear-gradient(135deg, rgba(154,203,255,0.12) 0%, rgba(255,125,224,0.12) 50%, rgba(162,102,255,0.12) 100%)", border: "1px solid rgba(255,255,255,0.15)", textDecoration: "none" }}>
+        <div className="flex items-center gap-4 min-w-0">
+          <div className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0"
+            style={{ background: "rgba(210,3,221,0.12)", border: "1px solid rgba(210,3,221,0.3)" }}>
+            <Settings className="w-5 h-5" style={{ color: "#D203DD" }} />
           </div>
-        )}
-      </div>
-
-      {/* Toggle followups automáticos */}
-      <div className="rounded-2xl p-5"
-        style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
-        <div className="flex items-start justify-between gap-3">
-          <div className="flex-1 min-w-0">
-            <p className="text-[10px] font-black text-white/40 mb-1.5 uppercase tracking-[0.25em]">
-              Seguimientos automáticos
-            </p>
-            <p className="text-sm font-bold text-white leading-snug">
-              {data?.followupsEnabled ? 'Activados' : 'Pausados'}
-            </p>
-            <p className="text-[11px] mt-1 leading-relaxed" style={{ color: 'rgba(255,255,255,0.45)' }}>
-              Cuando un cliente queda sin responder, el bot envía 1 mensaje a los 15 min y otro cada 3 días.
-              {' '}{data?.followupsEnabled
-                ? <b className="text-white/80">Cada seguimiento consume tokens de IA.</b>
-                : <b className="text-white/80">Mientras estén pausados, NO se consume saldo en automático.</b>}
+          <div className="min-w-0">
+            <p className="text-sm font-bold text-white">Configuración de IA</p>
+            <p className="text-[11px] font-light" style={{ color: "rgba(255,255,255,0.4)" }}>
+              Elegí cómo pagás la IA (saldo o tu propia API Key), tu modelo y los seguimientos — en Configuración.
             </p>
           </div>
-          <button
-            onClick={toggleFollowups}
-            disabled={togglingFollowups}
-            className="shrink-0 flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-black uppercase tracking-[0.14em] transition-all disabled:opacity-50"
-            style={{
-              background: data?.followupsEnabled ? 'rgba(74,222,128,0.15)' : 'rgba(248,113,113,0.10)',
-              border: `1px solid ${data?.followupsEnabled ? 'rgba(74,222,128,0.40)' : 'rgba(248,113,113,0.30)'}`,
-              color: data?.followupsEnabled ? '#4ade80' : '#fca5a5',
-            }}>
-            {togglingFollowups
-              ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
-              : data?.followupsEnabled ? 'Desactivar' : 'Activar'}
-          </button>
         </div>
-      </div>
-
-      {/* My OpenAI API Key */}
-      <div className="relative rounded-2xl p-5 overflow-hidden space-y-4"
-        style={{
-          background: 'linear-gradient(135deg, rgba(154,203,255,0.12) 0%, rgba(255,125,224,0.12) 50%, rgba(162,102,255,0.12) 100%)',
-          border: '1px solid rgba(255,255,255,0.15)',
-          backdropFilter: 'blur(16px)',
-        }}>
-        <div className="absolute top-0 left-0 right-0 h-px"
-          style={{ background: 'linear-gradient(90deg, transparent, rgba(154,203,255,0.4), transparent)' }} />
-
-        <div className="flex items-center gap-2">
-          <Key className="w-4 h-4 text-sky-400" />
-          <p className="text-[10px] font-black uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.4)' }}>
-            Mi API Key de OpenAI
-          </p>
-        </div>
-
-        {/* Current key status */}
-        {data?.ownKey && (
-          <div className="flex items-center gap-3 p-3 rounded-xl"
-            style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}>
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
-              style={{
-                background: data.ownKey.isValid ? 'rgba(0,255,136,0.1)' : 'rgba(239,68,68,0.1)',
-                border: `1px solid ${data.ownKey.isValid ? 'rgba(0,255,136,0.3)' : 'rgba(239,68,68,0.3)'}`,
-              }}>
-              {data.ownKey.isValid
-                ? <CheckCircle className="w-4 h-4 text-green-400" />
-                : <XCircle className="w-4 h-4 text-red-400" />
-              }
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-mono text-white">{data.ownKey.apiKeyMasked}</p>
-              <p className="text-[10px] mt-0.5" style={{ color: 'rgba(255,255,255,0.3)' }}>
-                {data.ownKey.isValid ? `Válida · ${data.ownKey.model}` : 'No válida — actualiza la key'}
-              </p>
-            </div>
-            <button onClick={deleteKey} disabled={deleting}
-              className="w-8 h-8 rounded-lg flex items-center justify-center transition-colors"
-              style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)' }}
-              title="Eliminar key">
-              {deleting ? <Loader2 className="w-3.5 h-3.5 text-red-400 animate-spin" /> : <Trash2 className="w-3.5 h-3.5 text-red-400" />}
-            </button>
-          </div>
-        )}
-
-        {/* Add/Update key form */}
-        <div className="space-y-3">
-          <div>
-            <label className="text-[11px] font-bold uppercase tracking-widest mb-1.5 block" style={{ color: 'rgba(255,255,255,0.35)' }}>
-              {data?.ownKey ? 'Actualizar API Key' : 'Agregar API Key de OpenAI'}
-            </label>
-            <div className="relative">
-              <input
-                type={showKey ? 'text' : 'password'}
-                placeholder="sk-proj-..."
-                value={apiKeyInput}
-                onChange={e => setApiKeyInput(e.target.value)}
-                className="w-full rounded-xl px-4 py-3 pr-11 text-sm font-mono text-white placeholder-white/20 outline-none transition-all"
-                style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)' }}
-                onFocus={e => (e.currentTarget.style.borderColor = 'rgba(154,203,255,0.4)')}
-                onBlur={e => (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)')}
-              />
-              <button
-                type="button"
-                onClick={() => setShowKey(v => !v)}
-                className="absolute right-3 top-1/2 -translate-y-1/2"
-                style={{ color: 'rgba(255,255,255,0.3)' }}>
-                {showKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-              </button>
-            </div>
-          </div>
-
-          <div>
-            <label className="text-[11px] font-bold uppercase tracking-widest mb-1.5 block" style={{ color: 'rgba(255,255,255,0.35)' }}>Modelo</label>
-            <select
-              value={model}
-              onChange={e => setModel(e.target.value)}
-              className="w-full rounded-xl px-4 py-2.5 text-sm text-white outline-none"
-              style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)' }}>
-              <option value="gpt-4o">GPT-4o (Recomendado)</option>
-              <option value="gpt-4o-mini">GPT-4o Mini (Económico)</option>
-              <option value="gpt-4-turbo">GPT-4 Turbo</option>
-              <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
-            </select>
-          </div>
-
-          {msg && (
-            <div className={`flex items-start gap-2 p-3 rounded-xl text-xs ${msg.type === 'ok' ? 'text-green-400' : 'text-red-400'}`}
-              style={{
-                background: msg.type === 'ok' ? 'rgba(0,255,136,0.08)' : 'rgba(239,68,68,0.08)',
-                border: `1px solid ${msg.type === 'ok' ? 'rgba(0,255,136,0.2)' : 'rgba(239,68,68,0.2)'}`,
-              }}>
-              {msg.type === 'ok' ? <CheckCircle className="w-3.5 h-3.5 mt-0.5 shrink-0" /> : <XCircle className="w-3.5 h-3.5 mt-0.5 shrink-0" />}
-              {msg.text}
-            </div>
-          )}
-
-          <button
-            onClick={saveKey}
-            disabled={saving || !apiKeyInput.trim()}
-            className="w-full py-3 rounded-xl font-bold text-sm transition-all active:scale-[0.98] disabled:opacity-40"
-            style={{ background: 'linear-gradient(135deg, rgba(154,203,255,0.25), rgba(162,102,255,0.25))', border: '1px solid rgba(255,255,255,0.2)', color: '#fff' }}>
-            {saving ? (
-              <span className="flex items-center justify-center gap-2">
-                <Loader2 className="w-4 h-4 animate-spin" /> Validando y guardando...
-              </span>
-            ) : (
-              data?.ownKey ? 'Actualizar API Key' : 'Guardar API Key'
-            )}
-          </button>
-        </div>
-
-        {/* Info note */}
-        <div className="flex items-start gap-2 p-3 rounded-xl"
-          style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
-          <Info className="w-3.5 h-3.5 mt-0.5 shrink-0" style={{ color: 'rgba(255,255,255,0.3)' }} />
-          <p className="text-[11px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.3)' }}>
-            Tu API Key se guarda cifrada con AES-256. Consíguela en{' '}
-            <span className="text-sky-400">platform.openai.com/api-keys</span>. Al usar tu propia key, los costos se cargan directamente a tu cuenta de OpenAI.
-          </p>
-        </div>
-      </div>
+        <span className="flex items-center gap-1 text-xs font-bold shrink-0 transition-all group-hover:translate-x-0.5" style={{ color: "#E879F9" }}>
+          Configurar <ChevronRight className="w-4 h-4" />
+        </span>
+      </Link>
 
       {/* ── MODAL: COMPRAR SALDO ───────────────────────────────────── */}
       {showBuyModal && (
