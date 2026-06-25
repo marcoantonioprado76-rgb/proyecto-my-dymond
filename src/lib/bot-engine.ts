@@ -165,12 +165,33 @@ export function buildSystemPrompt(
       // que es donde más se gasta). No pierde calidad: cuando el cliente menciona un producto,
       // su ficha completa aparece automáticamente en ese turno.
       if (!identifiedProductIds?.includes(p.id as string)) {
+        // Solo el TEXTO pesado (beneficios/uso/firstMessage) queda gateado para ahorrar
+        // tokens. TODO el material visual (fotos, más fotos, videos y testimonios) va
+        // SIEMPRE — si no, el bot no tiene qué mandar y dejaba de enviar imágenes/videos.
+        const allImgsMin = Array.isArray(p.imageMainUrls) ? (p.imageMainUrls as string[]) : []
+        const mainImgsMin = allImgsMin.slice(0, 3)
+        const moreImgsMin = allImgsMin.slice(3, 8)
+        const rawTestisMin = (Array.isArray(p.testimonialsVideoUrls) ? p.testimonialsVideoUrls : []) as Array<unknown>
+        const testiImgsMin = rawTestisMin.map(it => {
+          if (it && typeof it === 'object') { const o = it as any; return (o.type !== 'video' && typeof o.url === 'string' && o.url.startsWith('http')) ? { url: o.url, label: o.label || '' } : null }
+          return (typeof it === 'string' && it.startsWith('http')) ? { url: it, label: '' } : null
+        }).filter(Boolean)
+        const testiVidsMin = rawTestisMin.map(it => {
+          if (it && typeof it === 'object') { const o = it as any; return (o.type === 'video' && typeof o.url === 'string' && o.url.startsWith('http')) ? { url: o.url, label: o.label || '' } : null }
+          return null
+        }).filter(Boolean)
+        const prodVidsMin = Array.isArray((p as any).productVideoUrls) ? (p as any).productVideoUrls as string[] : []
         return [
           `### PRODUCTO: ${p.name}`,
           p.category    ? `- Categoría: ${p.category}` : '',
           p.priceUnit   ? `- Precio unitario: ${sym}${p.priceUnit} (${currency})` : '',
           p.pricePromo2 ? `- Precio promo ×2: ${sym}${p.pricePromo2} (${currency})` : '',
           p.priceSuper6 ? `- Precio súper ×6: ${sym}${p.priceSuper6} (${currency})` : '',
+          !welcomeSent && mainImgsMin.length ? `- Imágenes principales (enviar 1): ${JSON.stringify(mainImgsMin)}` : '',
+          moreImgsMin.length ? `- Más fotos: ${JSON.stringify(moreImgsMin)}` : '',
+          prodVidsMin.length ? `- Videos producto: ${JSON.stringify(prodVidsMin)}` : '',
+          testiImgsMin.length ? `- Fotos testimonios: ${JSON.stringify(testiImgsMin)}` : '',
+          testiVidsMin.length ? `- Videos testimonios: ${JSON.stringify(testiVidsMin)}` : '',
         ].filter(Boolean).join('\n')
       }
 
