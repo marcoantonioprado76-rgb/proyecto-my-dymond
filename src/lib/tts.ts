@@ -51,7 +51,16 @@ async function synthesizeFish(text: string, referenceId: string, format: 'opus' 
       method: 'POST',
       headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json', model: FISH_MODEL },
       signal: controller.signal,
-      body: JSON.stringify({ text: clean, reference_id: referenceId, format }),
+      body: JSON.stringify({
+        text: clean,
+        reference_id: referenceId,
+        format,
+        latency: 'normal',                 // mejor calidad que 'balanced' (default)
+        normalize: true,                   // normaliza números/siglas → menos errores
+        prosody: { speed: 1.0, volume: 0 },
+        temperature: 0.5,                  // más bajo = más fiel al texto, menos "inventos"
+        top_p: 0.7,
+      }),
     })
     if (!res.ok) {
       console.error(`[TTS Fish] ${res.status}: ${(await res.text()).slice(0, 200)}`)

@@ -20,8 +20,10 @@ export const BOT_VOICES: BotVoice[] = [
   { id: 'M8loDRgNKB2tSjz2DSyo', name: 'Fran',      desc: 'Latino · joven · profesional',       gender: 'male'   },
   { id: '2lXqHPvvYzPdMCli0szc', name: 'Cruz',      desc: 'Latino · casual · conversacional',   gender: 'male'   },
   { id: 'UxEeTOXgTgyv54iyYaa5', name: 'Alexander', desc: 'Colombiano · seguro · cierre',       gender: 'male'   },
-  { id: 'ff2941afa1654da5bb1f48ec1f908071', name: 'Orlando', desc: 'Latino · natural · cercano',  gender: 'male',   provider: 'fish' },
-  { id: '91cb315c198e4b00be65bbd69a737d50', name: 'Yecenia', desc: 'Latina · cálida · natural',   gender: 'female', provider: 'fish' },
+  // Clones propios de Marco en ElevenLabs (más fieles/claros que los de Fish, que
+  // distorsionaban el acento boliviano y se entendían mal).
+  { id: 'yisXnwAIqCXby8Q47Qf5', name: 'Orlando', desc: 'Boliviano · natural · cercano',  gender: 'male'   },
+  { id: 'L9WYNUNoPao3KaRfPpgN', name: 'Yecenia', desc: 'Boliviana · cálida · natural',   gender: 'female' },
 ]
 
 export const DEFAULT_VOICE_ID = 'M8loDRgNKB2tSjz2DSyo' // Fran
