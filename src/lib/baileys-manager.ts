@@ -447,6 +447,8 @@ async function handleMessage(
             if (ogg) {
                 await sock.sendPresenceUpdate('recording', jid)
                 await sleep(Math.floor(Math.random() * 800) + 700)
+                // ptt:true + audio-decode instalado → Baileys genera la onda y WhatsApp lo
+                // muestra como NOTA DE VOZ (onda + micrófono), no como archivo (audífonos).
                 await sock.sendMessage(jid, { audio: ogg, mimetype: 'audio/ogg; codecs=opus', ptt: true }).catch(() => { })
                 voiceSent = true
                 console.log(`[BAILEYS] 🎙️ nota de voz enviada a ${userPhone}`)

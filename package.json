@@ -22,6 +22,7 @@
     "@types/nodemailer": "^7.0.10",
     "@whiskeysockets/baileys": "^7.0.0-rc.9",
     "abitype": "^1.2.4",
+    "audio-decode": "^2.2.3",
     "axios": "^1.15.2",
     "axios-retry": "^4.5.0",
     "bcryptjs": "^2.4.3",
