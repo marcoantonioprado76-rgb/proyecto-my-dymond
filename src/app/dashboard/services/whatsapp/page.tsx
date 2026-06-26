@@ -43,6 +43,7 @@ import {
   UserCheck,
   Volume2,
   Play,
+  Pause,
 } from 'lucide-react'
 import { BOT_VOICES, DEFAULT_VOICE_ID } from '@/lib/voices'
 
@@ -1224,20 +1225,31 @@ function VoiceCard({ bot }: { bot: Bot }) {
   const [voiceId, setVoiceId] = useState(bot.voiceId || DEFAULT_VOICE_ID)
   const [voiceMode, setVoiceMode] = useState(bot.voiceMode && bot.voiceMode !== 'off' ? bot.voiceMode : 'audio_in')
   const [savingVoice, setSavingVoice] = useState(false)
-  const [previewVoice, setPreviewVoice] = useState<string | null>(null)
+  const [loadingVoice, setLoadingVoice] = useState<string | null>(null)   // generando la muestra
+  const [playingVoice, setPlayingVoice] = useState<string | null>(null)   // sonando ahora
   const previewAudioRef = useRef<HTMLAudioElement | null>(null)
   const [msg, setMsg] = useState<{ type: 'error' | 'success'; text: string } | null>(null)
 
+  const stopPreview = () => {
+    if (previewAudioRef.current) { previewAudioRef.current.pause(); previewAudioRef.current = null }
+    setLoadingVoice(null)
+    setPlayingVoice(null)
+  }
+
   const playPreview = (id: string) => {
-    setPreviewVoice(id)
+    // Tocar de nuevo la misma voz (cargando o sonando) → detener.
+    if (loadingVoice === id || playingVoice === id) { stopPreview(); return }
+    stopPreview()
+    setMsg(null)
+    setLoadingVoice(id)
     try {
-      if (previewAudioRef.current) previewAudioRef.current.pause()
       const a = new Audio(`/api/tts/preview?voice=${id}`)
       previewAudioRef.current = a
-      a.onended = () => setPreviewVoice(null)
-      a.onerror = () => { setPreviewVoice(null); setMsg({ type: 'error', text: 'No se pudo reproducir (¿voz configurada en el servidor?)' }) }
-      a.play().catch(() => setPreviewVoice(null))
-    } catch { setPreviewVoice(null) }
+      a.onplaying = () => { setLoadingVoice(null); setPlayingVoice(id) }   // ya suena → quitar spinner
+      a.onended = () => { setLoadingVoice(null); setPlayingVoice(null) }
+      a.onerror = () => { setLoadingVoice(null); setPlayingVoice(null); setMsg({ type: 'error', text: 'No se pudo reproducir (¿voz configurada en el servidor?)' }) }
+      a.play().catch(() => { setLoadingVoice(null); setPlayingVoice(null) })
+    } catch { stopPreview() }
   }
 
   return (
@@ -1293,13 +1305,13 @@ function VoiceCard({ bot }: { bot: Bot }) {
           </div>
 
           <div className="space-y-2">
-            <p className="text-xs font-semibold text-dark-400">Elige la voz <span className="text-dark-500">(toca ▶ para escuchar)</span></p>
+            <p className="text-xs font-semibold text-dark-400">Elige la voz <span className="text-dark-500">(▶ escuchar · ⏸ tocá de nuevo para detener)</span></p>
             {BOT_VOICES.map(v => (
               <div
                 key={v.id}
                 className={`w-full flex items-center justify-between px-4 py-2.5 rounded-xl border transition-all ${
                   voiceId === v.id ? 'border-neon-blue/60 bg-neon-blue/10' : 'border-white/10 bg-dark-900/30'
-                }`}
+                } ${playingVoice === v.id ? 'ring-1 ring-neon-blue/50' : ''}`}
               >
                 <button type="button" onClick={() => setVoiceId(v.id)} className="flex items-center gap-3 text-left flex-1 min-w-0">
                   {voiceId === v.id
@@ -1313,12 +1325,18 @@ function VoiceCard({ bot }: { bot: Bot }) {
                 <button
                   type="button"
                   onClick={() => playPreview(v.id)}
-                  title="Escuchar"
-                  className="ml-2 shrink-0 w-8 h-8 rounded-lg bg-white/5 border border-white/10 hover:border-neon-blue/40 flex items-center justify-center"
+                  title={playingVoice === v.id ? 'Detener' : loadingVoice === v.id ? 'Cargando…' : 'Escuchar'}
+                  className={`ml-2 shrink-0 w-8 h-8 rounded-lg border flex items-center justify-center transition-colors ${
+                    playingVoice === v.id
+                      ? 'bg-neon-blue/25 border-neon-blue/60'
+                      : 'bg-white/5 border-white/10 hover:border-neon-blue/40'
+                  }`}
                 >
-                  {previewVoice === v.id
+                  {loadingVoice === v.id
                     ? <Loader2 className="w-3.5 h-3.5 text-neon-blue animate-spin" />
-                    : <Play className="w-3.5 h-3.5 text-dark-400" />}
+                    : playingVoice === v.id
+                      ? <Pause className="w-3.5 h-3.5 text-neon-blue" />
+                      : <Play className="w-3.5 h-3.5 text-dark-400" />}
                 </button>
               </div>
             ))}
