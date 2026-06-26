@@ -5,12 +5,20 @@
  * servidor (motor TTS). La API key vive solo en el servidor (tts.ts).
  */
 
+export interface VoiceSettings {
+  stability?: number          // 0-1 · más alto = más calmada/estable; más bajo = más expresiva
+  similarity_boost?: number   // 0-1 · fidelidad al clon
+  style?: number              // 0-1 · 0 = natural/sin exagerar (evita que "grite")
+  use_speaker_boost?: boolean // true sube presencia/volumen; false = más suave
+}
+
 export interface BotVoice {
   id: string
   name: string
   desc: string
   gender: 'female' | 'male'
   provider?: 'elevenlabs' | 'fish' // por defecto elevenlabs
+  settings?: VoiceSettings         // ajustes ElevenLabs por voz (opcional)
 }
 
 export const BOT_VOICES: BotVoice[] = [
@@ -22,8 +30,10 @@ export const BOT_VOICES: BotVoice[] = [
   { id: 'UxEeTOXgTgyv54iyYaa5', name: 'Alexander', desc: 'Colombiano · seguro · cierre',       gender: 'male'   },
   // Clones propios de Marco en ElevenLabs (más fieles/claros que los de Fish, que
   // distorsionaban el acento boliviano y se entendían mal).
-  { id: 'yisXnwAIqCXby8Q47Qf5', name: 'Orlando', desc: 'Boliviano · natural · cercano',  gender: 'male'   },
-  { id: 'L9WYNUNoPao3KaRfPpgN', name: 'Yecenia', desc: 'Boliviana · cálida · natural',   gender: 'female' },
+  { id: 'yisXnwAIqCXby8Q47Qf5', name: 'Orlando', desc: 'Boliviano · natural · cercano',  gender: 'male',
+    settings: { stability: 0.55, similarity_boost: 0.70, style: 0.0, use_speaker_boost: false } },
+  { id: 'L9WYNUNoPao3KaRfPpgN', name: 'Yecenia', desc: 'Boliviana · cálida · suave',     gender: 'female',
+    settings: { stability: 0.6, similarity_boost: 0.70, style: 0.0, use_speaker_boost: false } },
 ]
 
 export const DEFAULT_VOICE_ID = 'M8loDRgNKB2tSjz2DSyo' // Fran

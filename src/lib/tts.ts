@@ -16,16 +16,34 @@ const FISH_MODEL = process.env.FISH_MODEL || 's1'
 // Límite de caracteres por nota de voz — controla costo y duración.
 const MAX_TTS_CHARS = 700
 
-/** Limpia el texto para que se escuche natural (sin markdown, sin emojis, sin URLs). */
+// Voseo argentino → tuteo (boliviano) SOLO para lo que se LOCUTA. Que diga "quieres",
+// no "querés"; "tú", no "vos". No toca el texto escrito que manda el bot.
+// El \b final de JS no funciona tras vocal acentuada (á/é/í), así que usamos un
+// lookahead que excluye letras (incl. acentuadas) para cerrar la palabra.
+const F = '(?![a-záéíóúñ])'
+const VOSEO_TO_TUTEO: Array<[RegExp, string]> = [
+  [new RegExp('\\bquerés' + F, 'gi'), 'quieres'], [new RegExp('\\btenés' + F, 'gi'), 'tienes'],
+  [new RegExp('\\bpodés' + F, 'gi'), 'puedes'],   [new RegExp('\\bsabés' + F, 'gi'), 'sabes'],
+  [new RegExp('\\bhacés' + F, 'gi'), 'haces'],    [new RegExp('\\bvenís' + F, 'gi'), 'vienes'],
+  [new RegExp('\\bdecís' + F, 'gi'), 'dices'],    [new RegExp('\\bsos' + F, 'gi'), 'eres'],
+  [new RegExp('\\bvos' + F, 'gi'), 'tú'],         [new RegExp('\\bmirá' + F, 'gi'), 'mira'],
+  [new RegExp('\\bfijate' + F, 'gi'), 'fíjate'],  [new RegExp('\\bcontame' + F, 'gi'), 'cuéntame'],
+  [new RegExp('\\bdecime' + F, 'gi'), 'dime'],    [new RegExp('\\bmandame' + F, 'gi'), 'mándame'],
+  [new RegExp('\\bescribime' + F, 'gi'), 'escríbeme'], [new RegExp('\\bllevate' + F, 'gi'), 'llévate'],
+  [new RegExp('\\baprovechá' + F, 'gi'), 'aprovecha'], [new RegExp('\\belegí' + F, 'gi'), 'elige'],
+  [new RegExp('\\bavisame' + F, 'gi'), 'avísame'],     [new RegExp('\\bllevás' + F, 'gi'), 'llevas'],
+]
+
+/** Limpia el texto para que se escuche natural (sin markdown/emojis/URLs, moneda y tuteo). */
 export function cleanForSpeech(text: string): string {
-  return (text || '')
+  let t = (text || '')
     .replace(/https?:\/\/\S+/g, '')                                   // URLs
     .replace(/[*_`#>~|]/g, '')                                        // markdown
     .replace(/[\uD83C-\uDBFF][\uDC00-\uDFFF]/g, '')                   // emojis (pares surrogate)
     .replace(/[☀-➿←-⇿⬀-⯿️]/g, '')  // símbolos BMP + variation selector
-    .replace(/\s{2,}/g, ' ')
-    .trim()
-    .slice(0, MAX_TTS_CHARS)
+    .replace(/\bBs\b\.?\s*/g, 'bolivianos ')                          // "Bs"/"Bs." → "bolivianos"
+  for (const [re, rep] of VOSEO_TO_TUTEO) t = t.replace(re, rep)
+  return t.replace(/\s{2,}/g, ' ').trim().slice(0, MAX_TTS_CHARS)
 }
 
 /** ¿Está configurada la voz a nivel plataforma? (ElevenLabs o Fish Audio) */
@@ -104,7 +122,7 @@ export async function synthesizeVoiceNote(text: string, voiceId?: string | null)
         method: 'POST',
         headers: { 'xi-api-key': apiKey, 'Content-Type': 'application/json' },
         signal: controller.signal,
-        body: JSON.stringify({ text: clean, model_id: ELEVEN_MODEL }),
+        body: JSON.stringify({ text: clean, model_id: ELEVEN_MODEL, ...(voice.settings ? { voice_settings: voice.settings } : {}) }),
       },
     )
     if (!res.ok) {
@@ -150,7 +168,7 @@ export async function synthesizePreviewMp3(text: string, voiceId?: string | null
         method: 'POST',
         headers: { 'xi-api-key': apiKey, 'Content-Type': 'application/json' },
         signal: controller.signal,
-        body: JSON.stringify({ text: clean, model_id: ELEVEN_MODEL }),
+        body: JSON.stringify({ text: clean, model_id: ELEVEN_MODEL, ...(voice.settings ? { voice_settings: voice.settings } : {}) }),
       },
     )
     if (!res.ok) {
