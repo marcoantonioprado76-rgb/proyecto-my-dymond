@@ -20,7 +20,6 @@ export const BOT_VOICES: BotVoice[] = [
   { id: 'M8loDRgNKB2tSjz2DSyo', name: 'Fran',      desc: 'Latino · joven · profesional',       gender: 'male'   },
   { id: '2lXqHPvvYzPdMCli0szc', name: 'Cruz',      desc: 'Latino · casual · conversacional',   gender: 'male'   },
   { id: 'UxEeTOXgTgyv54iyYaa5', name: 'Alexander', desc: 'Colombiano · seguro · cierre',       gender: 'male'   },
-  { id: 'd5d68ca3fef749038fb1a9bc9f32b9e2', name: 'Jarvis', desc: 'Fish Audio · voz clonada (más barata)', gender: 'male', provider: 'fish' },
 ]
 
 export const DEFAULT_VOICE_ID = 'M8loDRgNKB2tSjz2DSyo' // Fran
