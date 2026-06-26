@@ -31,7 +31,12 @@ const COUNTRY_NAMES: Record<string, string> = {
     ES: 'España', US: 'Estados Unidos', CA: 'Canadá',
 }
 
-export function parseLocation(loc: string): { type: 'country' | 'city'; key: string; name: string } {
+type LocType = 'country' | 'region' | 'city' | 'subcity'
+const TYPE_LABEL: Record<LocType, string> = { country: 'país', region: 'departamento', city: 'ciudad', subcity: 'pueblo' }
+
+export function parseLocation(loc: string): { type: LocType; key: string; name: string } {
+    if (loc.startsWith('region:')) { const p = loc.split(':'); return { type: 'region', key: p[1], name: p.slice(2).join(':') } }
+    if (loc.startsWith('subcity:')) { const p = loc.split(':'); return { type: 'subcity', key: p[1], name: p.slice(2).join(':') } }
     if (loc.startsWith('city:') || loc.startsWith('cc:')) {
         const p = loc.split(':')
         return { type: 'city', key: p[1], name: p.slice(2).join(':') }
@@ -76,8 +81,8 @@ export default function LocationSelector({ selected, onChange }: Props) {
             try {
                 const res = await fetch(`/api/ads/integrations/meta/locations?q=${encodeURIComponent(q)}`)
                 const data = res.ok ? await res.json() : { locations: [] }
-                // Solo país y ciudad: lo que el publicador targetea correctamente.
-                setResults((data.locations || []).filter((l: any) => l.type === 'country' || l.type === 'city').slice(0, 8))
+                // País, departamento (region), ciudad y pueblo (subcity): todos válidos en Meta.
+                setResults((data.locations || []).filter((l: any) => ['country', 'region', 'city', 'subcity'].includes(l.type)).slice(0, 15))
             } catch { setResults([]) }
             finally { setLoading(false) }
         }, 350)
@@ -90,6 +95,8 @@ export default function LocationSelector({ selected, onChange }: Props) {
 
     function pickResult(r: any) {
         if (r.type === 'country' && r.countryCode) add(String(r.countryCode).toUpperCase())
+        else if (r.type === 'region' && r.key) add(`region:${r.key}:${r.name}`)
+        else if (r.type === 'subcity' && r.key) add(`subcity:${r.key}:${r.name}`)
         else if (r.key) add(`city:${r.key}:${r.name}`)
         setQuery(''); setResults([])
     }
@@ -107,12 +114,13 @@ export default function LocationSelector({ selected, onChange }: Props) {
                 <div className="px-4 pt-3 pb-2 flex flex-wrap gap-1.5 border-b border-white/5">
                     {selected.map(loc => {
                         const p = parseLocation(loc)
+                        const broad = p.type === 'country' || p.type === 'region'
                         return (
-                            <span key={loc} className={`flex items-center gap-1.5 text-[11px] font-medium px-2.5 py-1 rounded-full border ${p.type === 'country'
+                            <span key={loc} className={`flex items-center gap-1.5 text-[11px] font-medium px-2.5 py-1 rounded-full border ${broad
                                 ? 'bg-purple-500/10 border-purple-500/20 text-purple-300'
                                 : 'bg-blue-500/10 border-blue-500/20 text-blue-300'}`}>
-                                {p.type === 'country' ? <Globe size={10} /> : <MapPin size={10} />}
-                                {p.name} <span className="opacity-40">· {p.type === 'country' ? 'país' : 'ciudad'}</span>
+                                {broad ? <Globe size={10} /> : <MapPin size={10} />}
+                                {p.name} <span className="opacity-40">· {TYPE_LABEL[p.type]}</span>
                                 <button onClick={() => remove(loc)} className="text-white/30 hover:text-red-400 ml-0.5"><X size={10} /></button>
                             </span>
                         )
@@ -139,12 +147,12 @@ export default function LocationSelector({ selected, onChange }: Props) {
                         {results.map((r, i) => (
                             <button key={`${r.key}-${i}`} onClick={() => pickResult(r)}
                                 className="w-full flex items-center gap-2.5 px-3 py-2.5 hover:bg-white/8 text-left transition-colors">
-                                {r.type === 'country'
+                                {(r.type === 'country' || r.type === 'region')
                                     ? <Globe size={13} className="text-purple-400 shrink-0" />
                                     : <MapPin size={13} className="text-blue-400 shrink-0" />}
                                 <span className="flex-1 min-w-0 flex items-baseline gap-1.5">
                                     <span className="text-xs text-white/90 truncate">{r.name}</span>
-                                    <span className="text-[10px] text-white/35">{r.type === 'country' ? 'país' : `ciudad · ${r.countryName || r.countryCode || ''}`}</span>
+                                    <span className="text-[10px] text-white/35">{r.type === 'country' ? 'país' : `${TYPE_LABEL[r.type as LocType] || r.type}${r.countryName || r.countryCode ? ' · ' + (r.countryName || r.countryCode) : ''}`}</span>
                                 </span>
                             </button>
                         ))}

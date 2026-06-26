@@ -27,8 +27,9 @@ export interface CampaignDraftPayload {
     budgetAmount: number
     geoLocations?: {
         countries?: string[]
-        regions?: Array<{ key: string; name: string }>
-        cities?: Array<{ key: string; name: string; radius?: number; distance_unit?: string }>
+        regions?: Array<{ key: string; name?: string }>
+        cities?: Array<{ key: string; name?: string; radius?: number; distance_unit?: string }>
+        subcities?: Array<{ key: string; name?: string }>
         custom_locations?: Array<{ lat: number; lng: number; radius: number; distance_unit: string; name?: string }>
     }
     ageMin?: number

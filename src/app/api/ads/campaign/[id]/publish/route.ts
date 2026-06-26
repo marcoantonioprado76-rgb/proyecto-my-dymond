@@ -90,18 +90,26 @@ export async function POST(req: Request, { params }: { params: { id: string } })
         }
         const metaObjective = objectiveMap[campaign.strategy.objective] || 'OUTCOME_TRAFFIC'
 
-        // Parse locations: "CO" → country, "city:KEY:Name" → city
+        // Parse locations: "CO" → país | "city:KEY:Name" → ciudad | "region:KEY:Name" →
+        // departamento/región | "subcity:KEY:Name" → pueblo/subciudad. (Validado contra Meta:
+        // regions y subcities son tipos de targeting aceptados.)
         const countries: string[] = []
         const cities: { key: string; radius: number; distance_unit: string }[] = []
+        const regions: { key: string }[] = []
+        const subcities: { key: string }[] = []
         for (const loc of campaign.locations as string[]) {
             if (loc.startsWith('city:')) {
-                const parts = loc.split(':')
-                const key = parts[1]
+                const key = loc.split(':')[1]
                 if (key) cities.push({ key, radius: 25, distance_unit: 'kilometer' })
+            } else if (loc.startsWith('region:')) {
+                const key = loc.split(':')[1]
+                if (key && !regions.some(r => r.key === key)) regions.push({ key })
+            } else if (loc.startsWith('subcity:')) {
+                const key = loc.split(':')[1]
+                if (key && !subcities.some(s => s.key === key)) subcities.push({ key })
             } else if (loc.startsWith('cc:')) {
-                // Format: "cc:CO:Bogotá" — extract country code
-                const parts = loc.split(':')
-                const countryCode = parts[1]
+                // Format: "cc:CO:Bogotá" — extract country code (legacy)
+                const countryCode = loc.split(':')[1]
                 if (countryCode?.length === 2 && !countries.includes(countryCode.toUpperCase())) {
                     countries.push(countryCode.toUpperCase())
                 }
@@ -109,10 +117,12 @@ export async function POST(req: Request, { params }: { params: { id: string } })
                 countries.push(loc.toUpperCase())
             }
         }
-        const geoLocations = (countries.length > 0 || cities.length > 0)
+        const geoLocations = (countries.length || cities.length || regions.length || subcities.length)
             ? {
                 ...(countries.length > 0 ? { countries } : {}),
-                ...(cities.length > 0 ? { cities } : {})
+                ...(cities.length > 0 ? { cities } : {}),
+                ...(regions.length > 0 ? { regions } : {}),
+                ...(subcities.length > 0 ? { subcities } : {})
             }
             : undefined
 

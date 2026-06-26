@@ -320,9 +320,10 @@ export class MetaAdapter implements IAdsAdapter {
             if (draft.geoLocations.countries?.length) targeting.geo_locations.countries = draft.geoLocations.countries
             if (draft.geoLocations.regions?.length) targeting.geo_locations.regions = draft.geoLocations.regions.map(r => ({ key: r.key }))
             if (draft.geoLocations.cities?.length) targeting.geo_locations.cities = draft.geoLocations.cities.map(c => ({ key: c.key, radius: c.radius, distance_unit: c.distance_unit }))
+            if (draft.geoLocations.subcities?.length) targeting.geo_locations.subcities = draft.geoLocations.subcities.map(s => ({ key: s.key }))
             if (draft.geoLocations.custom_locations?.length) targeting.geo_locations.custom_locations = draft.geoLocations.custom_locations
             // Ensure at least one geo is set
-            if (!targeting.geo_locations.countries && !targeting.geo_locations.regions && !targeting.geo_locations.cities && !targeting.geo_locations.custom_locations) {
+            if (!targeting.geo_locations.countries && !targeting.geo_locations.regions && !targeting.geo_locations.cities && !targeting.geo_locations.subcities && !targeting.geo_locations.custom_locations) {
                 targeting.geo_locations = { countries: ['US'] }
             }
         } else {
