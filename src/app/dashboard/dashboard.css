@@ -681,10 +681,12 @@
 
 /* ── Sidebar ── */
 .sidebar {
-    width: 240px;
+    width: 256px;
     flex-shrink: 0;
-    background: var(--clr-surface);
-    border-right: 1px solid var(--clr-border);
+    background:
+        radial-gradient(circle at top left, rgba(255,9,108,0.12), transparent 26%),
+        linear-gradient(180deg, #071522 0%, #0B1B2B 55%, #050B14 100%);
+    border-right: 1px solid rgba(255,255,255,0.06);
     border-radius: 24px 0 0 0;
     flex-direction: column;
     position: sticky;
@@ -883,10 +885,10 @@
     align-items: center;
     gap: 11px;
     padding: 10px 12px;
-    border-radius: 12px;
+    border-radius: 14px;
     font-size: 0.84rem;
     font-weight: 500;
-    color: rgba(255,255,255,0.38);
+    color: rgba(255,255,255,0.72);
     transition: color 0.18s ease, background 0.18s ease, box-shadow 0.18s ease;
     border: none;
     outline: none;
@@ -937,26 +939,32 @@
 
 .nav-item:hover {
     color: #fff;
-    background: linear-gradient(135deg, rgba(210, 3, 221, 0.13) 0%, rgba(123, 91, 255, 0.07) 100%);
-    box-shadow: inset 0 0 0 1px rgba(210, 3, 221, 0.22), 0 2px 12px -5px rgba(210, 3, 221, 0.30);
+    background: rgba(255,255,255,0.06);
+    box-shadow: none;
 }
 
 .nav-item:hover .nav-item__icon {
-    background: rgba(255,255,255,0.10);
-    color: rgba(255,255,255,0.92);
+    background: rgba(255,255,255,0.12);
+    color: #fff;
 }
 
 .nav-item--active {
     color: #fff;
-    background: linear-gradient(135deg, rgba(210, 3, 221, 0.20) 0%, rgba(13, 30, 121, 0.13) 100%);
-    box-shadow: inset 0 0 0 1px rgba(210, 3, 221, 0.32), 0 2px 14px -5px rgba(210, 3, 221, 0.32);
+    background: linear-gradient(135deg, #FF2D95 0%, #B735B8 48%, #233B8F 100%);
+    box-shadow: 0 12px 28px rgba(255,9,108,0.28);
     font-weight: 600;
 }
 
 .nav-item--active .nav-item__icon {
-    background: linear-gradient(135deg, rgba(210, 3, 221, 0.25), rgba(13, 30, 121, 0.20));
-    color: var(--clr-accent-lt);
-    box-shadow: 0 0 12px rgba(210, 3, 221, 0.22);
+    background: rgba(255,255,255,0.18);
+    color: #fff;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.18);
+}
+
+/* el punto a la derecha del activo se ve mejor blanco sobre el gradiente */
+.nav-item--active .nav-item__dot {
+    background: #fff;
+    box-shadow: 0 0 8px rgba(255,255,255,0.7);
 }
 
 .nav-item--active .nav-item__dot {
@@ -1395,3 +1403,141 @@
 @media (prefers-reduced-motion: reduce) {
     .svc-float, .svc-glow-pulse, .svc-wave { animation: none; }
 }
+
+/* ════════════════════════════════════════════════════════════
+   SISTEMA VISUAL "MY DIAMOND" — utilidades premium reutilizables
+   Aditivo: clases nuevas (prefijo dm- / text-silver-gradient).
+   Pensado para las vistas con fondo claro perla.
+════════════════════════════════════════════════════════════ */
+:root {
+    --dm-grad: linear-gradient(135deg, #FF2D95 0%, #B735B8 48%, #233B8F 100%);
+    --dm-silver: linear-gradient(135deg, #FFFFFF 0%, #E8EDF5 22%, #B8C0CC 45%, #F8FAFC 62%, #8F98A8 100%);
+    --dm-bg: linear-gradient(135deg, #F8FAFC 0%, #F5F7FA 45%, #EEF2F7 100%);
+    --dm-hero: radial-gradient(circle at 80% 40%, rgba(255,9,108,0.26), transparent 30%), linear-gradient(135deg, #081624 0%, #111A2E 52%, #070D17 100%);
+    --dm-sidebar: radial-gradient(circle at top left, rgba(255,9,108,0.12), transparent 26%), linear-gradient(180deg, #071522 0%, #0B1B2B 55%, #050B14 100%);
+}
+
+/* Fondo de página claro perla (las vistas migradas lo aplican en su wrapper) */
+.dm-page { background: var(--dm-bg); color: #111827; min-height: 100%; font-family: 'Inter', system-ui, sans-serif; }
+.dm-page .dm-fixbg { background: var(--dm-bg); }
+
+/* Tipografía */
+.font-display { font-family: 'Cormorant Garamond', Georgia, serif; }
+.font-ui { font-family: 'Inter', system-ui, sans-serif; }
+
+/* Texto plata degradado (solo para títulos importantes / fondos oscuros) */
+.text-silver-gradient {
+    background: var(--dm-silver);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+}
+/* Texto con gradiente diamante (rosa→morado→azul) */
+.text-diamond-gradient {
+    background: var(--dm-grad);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Card clara premium */
+.dm-card {
+    background: #FFFFFF;
+    border: 1px solid #E4E9F0;
+    border-radius: 22px;
+    box-shadow: 0 18px 40px rgba(15,23,42,0.07);
+    transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+}
+.dm-card--hover:hover { transform: translateY(-2px); box-shadow: 0 24px 54px rgba(15,23,42,0.11); }
+
+/* Card oscura premium */
+.dm-card-dark {
+    background: var(--dm-hero);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 24px;
+    color: #FFFFFF;
+    box-shadow: 0 24px 56px rgba(8,22,36,0.30);
+}
+
+/* Hero banner premium */
+.dm-hero {
+    background: var(--dm-hero);
+    border-radius: 24px;
+    overflow: hidden;
+    position: relative;
+    color: #fff;
+    box-shadow: 0 22px 50px rgba(8,22,36,0.25);
+}
+
+/* Botón gradiente principal */
+.dm-btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    background: var(--dm-grad);
+    color: #fff; font-weight: 700; font-family: 'Inter', sans-serif;
+    border: none; border-radius: 14px; padding: 12px 20px;
+    box-shadow: 0 14px 32px rgba(255,9,108,0.28);
+    transition: transform .18s ease, box-shadow .18s ease; cursor: pointer;
+}
+.dm-btn:hover { transform: translateY(-1px); box-shadow: 0 18px 40px rgba(255,9,108,0.36); }
+.dm-btn:disabled { opacity: .55; cursor: not-allowed; transform: none; }
+
+/* Botón secundario oscuro */
+.dm-btn-dark {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    background: #0B1726; color: #fff; font-weight: 600;
+    border: 1px solid rgba(255,255,255,0.10); border-radius: 14px; padding: 12px 20px;
+    transition: background .18s ease; cursor: pointer;
+}
+.dm-btn-dark:hover { background: #122236; }
+
+/* Botón ghost */
+.dm-btn-ghost {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    background: transparent; color: #6B7280; font-weight: 600;
+    border: 1px solid #E4E9F0; border-radius: 14px; padding: 12px 20px;
+    transition: border-color .18s ease, color .18s ease; cursor: pointer;
+}
+.dm-btn-ghost:hover { border-color: #FF096C; color: #FF096C; }
+
+/* Ícono circular con gradiente */
+.dm-icon {
+    width: 56px; height: 56px; border-radius: 999px;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--dm-grad); color: #fff;
+    box-shadow: 0 14px 32px rgba(255,9,108,0.26);
+    flex-shrink: 0;
+}
+
+/* Badges */
+.dm-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--dm-grad); color: #fff;
+    border-radius: 999px; padding: 7px 14px; font-size: 12px; font-weight: 700;
+    box-shadow: 0 12px 28px rgba(255,9,108,0.30);
+}
+.dm-badge-soft {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: rgba(255,9,108,0.08); color: #FF096C;
+    border: 1px solid rgba(255,9,108,0.18);
+    border-radius: 999px; padding: 6px 12px; font-size: 12px; font-weight: 700;
+}
+
+/* Inputs claros premium */
+.dm-input {
+    width: 100%; background: #FFFFFF; border: 1px solid #E4E9F0;
+    border-radius: 14px; padding: 12px 14px; color: #111827;
+    font-family: 'Inter', sans-serif; transition: border-color .15s ease, box-shadow .15s ease;
+}
+.dm-input::placeholder { color: #9CA3AF; }
+.dm-input:focus { outline: none; border-color: #FF096C; box-shadow: 0 0 0 4px rgba(255,9,108,0.14); }
+
+/* Barra de progreso */
+.dm-progress { height: 6px; background: #E5E7EB; border-radius: 999px; overflow: hidden; }
+.dm-progress > span { display: block; height: 100%; border-radius: 999px; background: linear-gradient(90deg, #FF096C 0%, #B735B8 55%, #233B8F 100%); }
+
+/* Tabs */
+.dm-tabs { display: inline-flex; gap: 4px; background: rgba(255,255,255,0.75); border: 1px solid #E4E9F0; border-radius: 18px; padding: 6px; }
+.dm-tab { color: #6B7280; border-radius: 14px; padding: 10px 16px; font-weight: 600; border: none; background: transparent; cursor: pointer; transition: all .15s ease; }
+.dm-tab--active { background: var(--dm-grad); color: #fff; box-shadow: 0 10px 24px rgba(255,9,108,0.22); }

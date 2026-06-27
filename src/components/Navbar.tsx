@@ -1,6 +1,5 @@
 'use client'
 
-import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import NotificationBell from './NotificationBell'
@@ -17,11 +16,6 @@ const serviceItems = [
   { href: '/dashboard/crm',                    iconClass: 'fa-solid fa-users-gear',   label: 'CRM Broadcast', grad: 'linear-gradient(145deg, #fb923c, #ea580c)' },
 ]
 
-const mainItemsBottom = [
-  { href: '/dashboard/recursos', iconClass: 'fa-solid fa-wand-magic-sparkles', label: 'Recursos' },
-  { href: '/dashboard/store',  iconClass: 'fa-solid fa-bag-shopping', label: 'Shop' },
-]
-
 const mobileNavItems = [
   { href: '/dashboard',         iconClass: 'fa-solid fa-house',        label: 'Inicio' },
   { href: '/dashboard/services',iconClass: 'fa-solid fa-th-large',     label: 'Servicios' },
@@ -36,12 +30,11 @@ async function logout() {
   window.location.href = '/login'
 }
 
+const GROUP_LABEL_STYLE = { padding: '14px 12px 6px' } as const
+
 export default function Navbar() {
   const pathname = usePathname()
-  const isInServices = pathname.startsWith('/dashboard/services') || pathname.startsWith('/dashboard/crm')
   const isInAcademy  = pathname.startsWith('/dashboard/courses') || pathname.startsWith('/dashboard/podcasts') || pathname === '/dashboard/academy'
-
-  const [servicesOpen, setServicesOpen] = useState(isInServices)
 
   return (
     <>
@@ -58,72 +51,61 @@ export default function Navbar() {
 
         <nav className="sidebar__nav" aria-label="Menú">
 
-          {/* Inicio */}
+          {/* ── PRINCIPAL ── */}
+          <p className="section-label" style={{ padding: '4px 12px 6px' }}>Principal</p>
           <Link href="/dashboard" className={`nav-item ${pathname === '/dashboard' ? 'nav-item--active' : ''}`}>
             <span className="nav-item__icon"><i className="fa-solid fa-house"></i></span>
             <span className="nav-item__label">Inicio</span>
             <span className="nav-item__dot"></span>
           </Link>
-
-          {/* Servicios colapsable */}
-          <button
-            onClick={() => setServicesOpen(o => !o)}
-            className={`nav-item ${isInServices ? 'nav-item--active' : ''}`}
-            style={{ width: '100%', background: 'none', border: 'none', cursor: 'pointer' }}
-          >
+          <Link href="/dashboard/services" className={`nav-item ${pathname === '/dashboard/services' ? 'nav-item--active' : ''}`}>
             <span className="nav-item__icon"><i className="fa-solid fa-th-large"></i></span>
             <span className="nav-item__label">Servicios</span>
-            <i className="fa-solid fa-chevron-down" style={{
-              fontSize: '0.65rem', color: 'rgba(255,255,255,0.35)', marginLeft: 'auto',
-              transition: 'transform 0.2s ease',
-              transform: servicesOpen ? 'rotate(180deg)' : 'rotate(0deg)',
-            }}></i>
-          </button>
-          {servicesOpen && (
-            <div style={{ paddingLeft: 10 }}>
-              {serviceItems.map(item => {
-                const isActive = pathname === item.href || pathname.startsWith(item.href)
-                return (
-                  <Link key={item.href} href={item.href} className={`nav-item ${isActive ? 'nav-item--active' : ''}`} style={{ fontSize: '0.78rem', padding: '8px 10px' }}>
-                    <span className="nav-item__icon" style={{
-                      width: 30, height: 30, fontSize: '0.78rem', color: '#fff',
-                      background: item.grad,
-                      boxShadow: 'inset 0 1.5px 0 rgba(255,255,255,0.4), inset 0 -2px 4px rgba(0,0,0,0.22), 0 3px 8px rgba(0,0,0,0.4)',
-                    }}><i className={item.iconClass}></i></span>
-                    <span className="nav-item__label">{item.label}</span>
-                    <span className="nav-item__dot"></span>
-                  </Link>
-                )
-              })}
-            </div>
-          )}
-
-          {/* Academy — enlace directo a la página con los botones-imagen */}
-          <Link href="/dashboard/academy" className={`nav-item ${isInAcademy ? 'nav-item--active' : ''}`}>
-            <span className="nav-item__icon"><i className="fa-solid fa-graduation-cap"></i></span>
-            <span className="nav-item__label">Academy</span>
             <span className="nav-item__dot"></span>
           </Link>
 
-          {/* Shop / Wallet */}
-          {mainItemsBottom.map(item => {
+          {/* ── SERVICIOS ── */}
+          <p className="section-label" style={GROUP_LABEL_STYLE}>Servicios</p>
+          {serviceItems.map(item => {
             const isActive = pathname === item.href || pathname.startsWith(item.href)
             return (
               <Link key={item.href} href={item.href} className={`nav-item ${isActive ? 'nav-item--active' : ''}`}>
-                <span className="nav-item__icon"><i className={item.iconClass}></i></span>
+                <span className="nav-item__icon" style={{
+                  color: '#fff', background: item.grad,
+                  boxShadow: 'inset 0 1.5px 0 rgba(255,255,255,0.4), inset 0 -2px 4px rgba(0,0,0,0.22), 0 3px 8px rgba(0,0,0,0.4)',
+                }}><i className={item.iconClass}></i></span>
                 <span className="nav-item__label">{item.label}</span>
                 <span className="nav-item__dot"></span>
               </Link>
             )
           })}
 
-          <div className="sidebar__nav-sep"></div>
+          {/* ── ACADEMIA ── */}
+          <p className="section-label" style={GROUP_LABEL_STYLE}>Academia</p>
+          <Link href="/dashboard/academy" className={`nav-item ${isInAcademy ? 'nav-item--active' : ''}`}>
+            <span className="nav-item__icon"><i className="fa-solid fa-graduation-cap"></i></span>
+            <span className="nav-item__label">Academy</span>
+            <span className="nav-item__dot"></span>
+          </Link>
+          <Link href="/dashboard/recursos" className={`nav-item ${pathname.startsWith('/dashboard/recursos') ? 'nav-item--active' : ''}`}>
+            <span className="nav-item__icon"><i className="fa-solid fa-wand-magic-sparkles"></i></span>
+            <span className="nav-item__label">Recursos</span>
+            <span className="nav-item__dot"></span>
+          </Link>
+
+          {/* ── CUENTA ── */}
+          <p className="section-label" style={GROUP_LABEL_STYLE}>Cuenta</p>
+          <Link href="/dashboard/store" className={`nav-item ${pathname.startsWith('/dashboard/store') ? 'nav-item--active' : ''}`}>
+            <span className="nav-item__icon"><i className="fa-solid fa-bag-shopping"></i></span>
+            <span className="nav-item__label">Shop</span>
+            <span className="nav-item__dot"></span>
+          </Link>
           <Link href="/dashboard/settings" className={`nav-item ${pathname === '/dashboard/settings' ? 'nav-item--active' : ''}`}>
             <span className="nav-item__icon"><i className="fa-solid fa-gear"></i></span>
             <span className="nav-item__label">Configuración</span>
             <span className="nav-item__dot"></span>
           </Link>
-          <button onClick={logout} className="nav-item" style={{ width: '100%', background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,100,100,0.8)' }}>
+          <button onClick={logout} className="nav-item" style={{ width: '100%', background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,120,120,0.85)' }}>
             <span className="nav-item__icon"><i className="fa-solid fa-right-from-bracket"></i></span>
             <span className="nav-item__label">Salir</span>
           </button>
