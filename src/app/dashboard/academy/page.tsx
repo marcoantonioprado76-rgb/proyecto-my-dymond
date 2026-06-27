@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 
-const CARD_BG = '#0e0a1c'
+const CARD_BG = '#FFFFFF'
 
 const SECTIONS = [
   {
@@ -47,12 +47,13 @@ const SECTIONS = [
 
 export default function AcademyPage() {
   return (
-    <div className="px-4 sm:px-6 pt-6 pb-24 max-w-5xl mx-auto">
+    <div className="font-ui" style={{ background: 'linear-gradient(135deg, #F8FAFC 0%, #F5F7FA 45%, #EEF2F7 100%)', minHeight: '100vh', color: '#111827' }}>
+    <div className="px-4 sm:px-6 lg:px-8 pt-8 pb-24 max-w-5xl mx-auto">
       {/* Header */}
       <div className="mb-7">
-        <h1 className="text-xl font-bold text-white uppercase tracking-widest">MY DIAMOND Academy</h1>
+        <h1 className="text-xl font-bold text-[#111827] uppercase tracking-widest">MY DIAMOND Academy</h1>
         <div className="h-px w-20 mt-2 rounded-full" style={{ background: 'linear-gradient(90deg, transparent, #D203DD, #FF2DF7, transparent)' }} />
-        <p className="text-xs text-white/30 mt-2">Selecciona el tipo de contenido que deseas ver.</p>
+        <p className="text-xs text-[#6B7280] mt-2">Selecciona el tipo de contenido que deseas ver.</p>
       </div>
 
       {/* Tarjetas */}
@@ -64,7 +65,7 @@ export default function AcademyPage() {
               style={{
                 position: 'relative', display: 'flex', flexDirection: 'column', height: '100%',
                 borderRadius: 24, overflow: 'hidden', background: CARD_BG,
-                border: '1px solid rgba(255,255,255,0.1)',
+                border: '1px solid #E4E9F0',
               }}
             >
               {/* Imagen superior que se funde al fondo */}
@@ -86,7 +87,7 @@ export default function AcademyPage() {
                     padding: '6px 13px', borderRadius: 999, fontSize: 11, fontWeight: 800, letterSpacing: '0.06em',
                     textTransform: 'uppercase', color: '#fff',
                     background: 'linear-gradient(90deg, #8b1fb0, #C026D3)',
-                    border: '1px solid rgba(255,255,255,0.25)', boxShadow: '0 4px 16px rgba(192,38,211,0.4)',
+                    border: '1px solid #E4E9F0', boxShadow: '0 4px 16px rgba(192,38,211,0.4)',
                   }}>
                     <i className="fa-solid fa-star" style={{ fontSize: 10 }} /> {s.badge}
                   </span>
@@ -105,19 +106,19 @@ export default function AcademyPage() {
                   }}>
                     <i className={`fa-solid ${s.icon}`} style={{ fontSize: 22, color: '#fff' }} />
                   </div>
-                  <h2 style={{ fontWeight: 900, fontSize: 26, color: '#fff', margin: 0, letterSpacing: '0.01em' }}>{s.label}</h2>
+                  <h2 style={{ fontWeight: 900, fontSize: 26, color: '#111827', margin: 0, letterSpacing: '0.01em' }}>{s.label}</h2>
                 </div>
 
                 {/* Descripción */}
-                <p style={{ fontSize: 13.5, color: 'rgba(255,255,255,0.55)', lineHeight: 1.55, margin: '0 0 16px' }}>{s.desc}</p>
+                <p style={{ fontSize: 13.5, color: '#6B7280', lineHeight: 1.55, margin: '0 0 16px' }}>{s.desc}</p>
 
                 {/* Features */}
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 20 }}>
                   {s.features.map(f => (
                     <span key={f.text} style={{
                       display: 'inline-flex', alignItems: 'center', gap: 7, padding: '7px 12px', borderRadius: 10,
-                      fontSize: 12, fontWeight: 600, color: 'rgba(255,255,255,0.7)',
-                      background: 'rgba(255,255,255,0.045)', border: '1px solid rgba(255,255,255,0.09)',
+                      fontSize: 12, fontWeight: 600, color: '#374151',
+                      background: '#F4F6FA', border: '1px solid #E4E9F0',
                     }}>
                       <i className={`fa-solid ${f.icon}`} style={{ fontSize: 12, color: s.accent }} /> {f.text}
                     </span>
@@ -143,10 +144,11 @@ export default function AcademyPage() {
         .academy-card__img { transition: transform 0.5s ease; }
         .academy-card:hover .academy-card__img { transform: scale(1.06); }
         .academy-card__box { transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease; }
-        .academy-card:hover .academy-card__box { border-color: rgba(255,255,255,0.22); box-shadow: 0 14px 40px rgba(0,0,0,0.5); transform: translateY(-3px); }
+        .academy-card:hover .academy-card__box { border-color: #E4E9F0; box-shadow: 0 14px 40px rgba(15,23,42,0.12); transform: translateY(-3px); }
         .academy-card__cta { transition: filter 0.2s ease, transform 0.2s ease; }
         .academy-card:hover .academy-card__cta { filter: brightness(1.1); }
       `}</style>
+    </div>
     </div>
   )
 }
