@@ -78,9 +78,8 @@ export default function ProfilePage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[50vh]">
-        <div className="w-10 h-10 border-2 rounded-full animate-spin"
-          style={{ borderColor: 'rgba(255,255,255,0.15)', borderTopColor: '#D203DD' }} />
+      <div className="flex items-center justify-center min-h-screen" style={{ background: 'linear-gradient(135deg,#F8FAFC,#F5F7FA 45%,#EEF2F7)' }}>
+        <Loader2 className="w-9 h-9 animate-spin" style={{ color: '#FF096C' }} />
       </div>
     )
   }
@@ -88,57 +87,33 @@ export default function ProfilePage() {
   if (!user) return null
 
   const fields = [
-    { icon: User,     label: 'Usuario',            value: `@${user.username}`,         color: '#D203DD' },
-    { icon: Mail,     label: 'Correo Electrónico',  value: user.email,                  color: '#FF2DF7' },
-    { icon: MapPin,   label: 'Ubicación',           value: user.city && user.country ? `${user.city}, ${user.country}` : 'No especificada', color: '#FFB800' },
-    { icon: Calendar, label: 'Miembro desde',       value: user.createdAt ? new Date(user.createdAt).toLocaleDateString() : '-', color: '#00FF88' },
+    { icon: User,     label: 'Usuario',            value: `@${user.username}`,         color: '#FF096C' },
+    { icon: Mail,     label: 'Correo Electrónico',  value: user.email,                  color: '#B735B8' },
+    { icon: MapPin,   label: 'Ubicación',           value: user.city && user.country ? `${user.city}, ${user.country}` : 'No especificada', color: '#233B8F' },
+    { icon: Calendar, label: 'Miembro desde',       value: user.createdAt ? new Date(user.createdAt).toLocaleDateString() : '-', color: '#16A34A' },
   ]
 
   return (
-    <div className="px-4 sm:px-6 pt-6 max-w-screen-xl mx-auto pb-20 space-y-6">
+    <div className="font-ui" style={{ background: 'linear-gradient(135deg, #F8FAFC 0%, #F5F7FA 45%, #EEF2F7 100%)', minHeight: '100vh' }}>
+    <div className="px-4 sm:px-6 lg:px-8 pt-8 max-w-screen-xl mx-auto pb-20 space-y-6">
 
       {/* Header */}
-      <div className="flex items-center gap-4 mb-2">
-        <div className="w-11 h-11 rounded-xl flex items-center justify-center"
-          style={{ background: 'rgba(210,3,221,0.08)', border: '1px solid rgba(255,255,255,0.15)' }}>
-          <User className="w-5 h-5" style={{ color: '#D203DD' }} />
-        </div>
-        <div>
-          <h1 className="text-xl font-medium text-white tracking-widest uppercase">Mi Perfil</h1>
-          <p className="text-xs font-light tracking-widest mt-0.5" style={{ color: 'rgba(255,255,255,0.3)' }}>Gestiona tu información personal</p>
-        </div>
-      </div>
-
-      {/* Línea decorativa */}
-      <div className="h-px w-full" style={{ background: 'linear-gradient(90deg, rgba(255,255,255,0.15), rgba(255,255,255,0.15), transparent)' }} />
+      <header>
+        <h1 className="font-display" style={{ fontSize: 34, fontWeight: 600, color: '#111827', margin: 0, lineHeight: 1.1 }}>Mi Perfil</h1>
+        <p style={{ fontSize: 14, color: '#6B7280', margin: '6px 0 0' }}>Gestiona tu información personal.</p>
+      </header>
 
       <div className="grid md:grid-cols-3 gap-6">
 
         {/* Card de perfil */}
-        <div className="md:col-span-1 relative rounded-2xl p-6 flex flex-col items-center text-center overflow-hidden"
-          style={{
-            background: 'linear-gradient(135deg, rgba(154,203,255,0.12) 0%, rgba(255,125,224,0.12) 50%, rgba(162,102,255,0.12) 100%)',
-            border: '1px solid rgba(255,255,255,0.1)',
-            boxShadow: '0 0 40px rgba(210,3,221,0.05)'
-          }}>
-          {/* Barra neon superior */}
-          <div className="absolute top-0 left-0 right-0 h-px"
-            style={{ background: 'linear-gradient(90deg, transparent, #D203DD60, #FF2DF740, transparent)' }} />
-          {/* Orbe decorativo */}
-          <div className="absolute -top-8 -right-8 w-28 h-28 rounded-full blur-2xl opacity-20"
-            style={{ background: 'radial-gradient(circle, #9B00FF, transparent)' }} />
-
-          {/* Avatar */}
-          <div className="relative mb-4 mt-2">
-            <div className="w-20 h-20 rounded-full flex items-center justify-center"
-              style={{ background: '#0A0030', border: '2px solid rgba(255,255,255,0.15)', boxShadow: '0 0 20px rgba(210,3,221,0.1)' }}>
-              <UserCircle className="w-14 h-14" style={{ color: 'rgba(255,255,255,0.1)' }} />
+        <div className="dm-card md:col-span-1" style={{ padding: 28, display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
+          <div className="relative mb-4">
+            <div style={{ width: 84, height: 84, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--dm-grad)', color: '#fff', boxShadow: '0 14px 32px rgba(255,9,108,0.26)' }}>
+              <UserCircle className="w-12 h-12" />
             </div>
-            <div className="absolute bottom-0.5 right-0.5 w-4 h-4 rounded-full border-2 border-[#0A0030]"
-              style={{ background: user.isActive ? '#00FF88' : '#ef4444', boxShadow: user.isActive ? '0 0 8px #00FF88' : 'none' }} />
+            <div style={{ position: 'absolute', bottom: 4, right: 4, width: 16, height: 16, borderRadius: '50%', border: '2px solid #fff', background: user.isActive ? '#16A34A' : '#ef4444' }} />
           </div>
 
-          {/* Nombre editable */}
           {editing ? (
             <div className="w-full mb-1 space-y-2">
               <input
@@ -149,98 +124,67 @@ export default function ProfilePage() {
                 autoFocus
                 disabled={saving}
                 maxLength={80}
-                className="w-full text-center text-base font-medium text-white uppercase tracking-widest px-3 py-2 rounded-lg outline-none transition-all"
-                style={{
-                  background: 'rgba(255,255,255,0.06)',
-                  border: '1px solid rgba(210,3,221,0.5)',
-                  boxShadow: '0 0 12px rgba(210,3,221,0.18)',
-                }}
+                className="dm-input"
+                style={{ textAlign: 'center', fontWeight: 600 }}
               />
               <div className="flex gap-2 justify-center">
-                <button onClick={saveName} disabled={saving}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-widest transition-all disabled:opacity-50"
-                  style={{ background: 'rgba(0,255,136,0.15)', border: '1px solid rgba(0,255,136,0.35)', color: '#00FF88' }}>
-                  {saving ? <Loader2 size={12} className="animate-spin" /> : <Check size={12} />}
-                  Guardar
+                <button onClick={saveName} disabled={saving} className="dm-btn" style={{ padding: '8px 14px', fontSize: 12 }}>
+                  {saving ? <Loader2 size={13} className="animate-spin" /> : <Check size={13} />} Guardar
                 </button>
-                <button onClick={cancelEdit} disabled={saving}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-widest transition-all disabled:opacity-50"
-                  style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.15)', color: 'rgba(255,255,255,0.6)' }}>
-                  <X size={12} />
-                  Cancelar
+                <button onClick={cancelEdit} disabled={saving} className="dm-btn-ghost" style={{ padding: '8px 14px', fontSize: 12 }}>
+                  <X size={13} /> Cancelar
                 </button>
               </div>
             </div>
           ) : (
             <div className="group relative flex items-center justify-center gap-2 mb-1">
-              <h2 className="text-base font-medium text-white uppercase tracking-widest">{user.fullName}</h2>
-              <button onClick={startEdit}
-                className="flex items-center justify-center w-7 h-7 rounded-lg transition-all opacity-50 group-hover:opacity-100"
-                style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.15)' }}
-                title="Editar nombre">
-                <Pencil className="w-3 h-3" style={{ color: '#D203DD' }} />
+              <h2 className="font-display" style={{ fontSize: 22, fontWeight: 600, color: '#111827', margin: 0 }}>{user.fullName}</h2>
+              <button onClick={startEdit} title="Editar nombre"
+                style={{ width: 28, height: 28, borderRadius: 8, background: '#F0F3F7', border: '1px solid #E4E9F0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Pencil className="w-3 h-3" style={{ color: '#FF096C' }} />
               </button>
             </div>
           )}
 
-          <p className="text-xs font-light tracking-[0.3em] uppercase mb-3" style={{ color: '#D203DD' }}>@{user.username}</p>
+          <p style={{ fontSize: 12, letterSpacing: '0.08em', color: '#FF096C', fontWeight: 600, margin: '2px 0 14px' }}>@{user.username}</p>
 
           {msg && (
-            <div className="w-full mb-3 py-2 px-3 rounded-lg text-[11px] font-medium"
-              style={{
-                background: msg.type === 'ok' ? 'rgba(0,255,136,0.10)' : 'rgba(239,68,68,0.10)',
-                border: `1px solid ${msg.type === 'ok' ? 'rgba(0,255,136,0.30)' : 'rgba(239,68,68,0.30)'}`,
-                color: msg.type === 'ok' ? '#00FF88' : '#fca5a5',
-              }}>
+            <div style={{ width: '100%', marginBottom: 12, padding: '8px 12px', borderRadius: 10, fontSize: 12, fontWeight: 600,
+              background: msg.type === 'ok' ? 'rgba(34,197,94,0.10)' : 'rgba(239,68,68,0.10)',
+              border: `1px solid ${msg.type === 'ok' ? 'rgba(34,197,94,0.3)' : 'rgba(239,68,68,0.3)'}`,
+              color: msg.type === 'ok' ? '#16A34A' : '#dc2626' }}>
               {msg.text}
             </div>
           )}
 
-          <div className="w-full py-2.5 px-4 rounded-xl"
-            style={{ background: 'linear-gradient(135deg, rgba(154,203,255,0.12) 0%, rgba(255,125,224,0.12) 50%, rgba(162,102,255,0.12) 100%)', border: '1px solid rgba(255,255,255,0.15)' }}>
-            <p className="text-[9px] font-black uppercase tracking-widest mb-1" style={{ color: 'rgba(255,255,255,0.25)' }}>Estado de Cuenta</p>
-            <p className="text-sm font-black uppercase tracking-widest"
-              style={{ color: user.isActive ? '#00FF88' : '#ef4444' }}>
-              {user.isActive ? 'Activo' : 'Inactivo'}
-            </p>
+          <div style={{ width: '100%', padding: '12px 16px', borderRadius: 14, background: '#F8FAFC', border: '1px solid #E4E9F0' }}>
+            <p style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#9CA3AF', margin: 0 }}>Estado de Cuenta</p>
+            <p style={{ fontSize: 15, fontWeight: 700, color: user.isActive ? '#16A34A' : '#ef4444', margin: '3px 0 0' }}>{user.isActive ? 'Activo' : 'Inactivo'}</p>
           </div>
         </div>
 
         {/* Detalles */}
-        <div className="md:col-span-2 relative rounded-2xl p-6 overflow-hidden"
-          style={{
-            background: 'linear-gradient(135deg, rgba(154,203,255,0.12) 0%, rgba(255,125,224,0.12) 50%, rgba(162,102,255,0.12) 100%)',
-            border: '1px solid rgba(255,255,255,0.06)',
-          }}>
-          <div className="absolute top-0 left-0 right-0 h-px"
-            style={{ background: 'linear-gradient(90deg, transparent, #FF2DF740, #D203DD30, transparent)' }} />
-
+        <div className="dm-card md:col-span-2" style={{ padding: 28 }}>
           <div className="flex items-center gap-2 mb-6">
-            <FileText className="w-4 h-4" style={{ color: '#FF2DF7' }} />
-            <h3 className="text-sm font-black uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.6)' }}>
-              Detalles de la Cuenta
-            </h3>
+            <FileText className="w-4 h-4" style={{ color: '#B735B8' }} />
+            <h3 style={{ fontSize: 13, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#111827', margin: 0 }}>Detalles de la Cuenta</h3>
           </div>
-
           <div className="grid gap-3">
             {fields.map((field, i) => (
-              <div key={i} className="flex items-center gap-4 p-3.5 rounded-xl transition-all duration-300 group"
-                style={{ background: 'linear-gradient(135deg, rgba(154,203,255,0.12) 0%, rgba(255,125,224,0.12) 50%, rgba(162,102,255,0.12) 100%)', border: '1px solid rgba(255,255,255,0.1)' }}
-                onMouseEnter={e => (e.currentTarget.style.borderColor = `${field.color}40`)}
-                onMouseLeave={e => (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)')}>
-                <div className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
-                  style={{ background: `${field.color}12`, border: `1px solid ${field.color}25` }}>
+              <div key={i} className="flex items-center gap-4 p-3.5 rounded-xl" style={{ background: '#F8FAFC', border: '1px solid #E4E9F0' }}>
+                <div style={{ width: 38, height: 38, borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', background: `${field.color}14`, border: `1px solid ${field.color}28` }}>
                   <field.icon className="w-4 h-4" style={{ color: field.color }} />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-[9px] font-black uppercase tracking-widest mb-0.5" style={{ color: 'rgba(255,255,255,0.25)' }}>{field.label}</p>
-                  <p className="text-sm font-light text-white truncate">{field.value}</p>
+                  <p style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', color: '#9CA3AF', margin: 0 }}>{field.label}</p>
+                  <p style={{ fontSize: 14, color: '#111827', margin: '2px 0 0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{field.value}</p>
                 </div>
               </div>
             ))}
           </div>
         </div>
       </div>
+    </div>
     </div>
   )
 }
