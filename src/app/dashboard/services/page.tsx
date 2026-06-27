@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { ShoppingCart, MessageCircle, Layout, ArrowRight, Megaphone, Play, Lock, AlertTriangle, Send, Zap, Users, Music2, Search } from 'lucide-react'
+import { ShoppingCart, MessageCircle, Layout, ArrowRight, Megaphone, Lock, AlertTriangle, Send, Users } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 
@@ -106,18 +106,18 @@ const services = [
 
 function SkeletonCard() {
   return (
-    <div className="rounded-3xl p-6 animate-pulse" style={{ background: '#2B2644', border: '1px solid rgba(255,255,255,0.05)' }}>
+    <div className="rounded-card p-6 animate-pulse" style={{ background: '#FFFFFF', border: '1px solid #E4E9F0' }}>
       <div className="flex items-start justify-between mb-6">
-        <div className="w-14 h-14 rounded-2xl bg-white/5" />
-        <div className="w-16 h-6 rounded-full bg-white/5" />
+        <div className="w-14 h-14 rounded-2xl" style={{ background: '#F0F3F7' }} />
+        <div className="w-16 h-6 rounded-full" style={{ background: '#F0F3F7' }} />
       </div>
-      <div className="w-3/4 h-5 rounded-lg bg-white/5 mb-3" />
-      <div className="w-full h-3 rounded bg-white/5 mb-2" />
-      <div className="w-5/6 h-3 rounded bg-white/5 mb-6" />
+      <div className="w-3/4 h-5 rounded-lg mb-3" style={{ background: '#F0F3F7' }} />
+      <div className="w-full h-3 rounded mb-2" style={{ background: '#F0F3F7' }} />
+      <div className="w-5/6 h-3 rounded mb-6" style={{ background: '#F0F3F7' }} />
       <div className="flex gap-2 mb-6">
-        {[1, 2, 3].map(i => <div key={i} className="h-6 w-24 rounded-full bg-white/5" />)}
+        {[1, 2, 3].map(i => <div key={i} className="h-6 w-24 rounded-full" style={{ background: '#F0F3F7' }} />)}
       </div>
-      <div className="w-full h-12 rounded-2xl bg-white/5" />
+      <div className="w-full h-12 rounded-2xl" style={{ background: '#F0F3F7' }} />
     </div>
   )
 }
@@ -152,37 +152,31 @@ export default function ServicesPage() {
   }
 
   return (
-    <div className="px-4 sm:px-6 pt-6 max-w-screen-xl mx-auto pb-20">
+    <div className="font-ui" style={{ background: 'linear-gradient(135deg, #F8FAFC 0%, #F5F7FA 45%, #EEF2F7 100%)', minHeight: '100vh' }}>
+    <div className="px-4 sm:px-6 lg:px-8 pt-8 max-w-screen-xl mx-auto pb-20">
 
       {/* Header */}
-      <div className="mb-8">
-        <div className="flex items-center gap-3 mb-2">
-          <div className="w-8 h-8 rounded-xl flex items-center justify-center"
-            style={{ background: 'linear-gradient(135deg, #D203DD, #0D1E79)', boxShadow: '0 0 16px rgba(210,3,221,0.35)' }}>
-            <Zap className="w-4 h-4 text-white" fill="white" />
-          </div>
-          <h1 className="text-xl font-black text-white uppercase tracking-widest">Servicios</h1>
-        </div>
-        <div className="h-px w-full" style={{ background: 'linear-gradient(90deg, rgba(255,255,255,0.2), rgba(255,255,255,0.08), transparent)' }} />
-        <p className="text-xs mt-3" style={{ color: 'rgba(255,255,255,0.3)' }}>
+      <header className="mb-8">
+        <h1 className="font-display" style={{ fontSize: 34, fontWeight: 600, color: '#111827', margin: 0, lineHeight: 1.1 }}>Servicios</h1>
+        <p style={{ fontSize: 14, color: '#6B7280', margin: '6px 0 0' }}>
           {!loading && plan !== 'NONE' && !expired
             ? `${PLAN_NAMES[plan]} activo · ${services.filter(s => isUnlocked(s.requiredPlan ?? null)).length} servicios desbloqueados`
-            : 'Activa tu plan y desbloquea todas las herramientas'}
+            : 'Gestiona tus herramientas digitales para crecer tu negocio.'}
         </p>
-      </div>
+      </header>
 
       {/* Banners de estado */}
       {!loading && expired && (
         <div className="mb-6 flex items-start gap-3 px-4 py-4 rounded-2xl"
-          style={{ background: 'rgba(255,100,0,0.08)', border: '1px solid rgba(255,100,0,0.25)' }}>
-          <AlertTriangle className="w-5 h-5 shrink-0 mt-0.5" style={{ color: '#FF6400' }} />
+          style={{ background: 'rgba(232,89,12,0.07)', border: '1px solid rgba(232,89,12,0.22)' }}>
+          <AlertTriangle className="w-5 h-5 shrink-0 mt-0.5" style={{ color: '#E8590C' }} />
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-bold" style={{ color: '#FF6400' }}>Tu plan ha vencido</p>
-            <p className="text-xs mt-0.5" style={{ color: 'rgba(255,100,0,0.7)' }}>Renueva tu plan para seguir usando todas las herramientas.</p>
+            <p className="text-sm font-bold" style={{ color: '#E8590C' }}>Tu plan ha vencido</p>
+            <p className="text-xs mt-0.5" style={{ color: '#B45309' }}>Renueva tu plan para seguir usando todas las herramientas.</p>
           </div>
           <button onClick={() => router.push('/dashboard/planes')}
-            className="shrink-0 text-xs font-black px-3 py-1.5 rounded-xl"
-            style={{ background: 'rgba(255,100,0,0.15)', border: '1px solid rgba(255,100,0,0.3)', color: '#FF6400' }}>
+            className="shrink-0 text-xs font-bold px-3 py-1.5 rounded-xl"
+            style={{ background: 'rgba(232,89,12,0.12)', border: '1px solid rgba(232,89,12,0.3)', color: '#E8590C' }}>
             Renovar
           </button>
         </div>
@@ -190,191 +184,67 @@ export default function ServicesPage() {
 
       {!loading && !expired && plan === 'NONE' && (
         <div className="mb-6 flex items-start gap-3 px-4 py-4 rounded-2xl"
-          style={{ background: 'rgba(210,3,221,0.07)', border: '1px solid rgba(210,3,221,0.2)' }}>
-          <Lock className="w-5 h-5 shrink-0 mt-0.5" style={{ color: '#D203DD' }} />
+          style={{ background: 'rgba(255,9,108,0.06)', border: '1px solid rgba(255,9,108,0.18)' }}>
+          <Lock className="w-5 h-5 shrink-0 mt-0.5" style={{ color: '#FF096C' }} />
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-bold text-white">Activa tu plan para desbloquear los servicios</p>
-            <p className="text-xs mt-0.5" style={{ color: 'rgba(255,255,255,0.35)' }}>
+            <p className="text-sm font-bold" style={{ color: '#111827' }}>Activa tu plan para desbloquear los servicios</p>
+            <p className="text-xs mt-0.5" style={{ color: '#6B7280' }}>
               Pack Básico desde $49 USD — agentes AI, tienda, landing pages y más.
             </p>
           </div>
           <button onClick={() => router.push('/dashboard/planes')}
-            className="shrink-0 text-xs font-black px-3 py-1.5 rounded-xl"
-            style={{ background: 'linear-gradient(135deg, #D203DD, #0D1E79)', color: '#fff' }}>
+            className="dm-btn shrink-0" style={{ padding: '9px 16px', fontSize: 12 }}>
             Ver Planes
           </button>
         </div>
       )}
 
       {/* Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
         {loading
           ? Array.from({ length: 6 }).map((_, i) => <SkeletonCard key={i} />)
           : services.map((service) => {
               const unlocked = isUnlocked(service.requiredPlan ?? null)
               const isFree = (service as any).free === true
-
               return (
-                <div key={service.id}
-                  className={`relative rounded-3xl overflow-hidden transition-all duration-500 group ${unlocked ? 'hover:-translate-y-1.5' : 'opacity-55'}`}
-                  style={{
-                    background: unlocked
-                      ? `radial-gradient(120% 72% at 50% -8%, ${service.from}1f, rgba(255,255,255,0) 58%), linear-gradient(180deg, rgba(17,19,40,0.85) 0%, rgba(10,11,24,0.8) 54%, rgba(14,16,34,0.74) 100%)`
-                      : 'linear-gradient(180deg, rgba(22,22,34,0.85), rgba(14,14,24,0.85))',
-                    border: `1px solid ${unlocked ? 'rgba(255,255,255,0.10)' : 'rgba(255,255,255,0.05)'}`,
-                    boxShadow: unlocked ? '0 26px 54px -24px rgba(0,0,0,0.82), inset 0 1px 0 rgba(255,255,255,0.05)' : 'none',
-                  }}
-                  onMouseEnter={e => {
-                    if (!unlocked) return
-                    e.currentTarget.style.boxShadow = `0 34px 64px -24px rgba(0,0,0,0.88), 0 0 30px -8px ${service.from}40, inset 0 1px 0 rgba(255,255,255,0.08)`
-                    e.currentTarget.style.borderColor = `${service.from}55`
-                  }}
-                  onMouseLeave={e => {
-                    if (!unlocked) return
-                    e.currentTarget.style.boxShadow = '0 26px 54px -24px rgba(0,0,0,0.82), inset 0 1px 0 rgba(255,255,255,0.05)'
-                    e.currentTarget.style.borderColor = 'rgba(255,255,255,0.10)'
-                  }}>
-
-                  {/* Figura gigante del servicio integrada en el fondo */}
-                  <service.icon className="absolute -bottom-6 -right-5 pointer-events-none select-none"
-                    style={{ width: 168, height: 168, color: service.from, opacity: unlocked ? 0.06 : 0.03, filter: 'blur(1.5px)', transform: 'rotate(-8deg)' }} />
-
-                  {/* Reflejo glass diagonal tenue */}
-                  <div className="absolute inset-0 pointer-events-none"
-                    style={{ background: 'linear-gradient(152deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0) 36%)' }} />
-
-                  {/* Línea de reflejo superior premium */}
-                  <div className="absolute top-0 left-5 right-5 h-px transition-opacity duration-500 pointer-events-none"
-                    style={{
-                      background: `linear-gradient(90deg, transparent, ${unlocked ? service.from + 'aa' : 'rgba(255,255,255,0.12)'}, transparent)`,
-                      opacity: unlocked ? 1 : 0.4,
-                    }} />
-
-                  {/* Halo ambiental cinematográfico */}
-                  {unlocked && (
-                    <div className="svc-glow-pulse absolute -top-10 left-1/2 -translate-x-1/2 rounded-full pointer-events-none"
-                      style={{ width: 200, height: 110, background: `radial-gradient(ellipse, ${service.from}33, transparent 72%)`, filter: 'blur(22px)' }} />
-                  )}
-
-                  <div className="relative z-10 p-6 flex flex-col h-full">
-
-                    {/* Icon row */}
-                    <div className="flex items-start justify-between mb-5">
-                      <div className="relative">
-                        <div className="w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-300"
-                          style={{
-                            background: unlocked
-                              ? `linear-gradient(155deg, rgba(255,255,255,0.12), rgba(255,255,255,0.02)), rgba(18,15,32,0.7)`
-                              : 'rgba(255,255,255,0.04)',
-                            border: `1px solid ${unlocked ? service.from + '55' : 'rgba(255,255,255,0.08)'}`,
-                            boxShadow: unlocked ? `0 14px 30px -10px rgba(0,0,0,0.7), 0 0 16px -2px ${service.from}3a, inset 0 1px 0 rgba(255,255,255,0.12)` : 'none',
-                          }}>
-                          <service.icon className="w-7 h-7 transition-transform duration-300 group-hover:scale-110"
-                            style={{ color: unlocked ? service.from : 'rgba(255,255,255,0.2)', filter: unlocked ? `drop-shadow(0 0 7px ${service.from}55)` : 'none' }} />
-                        </div>
-                        {/* Live dot */}
-                        {unlocked && (
-                          <span className="absolute -top-1 -right-1 w-3 h-3 rounded-full border-2 border-[#0b0c1a] svc-glow-pulse"
-                            style={{ background: service.from, boxShadow: `0 0 8px ${service.from}` }} />
-                        )}
-                      </div>
-
-                      {/* Badge */}
-                      <span className="text-[9px] font-bold uppercase tracking-[0.18em] px-3 py-1 rounded-full backdrop-blur-sm"
-                        style={
-                          isFree
-                            ? { background: 'rgba(210,3,221,0.12)', color: '#FF2DF7', border: '1px solid rgba(210,3,221,0.3)' }
-                            : unlocked
-                              ? { background: `${service.from}1c`, color: service.from, border: `1px solid ${service.from}45`, boxShadow: `0 0 12px -3px ${service.from}55` }
-                              : { background: 'rgba(255,255,255,0.04)', color: 'rgba(255,255,255,0.28)', border: '1px solid rgba(255,255,255,0.08)' }
-                        }>
-                        {isFree ? '✦ Gratis' : unlocked ? '● Activo' : expired ? 'Vencido' : '🔒 Bloqueado'}
-                      </span>
+                <div key={service.id} className={`dm-card ${unlocked ? 'dm-card--hover' : ''}`}
+                  style={{ padding: 24, display: 'flex', flexDirection: 'column', opacity: unlocked ? 1 : 0.72 }}>
+                  <div className="flex items-start justify-between mb-5">
+                    <div className="w-14 h-14 rounded-2xl flex items-center justify-center"
+                      style={{ background: unlocked ? `linear-gradient(145deg, ${service.from}, ${service.to})` : '#EEF2F7', boxShadow: unlocked ? `0 12px 28px -8px ${service.from}66` : 'none' }}>
+                      <service.icon className="w-7 h-7" style={{ color: unlocked ? '#fff' : '#9CA3AF' }} />
                     </div>
-
-                    {/* Title */}
-                    <h3 className="text-base font-bold mb-2 leading-tight"
-                      style={{ color: '#fff', letterSpacing: '-0.02em', textShadow: '0 1px 14px rgba(0,0,0,0.45)' }}>
-                      {service.title}
-                    </h3>
-
-                    {/* Description */}
-                    <p className="text-xs leading-relaxed mb-5 flex-1"
-                      style={{ color: unlocked ? 'rgba(255,255,255,0.55)' : 'rgba(255,255,255,0.2)', fontWeight: 400, letterSpacing: '0.01em' }}>
-                      {service.description}
-                    </p>
-
-                    {/* Feature pills */}
-                    <div className="flex flex-wrap gap-1.5 mb-5">
-                      {service.features.map((f, i) => (
-                        <span key={i} className="text-[10px] font-medium px-2.5 py-1 rounded-full"
-                          style={{
-                            background: unlocked ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.03)',
-                            border: `1px solid ${unlocked ? 'rgba(255,255,255,0.10)' : 'rgba(255,255,255,0.06)'}`,
-                            color: unlocked ? 'rgba(255,255,255,0.7)' : 'rgba(255,255,255,0.18)',
-                          }}>
-                          {f}
-                        </span>
-                      ))}
-                    </div>
-
-                    {/* CTA */}
-                    {unlocked ? (
-                      <Link href={service.link}
-                        className="flex items-center justify-center gap-2 w-full py-3 rounded-2xl font-bold text-sm text-white transition-all duration-300 group-hover:gap-3 active:scale-[0.98]"
-                        style={{
-                          background: `linear-gradient(135deg, ${service.from}2e, ${service.to}24)`,
-                          border: `1px solid ${service.from}4d`,
-                          boxShadow: `0 8px 22px -10px ${service.from}66, inset 0 1px 0 rgba(255,255,255,0.10)`,
-                        }}>
-                        Abrir Servicio
-                        <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
-                      </Link>
-                    ) : (
-                      <button onClick={() => router.push('/dashboard/planes')}
-                        className="flex items-center justify-center gap-2 w-full py-3 rounded-2xl font-bold text-sm transition-all duration-300 active:scale-[0.98]"
-                        style={{
-                          background: 'rgba(210,3,221,0.07)',
-                          border: '1px solid rgba(210,3,221,0.2)',
-                          color: 'rgba(210,3,221,0.6)',
-                        }}
-                        onMouseEnter={e => {
-                          e.currentTarget.style.background = 'rgba(210,3,221,0.14)'
-                          e.currentTarget.style.borderColor = 'rgba(210,3,221,0.4)'
-                          e.currentTarget.style.color = '#D203DD'
-                        }}
-                        onMouseLeave={e => {
-                          e.currentTarget.style.background = 'rgba(210,3,221,0.07)'
-                          e.currentTarget.style.borderColor = 'rgba(210,3,221,0.2)'
-                          e.currentTarget.style.color = 'rgba(210,3,221,0.6)'
-                        }}>
-                        <Lock className="w-4 h-4" />
-                        {expired ? 'Renovar Plan' : 'Ver Planes'}
-                      </button>
-                    )}
+                    <span className="text-[10px] font-bold uppercase tracking-[0.12em] px-3 py-1 rounded-full"
+                      style={isFree
+                        ? { background: 'rgba(255,9,108,0.08)', color: '#FF096C', border: '1px solid rgba(255,9,108,0.2)' }
+                        : unlocked
+                          ? { background: 'rgba(34,197,94,0.10)', color: '#16A34A', border: '1px solid rgba(34,197,94,0.22)' }
+                          : { background: '#F0F3F7', color: '#9CA3AF', border: '1px solid #E4E9F0' }}>
+                      {isFree ? '✦ Gratis' : unlocked ? '● Activo' : expired ? 'Vencido' : '🔒 Bloqueado'}
+                    </span>
                   </div>
-
-                  {/* Wave glow inferior — energía elegante difuminada */}
-                  {unlocked && (
-                    <svg width="100%" height="30" viewBox="0 0 200 30" preserveAspectRatio="none" className="svc-wave absolute bottom-0 left-0 right-0 pointer-events-none">
-                      <defs>
-                        <linearGradient id={`svcw-srv-${service.id}`} x1="0" y1="0" x2="1" y2="0">
-                          <stop offset="0" stopColor={service.from} stopOpacity="0" />
-                          <stop offset="0.5" stopColor={service.from} stopOpacity="0.75" />
-                          <stop offset="1" stopColor={service.from} stopOpacity="0" />
-                        </linearGradient>
-                        <filter id={`svcwb-srv-${service.id}`} x="-20%" y="-60%" width="140%" height="240%">
-                          <feGaussianBlur stdDeviation="2.2" />
-                        </filter>
-                      </defs>
-                      <path d="M0 18 Q 100 4 200 20 L 200 25 Q 100 10 0 24 Z" fill={`url(#svcw-srv-${service.id})`} opacity="0.5" filter={`url(#svcwb-srv-${service.id})`} />
-                      <path d="M0 19 Q 100 6 200 21" stroke={`url(#svcw-srv-${service.id})`} strokeWidth="1.3" fill="none" strokeLinecap="round" />
-                    </svg>
+                  <h3 className="text-base font-bold mb-2 leading-tight" style={{ color: '#111827' }}>{service.title}</h3>
+                  <p className="text-[13px] leading-relaxed mb-4 flex-1" style={{ color: '#6B7280' }}>{service.description}</p>
+                  <div className="flex flex-wrap gap-1.5 mb-5">
+                    {service.features.map((f, i) => (
+                      <span key={i} className="text-[10px] font-semibold px-2.5 py-1 rounded-full"
+                        style={{ background: '#F0F3F7', border: '1px solid #E4E9F0', color: '#6B7280' }}>{f}</span>
+                    ))}
+                  </div>
+                  {unlocked ? (
+                    <Link href={service.link} className="dm-btn" style={{ width: '100%', textDecoration: 'none' }}>
+                      Abrir servicio <ArrowRight className="w-4 h-4" />
+                    </Link>
+                  ) : (
+                    <button onClick={() => router.push('/dashboard/planes')} className="dm-btn-ghost" style={{ width: '100%' }}>
+                      <Lock className="w-4 h-4" /> {expired ? 'Renovar Plan' : 'Ver Planes'}
+                    </button>
                   )}
                 </div>
               )
             })}
       </div>
+    </div>
     </div>
   )
 }
