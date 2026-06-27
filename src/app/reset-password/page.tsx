@@ -8,7 +8,7 @@ import { Lock, Eye, EyeOff, ArrowRight, AlertCircle, CheckCircle2 } from 'lucide
 export default function ResetPasswordPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center">
+      <div style={{background:'linear-gradient(135deg,#F8FAFC,#F5F7FA 45%,#EEF2F7)',minHeight:'100vh',color:'#111827'}} className="font-ui min-h-screen flex items-center justify-center">
         <div className="w-8 h-8 border-2 border-cyan-400/30 border-t-cyan-400 rounded-full animate-spin" />
       </div>
     }>
@@ -54,8 +54,8 @@ function ResetForm() {
     }
   }
 
-  const inputCls = 'w-full bg-white/[0.04] border border-white/10 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-white/25 focus:outline-none focus:border-purple-500/40 focus:ring-1 focus:ring-purple-500/15 transition-colors'
-  const labelCls = 'block text-[10px] font-bold text-white/30 uppercase tracking-widest mb-1.5'
+  const inputCls = 'dm-input text-sm'
+  const labelCls = 'block text-[10px] font-bold text-[#6B7280] uppercase tracking-widest mb-1.5'
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4 relative overflow-hidden">
@@ -71,19 +71,19 @@ function ResetForm() {
           <div className="w-14 h-14 mb-3 rounded-xl overflow-hidden border border-white/10 shadow-lg shadow-black/50">
             <img src="/logo.png" alt="Logo" className="w-full h-full object-contain" />
           </div>
-          <h1 className="flex justify-center"><img src="/wordmark-mydiamond.png" alt="MY DIAMOND" className="h-[18px] w-auto" /></h1>
-          <p className="text-[11px] text-white/30 mt-0.5">Network Marketing Digital</p>
+          <h1 className="flex justify-center"><span className="font-display text-diamond-gradient" style={{fontSize:26,fontWeight:700,letterSpacing:'0.04em'}}>MY DIAMOND</span></h1>
+          <p className="text-[11px] text-[#6B7280] mt-0.5">Network Marketing Digital</p>
         </div>
 
-        <div className="water-glass shadow-2xl shadow-black/60" style={{ padding: '1.5rem' }}>
+        <div className="dm-card" style={{ padding: '1.5rem' }}>
           {success ? (
             <div className="text-center py-2">
               <div className="w-14 h-14 rounded-2xl bg-green-500/10 border border-green-500/20 flex items-center justify-center mx-auto mb-4">
                 <CheckCircle2 size={26} className="text-green-400" />
               </div>
               <p className="text-[10px] font-black uppercase tracking-widest text-green-400 mb-1">¡Listo!</p>
-              <h2 className="text-base font-black text-white mb-2">Contraseña actualizada</h2>
-              <p className="text-xs text-white/35 mb-5">Tu contraseña ha sido restablecida exitosamente.</p>
+              <h2 className="text-base font-black text-[#111827] mb-2">Contraseña actualizada</h2>
+              <p className="text-xs text-[#6B7280] mb-5">Tu contraseña ha sido restablecida exitosamente.</p>
               <Link
                 href="/login"
                 className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all active:scale-[0.98]"
@@ -99,8 +99,8 @@ function ResetForm() {
             </div>
           ) : (
             <>
-              <p className="text-[10px] font-black uppercase tracking-widest text-white/25 mb-3">Nueva contraseña</p>
-              <p className="text-xs text-white/40 mb-4 leading-relaxed">
+              <p className="text-[10px] font-black uppercase tracking-widest text-[#9CA3AF] mb-3">Nueva contraseña</p>
+              <p className="text-xs text-[#6B7280] mb-4 leading-relaxed">
                 Ingresa tu nueva contraseña para acceder a tu cuenta.
               </p>
 
@@ -124,7 +124,7 @@ function ResetForm() {
                       required
                     />
                     <button type="button" onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3.5 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/60 transition-colors">
+                      className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#6B7280] hover:text-[#111827]/60 transition-colors">
                       {showPassword ? <EyeOff size={14} /> : <Eye size={14} />}
                     </button>
                   </div>
@@ -142,7 +142,7 @@ function ResetForm() {
                       required
                     />
                     <button type="button" onClick={() => setShowConfirm(!showConfirm)}
-                      className="absolute right-3.5 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/60 transition-colors">
+                      className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#6B7280] hover:text-[#111827]/60 transition-colors">
                       {showConfirm ? <EyeOff size={14} /> : <Eye size={14} />}
                     </button>
                   </div>
@@ -169,7 +169,7 @@ function ResetForm() {
           )}
         </div>
 
-        <p className="text-center text-white/25 text-[11px] mt-5">
+        <p className="text-center text-[#9CA3AF] text-[11px] mt-5">
           <Link href="/login" className="text-purple-400 hover:text-purple-300 font-bold transition-colors">
             ← Volver al inicio de sesión
           </Link>
