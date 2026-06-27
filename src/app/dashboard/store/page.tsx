@@ -112,7 +112,8 @@ export default function StorePage() {
   }
 
   return (
-    <div className="px-4 sm:px-6 pt-6 pb-10 max-w-screen-xl mx-auto">
+    <div className="font-ui" style={{ background: 'linear-gradient(135deg, #F8FAFC 0%, #F5F7FA 45%, #EEF2F7 100%)', minHeight: '100vh', color: '#111827' }}>
+    <div className="px-4 sm:px-6 lg:px-8 pt-8 pb-10 max-w-screen-xl mx-auto">
       {/* Toast */}
       {toast && (
         <div style={{ position: 'fixed', top: 20, right: 20, zIndex: 9999, background: toast.startsWith('¡') ? 'rgba(0,255,136,0.15)' : 'rgba(239,68,68,0.15)', border: `1px solid ${toast.startsWith('¡') ? 'rgba(0,255,136,0.3)' : 'rgba(239,68,68,0.3)'}`, color: toast.startsWith('¡') ? '#00FF88' : '#ef4444', borderRadius: 10, padding: '10px 18px', fontSize: 13, fontWeight: 600 }}>
@@ -123,15 +124,15 @@ export default function StorePage() {
       {/* Header */}
       <div className="mb-5 flex items-start justify-between gap-3 flex-wrap">
         <div>
-          <h1 className="text-xl font-bold text-white uppercase tracking-widest">Tienda</h1>
+          <h1 className="text-xl font-bold text-[#111827] uppercase tracking-widest">Tienda</h1>
           <div className="h-px w-20 mt-2 rounded-full" style={{ background: 'linear-gradient(90deg, transparent, #D203DD, #FF2DF7, transparent)' }} />
-          <p className="text-xs text-white/30 mt-2">Productos exclusivos de MY DIAMOND.</p>
+          <p className="text-xs text-[#6B7280] mt-2">Productos exclusivos de MY DIAMOND.</p>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <Link href="/dashboard/store/my-orders" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 12, fontWeight: 600, color: '#D203DD', background: 'rgba(210,3,221,0.07)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: 8, padding: '7px 14px', textDecoration: 'none' }}>
+          <Link href="/dashboard/store/my-orders" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 12, fontWeight: 600, color: '#D203DD', background: 'rgba(210,3,221,0.07)', border: '1px solid #E4E9F0', borderRadius: 8, padding: '7px 14px', textDecoration: 'none' }}>
             📦 Mis pedidos
           </Link>
-          <Link href="/dashboard/store/cart" style={{ position: 'relative', display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 12, fontWeight: 600, color: '#fff', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, padding: '7px 14px', textDecoration: 'none' }}>
+          <Link href="/dashboard/store/cart" style={{ position: 'relative', display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 12, fontWeight: 600, color: '#111827', background: '#F0F3F7', border: '1px solid #E4E9F0', borderRadius: 8, padding: '7px 14px', textDecoration: 'none' }}>
             🛒 Carrito
             {cartCount > 0 && (
               <span style={{ position: 'absolute', top: -7, right: -7, background: '#FF2DF7', color: '#fff', fontSize: 10, fontWeight: 800, borderRadius: 99, minWidth: 18, height: 18, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 4px' }}>
@@ -148,8 +149,8 @@ export default function StorePage() {
           {['Todas', ...categories].map(cat => (
             <button key={cat} onClick={() => handleCategory(cat)}
               style={{ padding: '5px 14px', borderRadius: 99, fontSize: 12, fontWeight: 600, cursor: 'pointer', border: '1px solid', background: 'transparent',
-                borderColor: activeCategory === cat ? 'rgba(210,3,221,0.5)' : 'rgba(255,255,255,0.1)',
-                color: activeCategory === cat ? '#D203DD' : 'rgba(255,255,255,0.4)' }}>
+                borderColor: activeCategory === cat ? 'rgba(210,3,221,0.5)' : '#E4E9F0',
+                color: activeCategory === cat ? '#D203DD' : '#6B7280' }}>
               {cat}
             </button>
           ))}
@@ -164,7 +165,7 @@ export default function StorePage() {
 
       {!loading && items.length === 0 && (
         <div className="flex flex-col items-center justify-center py-24 text-center">
-          <p className="text-sm text-white/40">No hay productos disponibles{activeCategory !== 'Todas' ? ` en "${activeCategory}"` : ''}.</p>
+          <p className="text-sm text-[#6B7280]">No hay productos disponibles{activeCategory !== 'Todas' ? ` en "${activeCategory}"` : ''}.</p>
         </div>
       )}
 
@@ -174,7 +175,7 @@ export default function StorePage() {
             const img = Array.isArray(item.images) && item.images.length > 0 ? item.images[0] : null
             const outOfStock = item.stock === 0
             return (
-              <div key={item.id} style={{ borderRadius: 14, overflow: 'hidden', background: 'linear-gradient(135deg, rgba(154,203,255,0.12) 0%, rgba(255,125,224,0.12) 50%, rgba(162,102,255,0.12) 100%)', border: '1px solid rgba(255,255,255,0.15)', opacity: outOfStock ? 0.6 : 1, transition: 'border-color 0.2s', display: 'flex', flexDirection: 'column' }}>
+              <div key={item.id} style={{ borderRadius: 14, overflow: 'hidden', background: '#FFFFFF', border: '1px solid #E4E9F0', opacity: outOfStock ? 0.6 : 1, transition: 'border-color 0.2s', display: 'flex', flexDirection: 'column' }}>
                 {/* Image — click goes to detail */}
                 <Link href={`/dashboard/store/${item.id}`} style={{ textDecoration: 'none', display: 'block' }}>
                   <div style={{ aspectRatio: '1/1', background: 'rgba(210,3,221,0.04)', position: 'relative', overflow: 'hidden' }}>
@@ -187,10 +188,10 @@ export default function StorePage() {
                     )}
                     {outOfStock && (
                       <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.55)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        <span style={{ fontSize: 10, fontWeight: 800, color: 'rgba(255,255,255,0.7)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>No disponible</span>
+                        <span style={{ fontSize: 10, fontWeight: 800, color: '#374151', letterSpacing: '0.1em', textTransform: 'uppercase' }}>No disponible</span>
                       </div>
                     )}
-                    <span style={{ position: 'absolute', top: 8, left: 8, fontSize: 10, fontWeight: 600, color: 'rgba(255,255,255,0.6)', background: 'rgba(0,0,0,0.4)', borderRadius: 6, padding: '2px 7px' }}>
+                    <span style={{ position: 'absolute', top: 8, left: 8, fontSize: 10, fontWeight: 600, color: '#6B7280', background: 'rgba(0,0,0,0.4)', borderRadius: 6, padding: '2px 7px' }}>
                       {item.category}
                     </span>
                   </div>
@@ -206,13 +207,13 @@ export default function StorePage() {
                   {/* Action buttons */}
                   <div style={{ display: 'flex', gap: 5, marginTop: 'auto' }}>
                     <Link href={`/dashboard/store/${item.id}`}
-                      style={{ flex: 1, padding: '5px 0', borderRadius: 7, fontSize: 11, fontWeight: 600, textAlign: 'center', textDecoration: 'none', border: '1px solid rgba(255,255,255,0.12)', color: 'rgba(255,255,255,0.5)', background: 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      style={{ flex: 1, padding: '5px 0', borderRadius: 7, fontSize: 11, fontWeight: 600, textAlign: 'center', textDecoration: 'none', border: '1px solid #E4E9F0', color: '#6B7280', background: 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                       Ver
                     </Link>
                     <button
                       onClick={e => handleQuickAdd(e, item)}
                       disabled={outOfStock}
-                      style={{ flex: 2, padding: '5px 0', borderRadius: 7, fontSize: 11, fontWeight: 700, cursor: outOfStock ? 'not-allowed' : 'pointer', border: 'none', background: outOfStock ? 'rgba(255,255,255,0.05)' : 'linear-gradient(135deg, #D203DD, #00FF88)', color: outOfStock ? 'rgba(255,255,255,0.2)' : '#000' }}>
+                      style={{ flex: 2, padding: '5px 0', borderRadius: 7, fontSize: 11, fontWeight: 700, cursor: outOfStock ? 'not-allowed' : 'pointer', border: 'none', background: outOfStock ? '#F0F3F7' : 'linear-gradient(135deg, #D203DD, #00FF88)', color: outOfStock ? '#9CA3AF' : '#000' }}>
                       {outOfStock ? 'Agotado' : '🛒 Agregar'}
                     </button>
                   </div>
@@ -251,21 +252,21 @@ export default function StorePage() {
                         <div>
                           <p style={{ fontWeight: 800, color: '#fff', fontSize: 13, margin: '0 0 4px', lineHeight: 1.3 }}>{ev.title}</p>
                           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-                            {ev.date && <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)' }}>📅 {formatDate(ev.date)}</span>}
-                            {ev.location && <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)' }}>📍 {ev.location}</span>}
+                            {ev.date && <span style={{ fontSize: 10, color: '#6B7280' }}>📅 {formatDate(ev.date)}</span>}
+                            {ev.location && <span style={{ fontSize: 10, color: '#6B7280' }}>📍 {ev.location}</span>}
                           </div>
                         </div>
                         {/* Ticket types */}
                         <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                           {ev.ticketTypes.map(tt => (
                             <div key={tt.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '4px 0' }}>
-                              <span style={{ fontSize: 11, color: tt.soldOut ? 'rgba(255,255,255,0.25)' : 'rgba(255,255,255,0.6)', fontWeight: 600 }}>{tt.name}{tt.soldOut ? ' — Agotado' : ''}</span>
-                              <span style={{ fontSize: 11, fontWeight: 800, color: tt.soldOut ? 'rgba(255,255,255,0.2)' : '#F5A623' }}>${tt.price.toFixed(2)} USDT</span>
+                              <span style={{ fontSize: 11, color: tt.soldOut ? '#9CA3AF' : '#6B7280', fontWeight: 600 }}>{tt.name}{tt.soldOut ? ' — Agotado' : ''}</span>
+                              <span style={{ fontSize: 11, fontWeight: 800, color: tt.soldOut ? '#9CA3AF' : '#F5A623' }}>${tt.price.toFixed(2)} USDT</span>
                             </div>
                           ))}
                         </div>
                         <div style={{ marginTop: 'auto', paddingTop: 8 }}>
-                          <div style={{ padding: '8px 0', borderRadius: 9, textAlign: 'center', fontSize: 12, fontWeight: 700, background: allSoldOut ? 'rgba(255,255,255,0.05)' : 'linear-gradient(135deg,#D203DD,#0D1E79)', color: allSoldOut ? 'rgba(255,255,255,0.3)' : '#fff' }}>
+                          <div style={{ padding: '8px 0', borderRadius: 9, textAlign: 'center', fontSize: 12, fontWeight: 700, background: allSoldOut ? '#F0F3F7' : 'linear-gradient(135deg,#D203DD,#0D1E79)', color: allSoldOut ? '#6B7280' : '#fff' }}>
                             {allSoldOut ? 'Agotado' : '🎟 Comprar entrada'}
                           </div>
                         </div>
@@ -283,7 +284,7 @@ export default function StorePage() {
       {quickItem && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}
           onClick={() => setQuickItem(null)}>
-          <div style={{ background: '#0d1117', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 18, width: '100%', maxWidth: 360, padding: 24 }}
+          <div style={{ background: '#FFFFFF', border: '1px solid #E4E9F0', borderRadius: 18, width: '100%', maxWidth: 360, padding: 24 }}
             onClick={e => e.stopPropagation()}>
             <div style={{ display: 'flex', gap: 14, marginBottom: 18 }}>
               {quickItem.images[0] && (
@@ -299,13 +300,13 @@ export default function StorePage() {
 
             {quickItem.variants.map(v => (
               <div key={v.name} style={{ marginBottom: 14 }}>
-                <p style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>{v.name}</p>
+                <p style={{ fontSize: 11, fontWeight: 700, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>{v.name}</p>
                 <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                   {v.options.map(opt => (
                     <button key={opt} onClick={() => setSelectedVariants(p => ({ ...p, [v.name]: opt }))}
                       style={{ padding: '6px 14px', borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: 'pointer', border: '1px solid', background: 'transparent',
-                        borderColor: selectedVariants[v.name] === opt ? '#D203DD' : 'rgba(255,255,255,0.15)',
-                        color: selectedVariants[v.name] === opt ? '#D203DD' : 'rgba(255,255,255,0.5)' }}>
+                        borderColor: selectedVariants[v.name] === opt ? '#D203DD' : '#E4E9F0',
+                        color: selectedVariants[v.name] === opt ? '#D203DD' : '#6B7280' }}>
                       {opt}
                     </button>
                   ))}
@@ -315,7 +316,7 @@ export default function StorePage() {
 
             <div style={{ display: 'flex', gap: 8, marginTop: 18 }}>
               <button onClick={() => setQuickItem(null)}
-                style={{ flex: 1, padding: '10px 0', borderRadius: 9, border: '1px solid rgba(255,255,255,0.1)', background: 'transparent', color: 'rgba(255,255,255,0.4)', cursor: 'pointer', fontWeight: 600, fontSize: 13 }}>
+                style={{ flex: 1, padding: '10px 0', borderRadius: 9, border: '1px solid #E4E9F0', background: 'transparent', color: '#6B7280', cursor: 'pointer', fontWeight: 600, fontSize: 13 }}>
                 Cancelar
               </button>
               <button onClick={confirmQuickAdd}
@@ -326,6 +327,7 @@ export default function StorePage() {
           </div>
         </div>
       )}
+    </div>
     </div>
   )
 }
