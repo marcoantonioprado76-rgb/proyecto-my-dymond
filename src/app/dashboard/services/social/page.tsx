@@ -200,14 +200,15 @@ export default function SocialPage() {
     const networkConnected = (id: string) => connectedNetworks.includes(id)
 
     return (
-        <div className="p-4 md:p-6 max-w-5xl mx-auto">
+        <div className="font-ui" style={{ background: 'linear-gradient(135deg, #F8FAFC 0%, #F5F7FA 45%, #EEF2F7 100%)', minHeight: '100vh', color: '#111827' }}>
+        <div className="p-4 md:p-6 lg:px-8 max-w-5xl mx-auto">
             {/* Header */}
             <div className="mb-6 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
                 <div className="min-w-0">
-                    <h1 className="text-xl sm:text-2xl font-bold text-white flex items-center gap-2">
+                    <h1 className="text-xl sm:text-2xl font-bold text-[#111827] flex items-center gap-2">
                         <Send size={22} className="text-neon-green flex-shrink-0" /> Publicador Social
                     </h1>
-                    <p className="text-dark-400 text-xs sm:text-sm mt-1">Publica en Facebook, Instagram, TikTok y YouTube</p>
+                    <p className="text-[#6B7280] text-xs sm:text-sm mt-1">Publica en Facebook, Instagram, TikTok y YouTube</p>
                 </div>
                 <div className="flex items-center gap-2 self-start flex-shrink-0 flex-wrap">
                   <AIKeySelector compact />
@@ -225,12 +226,12 @@ export default function SocialPage() {
             {/* Usage limits bar */}
             {usageLimits && (
                 <div className="mb-5 grid grid-cols-2 gap-3">
-                    <div className="glass-panel p-3 rounded-xl border border-white/15">
+                    <div className="dm-card p-3 rounded-xl border border-[#E4E9F0]">
                         <div className="flex items-center justify-between mb-1.5">
-                            <span className="text-dark-400 text-xs">Publicaciones este mes</span>
-                            <span className="text-white text-xs font-semibold">{usageLimits.monthlyCount} / {usageLimits.limits.monthlyPosts}</span>
+                            <span className="text-[#6B7280] text-xs">Publicaciones este mes</span>
+                            <span className="text-[#111827] text-xs font-semibold">{usageLimits.monthlyCount} / {usageLimits.limits.monthlyPosts}</span>
                         </div>
-                        <div className="w-full bg-white/10 rounded-full h-1.5">
+                        <div className="w-full bg-[#EEF2F7] rounded-full h-1.5">
                             <div className="h-1.5 rounded-full transition-all"
                                 style={{
                                     width: `${Math.min(100, (usageLimits.monthlyCount / usageLimits.limits.monthlyPosts) * 100)}%`,
@@ -238,12 +239,12 @@ export default function SocialPage() {
                                 }} />
                         </div>
                     </div>
-                    <div className="glass-panel p-3 rounded-xl border border-white/15">
+                    <div className="dm-card p-3 rounded-xl border border-[#E4E9F0]">
                         <div className="flex items-center justify-between mb-1.5">
-                            <span className="text-dark-400 text-xs">Programadas activas</span>
-                            <span className="text-white text-xs font-semibold">{usageLimits.scheduledCount} / {usageLimits.limits.scheduledSlots}</span>
+                            <span className="text-[#6B7280] text-xs">Programadas activas</span>
+                            <span className="text-[#111827] text-xs font-semibold">{usageLimits.scheduledCount} / {usageLimits.limits.scheduledSlots}</span>
                         </div>
-                        <div className="w-full bg-white/10 rounded-full h-1.5">
+                        <div className="w-full bg-[#EEF2F7] rounded-full h-1.5">
                             <div className="h-1.5 rounded-full transition-all"
                                 style={{
                                     width: `${Math.min(100, (usageLimits.scheduledCount / usageLimits.limits.scheduledSlots) * 100)}%`,
@@ -264,7 +265,7 @@ export default function SocialPage() {
                     { id: 'connections', label: 'Cuentas', icon: Zap },
                 ].map(t => (
                     <button key={t.id} onClick={() => setTab(t.id as any)}
-                        className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium transition-all whitespace-nowrap ${tab === t.id ? 'bg-neon-green text-black' : 'bg-white/5 text-dark-400 hover:bg-white/10'}`}>
+                        className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium transition-all whitespace-nowrap ${tab === t.id ? 'bg-neon-green text-black' : 'bg-[#F4F6FA] text-[#6B7280] hover:bg-[#EEF2F7]'}`}>
                         <t.icon size={14} /> {t.label}
                     </button>
                 ))}
@@ -275,11 +276,11 @@ export default function SocialPage() {
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                     {/* Left: editor */}
                     <div className="lg:col-span-2 space-y-4">
-                        <div className="glass-panel p-4 rounded-2xl border border-white/15">
+                        <div className="dm-card p-4 rounded-2xl border border-[#E4E9F0]">
                             <div className="flex items-center justify-between mb-2">
-                                <span className="text-white text-sm font-medium">Contenido</span>
+                                <span className="text-[#111827] text-sm font-medium">Contenido</span>
                                 <div className="flex gap-2">
-                                    <button onClick={insertBold} title="Negrita Unicode" className="px-2 py-1 rounded-lg bg-white/10 text-white text-xs hover:bg-white/20 font-bold">𝗕</button>
+                                    <button onClick={insertBold} title="Negrita Unicode" className="px-2 py-1 rounded-lg bg-[#EEF2F7] text-[#111827] text-xs hover:bg-[#E4E9F0] font-bold">𝗕</button>
                                     <button onClick={() => handleAI('improve')} disabled={aiLoading || !content} className="flex items-center gap-1 px-2 py-1 rounded-lg bg-purple-500/20 text-purple-300 text-xs hover:bg-purple-500/30 disabled:opacity-40">
                                         <Wand2 size={11} /> Mejorar
                                     </button>
@@ -287,17 +288,17 @@ export default function SocialPage() {
                             </div>
                             <textarea ref={textareaRef} value={content} onChange={e => setContent(e.target.value)}
                                 placeholder="Escribe tu post aquí o genera con IA..."
-                                className="w-full bg-transparent text-white placeholder-dark-400 text-sm resize-none focus:outline-none min-h-[160px]" />
-                            <div className="text-right text-dark-500 text-xs mt-1">{content.length} caracteres</div>
+                                className="w-full bg-transparent text-[#111827] placeholder-[#9CA3AF] text-sm resize-none focus:outline-none min-h-[160px]" />
+                            <div className="text-right text-[#9CA3AF] text-xs mt-1">{content.length} caracteres</div>
                         </div>
 
                         {/* AI Generate */}
-                        <div className="glass-panel p-4 rounded-2xl border border-white/15">
-                            <p className="text-white text-sm font-medium mb-2 flex items-center gap-1"><Sparkles size={13} className="text-yellow-400" /> Generar con IA</p>
+                        <div className="dm-card p-4 rounded-2xl border border-[#E4E9F0]">
+                            <p className="text-[#111827] text-sm font-medium mb-2 flex items-center gap-1"><Sparkles size={13} className="text-yellow-400" /> Generar con IA</p>
                             <div className="flex flex-col sm:flex-row gap-2">
                                 <input value={topic} onChange={e => setTopic(e.target.value)}
                                     placeholder="Tema del post (ej: promoción de verano)"
-                                    className="flex-1 min-w-0 bg-white/5 border border-white/15 rounded-xl px-3 py-2 text-sm text-white placeholder-dark-400 focus:outline-none focus:border-neon-green/50" />
+                                    className="flex-1 min-w-0 bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-3 py-2 text-sm text-[#111827] placeholder-[#9CA3AF] focus:outline-none focus:border-neon-green/50" />
                                 <button onClick={() => handleAI('generate')} disabled={aiLoading || !topic}
                                     className="px-4 py-2 bg-neon-green text-black font-bold rounded-xl text-sm disabled:opacity-40 whitespace-nowrap w-full sm:w-auto">
                                     {aiLoading ? <Loader2 size={14} className="animate-spin" /> : 'Generar'}
@@ -306,8 +307,8 @@ export default function SocialPage() {
                         </div>
 
                         {/* Media */}
-                        <div className="glass-panel p-4 rounded-2xl border border-white/15">
-                            <p className="text-white text-sm font-medium mb-3">Media</p>
+                        <div className="dm-card p-4 rounded-2xl border border-[#E4E9F0]">
+                            <p className="text-[#111827] text-sm font-medium mb-3">Media</p>
                             {mediaUrl ? (
                                 <div className="relative">
                                     {mediaType === 'video'
@@ -320,7 +321,7 @@ export default function SocialPage() {
                                 </div>
                             ) : (
                                 <button onClick={() => fileRef.current?.click()} disabled={uploadingMedia}
-                                    className="w-full border-2 border-dashed border-white/20 rounded-xl p-6 text-dark-400 hover:border-neon-green/40 hover:text-neon-green transition-all flex flex-col items-center gap-2">
+                                    className="w-full border-2 border-dashed border-[#E4E9F0] rounded-xl p-6 text-[#6B7280] hover:border-neon-green/40 hover:text-neon-green transition-all flex flex-col items-center gap-2">
                                     {uploadingMedia ? <Loader2 size={20} className="animate-spin" /> : <><Image size={20} /><Video size={20} /></>}
                                     <span className="text-sm">{uploadingMedia ? 'Subiendo...' : 'Subir imagen o video'}</span>
                                 </button>
@@ -333,8 +334,8 @@ export default function SocialPage() {
                     {/* Right: settings */}
                     <div className="space-y-4">
                         {/* Networks */}
-                        <div className="glass-panel p-4 rounded-2xl border border-white/15">
-                            <p className="text-white text-sm font-medium mb-3">Redes sociales</p>
+                        <div className="dm-card p-4 rounded-2xl border border-[#E4E9F0]">
+                            <p className="text-[#111827] text-sm font-medium mb-3">Redes sociales</p>
                             <div className="space-y-2">
                                 {NETWORKS.map(n => {
                                     const isConnected = networkConnected(n.id)
@@ -347,11 +348,11 @@ export default function SocialPage() {
                                         <div key={n.id}>
                                             <button disabled={!isConnected}
                                                 onClick={() => toggleNetwork(n.id)}
-                                                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl border transition-all text-left ${isSelected ? 'border-neon-green/50 bg-neon-green/10' : 'border-white/10 bg-white/5'} ${!isConnected ? 'opacity-40 cursor-not-allowed' : 'hover:border-purple-500/40'}`}>
+                                                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl border transition-all text-left ${isSelected ? 'border-neon-green/50 bg-neon-green/10' : 'border-[#E4E9F0] bg-[#F4F6FA]'} ${!isConnected ? 'opacity-40 cursor-not-allowed' : 'hover:border-purple-500/40'}`}>
                                                 <span className="text-lg">{n.icon}</span>
                                                 <div className="flex-1 min-w-0">
-                                                    <span className="text-white text-sm font-medium">{n.label}</span>
-                                                    {!isConnected && <p className="text-dark-500 text-xs">No conectado</p>}
+                                                    <span className="text-[#111827] text-sm font-medium">{n.label}</span>
+                                                    {!isConnected && <p className="text-[#9CA3AF] text-xs">No conectado</p>}
                                                     {isConnected && !isSelected && <p className="text-neon-green text-xs">Conectado ✓</p>}
                                                     {isConnected && isSelected && (isFB || isIG) && pageSelections[n.id] && (
                                                         <p className="text-neon-green text-xs truncate">
@@ -366,11 +367,11 @@ export default function SocialPage() {
                                             {isSelected && isFB && isConnected && (
                                                 <div className="mt-1.5 ml-2">
                                                     {fbPagesLoading ? (
-                                                        <p className="text-dark-400 text-xs px-2 py-1">Cargando páginas...</p>
+                                                        <p className="text-[#6B7280] text-xs px-2 py-1">Cargando páginas...</p>
                                                     ) : fbPagesError ? (
                                                         <p className="text-red-400 text-xs px-2 py-1">⚠ {fbPagesError}</p>
                                                     ) : fbPages.length === 0 ? (
-                                                        <p className="text-dark-400 text-xs px-2 py-1">No se encontraron páginas de Facebook. Asegúrate de ser admin de alguna Página.</p>
+                                                        <p className="text-[#6B7280] text-xs px-2 py-1">No se encontraron páginas de Facebook. Asegúrate de ser admin de alguna Página.</p>
                                                     ) : (
                                                         <select
                                                             value={pageSelections.FACEBOOK?.pageId || ''}
@@ -378,7 +379,7 @@ export default function SocialPage() {
                                                                 const page = fbPages.find(p => p.pageId === e.target.value)
                                                                 if (page) setPageSelections(prev => ({ ...prev, FACEBOOK: { pageId: page.pageId, pageAccessToken: page.pageAccessToken, pageName: page.pageName } }))
                                                             }}
-                                                            className="w-full bg-white/5 border border-white/15 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-neon-green/50 [&>option]:bg-white/5">
+                                                            className="w-full bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-3 py-2 text-xs text-[#111827] focus:outline-none focus:border-neon-green/50 [&>option]:bg-[#F4F6FA]">
                                                             <option value="">— Selecciona una página —</option>
                                                             {fbPages.map(p => (
                                                                 <option key={p.pageId} value={p.pageId}>{p.pageName}</option>
@@ -392,7 +393,7 @@ export default function SocialPage() {
                                             {isSelected && isIG && isConnected && (
                                                 <div className="mt-1.5 ml-2">
                                                     {fbPagesLoading ? (
-                                                        <p className="text-dark-400 text-xs px-2 py-1">Cargando cuentas...</p>
+                                                        <p className="text-[#6B7280] text-xs px-2 py-1">Cargando cuentas...</p>
                                                     ) : fbPagesError ? (
                                                         <p className="text-red-400 text-xs px-2 py-1">⚠ {fbPagesError}</p>
                                                     ) : igPages.length === 0 ? (
@@ -404,7 +405,7 @@ export default function SocialPage() {
                                                                 const page = igPages.find(p => p.instagram?.accountId === e.target.value)
                                                                 if (page) setPageSelections(prev => ({ ...prev, INSTAGRAM: { accountId: page.instagram.accountId, pageAccessToken: page.pageAccessToken, username: page.instagram.username } }))
                                                             }}
-                                                            className="w-full bg-white/5 border border-white/15 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-neon-green/50 [&>option]:bg-white/5">
+                                                            className="w-full bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-3 py-2 text-xs text-[#111827] focus:outline-none focus:border-neon-green/50 [&>option]:bg-[#F4F6FA]">
                                                             <option value="">— Selecciona una cuenta —</option>
                                                             {igPages.map(p => (
                                                                 <option key={p.instagram.accountId} value={p.instagram.accountId}>@{p.instagram.username} ({p.pageName})</option>
@@ -420,23 +421,23 @@ export default function SocialPage() {
                         </div>
 
                         {/* Post type */}
-                        <div className="glass-panel p-4 rounded-2xl border border-white/15">
-                            <p className="text-white text-sm font-medium mb-3">Tipo de publicación</p>
+                        <div className="dm-card p-4 rounded-2xl border border-[#E4E9F0]">
+                            <p className="text-[#111827] text-sm font-medium mb-3">Tipo de publicación</p>
                             <div className="grid grid-cols-2 gap-2">
                                 <button onClick={() => setPostType('feed')}
-                                    className={`py-2 rounded-xl text-sm font-medium border transition-all ${postType === 'feed' ? 'bg-neon-green text-black border-neon-green' : 'border-white/10 text-dark-400 hover:border-purple-500/40'}`}>
+                                    className={`py-2 rounded-xl text-sm font-medium border transition-all ${postType === 'feed' ? 'bg-neon-green text-black border-neon-green' : 'border-[#E4E9F0] text-[#6B7280] hover:border-purple-500/40'}`}>
                                     Feed
                                 </button>
                                 <button onClick={() => setPostType('story')}
-                                    className={`py-2 rounded-xl text-sm font-medium border transition-all ${postType === 'story' ? 'bg-neon-green text-black border-neon-green' : 'border-white/10 text-dark-400 hover:border-purple-500/40'}`}>
+                                    className={`py-2 rounded-xl text-sm font-medium border transition-all ${postType === 'story' ? 'bg-neon-green text-black border-neon-green' : 'border-[#E4E9F0] text-[#6B7280] hover:border-purple-500/40'}`}>
                                     Story
                                 </button>
                             </div>
                         </div>
 
                         {/* Schedule */}
-                        <div className="glass-panel p-4 rounded-2xl border border-white/15">
-                            <p className="text-white text-sm font-medium mb-3 flex items-center gap-1"><Calendar size={13} /> Programar</p>
+                        <div className="dm-card p-4 rounded-2xl border border-[#E4E9F0]">
+                            <p className="text-[#111827] text-sm font-medium mb-3 flex items-center gap-1"><Calendar size={13} /> Programar</p>
                             <input
                                 type="datetime-local"
                                 value={scheduledAt}
@@ -445,8 +446,8 @@ export default function SocialPage() {
                                     return d.toISOString().slice(0, 16)
                                 })()}
                                 onChange={e => setScheduledAt(e.target.value)}
-                                className="w-full bg-white/5 border border-white/15 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-neon-green/50" />
-                            {scheduledAt && <p className="text-dark-400 text-xs mt-1">Se publicará automáticamente</p>}
+                                className="w-full bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-3 py-2 text-sm text-[#111827] focus:outline-none focus:border-neon-green/50" />
+                            {scheduledAt && <p className="text-[#6B7280] text-xs mt-1">Se publicará automáticamente</p>}
                         </div>
 
                         {/* Publish button */}
@@ -458,12 +459,12 @@ export default function SocialPage() {
 
                         {/* Result */}
                         {publishResult && (
-                            <div className="glass-panel p-4 rounded-2xl border border-neon-green/30">
+                            <div className="dm-card p-4 rounded-2xl border border-neon-green/30">
                                 <p className="text-neon-green text-sm font-medium mb-2">
                                     {publishResult.scheduled ? '✅ Programado' : '✅ Publicado'}
                                 </p>
                                 {publishResult.results?.map((r: any) => (
-                                    <div key={r.network} className="flex items-start gap-2 text-xs text-dark-400 mt-1 min-w-0">
+                                    <div key={r.network} className="flex items-start gap-2 text-xs text-[#6B7280] mt-1 min-w-0">
                                         <span className="flex-shrink-0 mt-0.5">{r.success ? <CheckCircle size={11} className="text-neon-green" /> : <XCircle size={11} className="text-red-400" />}</span>
                                         <span className="break-words min-w-0">{r.network}: {r.success ? 'OK' : r.error}</span>
                                     </div>
@@ -477,9 +478,9 @@ export default function SocialPage() {
             {/* CALENDAR TAB */}
             {tab === 'calendar' && (
                 <div className="space-y-3">
-                    <p className="text-dark-400 text-sm">Posts programados pendientes</p>
+                    <p className="text-[#6B7280] text-sm">Posts programados pendientes</p>
                     {posts.length === 0 ? (
-                        <div className="glass-panel p-8 rounded-2xl border border-white/15 text-center text-dark-400">
+                        <div className="dm-card p-8 rounded-2xl border border-[#E4E9F0] text-center text-[#6B7280]">
                             No hay posts programados
                         </div>
                     ) : posts.map(post => (
@@ -492,7 +493,7 @@ export default function SocialPage() {
             {tab === 'history' && (
                 <div className="space-y-3">
                     {posts.length === 0 ? (
-                        <div className="glass-panel p-8 rounded-2xl border border-white/15 text-center text-dark-400">
+                        <div className="dm-card p-8 rounded-2xl border border-[#E4E9F0] text-center text-[#6B7280]">
                             No hay publicaciones todavía
                         </div>
                     ) : posts.map(post => (
@@ -514,13 +515,13 @@ export default function SocialPage() {
             {/* SCRIPT MODAL */}
             {scriptModal && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" onClick={e => { if (e.target === e.currentTarget) setScriptModal(false) }}>
-                    <div className="w-full max-w-lg bg-dark-900 border border-white/15 rounded-2xl shadow-2xl overflow-hidden">
+                    <div className="w-full max-w-lg bg-dark-900 border border-[#E4E9F0] rounded-2xl shadow-2xl overflow-hidden">
                         {/* Modal header */}
-                        <div className="flex items-center justify-between px-5 py-4 border-b border-white/10">
-                            <h2 className="text-white font-semibold flex items-center gap-2">
+                        <div className="flex items-center justify-between px-5 py-4 border-b border-[#E4E9F0]">
+                            <h2 className="text-[#111827] font-semibold flex items-center gap-2">
                                 <FileText size={16} className="text-blue-400" /> Guión de video
                             </h2>
-                            <button onClick={() => setScriptModal(false)} className="text-dark-400 hover:text-white transition-colors text-xl leading-none">&times;</button>
+                            <button onClick={() => setScriptModal(false)} className="text-[#6B7280] hover:text-[#111827] transition-colors text-xl leading-none">&times;</button>
                         </div>
                         {/* Modal body */}
                         <div className="p-5 space-y-4">
@@ -530,7 +531,7 @@ export default function SocialPage() {
                                     onChange={e => setScriptTopic(e.target.value)}
                                     onKeyDown={e => e.key === 'Enter' && handleGenerateScript()}
                                     placeholder="Describe el tema de tu video..."
-                                    className="flex-1 min-w-0 bg-white/5 border border-white/15 rounded-xl px-3 py-2.5 text-sm text-white placeholder-dark-400 focus:outline-none focus:border-blue-400/50"
+                                    className="flex-1 min-w-0 bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-3 py-2.5 text-sm text-[#111827] placeholder-[#9CA3AF] focus:outline-none focus:border-blue-400/50"
                                 />
                                 <button onClick={handleGenerateScript} disabled={scriptLoading || !scriptTopic.trim()}
                                     className="px-4 py-2.5 bg-blue-500 text-white font-semibold rounded-xl text-sm disabled:opacity-40 hover:bg-blue-400 transition-colors whitespace-nowrap w-full sm:w-auto">
@@ -539,22 +540,23 @@ export default function SocialPage() {
                             </div>
                             {script ? (
                                 <>
-                                    <div className="bg-white/5 border border-white/15 rounded-xl p-4 text-sm text-dark-200 whitespace-pre-wrap max-h-72 overflow-y-auto leading-relaxed">
+                                    <div className="bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl p-4 text-sm text-[#374151] whitespace-pre-wrap max-h-72 overflow-y-auto leading-relaxed">
                                         {script}
                                     </div>
                                     <button
                                         onClick={() => navigator.clipboard.writeText(script)}
-                                        className="w-full py-2 rounded-xl border border-white/15 text-dark-400 hover:text-white hover:border-purple-500/40 text-sm transition-colors">
+                                        className="w-full py-2 rounded-xl border border-[#E4E9F0] text-[#6B7280] hover:text-[#111827] hover:border-purple-500/40 text-sm transition-colors">
                                         Copiar guión
                                     </button>
                                 </>
                             ) : (
-                                <p className="text-dark-500 text-sm text-center py-6">El guión aparecerá aquí</p>
+                                <p className="text-[#9CA3AF] text-sm text-center py-6">El guión aparecerá aquí</p>
                             )}
                         </div>
                     </div>
                 </div>
             )}
+        </div>
         </div>
     )
 }
@@ -563,22 +565,22 @@ function PostCard({ post, onDelete }: { post: any; onDelete: (id: string) => voi
     const cfg = STATUS_CONFIG[post.status] || STATUS_CONFIG.DRAFT
     const Icon = cfg.icon
     return (
-        <div className="glass-panel p-4 rounded-2xl border border-white/15">
+        <div className="dm-card p-4 rounded-2xl border border-[#E4E9F0]">
             <div className="flex items-start justify-between gap-3">
                 <div className="flex-1 min-w-0">
-                    <p className="text-white text-sm line-clamp-2">{post.content}</p>
+                    <p className="text-[#111827] text-sm line-clamp-2">{post.content}</p>
                     <div className="flex items-center gap-3 mt-2 flex-wrap">
                         <span className="flex items-center gap-1 text-xs" style={{ color: cfg.color }}>
                             <Icon size={11} /> {cfg.label}
                         </span>
                         {post.scheduledAt && (
-                            <span className="text-dark-400 text-xs flex items-center gap-1">
+                            <span className="text-[#6B7280] text-xs flex items-center gap-1">
                                 <Clock size={10} /> {new Date(post.scheduledAt).toLocaleString('es', { dateStyle: 'short', timeStyle: 'short' })}
                             </span>
                         )}
                         <div className="flex gap-1">
                             {post.networks?.map((n: any) => (
-                                <span key={n.id} className={`text-xs px-1.5 py-0.5 rounded-md ${n.status === 'PUBLISHED' ? 'bg-neon-green/10 text-neon-green' : n.status === 'FAILED' ? 'bg-red-500/10 text-red-400' : 'bg-white/5 text-dark-400'}`}>
+                                <span key={n.id} className={`text-xs px-1.5 py-0.5 rounded-md ${n.status === 'PUBLISHED' ? 'bg-neon-green/10 text-neon-green' : n.status === 'FAILED' ? 'bg-red-500/10 text-red-400' : 'bg-[#F4F6FA] text-[#6B7280]'}`}>
                                     {n.network}
                                 </span>
                             ))}
@@ -586,7 +588,7 @@ function PostCard({ post, onDelete }: { post: any; onDelete: (id: string) => voi
                     </div>
                 </div>
                 {post.mediaUrl && (
-                    <div className="w-16 h-16 flex-shrink-0 rounded-xl overflow-hidden bg-white/5">
+                    <div className="w-16 h-16 flex-shrink-0 rounded-xl overflow-hidden bg-[#F4F6FA]">
                         {post.mediaType === 'video'
                             ? <video src={post.mediaUrl} className="w-full h-full object-cover" />
                             : <img src={post.mediaUrl} className="w-full h-full object-cover" alt="" />}
@@ -594,7 +596,7 @@ function PostCard({ post, onDelete }: { post: any; onDelete: (id: string) => voi
                 )}
             </div>
             <div className="mt-3 flex justify-end">
-                <button onClick={() => onDelete(post.id)} className="p-1.5 rounded-lg hover:bg-red-500/10 text-dark-400 hover:text-red-400 transition-all">
+                <button onClick={() => onDelete(post.id)} className="p-1.5 rounded-lg hover:bg-red-500/10 text-[#6B7280] hover:text-red-400 transition-all">
                     <Trash2 size={13} />
                 </button>
             </div>
@@ -604,7 +606,7 @@ function PostCard({ post, onDelete }: { post: any; onDelete: (id: string) => voi
 
 function MetricsPanel({ metrics, onAiAnalyze, aiLoading }: { metrics: any; onAiAnalyze: () => void; aiLoading: boolean }) {
     if (!metrics) return (
-        <div className="glass-panel p-8 rounded-2xl border border-white/15 text-center text-dark-400">
+        <div className="dm-card p-8 rounded-2xl border border-[#E4E9F0] text-center text-[#6B7280]">
             Cargando métricas...
         </div>
     )
@@ -622,25 +624,25 @@ function MetricsPanel({ metrics, onAiAnalyze, aiLoading }: { metrics: any; onAiA
                     { label: 'Fallidos', value: postStats.FAILED || 0, color: '#FF4444' },
                     { label: 'Total', value: Object.values(postStats).reduce((a, b) => a + b, 0), color: '#888' },
                 ].map(stat => (
-                    <div key={stat.label} className="glass-panel p-4 rounded-2xl border border-white/15 text-center">
+                    <div key={stat.label} className="dm-card p-4 rounded-2xl border border-[#E4E9F0] text-center">
                         <p className="text-2xl font-bold" style={{ color: stat.color }}>{stat.value}</p>
-                        <p className="text-dark-400 text-xs mt-1">{stat.label}</p>
+                        <p className="text-[#6B7280] text-xs mt-1">{stat.label}</p>
                     </div>
                 ))}
             </div>
 
             {/* Platform metrics */}
             {metrics.metrics && Object.entries(metrics.metrics).map(([network, data]: [string, any]) => (
-                <div key={network} className="glass-panel p-4 rounded-2xl border border-white/15">
-                    <h3 className="text-white font-medium mb-3">{network}</h3>
+                <div key={network} className="dm-card p-4 rounded-2xl border border-[#E4E9F0]">
+                    <h3 className="text-[#111827] font-medium mb-3">{network}</h3>
                     {data.error ? (
                         <p className="text-red-400 text-sm">{data.error}</p>
                     ) : (
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                             {Object.entries(data).slice(0, 8).map(([k, v]: [string, any]) => (
-                                <div key={k} className="bg-white/5 rounded-xl p-3">
-                                    <p className="text-white font-bold">{typeof v === 'number' ? v.toLocaleString() : String(v)}</p>
-                                    <p className="text-dark-400 text-xs mt-0.5">{k}</p>
+                                <div key={k} className="bg-[#F4F6FA] rounded-xl p-3">
+                                    <p className="text-[#111827] font-bold">{typeof v === 'number' ? v.toLocaleString() : String(v)}</p>
+                                    <p className="text-[#6B7280] text-xs mt-0.5">{k}</p>
                                 </div>
                             ))}
                         </div>
@@ -709,18 +711,18 @@ function ConnectionsPanel({ connections, onRefresh }: { connections: any[]; onRe
     return (
         <div className="space-y-4">
             {/* OpenAI API Key */}
-            <div className="glass-panel p-4 rounded-2xl border border-yellow-500/20 bg-yellow-500/5">
+            <div className="dm-card p-4 rounded-2xl border border-yellow-500/20 bg-yellow-500/5">
                 <div className="flex items-center gap-2 mb-3">
                     <Sparkles size={15} className="text-yellow-400" />
-                    <p className="text-white font-medium text-sm">API Key de OpenAI (IA)</p>
+                    <p className="text-[#111827] font-medium text-sm">API Key de OpenAI (IA)</p>
                     {oaiConfig?.isValid && <span className="text-xs text-neon-green bg-neon-green/10 px-2 py-0.5 rounded-full">Activa ✓</span>}
                 </div>
-                <p className="text-dark-400 text-xs mb-3">Necesaria para generar texto, mejorar posts y crear guiones de video con IA.</p>
+                <p className="text-[#6B7280] text-xs mb-3">Necesaria para generar texto, mejorar posts y crear guiones de video con IA.</p>
                 {/* Model selector — shared between both states */}
                 <div className="mb-3">
-                    <label className="text-dark-400 text-xs mb-1.5 block">Modelo</label>
+                    <label className="text-[#6B7280] text-xs mb-1.5 block">Modelo</label>
                     <select value={oaiModel} onChange={e => setOaiModel(e.target.value)}
-                        className="w-full bg-white/5 border border-white/15 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-yellow-400/50 [&>option]:bg-white/5">
+                        className="w-full bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-3 py-2 text-sm text-[#111827] focus:outline-none focus:border-yellow-400/50 [&>option]:bg-[#F4F6FA]">
                         <option value="gpt-5.2">GPT-5.2 ⚡ Última generación — ⚠ Mayor costo</option>
                         <option value="gpt-5.1">GPT-5.1 ⭐ Más inteligente — ⚠ Mayor costo</option>
                         <option value="gpt-4.1">GPT-4.1 — Alta calidad — ⚠ Mayor costo</option>
@@ -735,7 +737,7 @@ function ConnectionsPanel({ connections, onRefresh }: { connections: any[]; onRe
 
                 {oaiConfig ? (
                     <div className="flex items-center justify-between gap-2 min-w-0">
-                        <span className="text-dark-300 text-xs sm:text-sm font-mono truncate min-w-0">{oaiConfig.apiKeyMasked}</span>
+                        <span className="text-[#374151] text-xs sm:text-sm font-mono truncate min-w-0">{oaiConfig.apiKeyMasked}</span>
                         <button onClick={removeOaiKey} className="flex-shrink-0 text-xs text-red-400 hover:text-red-300 px-3 py-1.5 rounded-lg border border-red-500/20 hover:bg-red-500/10">Eliminar</button>
                     </div>
                 ) : (
@@ -743,7 +745,7 @@ function ConnectionsPanel({ connections, onRefresh }: { connections: any[]; onRe
                         <input value={oaiKey} onChange={e => setOaiKey(e.target.value)}
                             placeholder="sk-proj-..."
                             type="password"
-                            className="flex-1 min-w-0 bg-white/5 border border-white/15 rounded-xl px-3 py-2 text-sm text-white placeholder-dark-400 focus:outline-none focus:border-yellow-400/50" />
+                            className="flex-1 min-w-0 bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-3 py-2 text-sm text-[#111827] placeholder-[#9CA3AF] focus:outline-none focus:border-yellow-400/50" />
                         <button onClick={saveOaiKey} disabled={oaiLoading || !oaiKey.trim()}
                             className="px-3 py-2 bg-yellow-500/20 text-yellow-300 border border-yellow-500/30 rounded-xl text-sm disabled:opacity-40 hover:bg-yellow-500/30 whitespace-nowrap w-full sm:w-auto">
                             {oaiLoading ? <Loader2 size={13} className="animate-spin" /> : 'Guardar'}
@@ -753,18 +755,18 @@ function ConnectionsPanel({ connections, onRefresh }: { connections: any[]; onRe
                 {oaiMsg && <p className={`text-xs mt-2 ${oaiMsg.startsWith('✓') ? 'text-neon-green' : 'text-yellow-400'}`}>{oaiMsg}</p>}
             </div>
 
-            <p className="text-dark-400 text-sm">Conecta tus cuentas para publicar desde aquí</p>
+            <p className="text-[#6B7280] text-sm">Conecta tus cuentas para publicar desde aquí</p>
 
             {/* Facebook + Instagram (same OAuth) */}
-            <div className="glass-panel p-4 rounded-2xl border border-white/15">
+            <div className="dm-card p-4 rounded-2xl border border-[#E4E9F0]">
                 <div className="flex items-center justify-between gap-3">
                     <div className="flex items-center gap-3 min-w-0">
                         <span className="text-2xl flex-shrink-0">📘</span>
                         <div className="min-w-0">
-                            <p className="text-white font-medium">Facebook + Instagram</p>
+                            <p className="text-[#111827] font-medium">Facebook + Instagram</p>
                             {connectedMap.FACEBOOK
                                 ? <p className="text-neon-green text-xs truncate">✓ {connectedMap.FACEBOOK.pageName || connectedMap.FACEBOOK.accountName}</p>
-                                : <p className="text-dark-400 text-xs">No conectado</p>}
+                                : <p className="text-[#6B7280] text-xs">No conectado</p>}
                         </div>
                     </div>
                     {connectedMap.FACEBOOK
@@ -774,33 +776,33 @@ function ConnectionsPanel({ connections, onRefresh }: { connections: any[]; onRe
             </div>
 
             {/* TikTok */}
-            <div className="glass-panel p-4 rounded-2xl border border-white/15">
+            <div className="dm-card p-4 rounded-2xl border border-[#E4E9F0]">
                 <div className="flex items-center justify-between gap-3">
                     <div className="flex items-center gap-3 min-w-0">
                         <span className="text-2xl flex-shrink-0">🎵</span>
                         <div className="min-w-0">
-                            <p className="text-white font-medium">TikTok</p>
+                            <p className="text-[#111827] font-medium">TikTok</p>
                             {connectedMap.TIKTOK
                                 ? <p className="text-neon-green text-xs truncate">✓ {connectedMap.TIKTOK.accountName}</p>
-                                : <p className="text-dark-400 text-xs">No conectado</p>}
+                                : <p className="text-[#6B7280] text-xs">No conectado</p>}
                         </div>
                     </div>
                     {connectedMap.TIKTOK
                         ? <button onClick={() => disconnect('TIKTOK')} className="flex-shrink-0 text-xs text-red-400 hover:text-red-300 px-3 py-1.5 rounded-lg border border-red-500/20 hover:bg-red-500/10">Desconectar</button>
-                        : <a href="/api/social/oauth/tiktok" className="flex-shrink-0 text-xs bg-black/40 text-white border border-white/20 px-3 py-1.5 rounded-lg hover:bg-white/10 flex items-center gap-1"><ExternalLink size={11} /> Conectar</a>}
+                        : <a href="/api/social/oauth/tiktok" className="flex-shrink-0 text-xs bg-black/40 text-white border border-[#E4E9F0] px-3 py-1.5 rounded-lg hover:bg-[#EEF2F7] flex items-center gap-1"><ExternalLink size={11} /> Conectar</a>}
                 </div>
             </div>
 
             {/* YouTube */}
-            <div className="glass-panel p-4 rounded-2xl border border-white/15">
+            <div className="dm-card p-4 rounded-2xl border border-[#E4E9F0]">
                 <div className="flex items-center justify-between gap-3">
                     <div className="flex items-center gap-3 min-w-0">
                         <span className="text-2xl flex-shrink-0">▶️</span>
                         <div className="min-w-0">
-                            <p className="text-white font-medium">YouTube</p>
+                            <p className="text-[#111827] font-medium">YouTube</p>
                             {connectedMap.YOUTUBE
                                 ? <p className="text-neon-green text-xs truncate">✓ {connectedMap.YOUTUBE.accountName}</p>
-                                : <p className="text-dark-400 text-xs">No conectado</p>}
+                                : <p className="text-[#6B7280] text-xs">No conectado</p>}
                         </div>
                     </div>
                     {connectedMap.YOUTUBE
