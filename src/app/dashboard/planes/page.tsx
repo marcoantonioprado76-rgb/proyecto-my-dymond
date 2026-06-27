@@ -285,18 +285,19 @@ export default function PlanesPage() {
   }, [router])
 
   return (
-    <div className="px-4 md:px-6 pt-6 max-w-screen-xl mx-auto pb-24 text-white">
+    <div className="font-ui" style={{ background: 'linear-gradient(135deg, #F8FAFC 0%, #F5F7FA 45%, #EEF2F7 100%)', minHeight: '100vh' }}>
+    <div className="px-4 md:px-6 lg:px-8 pt-8 max-w-screen-xl mx-auto pb-24 text-[#111827]">
 
       {/* Header */}
       <div className="text-center mb-8">
-        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-purple-500/25 text-[10px] font-bold text-white/40 uppercase tracking-widest mb-4">
+        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#F0F3F7] border border-purple-500/25 text-[10px] font-bold text-[#6B7280] uppercase tracking-widest mb-4">
           <Layers size={10} />
           MY DIAMOND · Planes oficiales
         </div>
         <h1 className="text-2xl md:text-3xl font-black uppercase tracking-tighter mb-2">
           Elige tu Plan
         </h1>
-        <p className="text-sm text-white/30 max-w-sm mx-auto leading-relaxed">
+        <p className="text-sm text-[#6B7280] max-w-sm mx-auto leading-relaxed">
           Bots de WhatsApp, tiendas y anuncios con IA — todo personalizado con tu marca.
         </p>
         {currentPlan !== 'NONE' && (
@@ -313,13 +314,13 @@ export default function PlanesPage() {
           style={{
             background: isFaseGlobal
               ? 'linear-gradient(135deg, rgba(0,255,136,0.06), rgba(0,200,100,0.03))'
-              : 'linear-gradient(135deg, rgba(154,203,255,0.12) 0%, rgba(255,125,224,0.12) 50%, rgba(162,102,255,0.12) 100%)',
-            borderColor: isFaseGlobal ? 'rgba(0,255,136,0.2)' : 'rgba(255,255,255,0.15)',
+              : '#FFFFFF',
+            borderColor: isFaseGlobal ? 'rgba(0,255,136,0.2)' : '#E4E9F0',
           }}>
           <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
             style={{
               background: isFaseGlobal ? 'rgba(0,255,136,0.08)' : 'rgba(210,3,221,0.08)',
-              border: isFaseGlobal ? '1px solid rgba(0,255,136,0.2)' : '1px solid rgba(255,255,255,0.15)',
+              border: isFaseGlobal ? '1px solid rgba(0,255,136,0.2)' : '1px solid #E4E9F0',
             }}>
             {isFaseGlobal ? <span className="text-lg">🌐</span> : <Timer size={18} style={{ color: '#D203DD' }} />}
           </div>
@@ -336,7 +337,7 @@ export default function PlanesPage() {
               ].map(({ v, l }) => (
                 <div key={l} className="text-center">
                   <span className="text-xl font-black tabular-nums" style={{ color: isFaseGlobal ? '#00FF88' : '#D203DD' }}>{String(v).padStart(2, '0')}</span>
-                  <p className="text-[9px] text-white/30 uppercase tracking-widest">{l}</p>
+                  <p className="text-[9px] text-[#6B7280] uppercase tracking-widest">{l}</p>
                 </div>
               ))}
             </div>
@@ -362,17 +363,17 @@ export default function PlanesPage() {
               className={`relative rounded-3xl border flex flex-col transition-all duration-300 ${pack.accent.border} ${pack.accent.glow} ${pack.accent.featured ? 'md:-mt-4' : ''} ${pack.locked ? 'opacity-60' : ''}`}
               style={{
                 background: pack.locked
-                  ? 'rgba(255,255,255,0.015)'
-                  : 'linear-gradient(135deg, rgba(154,203,255,0.12) 0%, rgba(255,125,224,0.12) 50%, rgba(162,102,255,0.12) 100%)',
+                  ? '#F8FAFC'
+                  : '#FFFFFF',
                 backdropFilter: 'blur(16px)',
               }}
             >
               {pack.locked && (
                 <div className="absolute inset-0 rounded-3xl z-10 flex flex-col items-center justify-center gap-2 backdrop-blur-[1px]">
-                  <div className="w-12 h-12 rounded-2xl bg-white/5 border border-purple-500/25 flex items-center justify-center">
-                    <Lock size={20} className="text-white/25" />
+                  <div className="w-12 h-12 rounded-2xl bg-[#F0F3F7] border border-purple-500/25 flex items-center justify-center">
+                    <Lock size={20} className="text-[#9CA3AF]" />
                   </div>
-                  <p className="text-[10px] font-black text-white/25 uppercase tracking-widest">Próximamente</p>
+                  <p className="text-[10px] font-black text-[#9CA3AF] uppercase tracking-widest">Próximamente</p>
                 </div>
               )}
 
@@ -391,21 +392,21 @@ export default function PlanesPage() {
                   </div>
                   <div>
                     <p className={`text-[11px] font-black uppercase tracking-widest ${pack.accent.text}`}>{pack.name}</p>
-                    <p className="text-[10px] text-white/30 leading-snug">{pack.tagline}</p>
+                    <p className="text-[10px] text-[#6B7280] leading-snug">{pack.tagline}</p>
                   </div>
                 </div>
 
-                <p className="text-[11px] text-white/40 leading-relaxed mb-4">{pack.pitch}</p>
+                <p className="text-[11px] text-[#6B7280] leading-relaxed mb-4">{pack.pitch}</p>
 
                 <div className="mb-5">
                   <div className="flex items-end gap-1">
                     <span className="text-[40px] font-black leading-none">${pack.price}</span>
-                    <span className="text-sm text-white/30 mb-1">USD</span>
+                    <span className="text-sm text-[#6B7280] mb-1">USD</span>
                   </div>
-                  <p className="text-[10px] text-white/20 mt-0.5">30 días de acceso · renovable</p>
+                  <p className="text-[10px] text-[#9CA3AF] mt-0.5">30 días de acceso · renovable</p>
                 </div>
 
-                <div className={`h-px mb-5 ${pack.accent.featured ? 'bg-purple-500/20' : 'bg-white/5'}`} />
+                <div className={`h-px mb-5 ${pack.accent.featured ? 'bg-purple-500/20' : 'bg-[#F0F3F7]'}`} />
 
                 <div className="flex-1 space-y-4 mb-6">
                   {pack.sections.map((section, si) => {
@@ -413,18 +414,18 @@ export default function PlanesPage() {
                     return (
                       <div key={si}>
                         <div className="flex items-center gap-1.5 mb-2">
-                          <SIcon size={11} className={pack.locked ? 'text-white/20' : pack.accent.text} />
-                          <p className={`text-[10px] font-black uppercase tracking-widest ${pack.locked ? 'text-white/20' : pack.accent.text}`}>
+                          <SIcon size={11} className={pack.locked ? 'text-[#9CA3AF]' : pack.accent.text} />
+                          <p className={`text-[10px] font-black uppercase tracking-widest ${pack.locked ? 'text-[#9CA3AF]' : pack.accent.text}`}>
                             {section.title}
                           </p>
                         </div>
                         <ul className="space-y-1.5">
                           {section.features.map((feat, fi) => (
                             <li key={fi} className="flex items-start gap-2">
-                              <div className={`w-3.5 h-3.5 rounded-full flex items-center justify-center shrink-0 mt-0.5 ${pack.locked ? 'bg-white/5' : pack.accent.bg}`}>
-                                <Check size={8} className={pack.locked ? 'text-white/20' : pack.accent.text} />
+                              <div className={`w-3.5 h-3.5 rounded-full flex items-center justify-center shrink-0 mt-0.5 ${pack.locked ? 'bg-[#F0F3F7]' : pack.accent.bg}`}>
+                                <Check size={8} className={pack.locked ? 'text-[#9CA3AF]' : pack.accent.text} />
                               </div>
-                              <span className={`text-[11px] leading-snug ${pack.locked ? 'text-white/25' : 'text-white/55'}`}>{feat}</span>
+                              <span className={`text-[11px] leading-snug ${pack.locked ? 'text-[#9CA3AF]' : 'text-[#374151]'}`}>{feat}</span>
                             </li>
                           ))}
                         </ul>
@@ -435,16 +436,16 @@ export default function PlanesPage() {
                   {pack.notIncluded.length > 0 && (
                     <div>
                       <div className="flex items-center gap-1.5 mb-2">
-                        <X size={11} className="text-white/15" />
-                        <p className="text-[10px] font-black uppercase tracking-widest text-white/15">No incluido</p>
+                        <X size={11} className="text-[#9CA3AF]" />
+                        <p className="text-[10px] font-black uppercase tracking-widest text-[#9CA3AF]">No incluido</p>
                       </div>
                       <ul className="space-y-1.5">
                         {pack.notIncluded.map((feat, fi) => (
                           <li key={fi} className="flex items-start gap-2">
                             <div className="w-3.5 h-3.5 rounded-full flex items-center justify-center shrink-0 mt-0.5 bg-white/3">
-                              <X size={7} className="text-white/15" />
+                              <X size={7} className="text-[#9CA3AF]" />
                             </div>
-                            <span className="text-[11px] leading-snug text-white/20 line-through">{feat}</span>
+                            <span className="text-[11px] leading-snug text-[#9CA3AF] line-through">{feat}</span>
                           </li>
                         ))}
                       </ul>
@@ -487,7 +488,7 @@ export default function PlanesPage() {
                   }
                   if (isLower) {
                     return (
-                      <button disabled className="w-full py-3 rounded-2xl text-sm font-black bg-white/3 text-white/20 border border-purple-500/20">
+                      <button disabled className="w-full py-3 rounded-2xl text-sm font-black bg-white/3 text-[#9CA3AF] border border-purple-500/20">
                         Plan inferior
                       </button>
                     )
@@ -530,7 +531,7 @@ export default function PlanesPage() {
                 <p className="text-sm font-black uppercase tracking-widest text-yellow-400">Pack Empresarial</p>
                 <span className="px-2 py-0.5 rounded-full bg-yellow-500/10 border border-yellow-500/20 text-[9px] font-black text-yellow-400 uppercase tracking-widest">A medida</span>
               </div>
-              <p className="text-xs text-white/40 leading-relaxed max-w-lg">
+              <p className="text-xs text-[#6B7280] leading-relaxed max-w-lg">
                 Solución personalizada para empresas y líderes de alto rendimiento. Agentes AI ilimitados, tiendas, landings y soporte dedicado adaptados a tu volumen de negocio. Contáctanos para armar tu plan.
               </p>
             </div>
@@ -549,14 +550,15 @@ export default function PlanesPage() {
 
       {/* Bottom note */}
       <div className="mt-6 p-4 bg-white/[0.02] border border-purple-500/15 rounded-2xl flex flex-col sm:flex-row items-center gap-3 text-center sm:text-left">
-        <div className="w-8 h-8 rounded-xl bg-white/5 border border-purple-500/20 flex items-center justify-center shrink-0">
-          <Layers size={14} className="text-white/30" />
+        <div className="w-8 h-8 rounded-xl bg-[#F0F3F7] border border-purple-500/20 flex items-center justify-center shrink-0">
+          <Layers size={14} className="text-[#6B7280]" />
         </div>
         <div>
-          <p className="text-xs font-bold text-white/40">Proceso manual · 30 días de acceso</p>
-          <p className="text-[11px] text-white/20">Envía tu solicitud. Nuestro equipo la aprobará y activará tu plan en menos de 24h.</p>
+          <p className="text-xs font-bold text-[#6B7280]">Proceso manual · 30 días de acceso</p>
+          <p className="text-[11px] text-[#9CA3AF]">Envía tu solicitud. Nuestro equipo la aprobará y activará tu plan en menos de 24h.</p>
         </div>
       </div>
+    </div>
     </div>
   )
 }
