@@ -360,7 +360,7 @@ export default function SettingsPage() {
                     <div className="flex gap-2 justify-center sm:justify-start">
                       <button onClick={saveName} disabled={savingName}
                         className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-widest transition-all disabled:opacity-50"
-                        style={{ background: 'rgba(0,255,136,0.15)', border: '1px solid rgba(0,255,136,0.35)', color: '#00FF88' }}>
+                        style={{ background: 'rgba(0,255,136,0.15)', border: '1px solid rgba(0,255,136,0.35)', color: '#FF096C' }}>
                         {savingName ? <Loader2 size={12} className="animate-spin" /> : <Check size={12} />} Guardar
                       </button>
                       <button onClick={cancelEditName} disabled={savingName}
@@ -487,7 +487,7 @@ export default function SettingsPage() {
               <p className="text-[8px] font-black uppercase tracking-[0.2em]" style={{ color: '#6B7280' }}>Última recarga</p>
               <p className="text-xs font-bold text-[#111827] truncate">
                 {credits?.lastRecharge
-                  ? <>{fmtDate(credits.lastRecharge.date)} <span style={{ color: '#00FF88' }}>+${credits.lastRecharge.amountUsd.toFixed(0)}</span></>
+                  ? <>{fmtDate(credits.lastRecharge.date)} <span style={{ color: '#FF096C' }}>+${credits.lastRecharge.amountUsd.toFixed(0)}</span></>
                   : 'Sin recargas'}
               </p>
             </div>
@@ -777,7 +777,7 @@ export default function SettingsPage() {
           style={{
             background: msg.type === 'ok' ? 'rgba(0,255,136,0.10)' : 'rgba(239,68,68,0.10)',
             border: `1px solid ${msg.type === 'ok' ? 'rgba(0,255,136,0.30)' : 'rgba(239,68,68,0.30)'}`,
-            color: msg.type === 'ok' ? '#00FF88' : '#fca5a5',
+            color: msg.type === 'ok' ? '#FF096C' : '#fca5a5',
           }}>
           {msg.text}
         </div>

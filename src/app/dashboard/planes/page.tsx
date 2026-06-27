@@ -336,7 +336,7 @@ export default function PlanesPage() {
                 { v: countdown.seconds, l: 'seg' },
               ].map(({ v, l }) => (
                 <div key={l} className="text-center">
-                  <span className="text-xl font-black tabular-nums" style={{ color: isFaseGlobal ? '#00FF88' : '#D203DD' }}>{String(v).padStart(2, '0')}</span>
+                  <span className="text-xl font-black tabular-nums" style={{ color: isFaseGlobal ? '#FF096C' : '#D203DD' }}>{String(v).padStart(2, '0')}</span>
                   <p className="text-[9px] text-[#6B7280] uppercase tracking-widest">{l}</p>
                 </div>
               ))}

@@ -116,7 +116,7 @@ export default function StorePage() {
     <div className="px-4 sm:px-6 lg:px-8 pt-8 pb-10 max-w-screen-xl mx-auto">
       {/* Toast */}
       {toast && (
-        <div style={{ position: 'fixed', top: 20, right: 20, zIndex: 9999, background: toast.startsWith('¡') ? 'rgba(0,255,136,0.15)' : 'rgba(239,68,68,0.15)', border: `1px solid ${toast.startsWith('¡') ? 'rgba(0,255,136,0.3)' : 'rgba(239,68,68,0.3)'}`, color: toast.startsWith('¡') ? '#00FF88' : '#ef4444', borderRadius: 10, padding: '10px 18px', fontSize: 13, fontWeight: 600 }}>
+        <div style={{ position: 'fixed', top: 20, right: 20, zIndex: 9999, background: toast.startsWith('¡') ? 'rgba(0,255,136,0.15)' : 'rgba(239,68,68,0.15)', border: `1px solid ${toast.startsWith('¡') ? 'rgba(0,255,136,0.3)' : 'rgba(239,68,68,0.3)'}`, color: toast.startsWith('¡') ? '#FF096C' : '#ef4444', borderRadius: 10, padding: '10px 18px', fontSize: 13, fontWeight: 600 }}>
           {toast}
         </div>
       )}
@@ -213,7 +213,7 @@ export default function StorePage() {
                     <button
                       onClick={e => handleQuickAdd(e, item)}
                       disabled={outOfStock}
-                      style={{ flex: 2, padding: '5px 0', borderRadius: 7, fontSize: 11, fontWeight: 700, cursor: outOfStock ? 'not-allowed' : 'pointer', border: 'none', background: outOfStock ? '#F0F3F7' : 'linear-gradient(135deg, #D203DD, #00FF88)', color: outOfStock ? '#9CA3AF' : '#000' }}>
+                      style={{ flex: 2, padding: '5px 0', borderRadius: 7, fontSize: 11, fontWeight: 700, cursor: outOfStock ? 'not-allowed' : 'pointer', border: 'none', background: outOfStock ? '#F0F3F7' : 'linear-gradient(135deg, #FF2D95 0%, #B735B8 48%, #233B8F 100%)', color: outOfStock ? '#9CA3AF' : '#000' }}>
                       {outOfStock ? 'Agotado' : '🛒 Agregar'}
                     </button>
                   </div>
@@ -266,7 +266,7 @@ export default function StorePage() {
                           ))}
                         </div>
                         <div style={{ marginTop: 'auto', paddingTop: 8 }}>
-                          <div style={{ padding: '8px 0', borderRadius: 9, textAlign: 'center', fontSize: 12, fontWeight: 700, background: allSoldOut ? '#F0F3F7' : 'linear-gradient(135deg,#D203DD,#0D1E79)', color: allSoldOut ? '#6B7280' : '#fff' }}>
+                          <div style={{ padding: '8px 0', borderRadius: 9, textAlign: 'center', fontSize: 12, fontWeight: 700, background: allSoldOut ? '#F0F3F7' : 'linear-gradient(135deg, #FF2D95 0%, #B735B8 48%, #233B8F 100%)', color: allSoldOut ? '#6B7280' : '#fff' }}>
                             {allSoldOut ? 'Agotado' : '🎟 Comprar entrada'}
                           </div>
                         </div>
@@ -320,7 +320,7 @@ export default function StorePage() {
                 Cancelar
               </button>
               <button onClick={confirmQuickAdd}
-                style={{ flex: 2, padding: '10px 0', borderRadius: 9, border: 'none', background: 'linear-gradient(135deg, #D203DD, #00FF88)', color: '#000', cursor: 'pointer', fontWeight: 700, fontSize: 13 }}>
+                style={{ flex: 2, padding: '10px 0', borderRadius: 9, border: 'none', background: 'linear-gradient(135deg, #FF2D95 0%, #B735B8 48%, #233B8F 100%)', color: '#000', cursor: 'pointer', fontWeight: 700, fontSize: 13 }}>
                 🛒 Agregar al carrito
               </button>
             </div>

@@ -26,7 +26,7 @@ const services = [
     title: 'Agentes AI de Ventas',
     description: 'Tu agente AI vende, responde y fideliza clientes las 24 horas sin levantar un dedo.',
     icon: MessageCircle,
-    from: '#00FF88', to: '#00C2FF',
+    from: '#FF096C', to: '#B735B8',
     features: ['Disponible 24/7', 'Respuestas automáticas', 'Cierre de ventas'],
     link: '/dashboard/services/whatsapp',
     requiredPlan: 'BASIC' as UserPlan,
@@ -211,7 +211,7 @@ export default function ServicesPage() {
                   style={{ padding: 24, display: 'flex', flexDirection: 'column', opacity: unlocked ? 1 : 0.72 }}>
                   <div className="flex items-start justify-between mb-5">
                     <div className="w-14 h-14 rounded-2xl flex items-center justify-center"
-                      style={{ background: unlocked ? `linear-gradient(145deg, ${service.from}, ${service.to})` : '#EEF2F7', boxShadow: unlocked ? `0 12px 28px -8px ${service.from}66` : 'none' }}>
+                      style={{ background: unlocked ? `linear-gradient(135deg, #FF2D95 0%, #B735B8 48%, #233B8F 100%)` : '#EEF2F7', boxShadow: unlocked ? `0 12px 28px -8px ${service.from}66` : 'none' }}>
                       <service.icon className="w-7 h-7" style={{ color: unlocked ? '#fff' : '#9CA3AF' }} />
                     </div>
                     <span className="text-[10px] font-bold uppercase tracking-[0.12em] px-3 py-1 rounded-full"

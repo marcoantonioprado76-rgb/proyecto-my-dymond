@@ -115,7 +115,7 @@ export default function CrmPage() {
                     <Link
                         href="/dashboard/crm/new"
                         className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-black uppercase tracking-wide text-white transition-all hover:opacity-90"
-                        style={{ background: 'linear-gradient(135deg, #D203DD, #00FF88)' }}
+                        style={{ background: 'linear-gradient(135deg, #FF2D95 0%, #B735B8 48%, #233B8F 100%)' }}
                     >
                         <Plus size={15} /> Nueva campaña
                     </Link>
@@ -190,7 +190,7 @@ export default function CrmPage() {
                                     </div>
                                     <div className="h-1.5 bg-[#E9EDF2] rounded-full overflow-hidden">
                                         <div
-                                            className="h-full bg-gradient-to-r from-[#D203DD] to-[#00FF88] rounded-full transition-all"
+                                            className="h-full bg-gradient-to-r from-[#D203DD] to-[#FF096C] rounded-full transition-all"
                                             style={{ width: `${Math.min(100, (c.sentCount / c.totalContacts) * 100)}%` }}
                                         />
                                     </div>

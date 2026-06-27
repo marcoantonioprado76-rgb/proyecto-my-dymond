@@ -31,7 +31,7 @@ const SERVICES = [
   { href: '/dashboard/services/ads/google',    icon: 'fa-brands fa-google',        label: 'Google Ads',     desc: 'Search · Display · YT',  accent: '#FBBC04', hidden: true },
   { href: '/dashboard/services/social',        icon: 'fa-solid fa-circle-nodes',   label: 'Social',         desc: 'Todas tus redes',        accent: '#9B6BFF' },
   { href: '/dashboard/services/landing-pages', icon: 'fa-solid fa-layer-group',    label: 'Landing Pages',  desc: 'Páginas que venden',     accent: '#7B5BFF' },
-  { href: '/dashboard/services/whatsapp',      icon: 'fa-solid fa-robot',          label: 'Agentes de IA', desc: 'Venden 24/7',            accent: '#00C2FF' },
+  { href: '/dashboard/services/whatsapp',      icon: 'fa-solid fa-robot',          label: 'Agentes de IA', desc: 'Venden 24/7',            accent: '#B735B8' },
   { href: '/dashboard/services/virtual-store', icon: 'fa-solid fa-store',          label: 'Tienda Virtual', desc: 'Tu tienda online',       accent: '#3B82F6' },
   { href: '/dashboard/crm',                    icon: 'fa-solid fa-users-gear',     label: 'CRM Broadcast',  desc: 'Mensajes masivos',       accent: '#D203DD' },
   { href: '/dashboard/academy',                icon: 'fa-solid fa-graduation-cap', label: 'Academy',        desc: 'Aprende y escala',       accent: '#8B5CF6' },
@@ -354,7 +354,7 @@ export default function DashboardPage() {
             <div className="d-grid d-grid-4">
               {SERVICES.filter(s => !s.hidden).map((s) => (
                 <Link key={s.href} href={s.href} className="dm-card dm-card--hover" style={{ padding: 22, display: 'flex', flexDirection: 'column', gap: 14, textDecoration: 'none', minHeight: 168 }}>
-                  <div style={{ width: 54, height: 54, borderRadius: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', background: `linear-gradient(145deg, ${s.accent}, ${s.accent}cc)`, color: '#fff', boxShadow: `0 12px 28px ${s.accent}3a`, fontSize: 20, flexShrink: 0 }}>
+                  <div style={{ width: 54, height: 54, borderRadius: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', background: `linear-gradient(135deg, #FF2D95 0%, #B735B8 48%, #233B8F 100%)`, color: '#fff', boxShadow: `0 12px 28px ${s.accent}3a`, fontSize: 20, flexShrink: 0 }}>
                     <i className={s.icon} />
                   </div>
                   <div style={{ flex: 1 }}>
