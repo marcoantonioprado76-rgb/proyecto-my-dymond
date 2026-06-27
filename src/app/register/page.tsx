@@ -47,7 +47,7 @@ interface SuccessData { fullName: string; username: string; password: string }
 export default function RegisterPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center">
+      <div style={{background:'linear-gradient(135deg,#F8FAFC,#F5F7FA 45%,#EEF2F7)',minHeight:'100vh',color:'#111827'}} className="font-ui min-h-screen flex items-center justify-center">
         <div className="w-8 h-8 border-2 border-cyan-400/30 border-t-cyan-400 rounded-full animate-spin" />
       </div>
     }>
@@ -121,14 +121,14 @@ function RegisterForm() {
     }
   }
 
-  const inputCls = 'w-full bg-white/[0.04] border border-white/10 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-white/25 focus:outline-none focus:border-cyan-500/40 focus:ring-1 focus:ring-cyan-500/15 transition-colors'
-  const selectCls = 'w-full bg-white/[0.04] border border-white/10 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-500/40 transition-colors appearance-none cursor-pointer'
-  const labelCls = 'block text-[10px] font-bold text-white/30 uppercase tracking-widest mb-1.5'
+  const inputCls = 'dm-input text-sm'
+  const selectCls = 'dm-input text-sm appearance-none cursor-pointer'
+  const labelCls = 'block text-[10px] font-bold text-[#6B7280] uppercase tracking-widest mb-1.5'
 
   // ── Pantalla de éxito ──
   if (success) {
     return (
-      <div className="min-h-screen flex items-center justify-center px-4 relative overflow-hidden">
+      <div style={{background:'linear-gradient(135deg,#F8FAFC,#F5F7FA 45%,#EEF2F7)',minHeight:'100vh',color:'#111827'}} className="font-ui min-h-screen flex items-center justify-center px-4 relative overflow-hidden">
         {/* Background glows */}
         <div className="pointer-events-none fixed inset-0 overflow-hidden">
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] rounded-full bg-green-500/5 blur-[140px]" />
@@ -136,7 +136,7 @@ function RegisterForm() {
         </div>
 
         <div className="w-full max-w-[380px] relative z-10">
-          <div className="water-glass relative overflow-hidden" style={{ padding: '2rem' }}>
+          <div className="dm-card relative overflow-hidden" style={{ padding: '2rem' }}>
 
             {/* Top neon line */}
             <div className="absolute top-0 left-0 right-0 h-px"
@@ -153,15 +153,15 @@ function RegisterForm() {
               <p className="text-[9px] font-black uppercase tracking-[0.22em] mb-1" style={{ color: '#00FF9D' }}>
                 ¡Cuenta creada!
               </p>
-              <h1 className="text-lg font-black text-white">Bienvenido,</h1>
-              <p className="text-base font-black text-white/70 -mt-0.5">{success.fullName}</p>
+              <h1 className="text-lg font-black text-[#111827]">Bienvenido,</h1>
+              <p className="text-base font-black text-[#374151] -mt-0.5">{success.fullName}</p>
             </div>
 
             {/* Warning */}
             <div className="flex items-start gap-2.5 px-3.5 py-2.5 rounded-xl mb-5"
               style={{ background: 'rgba(255,184,0,0.05)', border: '1px solid rgba(255,184,0,0.15)' }}>
               <span className="text-xs shrink-0 mt-px">⚠️</span>
-              <p className="text-[10px] text-white/35 leading-relaxed">
+              <p className="text-[10px] text-[#6B7280] leading-relaxed">
                 Guarda estas credenciales. No podrás recuperar tu contraseña si la olvidas.
               </p>
             </div>
@@ -171,17 +171,17 @@ function RegisterForm() {
               style={{ border: '1px solid rgba(255,255,255,0.08)' }}>
 
               {/* Username row */}
-              <div className="px-4 py-3.5 border-b border-white/[0.06]"
+              <div className="px-4 py-3.5 border-b border-[#E4E9F0]"
                 style={{ background: 'rgba(255,255,255,0.03)' }}>
-                <p className="text-[9px] font-black uppercase tracking-[0.18em] text-white/30 mb-1">Usuario</p>
-                <p className="text-sm font-black text-white tracking-wide">{success.username}</p>
+                <p className="text-[9px] font-black uppercase tracking-[0.18em] text-[#6B7280] mb-1">Usuario</p>
+                <p className="text-sm font-black text-[#111827] tracking-wide">{success.username}</p>
               </div>
 
               {/* Password row */}
-              <div className="px-4 py-3.5 border-b border-white/[0.06]"
+              <div className="px-4 py-3.5 border-b border-[#E4E9F0]"
                 style={{ background: 'rgba(255,255,255,0.02)' }}>
-                <p className="text-[9px] font-black uppercase tracking-[0.18em] text-white/30 mb-1">Contraseña</p>
-                <p className="text-sm font-black text-white font-mono tracking-widest">{success.password}</p>
+                <p className="text-[9px] font-black uppercase tracking-[0.18em] text-[#6B7280] mb-1">Contraseña</p>
+                <p className="text-sm font-black text-[#111827] font-mono tracking-widest">{success.password}</p>
               </div>
 
             </div>
@@ -193,7 +193,7 @@ function RegisterForm() {
               style={{
                 background: 'linear-gradient(135deg, #0D1E79, #D203DD)',
                 color: '#fff',
-                border: '1px solid rgba(255,255,255,0.1)',
+                border: '1px solid #E4E9F0',
                 boxShadow: '0 6px 24px rgba(210,3,221,0.30)',
               }}
             >
@@ -207,7 +207,7 @@ function RegisterForm() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 py-10 relative overflow-hidden">
+    <div style={{background:'linear-gradient(135deg,#F8FAFC,#F5F7FA 45%,#EEF2F7)',minHeight:'100vh',color:'#111827'}} className="font-ui min-h-screen flex items-center justify-center px-4 py-10 relative overflow-hidden">
       <div className="pointer-events-none fixed inset-0">
         <div className="absolute -top-32 -right-32 w-[500px] h-[500px] rounded-full bg-purple-600/10 blur-[120px]" />
         <div className="absolute -bottom-32 -left-32 w-[500px] h-[500px] rounded-full bg-cyan-500/8 blur-[120px]" />
@@ -217,18 +217,18 @@ function RegisterForm() {
 
         {/* Logo */}
         <div className="flex flex-col items-center mb-6">
-          <div className="w-14 h-14 mb-3 rounded-xl overflow-hidden border border-white/10 shadow-lg shadow-black/40">
+          <div className="w-14 h-14 mb-3 rounded-xl overflow-hidden border border-[#E4E9F0] shadow-lg shadow-black/40">
             <img src="/logo.png" alt="Logo" className="w-full h-full object-contain" />
           </div>
-          <h1 className="text-lg font-black text-white tracking-tight">MY DIAMOND</h1>
-          <p className="text-xs text-white/35 mt-0.5">Crea tu cuenta gratuita</p>
+          <h1 className="text-lg font-black text-[#111827] tracking-tight">MY DIAMOND</h1>
+          <p className="text-xs text-[#6B7280] mt-0.5">Crea tu cuenta gratuita</p>
         </div>
 
         {/* Card */}
-        <div className="water-glass p-6 shadow-2xl shadow-black/50">
+        <div className="dm-card p-6">
 
-          <h2 className="text-sm font-black text-white mb-0.5">Registro</h2>
-          <p className="text-[11px] text-white/30 mb-5">Completa los datos para unirte a la plataforma.</p>
+          <h2 className="text-sm font-black text-[#111827] mb-0.5">Registro</h2>
+          <p className="text-[11px] text-[#6B7280] mb-5">Completa los datos para unirte a la plataforma.</p>
 
           {error && (
             <div className="flex items-center gap-2 bg-red-500/10 border border-red-500/20 rounded-xl px-3 py-2.5 mb-4">
@@ -272,12 +272,12 @@ function RegisterForm() {
                     className={selectCls}
                     value={form.country}
                     onChange={e => update('country', e.target.value)}
-                    style={{ color: form.country ? '#fff' : 'rgba(255,255,255,0.3)' }}
+                    style={{ color: form.country ? '#fff' : '#6B7280' }}
                   >
-                    <option value="" disabled className="bg-[#0d0d1a] text-white/40">País</option>
-                    {COUNTRIES.map(c => <option key={c} value={c} className="bg-[#0d0d1a] text-white">{c}</option>)}
+                    <option value="" disabled className="bg-white text-[#9CA3AF]">País</option>
+                    {COUNTRIES.map(c => <option key={c} value={c} className="bg-white text-[#111827]">{c}</option>)}
                   </select>
-                  <ChevronDown size={12} className="absolute right-3 top-1/2 -translate-y-1/2 text-white/30 pointer-events-none" />
+                  <ChevronDown size={12} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#6B7280] pointer-events-none" />
                 </div>
               </div>
               <div>
@@ -289,15 +289,15 @@ function RegisterForm() {
                         className={selectCls}
                         value={form.city}
                         onChange={e => update('city', e.target.value)}
-                        style={{ color: form.city ? '#fff' : 'rgba(255,255,255,0.3)' }}
+                        style={{ color: form.city ? '#fff' : '#6B7280' }}
                       >
-                        <option value="" disabled className="bg-[#0d0d1a] text-white/40">Ciudad</option>
-                        {cities.map(c => <option key={c} value={c} className="bg-[#0d0d1a] text-white">{c}</option>)}
+                        <option value="" disabled className="bg-white text-[#9CA3AF]">Ciudad</option>
+                        {cities.map(c => <option key={c} value={c} className="bg-white text-[#111827]">{c}</option>)}
                       </select>
-                      <ChevronDown size={12} className="absolute right-3 top-1/2 -translate-y-1/2 text-white/30 pointer-events-none" />
+                      <ChevronDown size={12} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#6B7280] pointer-events-none" />
                     </>
                   ) : (
-                    <div className="w-full bg-white/[0.03] border border-white/[0.06] rounded-xl px-3.5 py-2.5 text-xs text-white/20 cursor-not-allowed opacity-50">Ciudad</div>
+                    <div className="w-full bg-[#F8FAFC] border border-[#E4E9F0] rounded-xl px-3.5 py-2.5 text-xs text-[#9CA3AF] cursor-not-allowed opacity-50">Ciudad</div>
                   )}
                 </div>
               </div>
@@ -328,7 +328,7 @@ function RegisterForm() {
             </div>
 
             {/* Separador */}
-            <div className="border-t border-white/[0.06] pt-1" />
+            <div className="border-t border-[#E4E9F0] pt-1" />
 
             {/* Email */}
             <div>
@@ -358,16 +358,16 @@ function RegisterForm() {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/60 transition-colors"
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#6B7280] hover:text-[#111827]/60 transition-colors"
                 >
                   {showPassword ? <EyeOff size={14} /> : <Eye size={14} />}
                 </button>
               </div>
               {form.password && (
                 <div className="flex gap-3 mt-1.5">
-                  <span className={`text-[10px] font-bold ${form.password.length >= 8 ? 'text-green-400' : 'text-white/20'}`}>8+ chars</span>
-                  <span className={`text-[10px] font-bold ${/[A-Z]/.test(form.password) ? 'text-green-400' : 'text-white/20'}`}>Mayúscula</span>
-                  <span className={`text-[10px] font-bold ${/[0-9]/.test(form.password) ? 'text-green-400' : 'text-white/20'}`}>Número</span>
+                  <span className={`text-[10px] font-bold ${form.password.length >= 8 ? 'text-green-400' : 'text-[#9CA3AF]'}`}>8+ chars</span>
+                  <span className={`text-[10px] font-bold ${/[A-Z]/.test(form.password) ? 'text-green-400' : 'text-[#9CA3AF]'}`}>Mayúscula</span>
+                  <span className={`text-[10px] font-bold ${/[0-9]/.test(form.password) ? 'text-green-400' : 'text-[#9CA3AF]'}`}>Número</span>
                 </div>
               )}
             </div>
@@ -387,7 +387,7 @@ function RegisterForm() {
                 <button
                   type="button"
                   onClick={() => setShowConfirm(!showConfirm)}
-                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/60 transition-colors"
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#6B7280] hover:text-[#111827]/60 transition-colors"
                 >
                   {showConfirm ? <EyeOff size={14} /> : <Eye size={14} />}
                 </button>
@@ -402,7 +402,7 @@ function RegisterForm() {
                 onChange={e => update('acceptTerms', e.target.checked)}
                 className="mt-0.5 w-3.5 h-3.5 accent-purple-500 rounded shrink-0"
               />
-              <span className="text-[11px] text-white/30 leading-relaxed">
+              <span className="text-[11px] text-[#6B7280] leading-relaxed">
                 Acepto los{' '}
                 <Link href="/terms" className="text-cyan-400 hover:text-cyan-300 transition-colors">Términos</Link>
                 {' '}y la{' '}
@@ -434,7 +434,7 @@ function RegisterForm() {
           </form>
         </div>
 
-        <p className="text-center text-white/25 text-xs mt-5">
+        <p className="text-center text-[#9CA3AF] text-xs mt-5">
           ¿Ya tienes cuenta?{' '}
           <Link href="/login" className="text-purple-400 hover:text-purple-300 font-bold transition-colors">
             Iniciar sesión
