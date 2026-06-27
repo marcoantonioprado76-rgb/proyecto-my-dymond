@@ -36,7 +36,7 @@ const services = [
     title: 'Landing Pages IA',
     description: 'Genera páginas de venta profesionales en segundos con inteligencia artificial.',
     icon: Layout,
-    from: '#9B00FF', to: '#FF2DF7',
+    from: '#6A35D9', to: '#FF2DF7',
     features: ['Generación con IA', 'Editor HTML', 'Publicación 1 clic'],
     link: '/dashboard/services/landing-pages',
     requiredPlan: 'BASIC' as UserPlan,

@@ -48,7 +48,7 @@ export default function RegisterPage() {
   return (
     <Suspense fallback={
       <div style={{background:'linear-gradient(135deg,#F8FAFC,#F5F7FA 45%,#EEF2F7)',minHeight:'100vh',color:'#111827'}} className="font-ui min-h-screen flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-cyan-400/30 border-t-cyan-400 rounded-full animate-spin" />
+        <div className="w-8 h-8 border-2 border-[#FF096C]/30 border-t-[#FF096C] rounded-full animate-spin" />
       </div>
     }>
       <RegisterForm />
@@ -140,17 +140,17 @@ function RegisterForm() {
 
             {/* Top neon line */}
             <div className="absolute top-0 left-0 right-0 h-px"
-              style={{ background: 'linear-gradient(90deg, transparent, #00FF9D 40%, #D203DD 60%, transparent)' }} />
+              style={{ background: 'linear-gradient(90deg, transparent, #FF096C 40%, #D203DD 60%, transparent)' }} />
 
             {/* Icon + header */}
             <div className="flex flex-col items-center text-center mb-6">
               <div className="relative mb-4">
                 <div className="w-14 h-14 rounded-2xl flex items-center justify-center"
                   style={{ background: 'rgba(0,255,157,0.08)', border: '1px solid rgba(0,255,157,0.25)', boxShadow: '0 0 40px rgba(0,255,157,0.1)' }}>
-                  <CheckCircle2 size={26} style={{ color: '#00FF9D' }} />
+                  <CheckCircle2 size={26} style={{ color: '#FF096C' }} />
                 </div>
               </div>
-              <p className="text-[9px] font-black uppercase tracking-[0.22em] mb-1" style={{ color: '#00FF9D' }}>
+              <p className="text-[9px] font-black uppercase tracking-[0.22em] mb-1" style={{ color: '#FF096C' }}>
                 ¡Cuenta creada!
               </p>
               <h1 className="text-lg font-black text-[#111827]">Bienvenido,</h1>
@@ -210,7 +210,7 @@ function RegisterForm() {
     <div style={{background:'linear-gradient(135deg,#F8FAFC,#F5F7FA 45%,#EEF2F7)',minHeight:'100vh',color:'#111827'}} className="font-ui min-h-screen flex items-center justify-center px-4 py-10 relative overflow-hidden">
       <div className="pointer-events-none fixed inset-0">
         <div className="absolute -top-32 -right-32 w-[500px] h-[500px] rounded-full bg-purple-600/10 blur-[120px]" />
-        <div className="absolute -bottom-32 -left-32 w-[500px] h-[500px] rounded-full bg-cyan-500/8 blur-[120px]" />
+        <div className="absolute -bottom-32 -left-32 w-[500px] h-[500px] rounded-full bg-[#FF096C]/8 blur-[120px]" />
       </div>
 
       <div className="w-full max-w-sm relative z-10">
@@ -404,9 +404,9 @@ function RegisterForm() {
               />
               <span className="text-[11px] text-[#6B7280] leading-relaxed">
                 Acepto los{' '}
-                <Link href="/terms" className="text-cyan-400 hover:text-cyan-300 transition-colors">Términos</Link>
+                <Link href="/terms" className="text-[#FF096C] hover:text-cyan-300 transition-colors">Términos</Link>
                 {' '}y la{' '}
-                <Link href="/privacy" className="text-cyan-400 hover:text-cyan-300 transition-colors">Política de Privacidad</Link>
+                <Link href="/privacy" className="text-[#FF096C] hover:text-cyan-300 transition-colors">Política de Privacidad</Link>
               </span>
             </label>
 

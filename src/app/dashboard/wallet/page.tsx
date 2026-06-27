@@ -720,7 +720,7 @@ export default function CreditsPage() {
               <Info className="w-3.5 h-3.5 mt-0.5 shrink-0" style={{ color: '#6B7280' }} />
               <p className="text-[11px] leading-relaxed" style={{ color: '#6B7280' }}>
                 {buyMethod === 'CRYPTO'
-                  ? <>Enviá los <strong className="text-yellow-400">USDT-BEP20</strong> a la dirección, pegá el TX hash y dale verificar. Si la red ya confirmó (3 bloques) tu saldo se acredita al instante. Si todavía está confirmando, queda pendiente y se aprueba sola en 1-2 min.</>
+                  ? <>Enviá los <strong className="text-[#B735B8]">USDT-BEP20</strong> a la dirección, pegá el TX hash y dale verificar. Si la red ya confirmó (3 bloques) tu saldo se acredita al instante. Si todavía está confirmando, queda pendiente y se aprueba sola en 1-2 min.</>
                   : <>Realizá la transferencia, subí el comprobante y enviá la solicitud. El admin la verifica y acredita tu saldo. Generalmente toma menos de 24h.</>
                 }
               </p>

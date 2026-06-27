@@ -294,7 +294,7 @@ export default function SocialPage() {
 
                         {/* AI Generate */}
                         <div className="dm-card p-4 rounded-2xl border border-[#E4E9F0]">
-                            <p className="text-[#111827] text-sm font-medium mb-2 flex items-center gap-1"><Sparkles size={13} className="text-yellow-400" /> Generar con IA</p>
+                            <p className="text-[#111827] text-sm font-medium mb-2 flex items-center gap-1"><Sparkles size={13} className="text-[#B735B8]" /> Generar con IA</p>
                             <div className="flex flex-col sm:flex-row gap-2">
                                 <input value={topic} onChange={e => setTopic(e.target.value)}
                                     placeholder="Tema del post (ej: promoción de verano)"
@@ -397,7 +397,7 @@ export default function SocialPage() {
                                                     ) : fbPagesError ? (
                                                         <p className="text-red-400 text-xs px-2 py-1">⚠ {fbPagesError}</p>
                                                     ) : igPages.length === 0 ? (
-                                                        <p className="text-yellow-400 text-xs px-2 py-1">⚠ No hay cuentas de Instagram Business vinculadas a tus páginas de Facebook</p>
+                                                        <p className="text-[#B735B8] text-xs px-2 py-1">⚠ No hay cuentas de Instagram Business vinculadas a tus páginas de Facebook</p>
                                                     ) : (
                                                         <select
                                                             value={pageSelections.INSTAGRAM?.accountId || ''}
@@ -711,9 +711,9 @@ function ConnectionsPanel({ connections, onRefresh }: { connections: any[]; onRe
     return (
         <div className="space-y-4">
             {/* OpenAI API Key */}
-            <div className="dm-card p-4 rounded-2xl border border-yellow-500/20 bg-yellow-500/5">
+            <div className="dm-card p-4 rounded-2xl border border-yellow-500/20 bg-[#B735B8]/5">
                 <div className="flex items-center gap-2 mb-3">
-                    <Sparkles size={15} className="text-yellow-400" />
+                    <Sparkles size={15} className="text-[#B735B8]" />
                     <p className="text-[#111827] font-medium text-sm">API Key de OpenAI (IA)</p>
                     {oaiConfig?.isValid && <span className="text-xs text-[#FF096C] bg-[#FF096C]/10 px-2 py-0.5 rounded-full">Activa ✓</span>}
                 </div>
@@ -747,12 +747,12 @@ function ConnectionsPanel({ connections, onRefresh }: { connections: any[]; onRe
                             type="password"
                             className="flex-1 min-w-0 bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-3 py-2 text-sm text-[#111827] placeholder-[#9CA3AF] focus:outline-none focus:border-yellow-400/50" />
                         <button onClick={saveOaiKey} disabled={oaiLoading || !oaiKey.trim()}
-                            className="px-3 py-2 bg-yellow-500/20 text-yellow-300 border border-yellow-500/30 rounded-xl text-sm disabled:opacity-40 hover:bg-yellow-500/30 whitespace-nowrap w-full sm:w-auto">
+                            className="px-3 py-2 bg-[#B735B8]/20 text-yellow-300 border border-yellow-500/30 rounded-xl text-sm disabled:opacity-40 hover:bg-[#B735B8]/30 whitespace-nowrap w-full sm:w-auto">
                             {oaiLoading ? <Loader2 size={13} className="animate-spin" /> : 'Guardar'}
                         </button>
                     </div>
                 )}
-                {oaiMsg && <p className={`text-xs mt-2 ${oaiMsg.startsWith('✓') ? 'text-[#FF096C]' : 'text-yellow-400'}`}>{oaiMsg}</p>}
+                {oaiMsg && <p className={`text-xs mt-2 ${oaiMsg.startsWith('✓') ? 'text-[#FF096C]' : 'text-[#B735B8]'}`}>{oaiMsg}</p>}
             </div>
 
             <p className="text-[#6B7280] text-sm">Conecta tus cuentas para publicar desde aquí</p>

@@ -31,7 +31,7 @@ const PLATFORM = {
 const STATUS_LABELS: Record<string, { label: string; color: string; dot: string; bg: string }> = {
     DRAFT:      { label: 'Borrador',   color: 'text-[#6B7280]',   dot: 'bg-white/25',                 bg: 'bg-[#F4F6FA] border-[#E4E9F0]' },
     READY:      { label: 'Listo',      color: 'text-blue-400',   dot: 'bg-blue-400',                 bg: 'bg-blue-500/10 border-blue-500/20' },
-    PUBLISHING: { label: 'Publicando', color: 'text-yellow-400', dot: 'bg-yellow-400 animate-pulse', bg: 'bg-yellow-500/10 border-yellow-500/20' },
+    PUBLISHING: { label: 'Publicando', color: 'text-[#B735B8]', dot: 'bg-[#B735B8] animate-pulse', bg: 'bg-[#B735B8]/10 border-yellow-500/20' },
     PUBLISHED:  { label: 'Publicado',  color: 'text-emerald-400',dot: 'bg-emerald-400',              bg: 'bg-emerald-500/10 border-emerald-500/20' },
     FAILED:     { label: 'Fallido',    color: 'text-red-400',    dot: 'bg-red-400',                  bg: 'bg-red-500/10 border-red-500/20' },
     PAUSED:     { label: 'Pausado',    color: 'text-orange-400', dot: 'bg-orange-400',               bg: 'bg-orange-500/10 border-orange-500/20' },

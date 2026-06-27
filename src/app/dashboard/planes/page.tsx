@@ -14,10 +14,10 @@ const PACKS = [
     planId: 'BASIC',
     icon: Zap,
     accent: {
-      text: 'text-cyan-400',
-      bg: 'bg-cyan-500/10',
-      border: 'border-cyan-500/25',
-      btn: 'bg-cyan-500 hover:bg-cyan-400 active:scale-[0.98] text-black font-black',
+      text: 'text-[#FF096C]',
+      bg: 'bg-[#FF096C]/10',
+      border: 'border-[#FF096C]/25',
+      btn: 'bg-[#FF096C] hover:bg-[#FF096C] active:scale-[0.98] text-black font-black',
       glow: '',
       featured: false,
     },
@@ -523,13 +523,13 @@ export default function PlanesPage() {
         <div className="absolute top-0 left-0 right-0 h-px" style={{ background: 'linear-gradient(90deg, transparent, rgba(234,179,8,0.5), transparent)' }} />
         <div className="p-6 md:p-8 flex flex-col md:flex-row items-start md:items-center gap-6">
           <div className="flex items-center gap-4 flex-1">
-            <div className="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 bg-yellow-500/10 border border-yellow-500/25">
-              <Users size={22} className="text-yellow-400" />
+            <div className="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 bg-[#B735B8]/10 border border-yellow-500/25">
+              <Users size={22} className="text-[#B735B8]" />
             </div>
             <div>
               <div className="flex items-center gap-2 mb-1">
-                <p className="text-sm font-black uppercase tracking-widest text-yellow-400">Pack Empresarial</p>
-                <span className="px-2 py-0.5 rounded-full bg-yellow-500/10 border border-yellow-500/20 text-[9px] font-black text-yellow-400 uppercase tracking-widest">A medida</span>
+                <p className="text-sm font-black uppercase tracking-widest text-[#B735B8]">Pack Empresarial</p>
+                <span className="px-2 py-0.5 rounded-full bg-[#B735B8]/10 border border-yellow-500/20 text-[9px] font-black text-[#B735B8] uppercase tracking-widest">A medida</span>
               </div>
               <p className="text-xs text-[#6B7280] leading-relaxed max-w-lg">
                 Solución personalizada para empresas y líderes de alto rendimiento. Agentes AI ilimitados, tiendas, landings y soporte dedicado adaptados a tu volumen de negocio. Contáctanos para armar tu plan.
@@ -540,7 +540,7 @@ export default function PlanesPage() {
             href="https://wa.me/59167534487"
             target="_blank"
             rel="noopener noreferrer"
-            className="shrink-0 flex items-center gap-2 px-6 py-3 rounded-2xl font-black text-sm transition-all bg-yellow-500 hover:bg-yellow-400 active:scale-[0.98] text-black"
+            className="shrink-0 flex items-center gap-2 px-6 py-3 rounded-2xl font-black text-sm transition-all bg-[#B735B8] hover:bg-[#B735B8] active:scale-[0.98] text-black"
           >
             <Phone size={15} />
             Contactar por WhatsApp

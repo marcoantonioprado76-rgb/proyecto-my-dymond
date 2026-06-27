@@ -41,7 +41,7 @@ export default function ForgotPasswordPage() {
     <div style={{background:'linear-gradient(135deg,#F8FAFC,#F5F7FA 45%,#EEF2F7)',minHeight:'100vh',color:'#111827'}} className="font-ui min-h-screen flex items-center justify-center px-4 relative overflow-hidden">
 
       <div className="pointer-events-none fixed inset-0 overflow-hidden">
-        <div className="absolute -top-40 -left-40 w-[450px] h-[450px] rounded-full bg-cyan-500/8 blur-[130px]" />
+        <div className="absolute -top-40 -left-40 w-[450px] h-[450px] rounded-full bg-[#FF096C]/8 blur-[130px]" />
         <div className="absolute -bottom-40 -right-40 w-[450px] h-[450px] rounded-full bg-purple-600/8 blur-[130px]" />
       </div>
 
@@ -58,10 +58,10 @@ export default function ForgotPasswordPage() {
         <div className="dm-card" style={{ padding: '1.5rem' }}>
           {sent ? (
             <div className="text-center py-2">
-              <div className="w-14 h-14 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center mx-auto mb-4">
-                <CheckCircle2 size={26} className="text-cyan-400" />
+              <div className="w-14 h-14 rounded-2xl bg-[#FF096C]/10 border border-[#FF096C]/20 flex items-center justify-center mx-auto mb-4">
+                <CheckCircle2 size={26} className="text-[#FF096C]" />
               </div>
-              <p className="text-[10px] font-black uppercase tracking-widest text-cyan-400 mb-1">Correo enviado</p>
+              <p className="text-[10px] font-black uppercase tracking-widest text-[#FF096C] mb-1">Correo enviado</p>
               <h2 className="text-base font-black text-[#111827] mb-2">Revisa tu bandeja</h2>
               <p className="text-xs text-[#6B7280] mb-5 leading-relaxed">
                 Si el correo <span className="text-[#111827] font-bold">{email}</span> está registrado, recibirás un enlace de recuperación.

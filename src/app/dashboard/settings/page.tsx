@@ -291,7 +291,7 @@ export default function SettingsPage() {
           {profile && !editingName && (
             <button onClick={startEditName}
               className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold text-white transition-all active:scale-[0.97] hover:brightness-110"
-              style={{ background: 'linear-gradient(135deg, #9B00FF, #D203DD)', boxShadow: '0 4px 16px rgba(155,0,255,0.3)' }}>
+              style={{ background: 'linear-gradient(135deg, #FF2D95 0%, #B735B8 48%, #233B8F 100%)', boxShadow: '0 4px 16px rgba(155,0,255,0.3)' }}>
               <User className="w-3.5 h-3.5" /> Editar perfil
             </button>
           )}
@@ -310,7 +310,7 @@ export default function SettingsPage() {
               {/* Avatar */}
               <div className="relative shrink-0">
                 <div className="w-28 h-28 sm:w-32 sm:h-32 rounded-full overflow-hidden flex items-center justify-center"
-                  style={{ background: '#0A0030', border: '3px solid rgba(210,3,221,0.5)', boxShadow: '0 0 30px rgba(210,3,221,0.35), inset 0 0 20px rgba(0,0,0,0.5)' }}>
+                  style={{ background: '#F0F3F7', border: '3px solid rgba(210,3,221,0.5)', boxShadow: '0 0 30px rgba(210,3,221,0.35), inset 0 0 20px rgba(0,0,0,0.5)' }}>
                   {profile.avatarUrl ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img src={profile.avatarUrl} alt={profile.fullName} className="w-full h-full object-cover" />
@@ -322,7 +322,7 @@ export default function SettingsPage() {
                   onClick={() => fileInputRef.current?.click()}
                   disabled={uploadingAvatar}
                   className="absolute bottom-0 right-0 w-11 h-11 rounded-full flex items-center justify-center transition-all disabled:opacity-50 active:scale-95"
-                  style={{ background: 'linear-gradient(135deg, #9B00FF, #D203DD)', border: '3px solid #0A0030', boxShadow: '0 0 14px rgba(210,3,221,0.5)' }}
+                  style={{ background: 'linear-gradient(135deg, #FF2D95 0%, #B735B8 48%, #233B8F 100%)', border: '3px solid #fff', boxShadow: '0 0 14px rgba(210,3,221,0.5)' }}
                   title="Cambiar foto de perfil">
                   {uploadingAvatar
                     ? <Loader2 className="w-4 h-4 text-white animate-spin" />
@@ -462,7 +462,7 @@ export default function SettingsPage() {
             <div className="flex flex-wrap items-center gap-2.5">
               <Link href="/dashboard/wallet"
                 className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold text-white transition-all active:scale-[0.97] hover:brightness-110"
-                style={{ background: 'linear-gradient(135deg, #9B00FF, #D203DD)', boxShadow: '0 4px 16px rgba(155,0,255,0.3)', textDecoration: 'none' }}>
+                style={{ background: 'linear-gradient(135deg, #FF2D95 0%, #B735B8 48%, #233B8F 100%)', boxShadow: '0 4px 16px rgba(155,0,255,0.3)', textDecoration: 'none' }}>
                 <Plus className="w-4 h-4" /> Recargar
               </Link>
               <button type="button" onClick={() => setModal('history')}
@@ -527,21 +527,21 @@ export default function SettingsPage() {
               disabled={!canUseAdminKey || togglingPref}
               className="w-full flex items-center gap-3.5 p-4 rounded-xl transition-all text-left"
               style={{
-                background: usingAdmin && canUseAdminKey ? 'rgba(162,102,255,0.18)' : 'rgba(255,255,255,0.04)',
-                border: `1px solid ${usingAdmin && canUseAdminKey ? 'rgba(162,102,255,0.50)' : 'rgba(255,255,255,0.10)'}`,
+                background: usingAdmin && canUseAdminKey ? 'rgba(183,53,184,0.18)' : 'rgba(255,255,255,0.04)',
+                border: `1px solid ${usingAdmin && canUseAdminKey ? 'rgba(183,53,184,0.50)' : 'rgba(255,255,255,0.10)'}`,
                 opacity: !canUseAdminKey ? 0.5 : 1,
                 cursor: !canUseAdminKey ? 'not-allowed' : 'pointer',
-                boxShadow: usingAdmin && canUseAdminKey ? '0 0 18px -6px rgba(162,102,255,0.45)' : 'none',
+                boxShadow: usingAdmin && canUseAdminKey ? '0 0 18px -6px rgba(183,53,184,0.45)' : 'none',
               }}>
               <div className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0"
-                style={{ background: 'rgba(162,102,255,0.18)', border: '1px solid rgba(162,102,255,0.35)' }}>
-                <ShieldCheck className="w-4 h-4 text-violet-400" />
+                style={{ background: 'rgba(183,53,184,0.18)', border: '1px solid rgba(183,53,184,0.35)' }}>
+                <ShieldCheck className="w-4 h-4 text-[#B735B8]" />
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
                   <p className="text-sm font-black text-[#111827]">Key del Administrador</p>
                   <span className="text-[8.5px] font-black uppercase tracking-[0.14em] px-1.5 py-0.5 rounded-full"
-                    style={{ background: 'rgba(162,102,255,0.18)', border: '1px solid rgba(162,102,255,0.30)', color: '#c4b5fd' }}>
+                    style={{ background: 'rgba(183,53,184,0.18)', border: '1px solid rgba(183,53,184,0.30)', color: '#B735B8' }}>
                     Pagás con saldo
                   </span>
                 </div>
@@ -551,7 +551,7 @@ export default function SettingsPage() {
                     : 'El administrador aún no configuró una key global.'}
                 </p>
               </div>
-              <div className={`w-5 h-5 rounded-full border-2 shrink-0 flex items-center justify-center ${usingAdmin && canUseAdminKey ? 'border-violet-400 bg-violet-400' : 'border-white/20'}`}>
+              <div className={`w-5 h-5 rounded-full border-2 shrink-0 flex items-center justify-center ${usingAdmin && canUseAdminKey ? 'border-[#B735B8] bg-[#B735B8]' : 'border-white/20'}`}>
                 {usingAdmin && canUseAdminKey && <CheckCircle className="w-3 h-3 text-white" />}
               </div>
             </button>
@@ -562,21 +562,21 @@ export default function SettingsPage() {
               disabled={!hasOwnKey || togglingPref}
               className="w-full flex items-center gap-3.5 p-4 rounded-xl transition-all text-left"
               style={{
-                background: !usingAdmin && hasOwnKey ? 'rgba(125,211,252,0.15)' : 'rgba(255,255,255,0.04)',
-                border: `1px solid ${!usingAdmin && hasOwnKey ? 'rgba(125,211,252,0.45)' : 'rgba(255,255,255,0.10)'}`,
+                background: !usingAdmin && hasOwnKey ? 'rgba(255,9,108,0.15)' : 'rgba(255,255,255,0.04)',
+                border: `1px solid ${!usingAdmin && hasOwnKey ? 'rgba(255,9,108,0.45)' : 'rgba(255,255,255,0.10)'}`,
                 opacity: !hasOwnKey ? 0.5 : 1,
                 cursor: !hasOwnKey ? 'not-allowed' : 'pointer',
-                boxShadow: !usingAdmin && hasOwnKey ? '0 0 18px -6px rgba(125,211,252,0.45)' : 'none',
+                boxShadow: !usingAdmin && hasOwnKey ? '0 0 18px -6px rgba(255,9,108,0.45)' : 'none',
               }}>
               <div className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0"
-                style={{ background: 'rgba(125,211,252,0.15)', border: '1px solid rgba(125,211,252,0.35)' }}>
-                <Key className="w-4 h-4 text-sky-400" />
+                style={{ background: 'rgba(255,9,108,0.15)', border: '1px solid rgba(255,9,108,0.35)' }}>
+                <Key className="w-4 h-4 text-[#FF096C]" />
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
                   <p className="text-sm font-black text-[#111827]">Mi Propia API Key</p>
                   <span className="text-[8.5px] font-black uppercase tracking-[0.14em] px-1.5 py-0.5 rounded-full"
-                    style={{ background: 'rgba(125,211,252,0.15)', border: '1px solid rgba(125,211,252,0.30)', color: '#7dd3fc' }}>
+                    style={{ background: 'rgba(255,9,108,0.15)', border: '1px solid rgba(255,9,108,0.30)', color: '#FF096C' }}>
                     No usa saldo
                   </span>
                 </div>
@@ -586,7 +586,7 @@ export default function SettingsPage() {
                     : 'Configurá tu key de OpenAI abajo (cifrada AES-256). Los costos van a tu cuenta de OpenAI.'}
                 </p>
               </div>
-              <div className={`w-5 h-5 rounded-full border-2 shrink-0 flex items-center justify-center ${!usingAdmin && hasOwnKey ? 'border-sky-400 bg-sky-400' : 'border-white/20'}`}>
+              <div className={`w-5 h-5 rounded-full border-2 shrink-0 flex items-center justify-center ${!usingAdmin && hasOwnKey ? 'border-[#FF096C] bg-[#FF096C]' : 'border-white/20'}`}>
                 {!usingAdmin && hasOwnKey && <CheckCircle className="w-3 h-3 text-white" />}
               </div>
             </button>
@@ -602,7 +602,7 @@ export default function SettingsPage() {
         <div className="mt-3 rounded-xl p-4 space-y-3.5"
           style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
           <div className="flex items-center gap-2">
-            <KeyRound className="w-4 h-4 text-sky-400" />
+            <KeyRound className="w-4 h-4 text-[#FF096C]" />
             <p className="text-[10px] font-black uppercase tracking-widest" style={{ color: '#6B7280' }}>
               Mi API Key de OpenAI
             </p>
@@ -674,7 +674,7 @@ export default function SettingsPage() {
 
             <button onClick={saveKey} disabled={savingKey || !apiKeyInput.trim()}
               className="w-full py-3 rounded-xl font-bold text-sm transition-all active:scale-[0.98] disabled:opacity-40"
-              style={{ background: 'linear-gradient(135deg, rgba(154,203,255,0.25), rgba(162,102,255,0.25))', border: '1px solid #9CA3AF', color: '#fff' }}>
+              style={{ background: 'linear-gradient(135deg, rgba(154,203,255,0.25), rgba(183,53,184,0.25))', border: '1px solid #9CA3AF', color: '#fff' }}>
               {savingKey
                 ? <span className="flex items-center justify-center gap-2"><Loader2 className="w-4 h-4 animate-spin" /> Validando y guardando...</span>
                 : (credits?.ownKey ? 'Actualizar API Key' : 'Guardar API Key')}
@@ -687,7 +687,7 @@ export default function SettingsPage() {
             <Info className="w-3.5 h-3.5 mt-0.5 shrink-0" style={{ color: '#6B7280' }} />
             <p className="text-[11px] leading-relaxed" style={{ color: '#6B7280' }}>
               Tu API Key se guarda cifrada con AES-256. Conseguila en{' '}
-              <span className="text-sky-400">platform.openai.com/api-keys</span>. Al usar tu propia key, los costos van directo a tu cuenta de OpenAI.
+              <span className="text-[#FF096C]">platform.openai.com/api-keys</span>. Al usar tu propia key, los costos van directo a tu cuenta de OpenAI.
             </p>
           </div>
         </div>

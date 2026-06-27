@@ -9,7 +9,7 @@ export default function ResetPasswordPage() {
   return (
     <Suspense fallback={
       <div style={{background:'linear-gradient(135deg,#F8FAFC,#F5F7FA 45%,#EEF2F7)',minHeight:'100vh',color:'#111827'}} className="font-ui min-h-screen flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-cyan-400/30 border-t-cyan-400 rounded-full animate-spin" />
+        <div className="w-8 h-8 border-2 border-[#FF096C]/30 border-t-[#FF096C] rounded-full animate-spin" />
       </div>
     }>
       <ResetForm />
@@ -62,7 +62,7 @@ function ResetForm() {
 
       <div className="pointer-events-none fixed inset-0 overflow-hidden">
         <div className="absolute -top-40 -right-40 w-[450px] h-[450px] rounded-full bg-purple-600/8 blur-[130px]" />
-        <div className="absolute -bottom-40 -left-40 w-[450px] h-[450px] rounded-full bg-cyan-500/8 blur-[130px]" />
+        <div className="absolute -bottom-40 -left-40 w-[450px] h-[450px] rounded-full bg-[#FF096C]/8 blur-[130px]" />
       </div>
 
       <div className="w-full max-w-[340px] relative z-10">
