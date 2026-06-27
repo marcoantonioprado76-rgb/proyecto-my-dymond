@@ -104,45 +104,45 @@ function ShareStoreModal({ store, onClose }: { store: StoreRecord; onClose: () =
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
-            <div className="bg-white/5 border border-white/15 rounded-3xl w-full max-w-sm p-6">
+            <div className="bg-[#F4F6FA] border border-[#E4E9F0] rounded-3xl w-full max-w-sm p-6">
                 <div className="flex items-center justify-between mb-5">
                     <div>
                         <h2 className="text-lg font-bold">Compartir tienda</h2>
-                        <p className="text-xs text-dark-400 mt-0.5">{store.name}</p>
+                        <p className="text-xs text-[#6B7280] mt-0.5">{store.name}</p>
                     </div>
-                    <button onClick={onClose}><X size={20} className="text-dark-400" /></button>
+                    <button onClick={onClose}><X size={20} className="text-[#6B7280]" /></button>
                 </div>
 
                 <form onSubmit={handleShare} className="space-y-4">
                     <div>
-                        <label className="text-xs font-bold text-dark-400 uppercase tracking-widest block mb-2">
+                        <label className="text-xs font-bold text-[#6B7280] uppercase tracking-widest block mb-2">
                             Username o email del destinatario
                         </label>
                         <input
                             value={identifier}
                             onChange={e => setIdentifier(e.target.value)}
                             placeholder="@usuario o correo@email.com"
-                            className="w-full bg-dark-900 border border-purple-500/25 rounded-xl px-4 py-3 text-white placeholder-dark-500 focus:border-neon-blue outline-none transition-all text-sm"
+                            className="w-full bg-white border border-purple-500/25 rounded-xl px-4 py-3 text-[#111827] placeholder-dark-500 focus:border-[#233B8F] outline-none transition-all text-sm"
                             autoFocus
                         />
                     </div>
 
                     {result && (
-                        <div className={`flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm ${result.ok ? 'bg-neon-green/10 text-neon-green border border-neon-green/20' : 'bg-red-500/10 text-red-400 border border-red-500/20'}`}>
+                        <div className={`flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm ${result.ok ? 'bg-[#16A34A]/10 text-[#16A34A] border border-[#16A34A]/20' : 'bg-red-500/10 text-red-400 border border-red-500/20'}`}>
                             {result.ok ? <Check size={14} /> : <X size={14} />}
                             {result.message}
                         </div>
                     )}
 
-                    <p className="text-xs text-dark-500">
+                    <p className="text-xs text-[#9CA3AF]">
                         El destinatario recibirá una copia independiente de la tienda con todos sus productos. Podrá modificarla sin afectar la tuya.
                     </p>
 
                     <div className="flex gap-3 pt-1">
-                        <button type="button" onClick={onClose} className="flex-1 py-3 text-dark-300 font-bold rounded-xl border border-purple-500/25 hover:bg-white/5 transition-all text-sm">
+                        <button type="button" onClick={onClose} className="flex-1 py-3 text-[#374151] font-bold rounded-xl border border-purple-500/25 hover:bg-[#F4F6FA] transition-all text-sm">
                             Cancelar
                         </button>
-                        <button type="submit" disabled={loading} className="flex-1 py-3 bg-neon-blue text-dark-950 font-bold rounded-xl disabled:opacity-50 flex items-center justify-center gap-2 text-sm transition-all">
+                        <button type="submit" disabled={loading} className="flex-1 py-3 bg-[#233B8F] text-dark-950 font-bold rounded-xl disabled:opacity-50 flex items-center justify-center gap-2 text-sm transition-all">
                             {loading ? <Loader2 size={14} className="animate-spin" /> : <Share2 size={14} />}
                             Compartir
                         </button>
@@ -403,10 +403,10 @@ export default function VirtualStorePage() {
 
     if (view === 'PRODUCTS' && selectedStore) {
         return (
-            <div className="px-4 sm:px-6 pt-6 max-w-screen-xl mx-auto pb-20 text-white">
+            <div className="px-4 sm:px-6 pt-6 max-w-screen-xl mx-auto pb-20 text-[#111827]">
                 <button
                     onClick={() => setView('STORES')}
-                    className="flex items-center gap-2 text-dark-400 hover:text-white mb-8 transition-colors"
+                    className="flex items-center gap-2 text-[#6B7280] hover:text-[#111827] mb-8 transition-colors"
                 >
                     <ArrowLeft size={18} /> Volver a mis tiendas
                 </button>
@@ -414,30 +414,30 @@ export default function VirtualStorePage() {
                 <div className="flex items-center justify-between mb-10">
                     <div>
                         <h1 className="text-3xl font-bold">Inventario: {selectedStore.name}</h1>
-                        <p className="text-dark-400 text-sm mt-1">Gestiona los productos exclusivos de esta tienda</p>
+                        <p className="text-[#6B7280] text-sm mt-1">Gestiona los productos exclusivos de esta tienda</p>
                     </div>
                     <button
                         onClick={() => { resetProductForm(); setShowProductModal(true); }}
-                        className="bg-neon-blue text-dark-950 px-6 py-3 rounded-xl font-bold flex items-center gap-2 hover:bg-neon-blue/90"
+                        className="bg-[#233B8F] text-dark-950 px-6 py-3 rounded-xl font-bold flex items-center gap-2 hover:bg-[#233B8F]/90"
                     >
                         <Plus size={20} /> Añadir Producto
                     </button>
                 </div>
 
                 {productsLoading ? (
-                    <div className="py-20 flex justify-center"><Loader2 className="animate-spin text-neon-blue" /></div>
+                    <div className="py-20 flex justify-center"><Loader2 className="animate-spin text-[#233B8F]" /></div>
                 ) : products.length === 0 ? (
-                    <div className="bg-dark-900/40 border border-purple-500/15 rounded-3xl p-20 text-center">
+                    <div className="bg-white/40 border border-purple-500/15 rounded-3xl p-20 text-center">
                         <Package className="w-16 h-16 text-dark-600 mx-auto mb-4" />
                         <h3 className="text-xl font-bold mb-2">No hay productos aún</h3>
-                        <p className="text-dark-400 mb-8">Empieza a llenar tu catálogo para que tus clientes puedan comprar.</p>
-                        <button onClick={() => setShowProductModal(true)} className="text-neon-blue font-bold border-b border-neon-blue/30">Subir mi primer producto</button>
+                        <p className="text-[#6B7280] mb-8">Empieza a llenar tu catálogo para que tus clientes puedan comprar.</p>
+                        <button onClick={() => setShowProductModal(true)} className="text-[#233B8F] font-bold border-b border-[#233B8F]/30">Subir mi primer producto</button>
                     </div>
                 ) : (
                     <div className="grid grid-cols-3 md:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-6">
                         {products.map(p => (
-                            <div key={p.id} className="bg-dark-900 border border-purple-500/15 rounded-2xl overflow-hidden group">
-                                <div className="aspect-square bg-dark-800 flex items-center justify-center overflow-hidden">
+                            <div key={p.id} className="bg-white border border-purple-500/15 rounded-2xl overflow-hidden group">
+                                <div className="aspect-square bg-[#F8FAFC] flex items-center justify-center overflow-hidden">
                                     {p.images?.[0] ? (
                                         <img src={p.images[0]} className="w-full h-full object-cover group-hover:scale-110 transition-transform" />
                                     ) : (
@@ -450,15 +450,15 @@ export default function VirtualStorePage() {
                                         <div className="flex flex-col items-end shrink-0">
                                             {p.pricePromo ? (
                                                 <>
-                                                    <span className="text-[9px] sm:text-xs text-dark-400 line-through">{p.currency === 'USD' ? '$' : p.currency + ' '}{p.price}</span>
+                                                    <span className="text-[9px] sm:text-xs text-[#6B7280] line-through">{p.currency === 'USD' ? '$' : p.currency + ' '}{p.price}</span>
                                                     <span className="text-orange-400 font-black text-[10px] sm:text-base">{p.currency === 'USD' ? '$' : p.currency + ' '}{p.pricePromo}</span>
                                                 </>
                                             ) : (
-                                                <span className="text-neon-green font-black text-[10px] sm:text-base">{p.currency === 'USD' ? '$' : p.currency + ' '}{p.price}</span>
+                                                <span className="text-[#16A34A] font-black text-[10px] sm:text-base">{p.currency === 'USD' ? '$' : p.currency + ' '}{p.price}</span>
                                             )}
                                         </div>
                                     </div>
-                                    <p className="text-dark-400 text-[9px] sm:text-xs mb-2 sm:mb-6 line-clamp-2 hidden sm:block">{p.description || 'Sin descripción'}</p>
+                                    <p className="text-[#6B7280] text-[9px] sm:text-xs mb-2 sm:mb-6 line-clamp-2 hidden sm:block">{p.description || 'Sin descripción'}</p>
                                     <div className="flex items-center gap-2">
                                         <button
                                             onClick={() => {
@@ -474,7 +474,7 @@ export default function VirtualStorePage() {
                                                 setProdImages(p.images || []);
                                                 setShowProductModal(true);
                                             }}
-                                            className="flex-1 bg-white/5 hover:bg-white/10 py-1 sm:py-2 rounded-lg text-[9px] sm:text-xs font-bold transition-all border border-purple-500/25 flex items-center justify-center gap-1"
+                                            className="flex-1 bg-[#F4F6FA] hover:bg-[#EEF2F7] py-1 sm:py-2 rounded-lg text-[9px] sm:text-xs font-bold transition-all border border-purple-500/25 flex items-center justify-center gap-1"
                                         >
                                             <Edit3 size={10} /> <span className="hidden sm:inline">Editar</span>
                                         </button>
@@ -494,15 +494,15 @@ export default function VirtualStorePage() {
                 {/* Product Modal */}
                 {showProductModal && (
                     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
-                        <div className="bg-white/5 border border-white/15 rounded-3xl w-full max-w-lg p-5 sm:p-8 max-h-[90vh] overflow-y-auto custom-scrollbar">
+                        <div className="bg-[#F4F6FA] border border-[#E4E9F0] rounded-3xl w-full max-w-lg p-5 sm:p-8 max-h-[90vh] overflow-y-auto custom-scrollbar">
                             <h2 className="text-xl sm:text-2xl font-bold mb-5">{editProduct ? 'Editar Producto' : 'Nuevo Producto'}</h2>
                             <form onSubmit={handleSaveProduct} className="space-y-6">
                                 <div>
-                                    <label className="text-xs font-bold text-dark-400 uppercase tracking-widest block mb-2">Nombre</label>
-                                    <input required value={prodName} onChange={e => setProdName(e.target.value)} className="w-full bg-dark-900 border border-purple-500/25 rounded-xl px-4 py-3 text-white placeholder-dark-500 focus:border-neon-blue outline-none transition-all" />
+                                    <label className="text-xs font-bold text-[#6B7280] uppercase tracking-widest block mb-2">Nombre</label>
+                                    <input required value={prodName} onChange={e => setProdName(e.target.value)} className="w-full bg-white border border-purple-500/25 rounded-xl px-4 py-3 text-[#111827] placeholder-dark-500 focus:border-[#233B8F] outline-none transition-all" />
                                 </div>
                                 <div>
-                                    <label className="text-xs font-bold text-dark-400 uppercase tracking-widest block mb-2">Categoría</label>
+                                    <label className="text-xs font-bold text-[#6B7280] uppercase tracking-widest block mb-2">Categoría</label>
                                     <div className="flex flex-col gap-3">
                                         <select
                                             value={[
@@ -519,7 +519,7 @@ export default function VirtualStorePage() {
                                             onChange={e => {
                                                 if (e.target.value !== 'Otra') setProdCategory(e.target.value)
                                             }}
-                                            className="w-full bg-dark-900 border border-purple-500/25 rounded-xl px-4 py-3 text-white placeholder-dark-500 focus:border-neon-blue outline-none transition-all"
+                                            className="w-full bg-white border border-purple-500/25 rounded-xl px-4 py-3 text-[#111827] placeholder-dark-500 focus:border-[#233B8F] outline-none transition-all"
                                         >
                                             <option value="General">General</option>
                                             <option value="Electrónica y Tecnología">Electrónica y Tecnología</option>
@@ -567,17 +567,17 @@ export default function VirtualStorePage() {
                                                     value={prodCategory === 'Otra' ? '' : prodCategory}
                                                     onChange={e => setProdCategory(e.target.value)}
                                                     placeholder="Nombre de categoría personalizada..."
-                                                    className="w-full bg-dark-900 border border-neon-blue/20 text-neon-blue rounded-xl px-4 py-3 focus:border-neon-blue outline-none transition-all placeholder:text-neon-blue/30"
+                                                    className="w-full bg-white border border-[#233B8F]/20 text-[#233B8F] rounded-xl px-4 py-3 focus:border-[#233B8F] outline-none transition-all placeholder:text-[#233B8F]/30"
                                                 />
                                             )}
                                     </div>
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-xs font-bold text-dark-400 uppercase tracking-widest block">Moneda</label>
+                                    <label className="text-xs font-bold text-[#6B7280] uppercase tracking-widest block">Moneda</label>
                                     <select
                                         value={prodCurrency}
                                         onChange={e => setProdCurrency(e.target.value)}
-                                        className="w-full bg-dark-900 border border-purple-500/25 rounded-xl px-4 py-3 text-sm text-white focus:border-neon-blue outline-none transition-all"
+                                        className="w-full bg-white border border-purple-500/25 rounded-xl px-4 py-3 text-sm text-[#111827] focus:border-[#233B8F] outline-none transition-all"
                                     >
                                         <option value="USD">USD ($)</option>
                                         <option value="PEN">PEN (S/)</option>
@@ -592,34 +592,34 @@ export default function VirtualStorePage() {
                                 </div>
                                 <div className="flex flex-col sm:flex-row gap-4">
                                     <div className="flex-1 space-y-2">
-                                        <label className="text-xs font-bold text-dark-400 uppercase tracking-widest block">Precio Normal</label>
-                                        <input required type="number" step="0.01" placeholder="0.00" value={prodPrice} onChange={e => setProdPrice(e.target.value)} className="w-full bg-dark-900 border border-purple-500/25 rounded-xl px-4 py-3 focus:border-neon-blue outline-none transition-all" />
+                                        <label className="text-xs font-bold text-[#6B7280] uppercase tracking-widest block">Precio Normal</label>
+                                        <input required type="number" step="0.01" placeholder="0.00" value={prodPrice} onChange={e => setProdPrice(e.target.value)} className="w-full bg-white border border-purple-500/25 rounded-xl px-4 py-3 focus:border-[#233B8F] outline-none transition-all" />
                                     </div>
                                     <div className="flex-1 space-y-2">
                                         <label className="text-xs font-bold text-orange-400/70 uppercase tracking-widest block flex items-center gap-1.5">
                                             <span className="text-[9px] px-1.5 py-0.5 bg-orange-500/20 border border-orange-500/30 rounded-full text-orange-400">OFERTA</span>
                                             Precio Promoción
                                         </label>
-                                        <input type="number" step="0.01" placeholder="Opcional" value={prodPromo} onChange={e => setProdPromo(e.target.value)} className="w-full bg-dark-900 border border-orange-500/20 rounded-xl px-4 py-3 text-orange-300 placeholder-dark-500 focus:border-orange-400 outline-none transition-all" />
+                                        <input type="number" step="0.01" placeholder="Opcional" value={prodPromo} onChange={e => setProdPromo(e.target.value)} className="w-full bg-white border border-orange-500/20 rounded-xl px-4 py-3 text-orange-300 placeholder-dark-500 focus:border-orange-400 outline-none transition-all" />
                                     </div>
                                     <div className="w-full sm:w-28 space-y-2">
-                                        <label className="text-xs font-bold text-dark-400 uppercase tracking-widest block">Stock</label>
-                                        <input required type="number" value={prodStock} onChange={e => setProdStock(e.target.value)} className="w-full bg-dark-900 border border-purple-500/25 rounded-xl px-4 py-3 text-white placeholder-dark-500 focus:border-neon-blue outline-none transition-all" />
+                                        <label className="text-xs font-bold text-[#6B7280] uppercase tracking-widest block">Stock</label>
+                                        <input required type="number" value={prodStock} onChange={e => setProdStock(e.target.value)} className="w-full bg-white border border-purple-500/25 rounded-xl px-4 py-3 text-[#111827] placeholder-dark-500 focus:border-[#233B8F] outline-none transition-all" />
                                     </div>
                                 </div>
                                 {selectedStore.type === 'NETWORK_MARKETING' && (
                                     <div>
-                                        <label className="text-xs font-bold text-neon-blue uppercase tracking-widest block mb-2 flex items-center gap-2">
+                                        <label className="text-xs font-bold text-[#233B8F] uppercase tracking-widest block mb-2 flex items-center gap-2">
                                             <Star size={12} /> Puntos (PV/BV)
                                         </label>
-                                        <input type="number" step="0.01" value={prodPoints} onChange={e => setProdPoints(e.target.value)} className="w-full bg-dark-950 border border-neon-blue/20 text-neon-blue rounded-xl px-4 py-3" />
+                                        <input type="number" step="0.01" value={prodPoints} onChange={e => setProdPoints(e.target.value)} className="w-full bg-white border border-[#233B8F]/20 text-[#233B8F] rounded-xl px-4 py-3" />
                                     </div>
                                 )}
                                 <div>
-                                    <label className="text-xs font-bold text-dark-400 uppercase tracking-widest block mb-2">Galería de Imágenes (Hasta 4)</label>
+                                    <label className="text-xs font-bold text-[#6B7280] uppercase tracking-widest block mb-2">Galería de Imágenes (Hasta 4)</label>
                                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
                                         {prodImages.map((img, idx) => (
-                                            <div key={idx} className="relative aspect-square rounded-xl overflow-hidden border border-purple-500/25 bg-dark-900 group">
+                                            <div key={idx} className="relative aspect-square rounded-xl overflow-hidden border border-purple-500/25 bg-white group">
                                                 <img src={img} className="w-full h-full object-cover" />
                                                 <button
                                                     type="button"
@@ -631,7 +631,7 @@ export default function VirtualStorePage() {
                                             </div>
                                         ))}
                                         {prodImages.length < 4 && (
-                                            <div className="relative aspect-square rounded-xl border border-dashed border-white/20 flex flex-col items-center justify-center text-[8px] font-bold text-dark-400 hover:border-neon-blue hover:text-neon-blue transition-all cursor-pointer">
+                                            <div className="relative aspect-square rounded-xl border border-dashed border-[#E4E9F0] flex flex-col items-center justify-center text-[8px] font-bold text-[#6B7280] hover:border-[#233B8F] hover:text-[#233B8F] transition-all cursor-pointer">
                                                 <input
                                                     type="file"
                                                     onChange={handleFileUpload}
@@ -646,7 +646,7 @@ export default function VirtualStorePage() {
                                         <input
                                             id="urlInput"
                                             placeholder="Pegar URL de imagen..."
-                                            className="flex-1 bg-dark-900 border border-purple-500/25 rounded-xl px-4 py-3 text-sm"
+                                            className="flex-1 bg-white border border-purple-500/25 rounded-xl px-4 py-3 text-sm"
                                             onKeyDown={e => {
                                                 if (e.key === 'Enter') {
                                                     e.preventDefault();
@@ -667,19 +667,19 @@ export default function VirtualStorePage() {
                                                     el.value = '';
                                                 }
                                             }}
-                                            className="px-4 bg-white/5 rounded-xl border border-purple-500/25 text-xs font-bold"
+                                            className="px-4 bg-[#F4F6FA] rounded-xl border border-purple-500/25 text-xs font-bold"
                                         >
                                             Añadir
                                         </button>
                                     </div>
                                 </div>
                                 <div>
-                                    <label className="text-xs font-bold text-dark-400 uppercase tracking-widest block mb-2">Descripción</label>
-                                    <textarea value={prodDesc} onChange={e => setProdDesc(e.target.value)} rows={3} className="w-full bg-dark-900 border border-purple-500/25 rounded-xl px-4 py-3 text-white placeholder-dark-500 focus:border-neon-blue outline-none transition-all resize-y" />
+                                    <label className="text-xs font-bold text-[#6B7280] uppercase tracking-widest block mb-2">Descripción</label>
+                                    <textarea value={prodDesc} onChange={e => setProdDesc(e.target.value)} rows={3} className="w-full bg-white border border-purple-500/25 rounded-xl px-4 py-3 text-[#111827] placeholder-dark-500 focus:border-[#233B8F] outline-none transition-all resize-y" />
                                 </div>
                                 <div className="flex gap-3 pt-4">
-                                    <button type="button" onClick={() => setShowProductModal(false)} className="flex-1 py-3 sm:py-4 text-dark-300 font-bold rounded-xl border border-purple-500/25 hover:bg-white/5 transition-all">Cancelar</button>
-                                    <button type="submit" className="flex-1 py-3 sm:py-4 bg-neon-blue text-dark-950 font-bold rounded-xl shadow-lg shadow-neon-blue/20 transition-all active:scale-95">Guardar</button>
+                                    <button type="button" onClick={() => setShowProductModal(false)} className="flex-1 py-3 sm:py-4 text-[#374151] font-bold rounded-xl border border-purple-500/25 hover:bg-[#F4F6FA] transition-all">Cancelar</button>
+                                    <button type="submit" className="flex-1 py-3 sm:py-4 bg-[#233B8F] text-dark-950 font-bold rounded-xl shadow-lg shadow-[#233B8F]/20 transition-all active:scale-95">Guardar</button>
                                 </div>
                             </form>
                         </div>
@@ -690,7 +690,8 @@ export default function VirtualStorePage() {
     }
 
     return (
-        <div className="px-4 sm:px-6 pt-6 max-w-4xl mx-auto pb-20 font-inter text-white">
+        <div className="font-ui" style={{ background: 'linear-gradient(135deg, #F8FAFC 0%, #F5F7FA 45%, #EEF2F7 100%)', minHeight: '100vh', color: '#111827' }}>
+        <div className="px-4 sm:px-6 lg:px-8 pt-8 max-w-4xl mx-auto pb-20 font-inter text-[#111827]">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
                 <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
@@ -698,8 +699,8 @@ export default function VirtualStorePage() {
                         <Store className="w-5 h-5" style={{ color: '#7FBEF0' }} />
                     </div>
                     <div className="min-w-0">
-                        <h1 className="text-xl font-bold text-white leading-tight" style={{ letterSpacing: '-0.02em' }}>Mis Tiendas Virtuales</h1>
-                        <p className="text-[11px] text-dark-400 mt-0.5">Tu galería de escaparates digitales · {stores.length} {stores.length === 1 ? 'tienda' : 'tiendas'}</p>
+                        <h1 className="text-xl font-bold text-[#111827] leading-tight" style={{ letterSpacing: '-0.02em' }}>Mis Tiendas Virtuales</h1>
+                        <p className="text-[11px] text-[#6B7280] mt-0.5">Tu galería de escaparates digitales · {stores.length} {stores.length === 1 ? 'tienda' : 'tiendas'}</p>
                     </div>
                 </div>
 
@@ -707,7 +708,7 @@ export default function VirtualStorePage() {
                     onClick={() => { resetStoreForm(); setShowStoreModal(true); }}
                     className="rounded-xl px-4 py-2.5 font-bold flex items-center gap-2 text-sm transition-all active:scale-[0.98]"
                     style={{
-                        background: 'linear-gradient(135deg, #22B7FF, #7B5BFF)',
+                        background: 'linear-gradient(135deg, #FF2D95 0%, #B735B8 48%, #233B8F 100%)',
                         color: '#fff',
                         boxShadow: '0 10px 26px -10px rgba(34,183,255,0.6), inset 0 1px 0 rgba(255,255,255,0.18)',
                     }}
@@ -721,20 +722,20 @@ export default function VirtualStorePage() {
             ) : stores.length === 0 ? (
                 <div className="rounded-3xl p-16 text-center max-w-2xl mx-auto"
                     style={{
-                        background: 'radial-gradient(120% 75% at 50% -10%, rgba(34,183,255,0.12), rgba(255,255,255,0) 60%), linear-gradient(180deg, rgba(17,19,40,0.82), rgba(11,12,26,0.8))',
+                        background: 'radial-gradient(120% 75% at 50% -10%, rgba(34,183,255,0.12), rgba(255,255,255,0) 60%), linear-gradient(180deg, rgba(255,255,255,0.82), rgba(255,255,255,0.8))',
                         border: '1px solid rgba(255,255,255,0.07)',
-                        boxShadow: '0 22px 50px -22px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.04)',
+                        boxShadow: '0 22px 50px -22px rgba(15,23,42,0.10), inset 0 1px 0 rgba(255,255,255,0.04)',
                     }}>
                     <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-5"
                         style={{ background: 'rgba(34,183,255,0.12)', border: '1px solid rgba(34,183,255,0.32)', boxShadow: '0 0 28px -6px rgba(34,183,255,0.55)' }}>
                         <ShoppingBag className="w-8 h-8" style={{ color: '#7FBEF0' }} />
                     </div>
-                    <h2 className="text-xl font-bold text-white mb-2" style={{ letterSpacing: '-0.02em' }}>Tu escaparate está vacío</h2>
-                    <p className="text-dark-400 text-sm mb-6 max-w-sm mx-auto leading-relaxed">Crea una tienda para empezar a vender tus productos en una vitrina digital premium.</p>
+                    <h2 className="text-xl font-bold text-[#111827] mb-2" style={{ letterSpacing: '-0.02em' }}>Tu escaparate está vacío</h2>
+                    <p className="text-[#6B7280] text-sm mb-6 max-w-sm mx-auto leading-relaxed">Crea una tienda para empezar a vender tus productos en una vitrina digital premium.</p>
                     <button onClick={() => setShowStoreModal(true)}
                         className="inline-flex items-center gap-2 rounded-xl px-5 py-2.5 font-bold text-sm transition-all active:scale-[0.98]"
                         style={{
-                            background: 'linear-gradient(135deg, #22B7FF, #7B5BFF)',
+                            background: 'linear-gradient(135deg, #FF2D95 0%, #B735B8 48%, #233B8F 100%)',
                             color: '#fff',
                             boxShadow: '0 10px 26px -10px rgba(34,183,255,0.6)',
                         }}>
@@ -751,16 +752,16 @@ export default function VirtualStorePage() {
                             <div key={store.id}
                                 className="relative rounded-2xl overflow-hidden group transition-all duration-300 hover:-translate-y-1"
                                 style={{
-                                    background: `radial-gradient(120% 80% at 50% -10%, ${p.accent}1c, rgba(255,255,255,0) 60%), radial-gradient(80% 80% at 100% 100%, ${p.accent}10, rgba(255,255,255,0) 62%), linear-gradient(180deg, rgba(20,24,48,0.94) 0%, rgba(14,16,34,0.94) 100%)`,
+                                    background: `radial-gradient(120% 80% at 50% -10%, ${p.accent}1c, rgba(255,255,255,0) 60%), radial-gradient(80% 80% at 100% 100%, ${p.accent}10, rgba(255,255,255,0) 62%), linear-gradient(180deg, rgba(20,24,48,0.94) 0%, rgba(255,255,255,0.94) 100%)`,
                                     border: '1px solid rgba(255,255,255,0.08)',
-                                    boxShadow: `0 22px 44px -22px rgba(0,0,0,0.78), 0 0 24px -14px ${p.accent}30, inset 0 1px 0 rgba(255,255,255,0.05)`,
+                                    boxShadow: `0 22px 44px -22px rgba(0,0,0,0.78), 0 0 24px -14px ${p.accent}30, inset 0 1px 0 #F0F3F7`,
                                 }}
                                 onMouseEnter={e => {
                                     e.currentTarget.style.boxShadow = `0 30px 56px -22px rgba(0,0,0,0.84), 0 0 36px -10px ${p.accent}55, 0 0 16px -8px rgba(123,91,255,0.35), inset 0 1px 0 rgba(255,255,255,0.09)`
                                     e.currentTarget.style.borderColor = `${p.accent}55`
                                 }}
                                 onMouseLeave={e => {
-                                    e.currentTarget.style.boxShadow = `0 22px 44px -22px rgba(0,0,0,0.78), 0 0 24px -14px ${p.accent}30, inset 0 1px 0 rgba(255,255,255,0.05)`
+                                    e.currentTarget.style.boxShadow = `0 22px 44px -22px rgba(0,0,0,0.78), 0 0 24px -14px ${p.accent}30, inset 0 1px 0 #F0F3F7`
                                     e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'
                                 }}>
 
@@ -784,7 +785,7 @@ export default function VirtualStorePage() {
                                     }} />
                                     {/* browser chrome compacto */}
                                     <div className="absolute top-0 left-0 right-0 px-2.5 py-1.5 flex items-center gap-1.5 pointer-events-none z-10"
-                                        style={{ background: 'linear-gradient(180deg, rgba(0,0,0,0.5), rgba(0,0,0,0))' }}>
+                                        style={{ background: 'linear-gradient(180deg, rgba(15,23,42,0.08), rgba(0,0,0,0))' }}>
                                         <span className="w-1 h-1 rounded-full" style={{ background: 'rgba(255,255,255,0.42)' }} />
                                         <span className="w-1 h-1 rounded-full" style={{ background: 'rgba(255,255,255,0.30)' }} />
                                         <span className="w-1 h-1 rounded-full" style={{ background: 'rgba(255,255,255,0.20)' }} />
@@ -810,11 +811,11 @@ export default function VirtualStorePage() {
                                         {/* top bar: marca + nav + carrito */}
                                         <div className="flex items-center gap-1 mb-1 opacity-90">
                                             <span className="w-2.5 h-2.5 rounded-full" style={{ background: 'rgba(255,255,255,0.85)' }} />
-                                            <span className="text-[8px] font-bold text-white truncate max-w-[40%]" style={{ letterSpacing: '-0.01em' }}>{store.name}</span>
+                                            <span className="text-[8px] font-bold text-[#111827] truncate max-w-[40%]" style={{ letterSpacing: '-0.01em' }}>{store.name}</span>
                                             <span className="ml-auto flex items-center gap-1.5">
-                                                <span className="text-[6.5px] font-medium uppercase tracking-[0.14em] text-white/50">Shop</span>
+                                                <span className="text-[6.5px] font-medium uppercase tracking-[0.14em] text-[#111827]/50">Shop</span>
                                                 <span className="relative">
-                                                    <ShoppingCart className="w-2.5 h-2.5 text-white/80" />
+                                                    <ShoppingCart className="w-2.5 h-2.5 text-[#111827]/80" />
                                                     {productCount > 0 && (
                                                         <span className="absolute -top-1 -right-1.5 min-w-[9px] h-[9px] px-1 rounded-full flex items-center justify-center text-[6px] font-bold text-black"
                                                             style={{ background: p.accent }}>
@@ -829,7 +830,7 @@ export default function VirtualStorePage() {
                                         <div className="flex-1 flex items-center gap-2 min-h-0">
                                             {/* hero izquierda */}
                                             <div className="flex-1 min-w-0 flex flex-col gap-0.5">
-                                                <div className="text-[11px] font-bold text-white leading-tight truncate" style={{ letterSpacing: '-0.02em', textShadow: '0 2px 12px rgba(0,0,0,0.6)' }}>
+                                                <div className="text-[11px] font-bold text-[#111827] leading-tight truncate" style={{ letterSpacing: '-0.02em', textShadow: '0 2px 12px rgba(15,23,42,0.10)' }}>
                                                     {store.name}
                                                 </div>
                                                 <div className="text-[7.5px] uppercase tracking-[0.18em] font-bold truncate" style={{ color: p.accent }}>
@@ -870,7 +871,7 @@ export default function VirtualStorePage() {
                                     <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-20">
                                         <div className="w-8 h-8 rounded-full flex items-center justify-center backdrop-blur-md"
                                             style={{ background: 'rgba(0,0,0,0.55)', border: '1px solid rgba(255,255,255,0.28)' }}>
-                                            <ExternalLink className="w-3.5 h-3.5 text-white" />
+                                            <ExternalLink className="w-3.5 h-3.5 text-[#111827]" />
                                         </div>
                                     </div>
                                 </a>
@@ -899,16 +900,16 @@ export default function VirtualStorePage() {
                                                     <LayoutIcon className="w-3 h-3" style={{ color: p.accent }} />}
                                         </div>
                                         <div className="flex-1 min-w-0">
-                                            <div className="text-[12.5px] font-bold text-white truncate leading-tight" style={{ letterSpacing: '-0.01em' }}>{store.name}</div>
+                                            <div className="text-[12.5px] font-bold text-[#111827] truncate leading-tight" style={{ letterSpacing: '-0.01em' }}>{store.name}</div>
                                             <div className="text-[9.5px] mt-0.5 truncate" style={{ color: 'rgba(255,255,255,0.46)' }}>
                                                 {storeTypeLabel(store.type)} · {productCount} {productCount === 1 ? 'producto' : 'productos'}
                                             </div>
                                         </div>
                                         <div className="flex items-center gap-0 shrink-0 -mr-1">
                                             <button onClick={() => setSharingStore(store)}
-                                                className="p-1 rounded-md transition-colors hover:bg-white/5"
+                                                className="p-1 rounded-md transition-colors hover:bg-[#F4F6FA]"
                                                 title="Compartir tienda">
-                                                <Share2 className="w-3 h-3 text-dark-400 hover:text-white transition-colors" />
+                                                <Share2 className="w-3 h-3 text-[#6B7280] hover:text-[#111827] transition-colors" />
                                             </button>
                                             <button
                                                 onClick={() => {
@@ -925,14 +926,14 @@ export default function VirtualStorePage() {
                                                     setStoreThemePrimary(store.themeConfig?.theme?.primary || '');
                                                     setShowStoreModal(true);
                                                 }}
-                                                className="p-1 rounded-md transition-colors hover:bg-white/5"
+                                                className="p-1 rounded-md transition-colors hover:bg-[#F4F6FA]"
                                                 title="Editar">
-                                                <Edit3 className="w-3 h-3 text-dark-400 hover:text-white transition-colors" />
+                                                <Edit3 className="w-3 h-3 text-[#6B7280] hover:text-[#111827] transition-colors" />
                                             </button>
                                             <button onClick={() => deleteStore(store.id)}
-                                                className="p-1 rounded-md transition-colors hover:bg-white/5"
+                                                className="p-1 rounded-md transition-colors hover:bg-[#F4F6FA]"
                                                 title="Eliminar">
-                                                <Trash2 className="w-3 h-3 text-dark-500 hover:text-red-400 transition-colors" />
+                                                <Trash2 className="w-3 h-3 text-[#9CA3AF] hover:text-red-400 transition-colors" />
                                             </button>
                                         </div>
                                     </div>
@@ -957,7 +958,7 @@ export default function VirtualStorePage() {
                                             target="_blank"
                                             className="px-2.5 rounded-lg flex items-center justify-center transition-all active:scale-[0.98] hover:bg-white/8"
                                             style={{
-                                                background: 'rgba(255,255,255,0.05)',
+                                                background: '#F0F3F7',
                                                 border: '1px solid rgba(255,255,255,0.10)',
                                                 color: 'rgba(255,255,255,0.88)',
                                             }}
@@ -969,7 +970,7 @@ export default function VirtualStorePage() {
                                     {(store.type === 'NETWORK_MARKETING' || store.type === 'GENERAL_BUSINESS') && (
                                         <button
                                             onClick={() => convertStoreType(store)}
-                                            className="mt-2 w-full flex items-center justify-center gap-1.5 text-[9.5px] font-medium py-1.5 rounded-md transition-colors hover:text-white"
+                                            className="mt-2 w-full flex items-center justify-center gap-1.5 text-[9.5px] font-medium py-1.5 rounded-md transition-colors hover:text-[#111827]"
                                             style={{ color: 'rgba(255,255,255,0.34)' }}>
                                             Convertir a {store.type === 'NETWORK_MARKETING' ? 'Mi Negocio (General)' : 'Network Marketing (PV)'}
                                         </button>
@@ -987,24 +988,24 @@ export default function VirtualStorePage() {
 
             {showStoreModal && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
-                    <div className="bg-white/5 border border-white/15 rounded-3xl w-full max-w-md p-5 sm:p-6 max-h-[90vh] overflow-y-auto custom-scrollbar">
+                    <div className="bg-[#F4F6FA] border border-[#E4E9F0] rounded-3xl w-full max-w-md p-5 sm:p-6 max-h-[90vh] overflow-y-auto custom-scrollbar">
                         <div className="flex items-center justify-between mb-6">
                             <h2 className="text-xl font-bold">{editStore ? 'Configurar Tienda' : 'Crear Tienda'}</h2>
-                            <button onClick={() => setShowStoreModal(false)}><X size={24} className="text-dark-400" /></button>
+                            <button onClick={() => setShowStoreModal(false)}><X size={24} className="text-[#6B7280]" /></button>
                         </div>
                         <form onSubmit={handleSaveStore} className="space-y-6">
                             <div>
-                                <label className="text-xs font-bold text-dark-400 uppercase tracking-widest block mb-4">Tipo de Tienda</label>
+                                <label className="text-xs font-bold text-[#6B7280] uppercase tracking-widest block mb-4">Tipo de Tienda</label>
                                 <div className="grid grid-cols-3 gap-3">
                                     <button
                                         type="button"
                                         onClick={() => setStoreType('GENERAL_BUSINESS')}
                                         className={`p-3 rounded-2xl border-2 transition-all flex flex-col items-center gap-2 text-center ${storeType === 'GENERAL_BUSINESS'
-                                            ? 'border-neon-purple bg-neon-purple/10 text-white shadow-[0_0_20px_rgba(var(--neon-purple-rgb),0.2)]'
-                                            : 'border-white/5 bg-dark-900 text-dark-500 hover:border-purple-500/30'
+                                            ? 'border-[#B735B8] bg-[#B735B8]/10 text-white shadow-[0_0_20px_rgba(var(--[#B735B8]-rgb),0.2)]'
+                                            : 'border-[#E4E9F0] bg-white text-[#9CA3AF] hover:border-purple-500/30'
                                             }`}
                                     >
-                                        <Store className={storeType === 'GENERAL_BUSINESS' ? 'text-neon-purple' : ''} size={20} />
+                                        <Store className={storeType === 'GENERAL_BUSINESS' ? 'text-[#B735B8]' : ''} size={20} />
                                         <div>
                                             <p className="font-bold text-[11px]">Mi Negocio</p>
                                             <p className="text-[9px] opacity-60">Venta General</p>
@@ -1014,11 +1015,11 @@ export default function VirtualStorePage() {
                                         type="button"
                                         onClick={() => setStoreType('NETWORK_MARKETING')}
                                         className={`p-3 rounded-2xl border-2 transition-all flex flex-col items-center gap-2 text-center ${storeType === 'NETWORK_MARKETING'
-                                            ? 'border-neon-blue bg-neon-blue/10 text-white shadow-[0_0_20px_rgba(var(--neon-blue-rgb),0.2)]'
-                                            : 'border-white/5 bg-dark-900 text-dark-500 hover:border-purple-500/30'
+                                            ? 'border-[#233B8F] bg-[#233B8F]/10 text-white shadow-[0_0_20px_rgba(var(--[#233B8F]-rgb),0.2)]'
+                                            : 'border-[#E4E9F0] bg-white text-[#9CA3AF] hover:border-purple-500/30'
                                             }`}
                                     >
-                                        <Globe className={storeType === 'NETWORK_MARKETING' ? 'text-neon-blue' : ''} size={20} />
+                                        <Globe className={storeType === 'NETWORK_MARKETING' ? 'text-[#233B8F]' : ''} size={20} />
                                         <div>
                                             <p className="font-bold text-[11px]">Network</p>
                                             <p className="text-[9px] opacity-60">Puntos PV</p>
@@ -1028,11 +1029,11 @@ export default function VirtualStorePage() {
                                         type="button"
                                         onClick={() => setStoreType('LANDING')}
                                         className={`p-3 rounded-2xl border-2 transition-all flex flex-col items-center gap-2 text-center ${storeType === 'LANDING'
-                                            ? 'border-neon-green bg-neon-green/10 text-white shadow-[0_0_20px_rgba(var(--neon-green-rgb),0.2)]'
-                                            : 'border-white/5 bg-dark-900 text-dark-500 hover:border-purple-500/30'
+                                            ? 'border-[#16A34A] bg-[#16A34A]/10 text-[#111827] shadow-[0_0_20px_rgba(var(--[#16A34A]-rgb),0.2)]'
+                                            : 'border-[#E4E9F0] bg-white text-[#9CA3AF] hover:border-purple-500/30'
                                             }`}
                                     >
-                                        <LayoutIcon className={storeType === 'LANDING' ? 'text-neon-green' : ''} size={20} />
+                                        <LayoutIcon className={storeType === 'LANDING' ? 'text-[#16A34A]' : ''} size={20} />
                                         <div>
                                             <p className="font-bold text-[11px]">Landing Pro</p>
                                             <p className="text-[9px] opacity-60">Página Única</p>
@@ -1042,21 +1043,21 @@ export default function VirtualStorePage() {
                             </div>
 
                             <div>
-                                <label className="text-xs font-bold text-dark-400 uppercase tracking-widest block mb-2">Nombre</label>
-                                <input required value={storeName} onChange={e => setStoreName(e.target.value)} placeholder="Ej: Mi Boutique" className="w-full bg-dark-900 border border-purple-500/25 rounded-xl px-4 py-3 text-white placeholder-dark-500 focus:border-neon-blue outline-none transition-all" />
+                                <label className="text-xs font-bold text-[#6B7280] uppercase tracking-widest block mb-2">Nombre</label>
+                                <input required value={storeName} onChange={e => setStoreName(e.target.value)} placeholder="Ej: Mi Boutique" className="w-full bg-white border border-purple-500/25 rounded-xl px-4 py-3 text-[#111827] placeholder-dark-500 focus:border-[#233B8F] outline-none transition-all" />
                             </div>
                             <div>
-                                <label className="text-xs font-bold text-dark-400 uppercase tracking-widest block mb-2">Slug (URL)</label>
-                                <input required value={storeSlug} onChange={e => setStoreSlug(e.target.value)} placeholder="mi-boutique" className="w-full bg-dark-900 border border-purple-500/25 rounded-xl px-4 py-3 text-white placeholder-dark-500 focus:border-neon-blue outline-none transition-all" />
+                                <label className="text-xs font-bold text-[#6B7280] uppercase tracking-widest block mb-2">Slug (URL)</label>
+                                <input required value={storeSlug} onChange={e => setStoreSlug(e.target.value)} placeholder="mi-boutique" className="w-full bg-white border border-purple-500/25 rounded-xl px-4 py-3 text-[#111827] placeholder-dark-500 focus:border-[#233B8F] outline-none transition-all" />
                             </div>
                             <div>
-                                <label className="text-xs font-bold text-dark-400 uppercase tracking-widest block mb-2">WhatsApp de Pedidos</label>
-                                <input value={storeWhatsapp} onChange={e => setStoreWhatsapp(e.target.value)} placeholder="Ej: 51987654321 (con código de país)" className="w-full bg-dark-900 border border-purple-500/25 rounded-xl px-4 py-3 text-white placeholder-dark-500 focus:border-neon-blue outline-none transition-all" />
-                                <p className="text-[10px] text-dark-500 mt-2">Los pedidos de esta tienda llegarán directamente a este número.</p>
+                                <label className="text-xs font-bold text-[#6B7280] uppercase tracking-widest block mb-2">WhatsApp de Pedidos</label>
+                                <input value={storeWhatsapp} onChange={e => setStoreWhatsapp(e.target.value)} placeholder="Ej: 51987654321 (con código de país)" className="w-full bg-white border border-purple-500/25 rounded-xl px-4 py-3 text-[#111827] placeholder-dark-500 focus:border-[#233B8F] outline-none transition-all" />
+                                <p className="text-[10px] text-[#9CA3AF] mt-2">Los pedidos de esta tienda llegarán directamente a este número.</p>
                             </div>
 
                             <div>
-                                <label className="text-xs font-bold text-dark-400 uppercase tracking-widest block mb-2">QR de Pago (Transferencia)</label>
+                                <label className="text-xs font-bold text-[#6B7280] uppercase tracking-widest block mb-2">QR de Pago (Transferencia)</label>
                                 <div className="flex items-center gap-4">
                                     {storeQr ? (
                                         <div className="relative w-20 h-20 rounded-xl overflow-hidden border border-purple-500/25 group">
@@ -1070,7 +1071,7 @@ export default function VirtualStorePage() {
                                             </button>
                                         </div>
                                     ) : (
-                                        <div className="relative w-20 h-20 rounded-xl border border-dashed border-white/20 flex flex-col items-center justify-center text-[10px] font-bold text-dark-400 hover:border-neon-blue hover:text-neon-blue transition-all cursor-pointer">
+                                        <div className="relative w-20 h-20 rounded-xl border border-dashed border-[#E4E9F0] flex flex-col items-center justify-center text-[10px] font-bold text-[#6B7280] hover:border-[#233B8F] hover:text-[#233B8F] transition-all cursor-pointer">
                                             <input
                                                 type="file"
                                                 onChange={async (e) => {
@@ -1094,18 +1095,18 @@ export default function VirtualStorePage() {
                                         </div>
                                     )}
                                     <div className="flex-1">
-                                        <p className="text-[10px] text-dark-500 leading-relaxed">
+                                        <p className="text-[10px] text-[#9CA3AF] leading-relaxed">
                                             Este QR se mostrará a los clientes que elijan pagar por transferencia en tu tienda.
                                         </p>
                                     </div>
                                 </div>
                             </div>
                             <div>
-                                <label className="text-xs font-bold text-dark-400 uppercase tracking-widest block mb-2">Fotos de Portada (Banner)</label>
-                                <p className="text-[10px] text-dark-500 mb-3">Sube hasta 2 fotos. Se mostrarán rotando en la parte superior de tu tienda.</p>
+                                <label className="text-xs font-bold text-[#6B7280] uppercase tracking-widest block mb-2">Fotos de Portada (Banner)</label>
+                                <p className="text-[10px] text-[#9CA3AF] mb-3">Sube hasta 2 fotos. Se mostrarán rotando en la parte superior de tu tienda.</p>
                                 <div className="flex gap-3">
                                     {/* Banner 1 */}
-                                    <div className="flex-1 relative h-24 rounded-xl overflow-hidden border border-dashed border-white/20 hover:border-neon-blue transition-all cursor-pointer flex items-center justify-center">
+                                    <div className="flex-1 relative h-24 rounded-xl overflow-hidden border border-dashed border-[#E4E9F0] hover:border-[#233B8F] transition-all cursor-pointer flex items-center justify-center">
                                         {storeBanner1 ? (
                                             <>
                                                 <img src={storeBanner1} className="absolute inset-0 w-full h-full object-cover opacity-70" />
@@ -1138,7 +1139,7 @@ export default function VirtualStorePage() {
                                                     className="absolute inset-0 opacity-0 cursor-pointer z-10"
                                                     accept="image/*"
                                                 />
-                                                <div className="text-center text-dark-500 pointer-events-none">
+                                                <div className="text-center text-[#9CA3AF] pointer-events-none">
                                                     <Plus size={20} className="mx-auto mb-1" />
                                                     <span className="text-[10px] font-bold">Foto 1</span>
                                                 </div>
@@ -1146,7 +1147,7 @@ export default function VirtualStorePage() {
                                         )}
                                     </div>
                                     {/* Banner 2 */}
-                                    <div className="flex-1 relative h-24 rounded-xl overflow-hidden border border-dashed border-white/20 hover:border-neon-blue transition-all cursor-pointer flex items-center justify-center">
+                                    <div className="flex-1 relative h-24 rounded-xl overflow-hidden border border-dashed border-[#E4E9F0] hover:border-[#233B8F] transition-all cursor-pointer flex items-center justify-center">
                                         {storeBanner2 ? (
                                             <>
                                                 <img src={storeBanner2} className="absolute inset-0 w-full h-full object-cover opacity-70" />
@@ -1179,7 +1180,7 @@ export default function VirtualStorePage() {
                                                     className="absolute inset-0 opacity-0 cursor-pointer z-10"
                                                     accept="image/*"
                                                 />
-                                                <div className="text-center text-dark-500 pointer-events-none">
+                                                <div className="text-center text-[#9CA3AF] pointer-events-none">
                                                     <Plus size={20} className="mx-auto mb-1" />
                                                     <span className="text-[10px] font-bold">Foto 2</span>
                                                 </div>
@@ -1190,45 +1191,45 @@ export default function VirtualStorePage() {
                             </div>
                             {/* ── APARIENCIA (tema de la tienda) ── */}
                             <div>
-                                <label className="text-xs font-bold text-dark-400 uppercase tracking-widest block mb-2">Apariencia de la tienda</label>
-                                <p className="text-[10px] text-dark-500 mb-3">Elige un tema: cambia los colores y la tipografía de tu vitrina.</p>
+                                <label className="text-xs font-bold text-[#6B7280] uppercase tracking-widest block mb-2">Apariencia de la tienda</label>
+                                <p className="text-[10px] text-[#9CA3AF] mb-3">Elige un tema: cambia los colores y la tipografía de tu vitrina.</p>
                                 <div className="grid grid-cols-3 gap-2">
                                     {Object.entries(STORE_THEMES).map(([id, t]) => {
                                         const sel = storeThemePreset === id
                                         return (
                                             <button key={id} type="button" onClick={() => setStoreThemePreset(id)}
-                                                className={`relative rounded-xl p-2 border text-left transition-all ${sel ? 'border-neon-blue' : 'border-white/10 hover:border-white/25'}`}
+                                                className={`relative rounded-xl p-2 border text-left transition-all ${sel ? 'border-[#233B8F]' : 'border-[#E4E9F0] hover:border-white/25'}`}
                                                 style={{ background: 'rgba(255,255,255,0.03)' }}>
                                                 <div className="h-9 rounded-lg mb-1.5 flex items-center gap-1 px-2" style={{ background: t.vars['--st-bg'] }}>
                                                     <span className="w-3.5 h-3.5 rounded-full" style={{ background: t.vars['--st-primary'] }} />
                                                     <span className="w-3.5 h-3.5 rounded-full" style={{ background: t.vars['--st-price'] }} />
                                                     <span className="flex-1 h-2 rounded-full" style={{ background: t.vars['--st-card-border'] }} />
                                                 </div>
-                                                <span className="text-[10px] font-bold block truncate" style={{ color: sel ? '#fff' : 'rgba(255,255,255,0.6)' }}>{t.label}</span>
-                                                {sel && <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 rounded-full bg-neon-blue" />}
+                                                <span className="text-[10px] font-bold block truncate" style={{ color: sel ? '#fff' : '#6B7280' }}>{t.label}</span>
+                                                {sel && <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 rounded-full bg-[#233B8F]" />}
                                             </button>
                                         )
                                     })}
                                 </div>
 
-                                <label className="text-xs font-bold text-dark-400 uppercase tracking-widest block mb-2 mt-4">Tipografía</label>
+                                <label className="text-xs font-bold text-[#6B7280] uppercase tracking-widest block mb-2 mt-4">Tipografía</label>
                                 <div className="flex flex-wrap gap-2">
                                     <button type="button" onClick={() => setStoreThemeFont('')}
-                                        className={`px-3 py-1.5 rounded-lg text-[11px] font-bold border transition-all ${storeThemeFont === '' ? 'border-neon-blue text-white' : 'border-white/10 text-dark-400'}`}>Auto</button>
+                                        className={`px-3 py-1.5 rounded-lg text-[11px] font-bold border transition-all ${storeThemeFont === '' ? 'border-[#233B8F] text-[#111827]' : 'border-[#E4E9F0] text-[#6B7280]'}`}>Auto</button>
                                     {Object.entries(STORE_FONTS).map(([key, f]) => (
                                         <button key={key} type="button" onClick={() => setStoreThemeFont(key)}
-                                            className={`px-3 py-1.5 rounded-lg text-[11px] font-bold border transition-all ${storeThemeFont === key ? 'border-neon-blue text-white' : 'border-white/10 text-dark-400'}`}
+                                            className={`px-3 py-1.5 rounded-lg text-[11px] font-bold border transition-all ${storeThemeFont === key ? 'border-[#233B8F] text-[#111827]' : 'border-[#E4E9F0] text-[#6B7280]'}`}
                                             style={{ fontFamily: f.family }}>{f.label}</button>
                                     ))}
                                 </div>
 
-                                <label className="text-xs font-bold text-dark-400 uppercase tracking-widest block mb-2 mt-4">Color principal (opcional)</label>
+                                <label className="text-xs font-bold text-[#6B7280] uppercase tracking-widest block mb-2 mt-4">Color principal (opcional)</label>
                                 <div className="flex items-center gap-3">
                                     <input type="color" value={storeThemePrimary || '#D203DD'} onChange={e => setStoreThemePrimary(e.target.value)}
-                                        className="w-11 h-9 rounded-lg bg-transparent border border-white/10 cursor-pointer p-0.5" />
+                                        className="w-11 h-9 rounded-lg bg-transparent border border-[#E4E9F0] cursor-pointer p-0.5" />
                                     {storeThemePrimary
-                                        ? <button type="button" onClick={() => setStoreThemePrimary('')} className="text-[10px] text-dark-400 underline">usar el del tema</button>
-                                        : <span className="text-[10px] text-dark-500">Sobrescribe el color del tema con el tuyo.</span>}
+                                        ? <button type="button" onClick={() => setStoreThemePrimary('')} className="text-[10px] text-[#6B7280] underline">usar el del tema</button>
+                                        : <span className="text-[10px] text-[#9CA3AF]">Sobrescribe el color del tema con el tuyo.</span>}
                                 </div>
 
                                 {/* Vista previa en vivo del tema */}
@@ -1236,7 +1237,7 @@ export default function VirtualStorePage() {
                                     const pv = resolveStoreTheme({ theme: { preset: storeThemePreset, font: storeThemeFont || undefined, primary: storeThemePrimary || undefined } })
                                     return (
                                         <div className="mt-4">
-                                            <label className="text-xs font-bold text-dark-400 uppercase tracking-widest block mb-2">Vista previa</label>
+                                            <label className="text-xs font-bold text-[#6B7280] uppercase tracking-widest block mb-2">Vista previa</label>
                                             <link rel="stylesheet" href={pv.fontHref} />
                                             <div style={{ ...(pv.vars as any), background: 'var(--st-bg)', fontFamily: 'var(--st-font)', borderRadius: 16, padding: 14, border: '1px solid var(--st-border)' }}>
                                                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
@@ -1264,13 +1265,14 @@ export default function VirtualStorePage() {
                                 })()}
                             </div>
 
-                            <button type="submit" className="w-full bg-neon-blue text-dark-950 font-bold py-4 rounded-xl shadow-lg active:scale-[0.98] transition-all">
+                            <button type="submit" className="w-full bg-[#233B8F] text-dark-950 font-bold py-4 rounded-xl shadow-lg active:scale-[0.98] transition-all">
                                 {editStore ? 'Guardar Cambios' : 'Crear Tienda'}
                             </button>
                         </form>
                     </div>
                 </div>
             )}
+        </div>
         </div>
     )
 }
