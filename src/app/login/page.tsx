@@ -41,47 +41,43 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 relative overflow-hidden">
+    <div className="font-ui min-h-screen flex items-center justify-center px-4 relative overflow-hidden"
+      style={{ background: 'linear-gradient(135deg, #F8FAFC 0%, #F5F7FA 45%, #EEF2F7 100%)' }}>
 
-      {/* Background glows */}
+      {/* Glows suaves */}
       <div className="pointer-events-none fixed inset-0 overflow-hidden">
-        <div className="absolute -top-60 -left-40 w-[600px] h-[600px] rounded-full bg-cyan-500/6 blur-[140px]" />
-        <div className="absolute -bottom-60 -right-40 w-[600px] h-[600px] rounded-full bg-purple-600/7 blur-[140px]" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] rounded-full bg-cyan-400/3 blur-[120px]" />
+        <div className="absolute -top-60 -left-40 w-[600px] h-[600px] rounded-full blur-[150px]" style={{ background: 'rgba(255,9,108,0.08)' }} />
+        <div className="absolute -bottom-60 -right-40 w-[600px] h-[600px] rounded-full blur-[150px]" style={{ background: 'rgba(106,53,217,0.08)' }} />
       </div>
 
       <div className="w-full max-w-[380px] relative z-10">
 
         {/* Logo + Brand */}
         <div className="flex flex-col items-center mb-8">
-          <div className="w-16 h-16 mb-4 rounded-2xl overflow-hidden shadow-lg shadow-black/60"
-            style={{ border: '1px solid rgba(255,255,255,0.12)' }}>
+          <div className="w-16 h-16 mb-3 rounded-2xl overflow-hidden"
+            style={{ background: '#071522', border: '1px solid #E4E9F0', boxShadow: '0 14px 32px rgba(8,22,36,0.18)' }}>
             <img src="/logo.png" alt="Logo" className="w-full h-full object-contain" />
           </div>
-          <h1 className="flex justify-center"><img src="/wordmark-mydiamond.png" alt="MY DIAMOND" className="h-5 w-auto" /></h1>
-          <p className="text-[11px] text-white/30 mt-1 tracking-widest uppercase">Network Marketing Digital</p>
+          <h1 className="font-display text-diamond-gradient" style={{ fontSize: 30, fontWeight: 700, letterSpacing: '0.04em', margin: 0 }}>MY DIAMOND</h1>
+          <p className="text-[11px] mt-1 tracking-widest uppercase" style={{ color: '#9CA3AF' }}>Network Marketing Digital</p>
         </div>
 
         {/* Card */}
-        <div className="water-glass relative overflow-hidden" style={{ padding: '2rem' }}>
+        <div className="dm-card" style={{ padding: '2rem' }}>
 
-          {/* Top accent line */}
-          <div className="absolute top-0 left-0 right-0 h-px"
-            style={{ background: 'linear-gradient(90deg, transparent, rgba(13,30,121,0.6) 40%, rgba(210,3,221,0.6) 60%, transparent)' }} />
-
-          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/25 mb-5">Iniciar sesión</p>
+          <p className="text-[10px] font-black uppercase tracking-[0.2em] mb-5" style={{ color: '#9CA3AF' }}>Iniciar sesión</p>
 
           {error && (
-            <div className="flex items-center gap-2.5 bg-red-500/10 border border-red-500/20 rounded-xl px-3.5 py-2.5 mb-5">
-              <AlertCircle size={13} className="text-red-400 shrink-0" />
-              <p className="text-[11px] text-red-400 leading-snug">{error}</p>
+            <div className="flex items-center gap-2.5 rounded-xl px-3.5 py-2.5 mb-5" style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.22)' }}>
+              <AlertCircle size={13} className="shrink-0" style={{ color: '#dc2626' }} />
+              <p className="text-[11px] leading-snug" style={{ color: '#dc2626' }}>{error}</p>
             </div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
 
             <div>
-              <label className="block text-[10px] font-black text-white/30 uppercase tracking-[0.15em] mb-1.5">
+              <label className="block text-[10px] font-black uppercase tracking-[0.15em] mb-1.5" style={{ color: '#6B7280' }}>
                 Usuario o Correo
               </label>
               <input
@@ -92,16 +88,16 @@ export default function LoginPage() {
                 required
                 autoComplete="username"
                 autoFocus
-                className="w-full bg-white/[0.04] border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-white/20 focus:outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/15 transition-colors"
+                className="dm-input text-sm"
               />
             </div>
 
             <div>
               <div className="flex items-center justify-between mb-1.5">
-                <label className="block text-[10px] font-black text-white/30 uppercase tracking-[0.15em]">
+                <label className="block text-[10px] font-black uppercase tracking-[0.15em]" style={{ color: '#6B7280' }}>
                   Contraseña
                 </label>
-                <Link href="/forgot-password" className="text-[10px] text-white/30 hover:text-cyan-400 transition-colors">
+                <Link href="/forgot-password" className="text-[10px] transition-colors" style={{ color: '#6B7280' }}>
                   ¿Olvidaste?
                 </Link>
               </div>
@@ -113,12 +109,13 @@ export default function LoginPage() {
                   onChange={e => setForm({ ...form, password: e.target.value })}
                   required
                   autoComplete="current-password"
-                  className="w-full bg-white/[0.04] border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-white/20 focus:outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/15 transition-colors pr-11"
+                  className="dm-input text-sm pr-11"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-white/25 hover:text-white/60 transition-colors"
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 transition-colors"
+                  style={{ color: '#9CA3AF' }}
                 >
                   {showPassword ? <EyeOff size={14} /> : <Eye size={14} />}
                 </button>
@@ -130,16 +127,11 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-xs font-black uppercase tracking-[0.18em] transition-all active:scale-[0.98] disabled:opacity-50 mt-2"
-              style={{
-                background: 'linear-gradient(135deg, #0D1E79, #D203DD)',
-                color: '#fff',
-                border: '1px solid rgba(255,255,255,0.1)',
-                boxShadow: '0 6px 24px rgba(210,3,221,0.35)',
-              }}
+              className="dm-btn w-full uppercase tracking-[0.18em] text-xs mt-2"
+              style={{ padding: '13px 20px' }}
             >
               {loading
-                ? <div className="w-4 h-4 border-2 border-white/25 border-t-white rounded-full animate-spin" />
+                ? <div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
                 : <><span>Ingresar</span><ArrowRight size={13} /></>
               }
             </button>
@@ -147,9 +139,9 @@ export default function LoginPage() {
           </form>
         </div>
 
-        <p className="text-center text-white/25 text-[11px] mt-5">
+        <p className="text-center text-[11px] mt-5" style={{ color: '#9CA3AF' }}>
           ¿Sin cuenta?{' '}
-          <Link href="/register" className="text-purple-400 hover:text-purple-300 font-bold transition-colors">
+          <Link href="/register" className="font-bold transition-colors" style={{ color: '#FF096C' }}>
             Registrarse
           </Link>
         </p>
