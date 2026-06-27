@@ -242,7 +242,7 @@ export default function CreditsPage() {
     return (
       <div className="flex items-center justify-center min-h-[50vh]">
         <div className="w-10 h-10 border-2 rounded-full animate-spin"
-          style={{ borderColor: 'rgba(255,255,255,0.1)', borderTopColor: '#a78bfa' }} />
+          style={{ borderColor: '#E4E9F0', borderTopColor: '#a78bfa' }} />
       </div>
     )
   }
@@ -253,17 +253,18 @@ export default function CreditsPage() {
   const usingAdmin = !usingOwn && !!canUseAdminKey
 
   return (
-    <div className="px-4 sm:px-6 pt-6 max-w-2xl mx-auto pb-24 space-y-6">
+    <div className="font-ui" style={{ background: 'linear-gradient(135deg, #F8FAFC 0%, #F5F7FA 45%, #EEF2F7 100%)', minHeight: '100vh', color: '#111827' }}>
+    <div className="px-4 sm:px-6 lg:px-8 pt-8 max-w-2xl mx-auto pb-24 space-y-6">
 
       {/* Header */}
       <div className="flex items-center gap-4">
         <div className="w-11 h-11 rounded-xl flex items-center justify-center"
-          style={{ background: 'linear-gradient(135deg, rgba(154,203,255,0.15), rgba(162,102,255,0.15))', border: '1px solid rgba(255,255,255,0.15)' }}>
+          style={{ background: 'linear-gradient(135deg, rgba(154,203,255,0.15), rgba(162,102,255,0.15))', border: '1px solid #E4E9F0' }}>
           <Cpu className="w-5 h-5 text-violet-400" />
         </div>
         <div>
-          <h1 className="text-xl font-medium text-white tracking-widest uppercase">Créditos AI</h1>
-          <p className="text-xs font-light tracking-widest mt-0.5" style={{ color: 'rgba(255,255,255,0.3)' }}>
+          <h1 className="text-xl font-medium text-[#111827] tracking-widest uppercase">Créditos AI</h1>
+          <p className="text-xs font-light tracking-widest mt-0.5" style={{ color: '#6B7280' }}>
             Gestiona tu acceso a los servicios de inteligencia artificial
           </p>
         </div>
@@ -275,8 +276,8 @@ export default function CreditsPage() {
       {/* Credits Balance Card — USD */}
       <div className="relative rounded-2xl p-6 overflow-hidden"
         style={{
-          background: 'linear-gradient(135deg, rgba(154,203,255,0.12) 0%, rgba(255,125,224,0.12) 50%, rgba(162,102,255,0.12) 100%)',
-          border: '1px solid rgba(255,255,255,0.15)',
+          background: '#FFFFFF',
+          border: '1px solid #E4E9F0',
           backdropFilter: 'blur(16px)',
         }}>
         <div className="absolute top-0 left-0 right-0 h-px"
@@ -287,7 +288,7 @@ export default function CreditsPage() {
         <div className="flex items-center justify-between gap-3 mb-4">
           <div className="flex items-center gap-3">
             <Wallet className="w-4 h-4 text-violet-400" />
-            <span className="text-xs font-black uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.4)' }}>
+            <span className="text-xs font-black uppercase tracking-widest" style={{ color: '#6B7280' }}>
               Saldo de IA
             </span>
           </div>
@@ -305,11 +306,11 @@ export default function CreditsPage() {
         </div>
 
         <div className="flex items-end gap-3 mb-4">
-          <span className="text-5xl font-black text-white tabular-nums">${(data?.aiBalanceUsd ?? 0).toFixed(2)}</span>
-          <span className="text-sm font-light mb-2" style={{ color: 'rgba(255,255,255,0.35)' }}>USD disponibles</span>
+          <span className="text-5xl font-black text-[#111827] tabular-nums">${(data?.aiBalanceUsd ?? 0).toFixed(2)}</span>
+          <span className="text-sm font-light mb-2" style={{ color: '#6B7280' }}>USD disponibles</span>
         </div>
 
-        <p className="text-xs font-light" style={{ color: 'rgba(255,255,255,0.3)' }}>
+        <p className="text-xs font-light" style={{ color: '#6B7280' }}>
           Tu saldo se descuenta automáticamente con cada uso de IA que pase por la key del administrador. Si usás tu propia API Key, no se descuenta nada.
         </p>
       </div>
@@ -318,13 +319,13 @@ export default function CreditsPage() {
       {purchases.length > 0 && (
         <div className="relative rounded-2xl p-5 overflow-hidden space-y-3"
           style={{
-            background: 'rgba(255,255,255,0.03)',
-            border: '1px solid rgba(255,255,255,0.08)',
+            background: '#F8FAFC',
+            border: '1px solid #EEF2F7',
             backdropFilter: 'blur(16px)',
           }}>
           <div className="flex items-center gap-2">
             <Receipt className="w-4 h-4 text-violet-400" />
-            <p className="text-[10px] font-black uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.4)' }}>
+            <p className="text-[10px] font-black uppercase tracking-widest" style={{ color: '#6B7280' }}>
               Mis solicitudes
             </p>
           </div>
@@ -336,11 +337,11 @@ export default function CreditsPage() {
                                           { color: '#fbbf24', bg: 'rgba(251,191,36,0.08)', border: 'rgba(251,191,36,0.22)', label: 'Pendiente' }
               return (
                 <div key={p.id} className="flex items-center gap-3 p-3 rounded-xl"
-                  style={{ background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.06)' }}>
+                  style={{ background: '#F8FAFC', border: '1px solid #EEF2F7' }}>
                   <ArrowDownLeft className="w-3.5 h-3.5 text-violet-400 shrink-0" />
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-bold text-white">+${Number(p.amountUsd).toFixed(2)} USD</p>
-                    <p className="text-[10px]" style={{ color: 'rgba(255,255,255,0.35)' }}>
+                    <p className="text-sm font-bold text-[#111827]">+${Number(p.amountUsd).toFixed(2)} USD</p>
+                    <p className="text-[10px]" style={{ color: '#6B7280' }}>
                       {new Date(p.createdAt).toLocaleDateString()} · {p.paymentMethod === 'MANUAL' ? 'Transferencia' : p.paymentMethod}
                     </p>
                   </div>
@@ -359,13 +360,13 @@ export default function CreditsPage() {
       {data?.recentUsage && data.recentUsage.length > 0 && (
         <div className="relative rounded-2xl p-5 overflow-hidden space-y-3"
           style={{
-            background: 'rgba(255,255,255,0.03)',
-            border: '1px solid rgba(255,255,255,0.08)',
+            background: '#F8FAFC',
+            border: '1px solid #EEF2F7',
             backdropFilter: 'blur(16px)',
           }}>
           <div className="flex items-center gap-2">
             <Clock className="w-4 h-4 text-sky-400" />
-            <p className="text-[10px] font-black uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.4)' }}>
+            <p className="text-[10px] font-black uppercase tracking-widest" style={{ color: '#6B7280' }}>
               Movimientos recientes
             </p>
           </div>
@@ -374,7 +375,7 @@ export default function CreditsPage() {
               const isRecharge = u.costUsd < 0   // negativo = recarga (entrada)
               return (
                 <div key={u.id} className="flex items-center gap-3 px-3 py-2 rounded-lg"
-                  style={{ background: 'rgba(255,255,255,0.02)' }}>
+                  style={{ background: '#F8FAFC' }}>
                   {isRecharge
                     ? <ArrowDownLeft className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
                     : <ArrowUpRight className="w-3.5 h-3.5 text-rose-400 shrink-0" />}
@@ -400,15 +401,15 @@ export default function CreditsPage() {
       {/* Configuración de IA — vive en Configuración para no duplicar */}
       <Link href="/dashboard/settings"
         className="relative rounded-2xl p-5 overflow-hidden flex items-center justify-between gap-4 transition-all group"
-        style={{ background: "linear-gradient(135deg, rgba(154,203,255,0.12) 0%, rgba(255,125,224,0.12) 50%, rgba(162,102,255,0.12) 100%)", border: "1px solid rgba(255,255,255,0.15)", textDecoration: "none" }}>
+        style={{ background: "#FFFFFF", border: "1px solid #E4E9F0", textDecoration: "none" }}>
         <div className="flex items-center gap-4 min-w-0">
           <div className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0"
             style={{ background: "rgba(210,3,221,0.12)", border: "1px solid rgba(210,3,221,0.3)" }}>
             <Settings className="w-5 h-5" style={{ color: "#D203DD" }} />
           </div>
           <div className="min-w-0">
-            <p className="text-sm font-bold text-white">Configuración de IA</p>
-            <p className="text-[11px] font-light" style={{ color: "rgba(255,255,255,0.4)" }}>
+            <p className="text-sm font-bold text-[#111827]">Configuración de IA</p>
+            <p className="text-[11px] font-light" style={{ color: "#6B7280" }}>
               Elegí cómo pagás la IA (saldo o tu propia API Key), tu modelo y los seguimientos — en Configuración.
             </p>
           </div>
@@ -424,7 +425,7 @@ export default function CreditsPage() {
           <div className="w-full max-w-md max-h-[90vh] overflow-y-auto custom-scrollbar rounded-3xl p-5 sm:p-6 space-y-5 relative"
             style={{
               background: 'linear-gradient(180deg, rgba(20,24,48,0.96) 0%, rgba(14,16,34,0.96) 100%)',
-              border: '1px solid rgba(255,255,255,0.12)',
+              border: '1px solid #9CA3AF',
               boxShadow: '0 30px 60px -22px rgba(0,0,0,0.82), 0 0 36px -8px rgba(162,102,255,0.30)',
             }}>
             {/* Header modal */}
@@ -435,21 +436,21 @@ export default function CreditsPage() {
                   <Wallet className="w-5 h-5 text-violet-300" />
                 </div>
                 <div>
-                  <h2 className="text-base font-black text-white leading-tight">Comprar saldo de IA</h2>
-                  <p className="text-[10px] mt-0.5" style={{ color: 'rgba(255,255,255,0.35)' }}>
+                  <h2 className="text-base font-black text-[#111827] leading-tight">Comprar saldo de IA</h2>
+                  <p className="text-[10px] mt-0.5" style={{ color: '#6B7280' }}>
                     {buyMethod === 'CRYPTO' ? 'USDT-BEP20 · auto-verificado on-chain' : 'Transferencia + comprobante'}
                   </p>
                 </div>
               </div>
               <button onClick={() => setShowBuyModal(false)}
-                className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-white/5 transition-colors">
-                <X className="w-4 h-4 text-white/40" />
+                className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-[#F0F3F7] transition-colors">
+                <X className="w-4 h-4 text-[#6B7280]" />
               </button>
             </div>
 
             {/* Quick amounts + custom input */}
             <div className="space-y-2.5">
-              <label className="text-[10px] font-black uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.4)' }}>
+              <label className="text-[10px] font-black uppercase tracking-widest" style={{ color: '#6B7280' }}>
                 Monto a cargar (USD)
               </label>
               <div className="grid grid-cols-3 gap-2">
@@ -459,7 +460,7 @@ export default function CreditsPage() {
                     style={{
                       background: buyAmount === String(a)
                         ? 'linear-gradient(135deg, rgba(162,102,255,0.30), rgba(154,203,255,0.20))'
-                        : 'rgba(255,255,255,0.04)',
+                        : '#F0F3F7',
                       border: `1px solid ${buyAmount === String(a) ? 'rgba(162,102,255,0.55)' : 'rgba(255,255,255,0.10)'}`,
                       color: buyAmount === String(a) ? '#fff' : 'rgba(255,255,255,0.65)',
                     }}>
@@ -468,7 +469,7 @@ export default function CreditsPage() {
                 ))}
               </div>
               <div className="relative">
-                <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm font-bold" style={{ color: 'rgba(255,255,255,0.45)' }}>$</span>
+                <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm font-bold" style={{ color: '#6B7280' }}>$</span>
                 <input
                   type="number"
                   min="1"
@@ -476,11 +477,11 @@ export default function CreditsPage() {
                   step="0.01"
                   value={buyAmount}
                   onChange={e => setBuyAmount(e.target.value)}
-                  className="w-full pl-8 pr-3 py-3 rounded-xl text-sm font-bold text-white outline-none tabular-nums"
+                  className="w-full pl-8 pr-3 py-3 rounded-xl text-sm font-bold text-[#111827] outline-none tabular-nums"
                   placeholder="Otro monto"
-                  style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.12)' }}
+                  style={{ background: '#F0F3F7', border: '1px solid #9CA3AF' }}
                   onFocus={e => (e.currentTarget.style.borderColor = 'rgba(162,102,255,0.50)')}
-                  onBlur={e => (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)')}
+                  onBlur={e => (e.currentTarget.style.borderColor = '#9CA3AF')}
                 />
               </div>
               <p className="text-[10px]" style={{ color: 'rgba(255,255,255,0.30)' }}>
@@ -490,7 +491,7 @@ export default function CreditsPage() {
 
             {/* Tabs método de pago */}
             <div className="flex items-center gap-1 p-1 rounded-xl"
-              style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
+              style={{ background: '#F0F3F7', border: '1px solid #EEF2F7' }}>
               <button
                 onClick={() => { setBuyMethod('CRYPTO'); setBuyMsg(null) }}
                 className="flex-1 py-2.5 rounded-lg text-xs font-black transition-all flex items-center justify-center gap-1.5"
@@ -498,7 +499,7 @@ export default function CreditsPage() {
                   background: buyMethod === 'CRYPTO'
                     ? 'linear-gradient(135deg, rgba(251,191,36,0.18), rgba(251,146,60,0.12))'
                     : 'transparent',
-                  color: buyMethod === 'CRYPTO' ? '#fbbf24' : 'rgba(255,255,255,0.5)',
+                  color: buyMethod === 'CRYPTO' ? '#fbbf24' : '#6B7280',
                   border: buyMethod === 'CRYPTO' ? '1px solid rgba(251,191,36,0.35)' : '1px solid transparent',
                 }}>
                 ₮ Pagar con USDT
@@ -510,7 +511,7 @@ export default function CreditsPage() {
                   background: buyMethod === 'MANUAL'
                     ? 'rgba(255,255,255,0.10)'
                     : 'transparent',
-                  color: buyMethod === 'MANUAL' ? '#fff' : 'rgba(255,255,255,0.5)',
+                  color: buyMethod === 'MANUAL' ? '#fff' : '#6B7280',
                   border: buyMethod === 'MANUAL' ? '1px solid rgba(255,255,255,0.20)' : '1px solid transparent',
                 }}>
                 🏦 Transferencia
@@ -536,7 +537,7 @@ export default function CreditsPage() {
             {/* ═══ FLUJO USDT (CRYPTO) ═══ Componente compartido con checkout de planes */}
             {buyMethod === 'CRYPTO' && parseFloat(buyAmount || '0') >= 1 && (
               <div className="rounded-xl p-3"
-                style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)' }}>
+                style={{ background: '#F8FAFC', border: '1px solid #EEF2F7' }}>
                 <PaymentGateway
                   plan="CREDITS"
                   productLabel="Saldo IA"
@@ -586,20 +587,20 @@ export default function CreditsPage() {
                   <div className="flex items-center gap-2">
                     <span className="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black"
                       style={{ background: 'linear-gradient(135deg, #a78bfa, #60a5fa)', color: '#fff' }}>1</span>
-                    <label className="text-[10px] font-black uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.4)' }}>
+                    <label className="text-[10px] font-black uppercase tracking-widest" style={{ color: '#6B7280' }}>
                       Escanea el QR y paga
                     </label>
                   </div>
 
                   {paymentQrUrl ? (
                     <div className="flex flex-col sm:flex-row items-center gap-4 p-4 rounded-xl"
-                      style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.10)' }}>
+                      style={{ background: '#F0F3F7', border: '1px solid rgba(255,255,255,0.10)' }}>
                       <div className="w-36 h-36 rounded-xl bg-white flex items-center justify-center shrink-0 overflow-hidden"
                         style={{ border: '1px solid rgba(255,255,255,0.20)' }}>
                         <img src={paymentQrUrl} alt="QR de pago" className="w-full h-full object-contain p-2" />
                       </div>
                       <div className="text-center sm:text-left space-y-1.5 flex-1 min-w-0">
-                        <p className="text-[11px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.55)' }}>
+                        <p className="text-[11px] leading-relaxed" style={{ color: '#374151' }}>
                           Escaneá con tu billetera y transferí exactamente:
                         </p>
                         <p className="text-2xl font-black tabular-nums"
@@ -631,24 +632,24 @@ export default function CreditsPage() {
                   <div className="flex items-center gap-2">
                     <span className="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black"
                       style={{ background: 'linear-gradient(135deg, #a78bfa, #60a5fa)', color: '#fff' }}>2</span>
-                    <label className="text-[10px] font-black uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.4)' }}>
+                    <label className="text-[10px] font-black uppercase tracking-widest" style={{ color: '#6B7280' }}>
                       Subí el comprobante
                     </label>
                   </div>
                   <label className="w-full flex items-center gap-3 p-3.5 rounded-xl cursor-pointer transition-all"
                     style={{
-                      background: buyProofUrl ? 'rgba(52,211,153,0.06)' : 'rgba(255,255,255,0.04)',
+                      background: buyProofUrl ? 'rgba(52,211,153,0.06)' : '#F0F3F7',
                       border: `1px dashed ${buyProofUrl ? 'rgba(52,211,153,0.35)' : 'rgba(255,255,255,0.18)'}`,
                     }}>
                     <input type="file" accept="image/*" className="hidden"
                       onChange={e => { const f = e.target.files?.[0]; if (f) uploadProofFile(f) }} disabled={uploadingProof || submittingPurchase} />
                     <div className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0"
-                      style={{ background: buyProofUrl ? 'rgba(52,211,153,0.10)' : 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.10)' }}>
+                      style={{ background: buyProofUrl ? 'rgba(52,211,153,0.10)' : '#F0F3F7', border: '1px solid rgba(255,255,255,0.10)' }}>
                       {uploadingProof
                         ? <Loader2 className="w-4 h-4 text-violet-400 animate-spin" />
                         : buyProofUrl
                           ? <CheckCircle className="w-4 h-4 text-emerald-400" />
-                          : <Upload className="w-4 h-4 text-white/40" />}
+                          : <Upload className="w-4 h-4 text-[#6B7280]" />}
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-bold" style={{ color: buyProofUrl ? '#fff' : 'rgba(255,255,255,0.75)' }}>
@@ -665,7 +666,7 @@ export default function CreditsPage() {
 
             {/* Notas opcionales */}
             <div className="space-y-2">
-              <label className="text-[10px] font-black uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.4)' }}>
+              <label className="text-[10px] font-black uppercase tracking-widest" style={{ color: '#6B7280' }}>
                 Notas (opcional)
               </label>
               <textarea
@@ -674,8 +675,8 @@ export default function CreditsPage() {
                 rows={2}
                 maxLength={500}
                 placeholder="Banco, alias, referencia..."
-                className="w-full px-3.5 py-2.5 rounded-xl text-sm text-white outline-none resize-none"
-                style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.12)' }}
+                className="w-full px-3.5 py-2.5 rounded-xl text-sm text-[#111827] outline-none resize-none"
+                style={{ background: '#F0F3F7', border: '1px solid #9CA3AF' }}
               />
             </div>
 
@@ -700,7 +701,7 @@ export default function CreditsPage() {
                 style={{
                   background: 'linear-gradient(135deg, #a78bfa, #60a5fa)',
                   color: '#fff',
-                  boxShadow: '0 10px 26px -10px rgba(162,102,255,0.55), inset 0 1px 0 rgba(255,255,255,0.15)',
+                  boxShadow: '0 10px 26px -10px rgba(162,102,255,0.55), inset 0 1px 0 #E4E9F0',
                   letterSpacing: '-0.01em',
                 }}>
                 {submittingPurchase ? (
@@ -715,9 +716,9 @@ export default function CreditsPage() {
 
             {/* Info de proceso */}
             <div className="flex items-start gap-2 p-3 rounded-xl"
-              style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
-              <Info className="w-3.5 h-3.5 mt-0.5 shrink-0" style={{ color: 'rgba(255,255,255,0.3)' }} />
-              <p className="text-[11px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.4)' }}>
+              style={{ background: '#F8FAFC', border: '1px solid #EEF2F7' }}>
+              <Info className="w-3.5 h-3.5 mt-0.5 shrink-0" style={{ color: '#6B7280' }} />
+              <p className="text-[11px] leading-relaxed" style={{ color: '#6B7280' }}>
                 {buyMethod === 'CRYPTO'
                   ? <>Enviá los <strong className="text-yellow-400">USDT-BEP20</strong> a la dirección, pegá el TX hash y dale verificar. Si la red ya confirmó (3 bloques) tu saldo se acredita al instante. Si todavía está confirmando, queda pendiente y se aprueba sola en 1-2 min.</>
                   : <>Realizá la transferencia, subí el comprobante y enviá la solicitud. El admin la verifica y acredita tu saldo. Generalmente toma menos de 24h.</>
@@ -728,6 +729,7 @@ export default function CreditsPage() {
         </div>
       )}
 
+    </div>
     </div>
   )
 }
