@@ -114,10 +114,10 @@ function CopyButton({ text }: { text: string }) {
         setCopied(true)
         setTimeout(() => setCopied(false), 2000)
       }}
-      className="p-1.5 rounded-lg hover:bg-white/10 transition-colors text-dark-400 hover:text-white"
+      className="p-1.5 rounded-lg hover:bg-[#EEF2F7] transition-colors text-[#6B7280] hover:text-[#111827]"
       title="Copiar"
     >
-      {copied ? <Check className="w-4 h-4 text-neon-green" /> : <Copy className="w-4 h-4" />}
+      {copied ? <Check className="w-4 h-4 text-[#16A34A]" /> : <Copy className="w-4 h-4" />}
     </button>
   )
 }
@@ -128,7 +128,7 @@ function Alert({ type, msg }: { type: 'error' | 'success'; msg: string }) {
     <div
       className={`flex items-center gap-2 px-4 py-3 rounded-xl text-sm fade-in ${type === 'error'
         ? 'bg-red-500/10 border border-red-500/20 text-red-400'
-        : 'bg-neon-green/10 border border-neon-green/20 text-neon-green'
+        : 'bg-[#16A34A]/10 border border-[#16A34A]/20 text-[#16A34A]'
         }`}
     >
       {type === 'error' ? <AlertCircle className="w-4 h-4 shrink-0" /> : <CheckCircle2 className="w-4 h-4 shrink-0" />}
@@ -138,7 +138,7 @@ function Alert({ type, msg }: { type: 'error' | 'success'; msg: string }) {
 }
 
 function Spinner({ color }: { color?: string }) {
-  return <Loader2 className={`w-4 h-4 animate-spin ${color ?? 'text-neon-green'}`} />
+  return <Loader2 className={`w-4 h-4 animate-spin ${color ?? 'text-[#16A34A]'}`} />
 }
 
 // ─── Create Bot Form ──────────────────────────────────────────────────────────
@@ -173,12 +173,12 @@ function CreateBotForm({ onCreated }: { onCreated: (bot: Bot, webhookUrl: string
 
   return (
     <form onSubmit={handleSubmit} className="rounded-2xl p-4"
-      style={{ background: 'radial-gradient(120% 80% at 50% -10%, rgba(34,183,255,0.12), rgba(255,255,255,0) 58%), radial-gradient(90% 70% at 100% 110%, rgba(123,91,255,0.12), rgba(255,255,255,0) 60%), linear-gradient(180deg, rgba(16,18,38,0.85), rgba(11,12,26,0.82))', border: '1px solid rgba(255,255,255,0.08)', boxShadow: '0 16px 36px -22px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.04)' }}>
+      style={{ background: 'radial-gradient(120% 80% at 50% -10%, rgba(34,183,255,0.12), rgba(255,255,255,0) 58%), radial-gradient(90% 70% at 100% 110%, rgba(123,91,255,0.12), rgba(255,255,255,0) 60%), linear-gradient(180deg, rgba(255,255,255,0.85), rgba(255,255,255,0.82))', border: '1px solid rgba(255,255,255,0.08)', boxShadow: '0 16px 36px -22px rgba(15,23,42,0.10), inset 0 1px 0 rgba(255,255,255,0.04)' }}>
       <div className="flex items-center gap-2 mb-3">
         <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: 'rgba(34,183,255,0.14)', border: '1px solid rgba(34,183,255,0.35)' }}>
           <Plus className="w-3.5 h-3.5" style={{ color: '#22B7FF' }} />
         </div>
-        <h3 className="text-sm font-bold text-white" style={{ letterSpacing: '-0.01em' }}>Crear nuevo agente</h3>
+        <h3 className="text-sm font-bold text-[#111827]" style={{ letterSpacing: '-0.01em' }}>Crear nuevo agente</h3>
       </div>
 
       {/* Tipo de bot — selector compacto */}
@@ -197,10 +197,10 @@ function CreateBotForm({ onCreated }: { onCreated: (bot: Bot, webhookUrl: string
                 border: `1px solid ${sel ? o.c + '66' : 'rgba(255,255,255,0.07)'}`,
                 boxShadow: sel ? `0 0 14px -4px ${o.c}66` : 'none',
               }}>
-              <o.icon className="w-4 h-4 shrink-0" style={{ color: sel ? o.c : 'rgba(255,255,255,0.4)' }} />
+              <o.icon className="w-4 h-4 shrink-0" style={{ color: sel ? o.c : '#6B7280' }} />
               <div className="min-w-0 text-left">
-                <div className="text-[11px] font-bold leading-tight" style={{ color: sel ? '#fff' : 'rgba(255,255,255,0.6)' }}>{o.label}</div>
-                <div className="text-[9px] truncate" style={{ color: 'rgba(255,255,255,0.3)' }}>{o.sub}</div>
+                <div className="text-[11px] font-bold leading-tight" style={{ color: sel ? '#fff' : '#6B7280' }}>{o.label}</div>
+                <div className="text-[9px] truncate" style={{ color: '#6B7280' }}>{o.sub}</div>
               </div>
             </button>
           )
@@ -213,7 +213,7 @@ function CreateBotForm({ onCreated }: { onCreated: (bot: Bot, webhookUrl: string
           value={name}
           onChange={e => setName(e.target.value)}
           placeholder="Nombre del agente (ej: Agente Ventas Bolivia)"
-          className="flex-1 rounded-xl px-4 py-2.5 text-sm text-white placeholder-dark-400 focus:outline-none transition-colors"
+          className="flex-1 rounded-xl px-4 py-2.5 text-sm text-[#111827] placeholder-[#9CA3AF] focus:outline-none transition-colors"
           style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}
           required
         />
@@ -222,7 +222,7 @@ function CreateBotForm({ onCreated }: { onCreated: (bot: Bot, webhookUrl: string
           disabled={loading || !name.trim()}
           className="w-full sm:w-auto px-5 py-2.5 font-bold rounded-xl text-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition-all duration-200 active:scale-[0.98]"
           style={{
-            background: 'linear-gradient(135deg, #00E58A, #16A34A)',
+            background: 'linear-gradient(135deg, #FF2D95 0%, #B735B8 48%, #233B8F 100%)',
             color: '#04231a',
             boxShadow: '0 10px 24px -10px rgba(0,229,138,0.55), inset 0 1px 0 rgba(255,255,255,0.28)',
           }}
@@ -336,7 +336,7 @@ function GlobalBotChart({ bots }: { bots: Bot[] }) {
   const yVals = [0, Math.round(maxVal / 2), maxVal]
 
   return (
-    <div className="rounded-2xl" style={{ padding: '14px 16px 10px', background: 'radial-gradient(120% 80% at 50% -10%, rgba(123,91,255,0.12), rgba(255,255,255,0) 58%), linear-gradient(180deg, rgba(17,19,40,0.85) 0%, rgba(10,11,24,0.8) 55%, rgba(14,16,34,0.74) 100%)', border: '1px solid rgba(255,255,255,0.08)', boxShadow: '0 18px 40px -22px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.04)' }}>
+    <div className="rounded-2xl" style={{ padding: '14px 16px 10px', background: 'radial-gradient(120% 80% at 50% -10%, rgba(123,91,255,0.12), rgba(255,255,255,0) 58%), linear-gradient(180deg, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.8) 55%, rgba(255,255,255,0.74) 100%)', border: '1px solid rgba(255,255,255,0.08)', boxShadow: '0 18px 40px -22px rgba(15,23,42,0.10), inset 0 1px 0 rgba(255,255,255,0.04)' }}>
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 8, flexWrap: 'wrap', gap: 8 }}>
         <div>
@@ -370,7 +370,7 @@ function GlobalBotChart({ bots }: { bots: Bot[] }) {
               style={{ padding: '4px 12px', borderRadius: 99, fontSize: 11, fontWeight: 600, cursor: 'pointer', border: '1px solid', transition: 'all 0.15s',
                 background: selectedBotId === b.id ? 'rgba(255,45,247,0.1)' : 'transparent',
                 borderColor: selectedBotId === b.id ? 'rgba(255,45,247,0.4)' : 'rgba(255,255,255,0.08)',
-                color: selectedBotId === b.id ? '#FF2DF7' : 'rgba(255,255,255,0.35)',
+                color: selectedBotId === b.id ? '#FF2DF7' : '#6B7280',
               }}>
               🤖 {b.name}
               {(b.salesCount ?? 0) > 0 && (
@@ -391,7 +391,7 @@ function GlobalBotChart({ bots }: { bots: Bot[] }) {
       {/* Chart */}
       {loadingChart ? (
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 60 }}>
-          <Loader2 className="w-5 h-5 animate-spin text-dark-400" />
+          <Loader2 className="w-5 h-5 animate-spin text-[#6B7280]" />
         </div>
       ) : (
         <div
@@ -449,7 +449,7 @@ function GlobalBotChart({ bots }: { bots: Bot[] }) {
             return (
               <g key={i}>
                 <line x1={padL} y1={y} x2={W - padR} y2={y}
-                  stroke="rgba(255,255,255,0.05)" strokeWidth="1"
+                  stroke="#F0F3F7" strokeWidth="1"
                   strokeDasharray={i === 0 ? undefined : '3 7'} />
                 <text x={padL - 6} y={y + 4} textAnchor="end"
                   fontSize="8" fill="rgba(255,255,255,0.18)" fontFamily="monospace">{v}</text>
@@ -463,7 +463,7 @@ function GlobalBotChart({ bots }: { bots: Bot[] }) {
           {convArea  && <path d={convArea}  fill="url(#gc-conv-area)" />}
           {convLine  && <path d={convLine}  fill="none" stroke="url(#gc-conv-line)"  strokeWidth="1.4" strokeLinejoin="round" strokeLinecap="round" filter="url(#gc-glow-conv)" />}
           {convPoints.map((p, i) => p.val === 0 ? null : (
-            <circle key={i} cx={p.x} cy={p.y} r="2.5" fill="#0D1E79" stroke="rgba(0,0,0,0.7)" strokeWidth="1.5" />
+            <circle key={i} cx={p.x} cy={p.y} r="2.5" fill="#0D1E79" stroke="rgba(15,23,42,0.10)" strokeWidth="1.5" />
           ))}
 
           {/* ── Ventas (green) con badges ── */}
@@ -477,7 +477,7 @@ function GlobalBotChart({ bots }: { bots: Bot[] }) {
                 <rect x={p.x - 11} y={p.y - 30} width="22" height="15" rx="5" fill="#7B5BFF" opacity="0.92" />
                 <text x={p.x} y={p.y - 19} textAnchor="middle" fontSize="8" fontWeight="800" fill="#fff">{p.val}</text>
                 <line x1={p.x} y1={p.y - 15} x2={p.x} y2={p.y - 5} stroke="#7B5BFF" strokeWidth="1" opacity="0.4" />
-                <circle cx={p.x} cy={p.y} r="4" fill="#7B5BFF" stroke="rgba(0,0,0,0.7)" strokeWidth="1.5" />
+                <circle cx={p.x} cy={p.y} r="4" fill="#7B5BFF" stroke="rgba(15,23,42,0.10)" strokeWidth="1.5" />
                 <circle cx={p.x} cy={p.y} r="2" fill="#fff" opacity="0.5" />
               </g>
             )
@@ -568,13 +568,13 @@ function GlobalBotChart({ bots }: { bots: Bot[] }) {
                 )}
                 <button
                   onClick={() => setShowSalesModal(false)}
-                  style={{ background: 'rgba(255,255,255,0.06)', border: 'none', borderRadius: 8, padding: '3px 8px', color: 'rgba(255,255,255,0.5)', cursor: 'pointer', fontSize: 11 }}
+                  style={{ background: 'rgba(255,255,255,0.06)', border: 'none', borderRadius: 8, padding: '3px 8px', color: '#6B7280', cursor: 'pointer', fontSize: 11 }}
                 >✕</button>
               </div>
             </div>
 
             {recentSales.length === 0 ? (
-              <div style={{ textAlign: 'center', color: 'rgba(255,255,255,0.3)', fontSize: 11, padding: '28px 0' }}>
+              <div style={{ textAlign: 'center', color: '#6B7280', fontSize: 11, padding: '28px 0' }}>
                 No hay ventas registradas aún
               </div>
             ) : (
@@ -589,7 +589,7 @@ function GlobalBotChart({ bots }: { bots: Bot[] }) {
                       <span style={{ fontSize: 12, fontWeight: 700, color: '#fff', wordBreak: 'break-word' }}>
                         {s.userName || 'Sin nombre'}
                       </span>
-                      <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.3)', flexShrink: 0 }}>
+                      <span style={{ fontSize: 9, color: '#6B7280', flexShrink: 0 }}>
                         {s.soldAt ? new Date(s.soldAt).toLocaleDateString('es-BO', { day: '2-digit', month: 'short', year: 'numeric', timeZone: 'America/La_Paz' }) : '—'}
                       </span>
                     </div>
@@ -606,7 +606,7 @@ function GlobalBotChart({ bots }: { bots: Bot[] }) {
                     {/* Reporte — ancho completo */}
                     {s.reporte && (
                       <div style={{
-                        fontSize: 11, color: 'rgba(255,255,255,0.6)',
+                        fontSize: 11, color: '#6B7280',
                         background: 'rgba(0,0,0,0.25)', borderRadius: 8,
                         padding: '7px 10px', lineHeight: 1.6,
                         borderLeft: '2px solid rgba(123,91,255,0.3)',
@@ -646,9 +646,9 @@ function BotCard({ bot, onSelect }: { bot: Bot; onSelect: (bot: Bot) => void }) 
         marginTop: 30,
         borderRadius: 18,
         background: isActive
-          ? `radial-gradient(120% 80% at 50% -6%, ${accent}1f, rgba(255,255,255,0) 56%), radial-gradient(95% 75% at 100% 108%, rgba(123,91,255,0.16), rgba(255,255,255,0) 60%), linear-gradient(180deg, rgba(16,18,38,0.92) 0%, rgba(10,11,26,0.88) 100%)`
+          ? `radial-gradient(120% 80% at 50% -6%, ${accent}1f, rgba(255,255,255,0) 56%), radial-gradient(95% 75% at 100% 108%, rgba(123,91,255,0.16), rgba(255,255,255,0) 60%), linear-gradient(180deg, rgba(255,255,255,0.92) 0%, rgba(10,11,26,0.88) 100%)`
           : 'linear-gradient(180deg, rgba(20,20,32,0.85), rgba(14,14,24,0.85))',
-        border: `1px solid ${isActive ? 'rgba(255,255,255,0.09)' : 'rgba(255,255,255,0.05)'}`,
+        border: `1px solid ${isActive ? 'rgba(255,255,255,0.09)' : '#F0F3F7'}`,
         boxShadow: isActive ? '0 18px 38px -22px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.045)' : 'none',
         opacity: isActive ? 1 : 0.62,
       }}
@@ -684,7 +684,7 @@ function BotCard({ bot, onSelect }: { bot: Bot; onSelect: (bot: Bot) => void }) 
           backgroundSize: '30px 30px', maskImage: 'radial-gradient(ellipse at 50% 0%, #000 28%, transparent 74%)', WebkitMaskImage: 'radial-gradient(ellipse at 50% 0%, #000 28%, transparent 74%)',
         }} />
         {/* reflejo glass diagonal */}
-        <div className="absolute inset-0" style={{ background: 'linear-gradient(152deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0) 34%)' }} />
+        <div className="absolute inset-0" style={{ background: 'linear-gradient(152deg, #F0F3F7 0%, rgba(255,255,255,0) 34%)' }} />
         {/* línea superior premium */}
         <div className="absolute top-0 left-5 right-5 h-px" style={{ background: `linear-gradient(90deg, transparent, ${isActive ? accent + '99' : 'rgba(255,255,255,0.10)'}, transparent)` }} />
       </div>
@@ -700,7 +700,7 @@ function BotCard({ bot, onSelect }: { bot: Bot; onSelect: (bot: Bot) => void }) 
           <div className="svc-glow-pulse absolute inset-0 rounded-full pointer-events-none" style={{ background: `radial-gradient(circle, ${accent}40, transparent 70%)`, filter: 'blur(9px)' }} />
           <div className="relative w-[60px] h-[60px] rounded-full overflow-hidden flex items-center justify-center"
             style={{
-              background: `linear-gradient(155deg, rgba(255,255,255,0.14), rgba(255,255,255,0.02)), rgba(18,15,32,0.72)`,
+              background: `linear-gradient(155deg, rgba(255,255,255,0.14), rgba(255,255,255,0.02)), rgba(255,255,255,0.72)`,
               border: `1px solid ${accent}66`,
               boxShadow: `0 16px 32px -10px rgba(0,0,0,0.75), 0 0 18px -3px ${accent}55, inset 0 1px 0 rgba(255,255,255,0.14)`,
             }}>
@@ -722,7 +722,7 @@ function BotCard({ bot, onSelect }: { bot: Bot; onSelect: (bot: Bot) => void }) 
 
       <div className="relative z-10 px-5 pb-5" style={{ paddingTop: 42 }}>
         {/* nombre centrado */}
-        <div className="text-center font-bold text-white text-[15px] leading-tight truncate px-2"
+        <div className="text-center font-bold text-[#111827] text-[15px] leading-tight truncate px-2"
           style={{ letterSpacing: '-0.02em', textShadow: '0 1px 14px rgba(0,0,0,0.45)' }}>
           {bot.name}
         </div>
@@ -744,7 +744,7 @@ function BotCard({ bot, onSelect }: { bot: Bot; onSelect: (bot: Bot) => void }) 
               </span>
             )
           })()}
-          <span className="text-[8.5px] font-medium uppercase tracking-[0.1em] truncate" style={{ color: 'rgba(255,255,255,0.3)' }}>{channel}</span>
+          <span className="text-[8.5px] font-medium uppercase tracking-[0.1em] truncate" style={{ color: '#6B7280' }}>{channel}</span>
         </div>
 
         {/* mini stats — strip alineado abajo */}
@@ -759,7 +759,7 @@ function BotCard({ bot, onSelect }: { bot: Bot; onSelect: (bot: Bot) => void }) 
               style={idx < stats.length - 1 ? { borderRight: '1px solid rgba(255,255,255,0.06)' } : undefined}>
               <div className="flex items-center gap-1.5">
                 <st.icon className="w-3 h-3 shrink-0" style={{ color: isActive ? accent : 'rgba(255,255,255,0.28)' }} />
-                <span className="text-sm font-bold text-white leading-none" style={{ letterSpacing: '-0.02em' }}>{st.value}</span>
+                <span className="text-sm font-bold text-[#111827] leading-none" style={{ letterSpacing: '-0.02em' }}>{st.value}</span>
               </div>
               <span className="text-[8px] uppercase tracking-[0.1em]" style={{ color: 'rgba(255,255,255,0.34)' }}>{st.label}</span>
             </div>
@@ -799,24 +799,24 @@ function WebhookTab({ bot }: { bot: Bot }) {
 
   return (
     <div className="space-y-6">
-      <div className="glass-panel p-6 rounded-2xl border border-neon-blue/20">
-        <h3 className="text-sm font-bold text-white mb-1 flex items-center gap-2">
-          <Webhook className="w-4 h-4 text-neon-blue" />
+      <div className="dm-card p-6 rounded-2xl border border-[#233B8F]/20">
+        <h3 className="text-sm font-bold text-[#111827] mb-1 flex items-center gap-2">
+          <Webhook className="w-4 h-4 text-[#233B8F]" />
           URL del Webhook
         </h3>
-        <p className="text-xs text-dark-400 mb-4">
+        <p className="text-xs text-[#6B7280] mb-4">
           {isMeta
             ? 'Configura esta URL en developers.facebook.com → tu App → Messenger → Webhooks. El Verify Token es el de abajo.'
             : 'Configura esta URL en tu panel de YCloud como Webhook URL para mensajes entrantes.'}
         </p>
-        <div className="bg-dark-900/70 border border-white/5 rounded-xl p-3 flex items-center gap-2">
-          <code className="flex-1 text-xs text-neon-blue break-all font-mono">{webhookUrl}</code>
+        <div className="bg-white/70 border border-[#E4E9F0] rounded-xl p-3 flex items-center gap-2">
+          <code className="flex-1 text-xs text-[#233B8F] break-all font-mono">{webhookUrl}</code>
           <CopyButton text={webhookUrl} />
         </div>
         {isMeta && (
           <div className="mt-3">
-            <p className="text-xs text-dark-400 mb-2">Verify Token (pégalo en Meta al configurar el webhook):</p>
-            <div className="bg-dark-900/70 border border-white/5 rounded-xl p-3 flex items-center gap-2">
+            <p className="text-xs text-[#6B7280] mb-2">Verify Token (pégalo en Meta al configurar el webhook):</p>
+            <div className="bg-white/70 border border-[#E4E9F0] rounded-xl p-3 flex items-center gap-2">
               <code className="flex-1 text-xs text-purple-400 break-all font-mono">{bot.webhookToken}</code>
               <CopyButton text={bot.webhookToken} />
             </div>
@@ -825,17 +825,17 @@ function WebhookTab({ bot }: { bot: Bot }) {
       </div>
 
       {!isMeta && (
-        <div className="glass-panel p-6 rounded-2xl">
-          <h3 className="text-sm font-bold text-white mb-1 flex items-center gap-2">
-            <Key className="w-4 h-4 text-neon-purple" />
+        <div className="dm-card p-6 rounded-2xl">
+          <h3 className="text-sm font-bold text-[#111827] mb-1 flex items-center gap-2">
+            <Key className="w-4 h-4 text-[#B735B8]" />
             Webhook Token (secreto)
           </h3>
-          <p className="text-xs text-dark-400 mb-4">
+          <p className="text-xs text-[#6B7280] mb-4">
             Este token valida que el webhook viene de YCloud. Ya está incluido en la URL anterior como{' '}
-            <code className="text-neon-purple">?token=...</code>
+            <code className="text-[#B735B8]">?token=...</code>
           </p>
-          <div className="bg-dark-900/70 border border-white/5 rounded-xl p-3 flex items-center gap-2">
-            <code className="flex-1 text-xs text-dark-300 font-mono truncate">
+          <div className="bg-white/70 border border-[#E4E9F0] rounded-xl p-3 flex items-center gap-2">
+            <code className="flex-1 text-xs text-[#374151] font-mono truncate">
               {bot.webhookToken.slice(0, 8)}{'*'.repeat(20)}{bot.webhookToken.slice(-4)}
             </code>
             <CopyButton text={bot.webhookToken} />
@@ -843,10 +843,10 @@ function WebhookTab({ bot }: { bot: Bot }) {
         </div>
       )}
 
-      <div className="glass-panel p-6 rounded-2xl border border-white/5">
+      <div className="dm-card p-6 rounded-2xl border border-[#E4E9F0]">
         {isMeta ? (
           <>
-            <h3 className="text-sm font-bold text-white mb-3 flex items-center gap-2">
+            <h3 className="text-sm font-bold text-[#111827] mb-3 flex items-center gap-2">
               <span className="text-base">💬</span> Pasos de configuración en Meta (Facebook Messenger)
             </h3>
             <ol className="space-y-3">
@@ -861,7 +861,7 @@ function WebhookTab({ bot }: { bot: Bot }) {
                 'En "Tokens de acceso" genera el token para tu Página y guárdalo en Credenciales',
                 'Envía un mensaje de prueba a tu Página de Facebook',
               ].map((step, i) => (
-                <li key={i} className="flex gap-3 text-sm text-dark-300">
+                <li key={i} className="flex gap-3 text-sm text-[#374151]">
                   <span className="w-5 h-5 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-400 text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">
                     {i + 1}
                   </span>
@@ -872,7 +872,7 @@ function WebhookTab({ bot }: { bot: Bot }) {
           </>
         ) : (
           <>
-            <h3 className="text-sm font-bold text-white mb-3">Pasos de configuración en YCloud</h3>
+            <h3 className="text-sm font-bold text-[#111827] mb-3">Pasos de configuración en YCloud</h3>
             <ol className="space-y-3">
               {[
                 'Inicia sesión en https://app.ycloud.com',
@@ -882,8 +882,8 @@ function WebhookTab({ bot }: { bot: Bot }) {
                 'Guarda la configuración',
                 'Envía un mensaje de prueba al número configurado',
               ].map((step, i) => (
-                <li key={i} className="flex gap-3 text-sm text-dark-300">
-                  <span className="w-5 h-5 rounded-full bg-neon-blue/10 border border-neon-blue/20 text-neon-blue text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">
+                <li key={i} className="flex gap-3 text-sm text-[#374151]">
+                  <span className="w-5 h-5 rounded-full bg-[#233B8F]/10 border border-[#233B8F]/20 text-[#233B8F] text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">
                     {i + 1}
                   </span>
                   {step}
@@ -895,12 +895,12 @@ function WebhookTab({ bot }: { bot: Bot }) {
       </div>
 
       {/* ── Zona de riesgo ── */}
-      <div className="glass-panel p-6 rounded-2xl border border-red-500/20">
+      <div className="dm-card p-6 rounded-2xl border border-red-500/20">
         <h3 className="text-sm font-bold text-red-400 flex items-center gap-2 mb-1">
           <Trash2 className="w-4 h-4" />
           Zona de riesgo
         </h3>
-        <p className="text-xs text-dark-400 mb-4">
+        <p className="text-xs text-[#6B7280] mb-4">
           Elimina permanentemente todo el historial de conversaciones y mensajes de este bot.
           Los productos y la configuración no se verán afectados.
         </p>
@@ -998,10 +998,10 @@ function CredentialsTab({ bot, onStatusChange }: { bot: Bot; onStatusChange: (st
   return (
     <div className="space-y-6">
       {/* Status toggle */}
-      <div className="glass-panel p-5 rounded-2xl flex items-center justify-between gap-3">
+      <div className="dm-card p-5 rounded-2xl flex items-center justify-between gap-3">
         <div className="min-w-0">
-          <div className="text-sm font-bold text-white">Estado del Agente</div>
-          <div className="text-xs text-dark-400 mt-0.5 truncate">
+          <div className="text-sm font-bold text-[#111827]">Estado del Agente</div>
+          <div className="text-xs text-[#6B7280] mt-0.5 truncate">
             {bot.status === 'ACTIVE' ? 'El bot está respondiendo mensajes' : 'El bot está pausado'}
           </div>
         </div>
@@ -1013,20 +1013,20 @@ function CredentialsTab({ bot, onStatusChange }: { bot: Bot; onStatusChange: (st
           {savingStatus ? (
             <Spinner />
           ) : bot.status === 'ACTIVE' ? (
-            <ToggleRight className="w-8 h-8 text-neon-green" />
+            <ToggleRight className="w-8 h-8 text-[#16A34A]" />
           ) : (
-            <ToggleLeft className="w-8 h-8 text-dark-500" />
+            <ToggleLeft className="w-8 h-8 text-[#9CA3AF]" />
           )}
-          <span className={bot.status === 'ACTIVE' ? 'text-neon-green' : 'text-dark-400'}>
+          <span className={bot.status === 'ACTIVE' ? 'text-[#16A34A]' : 'text-[#6B7280]'}>
             {bot.status === 'ACTIVE' ? 'Activo' : 'Pausado'}
           </span>
         </button>
       </div>
 
       {/* Credentials form */}
-      <form onSubmit={handleSave} className="glass-panel p-6 rounded-2xl space-y-5">
-        <h3 className="text-sm font-bold text-white flex items-center gap-2">
-          <Key className="w-4 h-4 text-neon-purple" />
+      <form onSubmit={handleSave} className="dm-card p-6 rounded-2xl space-y-5">
+        <h3 className="text-sm font-bold text-[#111827] flex items-center gap-2">
+          <Key className="w-4 h-4 text-[#B735B8]" />
           Claves de API
         </h3>
 
@@ -1035,10 +1035,10 @@ function CredentialsTab({ bot, onStatusChange }: { bot: Bot; onStatusChange: (st
         {/* YCloud API Key — solo para bots YCloud */}
         {!isBaileys && !isMeta && (
           <div>
-            <label className="block text-xs font-medium text-dark-300 mb-1.5">
+            <label className="block text-xs font-medium text-[#374151] mb-1.5">
               YCloud API Key{' '}
               {creds?.hasYcloudKey && (
-                <span className="text-neon-green ml-1">✓ configurada</span>
+                <span className="text-[#16A34A] ml-1">✓ configurada</span>
               )}
             </label>
             <div className="relative">
@@ -1047,12 +1047,12 @@ function CredentialsTab({ bot, onStatusChange }: { bot: Bot; onStatusChange: (st
                 value={form.ycloudApiKey}
                 onChange={e => setForm(f => ({ ...f, ycloudApiKey: e.target.value }))}
                 placeholder={creds?.hasYcloudKey ? '(dejar vacío para mantener)' : 'yk_live_...'}
-                className="w-full bg-dark-900/50 border border-white/10 rounded-xl px-4 py-2.5 pr-10 text-sm text-white placeholder-dark-500 focus:outline-none focus:border-neon-purple/40"
+                className="w-full bg-[#F4F6FA]0 border border-[#E4E9F0] rounded-xl px-4 py-2.5 pr-10 text-sm text-[#111827] placeholder-dark-500 focus:outline-none focus:border-[#B735B8]/40"
               />
               <button
                 type="button"
                 onClick={() => setShowYcloud(s => !s)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-dark-400 hover:text-white"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#6B7280] hover:text-[#111827]"
               >
                 {showYcloud ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
@@ -1063,10 +1063,10 @@ function CredentialsTab({ bot, onStatusChange }: { bot: Bot; onStatusChange: (st
         {/* Meta Page Access Token — solo para bots META */}
         {isMeta && (
           <div>
-            <label className="block text-xs font-medium text-dark-300 mb-1.5">
+            <label className="block text-xs font-medium text-[#374151] mb-1.5">
               Meta Page Access Token{' '}
               {creds?.hasMetaToken && (
-                <span className="text-neon-green ml-1">✓ configurado ({creds.metaPageTokenHint})</span>
+                <span className="text-[#16A34A] ml-1">✓ configurado ({creds.metaPageTokenHint})</span>
               )}
             </label>
             <div className="relative">
@@ -1075,26 +1075,26 @@ function CredentialsTab({ bot, onStatusChange }: { bot: Bot; onStatusChange: (st
                 value={form.metaPageToken}
                 onChange={e => setForm(f => ({ ...f, metaPageToken: e.target.value }))}
                 placeholder={creds?.hasMetaToken ? '(dejar vacío para mantener)' : 'EAAxxxxxxx...'}
-                className="w-full bg-dark-900/50 border border-white/10 rounded-xl px-4 py-2.5 pr-10 text-sm text-white placeholder-dark-500 focus:outline-none focus:border-purple-400/40"
+                className="w-full bg-[#F4F6FA]0 border border-[#E4E9F0] rounded-xl px-4 py-2.5 pr-10 text-sm text-[#111827] placeholder-dark-500 focus:outline-none focus:border-purple-400/40"
               />
               <button
                 type="button"
                 onClick={() => setShowMeta(s => !s)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-dark-400 hover:text-white"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#6B7280] hover:text-[#111827]"
               >
                 {showMeta ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
             </div>
-            <p className="text-xs text-dark-500 mt-1">Obtén el token permanente desde developers.facebook.com → tu App → Messenger → Tokens de acceso.</p>
+            <p className="text-xs text-[#9CA3AF] mt-1">Obtén el token permanente desde developers.facebook.com → tu App → Messenger → Tokens de acceso.</p>
           </div>
         )}
 
         {/* OpenAI API Key */}
         <div>
-          <label className="block text-xs font-medium text-dark-300 mb-1.5">
+          <label className="block text-xs font-medium text-[#374151] mb-1.5">
             OpenAI API Key{' '}
             {creds?.hasOpenAIKey && (
-              <span className="text-neon-green ml-1">✓ configurada</span>
+              <span className="text-[#16A34A] ml-1">✓ configurada</span>
             )}
           </label>
           <div className="relative">
@@ -1103,12 +1103,12 @@ function CredentialsTab({ bot, onStatusChange }: { bot: Bot; onStatusChange: (st
               value={form.openaiApiKey}
               onChange={e => setForm(f => ({ ...f, openaiApiKey: e.target.value }))}
               placeholder={creds?.hasOpenAIKey ? '(dejar vacío para mantener)' : 'sk-proj-...'}
-              className="w-full bg-dark-900/50 border border-white/10 rounded-xl px-4 py-2.5 pr-10 text-sm text-white placeholder-dark-500 focus:outline-none focus:border-neon-purple/40"
+              className="w-full bg-[#F4F6FA]0 border border-[#E4E9F0] rounded-xl px-4 py-2.5 pr-10 text-sm text-[#111827] placeholder-dark-500 focus:outline-none focus:border-[#B735B8]/40"
             />
             <button
               type="button"
               onClick={() => setShowOpenai(s => !s)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-dark-400 hover:text-white"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-[#6B7280] hover:text-[#111827]"
             >
               {showOpenai ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
             </button>
@@ -1118,14 +1118,14 @@ function CredentialsTab({ bot, onStatusChange }: { bot: Bot; onStatusChange: (st
         {/* WhatsApp number — solo para bots YCloud */}
         {!isBaileys && !isMeta && (
           <div>
-            <label className="block text-xs font-medium text-dark-300 mb-1.5">
+            <label className="block text-xs font-medium text-[#374151] mb-1.5">
               Número WhatsApp Business (from)
             </label>
             <input
               value={form.whatsappInstanceNumber}
               onChange={e => setForm(f => ({ ...f, whatsappInstanceNumber: e.target.value }))}
               placeholder="15551234567 (sin + ni espacios)"
-              className="w-full bg-dark-900/50 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white placeholder-dark-500 focus:outline-none focus:border-neon-purple/40"
+              className="w-full bg-[#F4F6FA]0 border border-[#E4E9F0] rounded-xl px-4 py-2.5 text-sm text-[#111827] placeholder-dark-500 focus:outline-none focus:border-[#B735B8]/40"
             />
           </div>
         )}
@@ -1133,17 +1133,17 @@ function CredentialsTab({ bot, onStatusChange }: { bot: Bot; onStatusChange: (st
         {/* Report phone — solo para bots WhatsApp (YCLOUD y BAILEYS) */}
         {!isMeta && (
           <div>
-            <label className="block text-xs font-medium text-dark-300 mb-1.5">
+            <label className="block text-xs font-medium text-[#374151] mb-1.5">
               Número interno para reportes
             </label>
             <input
               value={form.reportPhone}
               onChange={e => setForm(f => ({ ...f, reportPhone: e.target.value }))}
               placeholder="15559876543"
-              className="w-full bg-dark-900/50 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white placeholder-dark-500 focus:outline-none focus:border-neon-purple/40"
+              className="w-full bg-[#F4F6FA]0 border border-[#E4E9F0] rounded-xl px-4 py-2.5 text-sm text-[#111827] placeholder-dark-500 focus:outline-none focus:border-[#B735B8]/40"
               required
             />
-            <p className="text-xs text-dark-500 mt-1">
+            <p className="text-xs text-[#9CA3AF] mt-1">
               Cuando un cliente confirme su pedido, el agente enviará un reporte a este número por WhatsApp.
             </p>
           </div>
@@ -1152,7 +1152,7 @@ function CredentialsTab({ bot, onStatusChange }: { bot: Bot; onStatusChange: (st
         <button
           type="submit"
           disabled={loading}
-          className="w-full py-3 bg-neon-purple text-white font-bold rounded-xl hover:bg-neon-purple/90 disabled:opacity-50 flex items-center justify-center gap-2 transition-colors"
+          className="w-full py-3 bg-[#B735B8] text-white font-bold rounded-xl hover:bg-[#B735B8]/90 disabled:opacity-50 flex items-center justify-center gap-2 transition-colors"
         >
           {loading ? <Spinner /> : <Save className="w-4 h-4" />}
           Guardar credenciales
@@ -1160,20 +1160,20 @@ function CredentialsTab({ bot, onStatusChange }: { bot: Bot; onStatusChange: (st
       </form>
 
       {/* Model selector */}
-      <div className="glass-panel p-6 rounded-2xl space-y-4">
-        <h3 className="text-sm font-bold text-white flex items-center gap-2">
-          <Zap className="w-4 h-4 text-neon-green" />
+      <div className="dm-card p-6 rounded-2xl space-y-4">
+        <h3 className="text-sm font-bold text-[#111827] flex items-center gap-2">
+          <Zap className="w-4 h-4 text-[#16A34A]" />
           Modelo de IA
-          <span className="text-xs font-normal text-dark-400 ml-1">— para respuestas al cliente</span>
+          <span className="text-xs font-normal text-[#6B7280] ml-1">— para respuestas al cliente</span>
         </h3>
-        <p className="text-xs text-dark-500">Los seguimientos automáticos siempre usan GPT-4o Mini (más económico).</p>
+        <p className="text-xs text-[#9CA3AF]">Los seguimientos automáticos siempre usan GPT-4o Mini (más económico).</p>
 
         <div className="space-y-2">
           {[
-            { id: 'gpt-5.2',     label: 'GPT-5.2',     desc: 'Último modelo · Máxima capacidad', color: 'text-neon-purple' },
-            { id: 'gpt-5.1',     label: 'GPT-5.1',     desc: 'Más inteligente · Mayor costo',    color: 'text-neon-purple' },
-            { id: 'gpt-4o',      label: 'GPT-4o',       desc: 'Equilibrado · Costo moderado',     color: 'text-neon-blue' },
-            { id: 'gpt-4o-mini', label: 'GPT-4o Mini',  desc: 'Más económico · Muy capaz',        color: 'text-neon-green' },
+            { id: 'gpt-5.2',     label: 'GPT-5.2',     desc: 'Último modelo · Máxima capacidad', color: 'text-[#B735B8]' },
+            { id: 'gpt-5.1',     label: 'GPT-5.1',     desc: 'Más inteligente · Mayor costo',    color: 'text-[#B735B8]' },
+            { id: 'gpt-4o',      label: 'GPT-4o',       desc: 'Equilibrado · Costo moderado',     color: 'text-[#233B8F]' },
+            { id: 'gpt-4o-mini', label: 'GPT-4o Mini',  desc: 'Más económico · Muy capaz',        color: 'text-[#16A34A]' },
           ].map(m => (
             <button
               key={m.id}
@@ -1181,15 +1181,15 @@ function CredentialsTab({ bot, onStatusChange }: { bot: Bot; onStatusChange: (st
               onClick={() => setSelectedModel(m.id)}
               className={`w-full flex items-center justify-between px-4 py-3 rounded-xl border transition-all text-left ${
                 selectedModel === m.id
-                  ? 'border-neon-purple/60 bg-neon-purple/10'
-                  : 'border-white/10 bg-dark-900/30 hover:border-white/20'
+                  ? 'border-[#B735B8]/60 bg-[#B735B8]/10'
+                  : 'border-[#E4E9F0] bg-white/30 hover:border-[#E4E9F0]'
               }`}
             >
               <div>
-                <span className={`text-sm font-semibold ${selectedModel === m.id ? m.color : 'text-white'}`}>{m.label}</span>
-                <p className="text-xs text-dark-400 mt-0.5">{m.desc}</p>
+                <span className={`text-sm font-semibold ${selectedModel === m.id ? m.color : 'text-[#111827]'}`}>{m.label}</span>
+                <p className="text-xs text-[#6B7280] mt-0.5">{m.desc}</p>
               </div>
-              {selectedModel === m.id && <CheckCircle2 className="w-4 h-4 text-neon-purple shrink-0" />}
+              {selectedModel === m.id && <CheckCircle2 className="w-4 h-4 text-[#B735B8] shrink-0" />}
             </button>
           ))}
         </div>
@@ -1208,7 +1208,7 @@ function CredentialsTab({ bot, onStatusChange }: { bot: Bot; onStatusChange: (st
               setSavingModel(false)
             }
           }}
-          className="w-full py-2.5 bg-dark-800 border border-white/10 text-white text-sm font-semibold rounded-xl hover:border-neon-green/40 disabled:opacity-50 flex items-center justify-center gap-2 transition-colors"
+          className="w-full py-2.5 bg-[#F8FAFC] border border-[#E4E9F0] text-[#111827] text-sm font-semibold rounded-xl hover:border-[#16A34A]/40 disabled:opacity-50 flex items-center justify-center gap-2 transition-colors"
         >
           {savingModel ? <Spinner /> : <Save className="w-4 h-4" />}
           Guardar modelo
@@ -1253,36 +1253,36 @@ function VoiceCard({ bot }: { bot: Bot }) {
   }
 
   return (
-    <div className="glass-panel p-6 rounded-2xl space-y-4">
+    <div className="dm-card p-6 rounded-2xl space-y-4">
       {msg && (
-        <div className={`text-xs px-3 py-2 rounded-lg border ${msg.type === 'success' ? 'border-neon-green/40 bg-neon-green/10 text-neon-green' : 'border-red-500/40 bg-red-500/10 text-red-300'}`}>
+        <div className={`text-xs px-3 py-2 rounded-lg border ${msg.type === 'success' ? 'border-[#16A34A]/40 bg-[#16A34A]/10 text-[#16A34A]' : 'border-red-500/40 bg-red-500/10 text-red-300'}`}>
           {msg.text}
         </div>
       )}
-      <h3 className="text-sm font-bold text-white flex items-center gap-2">
-        <Volume2 className="w-4 h-4 text-neon-blue" />
+      <h3 className="text-sm font-bold text-[#111827] flex items-center gap-2">
+        <Volume2 className="w-4 h-4 text-[#233B8F]" />
         Voz del agente
-        <span className="text-xs font-normal text-dark-400 ml-1">— responde con notas de voz</span>
+        <span className="text-xs font-normal text-[#6B7280] ml-1">— responde con notas de voz</span>
       </h3>
 
       <button
         type="button"
         onClick={() => setVoiceEnabled(v => !v)}
-        className="w-full flex items-center justify-between px-4 py-3 rounded-xl border border-white/10 bg-dark-900/30 text-left"
+        className="w-full flex items-center justify-between px-4 py-3 rounded-xl border border-[#E4E9F0] bg-white/30 text-left"
       >
         <div>
-          <span className="text-sm font-semibold text-white">Activar voz</span>
-          <p className="text-xs text-dark-400 mt-0.5">Notas de voz reales con IA (voces en español).</p>
+          <span className="text-sm font-semibold text-[#111827]">Activar voz</span>
+          <p className="text-xs text-[#6B7280] mt-0.5">Notas de voz reales con IA (voces en español).</p>
         </div>
         {voiceEnabled
-          ? <ToggleRight className="w-7 h-7 text-neon-blue shrink-0" />
-          : <ToggleLeft className="w-7 h-7 text-dark-400 shrink-0" />}
+          ? <ToggleRight className="w-7 h-7 text-[#233B8F] shrink-0" />
+          : <ToggleLeft className="w-7 h-7 text-[#6B7280] shrink-0" />}
       </button>
 
       {voiceEnabled && (
         <>
           <div className="space-y-2">
-            <p className="text-xs font-semibold text-dark-400">¿Cuándo responde con voz?</p>
+            <p className="text-xs font-semibold text-[#6B7280]">¿Cuándo responde con voz?</p>
             {[
               { id: 'audio_in', label: 'Solo si el cliente manda audio', desc: 'Recomendado · natural y ahorra costo' },
               { id: 'always',   label: 'Siempre con voz',                 desc: 'Cada respuesta también en nota de voz' },
@@ -1292,34 +1292,34 @@ function VoiceCard({ bot }: { bot: Bot }) {
                 type="button"
                 onClick={() => setVoiceMode(m.id)}
                 className={`w-full flex items-center justify-between px-4 py-2.5 rounded-xl border text-left transition-all ${
-                  voiceMode === m.id ? 'border-neon-blue/60 bg-neon-blue/10' : 'border-white/10 bg-dark-900/30 hover:border-white/20'
+                  voiceMode === m.id ? 'border-[#233B8F]/60 bg-[#233B8F]/10' : 'border-[#E4E9F0] bg-white/30 hover:border-[#E4E9F0]'
                 }`}
               >
                 <div>
-                  <span className={`text-sm font-semibold ${voiceMode === m.id ? 'text-neon-blue' : 'text-white'}`}>{m.label}</span>
-                  <p className="text-xs text-dark-400 mt-0.5">{m.desc}</p>
+                  <span className={`text-sm font-semibold ${voiceMode === m.id ? 'text-[#233B8F]' : 'text-[#111827]'}`}>{m.label}</span>
+                  <p className="text-xs text-[#6B7280] mt-0.5">{m.desc}</p>
                 </div>
-                {voiceMode === m.id && <CheckCircle2 className="w-4 h-4 text-neon-blue shrink-0" />}
+                {voiceMode === m.id && <CheckCircle2 className="w-4 h-4 text-[#233B8F] shrink-0" />}
               </button>
             ))}
           </div>
 
           <div className="space-y-2">
-            <p className="text-xs font-semibold text-dark-400">Elige la voz <span className="text-dark-500">(▶ escuchar · ⏸ tocá de nuevo para detener)</span></p>
+            <p className="text-xs font-semibold text-[#6B7280]">Elige la voz <span className="text-[#9CA3AF]">(▶ escuchar · ⏸ tocá de nuevo para detener)</span></p>
             {BOT_VOICES.map(v => (
               <div
                 key={v.id}
                 className={`w-full flex items-center justify-between px-4 py-2.5 rounded-xl border transition-all ${
-                  voiceId === v.id ? 'border-neon-blue/60 bg-neon-blue/10' : 'border-white/10 bg-dark-900/30'
-                } ${playingVoice === v.id ? 'ring-1 ring-neon-blue/50' : ''}`}
+                  voiceId === v.id ? 'border-[#233B8F]/60 bg-[#233B8F]/10' : 'border-[#E4E9F0] bg-white/30'
+                } ${playingVoice === v.id ? 'ring-1 ring-[#233B8F]/50' : ''}`}
               >
                 <button type="button" onClick={() => setVoiceId(v.id)} className="flex items-center gap-3 text-left flex-1 min-w-0">
                   {voiceId === v.id
-                    ? <CheckCircle2 className="w-4 h-4 text-neon-blue shrink-0" />
-                    : <span className="w-4 h-4 rounded-full border border-white/20 shrink-0" />}
+                    ? <CheckCircle2 className="w-4 h-4 text-[#233B8F] shrink-0" />
+                    : <span className="w-4 h-4 rounded-full border border-[#E4E9F0] shrink-0" />}
                   <span className="min-w-0">
-                    <span className={`text-sm font-semibold ${voiceId === v.id ? 'text-neon-blue' : 'text-white'}`}>{v.name}</span>
-                    <span className="block text-xs text-dark-400 truncate">{v.desc}</span>
+                    <span className={`text-sm font-semibold ${voiceId === v.id ? 'text-[#233B8F]' : 'text-[#111827]'}`}>{v.name}</span>
+                    <span className="block text-xs text-[#6B7280] truncate">{v.desc}</span>
                   </span>
                 </button>
                 <button
@@ -1328,15 +1328,15 @@ function VoiceCard({ bot }: { bot: Bot }) {
                   title={playingVoice === v.id ? 'Detener' : loadingVoice === v.id ? 'Cargando…' : 'Escuchar'}
                   className={`ml-2 shrink-0 w-8 h-8 rounded-lg border flex items-center justify-center transition-colors ${
                     playingVoice === v.id
-                      ? 'bg-neon-blue/25 border-neon-blue/60'
-                      : 'bg-white/5 border-white/10 hover:border-neon-blue/40'
+                      ? 'bg-[#233B8F]/25 border-[#233B8F]/60'
+                      : 'bg-[#F4F6FA] border-[#E4E9F0] hover:border-[#233B8F]/40'
                   }`}
                 >
                   {loadingVoice === v.id
-                    ? <Loader2 className="w-3.5 h-3.5 text-neon-blue animate-spin" />
+                    ? <Loader2 className="w-3.5 h-3.5 text-[#233B8F] animate-spin" />
                     : playingVoice === v.id
-                      ? <Pause className="w-3.5 h-3.5 text-neon-blue" />
-                      : <Play className="w-3.5 h-3.5 text-dark-400" />}
+                      ? <Pause className="w-3.5 h-3.5 text-[#233B8F]" />
+                      : <Play className="w-3.5 h-3.5 text-[#6B7280]" />}
                 </button>
               </div>
             ))}
@@ -1363,7 +1363,7 @@ function VoiceCard({ bot }: { bot: Bot }) {
             setSavingVoice(false)
           }
         }}
-        className="w-full py-2.5 bg-dark-800 border border-white/10 text-white text-sm font-semibold rounded-xl hover:border-neon-blue/40 disabled:opacity-50 flex items-center justify-center gap-2 transition-colors"
+        className="w-full py-2.5 bg-[#F8FAFC] border border-[#E4E9F0] text-[#111827] text-sm font-semibold rounded-xl hover:border-[#233B8F]/40 disabled:opacity-50 flex items-center justify-center gap-2 transition-colors"
       >
         {savingVoice ? <Spinner /> : <Save className="w-4 h-4" />}
         Guardar voz
@@ -1551,9 +1551,9 @@ function PromptTab({ bot, onSaved }: { bot: Bot; onSaved: (updated: Partial<Bot>
   return (
     <div className="space-y-6">
     <form onSubmit={handleSave} className="space-y-6">
-      <div className="glass-panel p-6 rounded-2xl space-y-5">
-        <h3 className="text-sm font-bold text-white flex items-center gap-2">
-          <FileText className="w-4 h-4 text-neon-blue" />
+      <div className="dm-card p-6 rounded-2xl space-y-5">
+        <h3 className="text-sm font-bold text-[#111827] flex items-center gap-2">
+          <FileText className="w-4 h-4 text-[#233B8F]" />
           Prompt del vendedor
         </h3>
 
@@ -1561,7 +1561,7 @@ function PromptTab({ bot, onSaved }: { bot: Bot; onSaved: (updated: Partial<Bot>
 
         <div>
           <div className="flex items-center justify-between mb-1.5">
-            <label className="block text-xs font-medium text-dark-300">
+            <label className="block text-xs font-medium text-[#374151]">
               Instrucciones del vendedor (system prompt)
             </label>
             <button
@@ -1573,7 +1573,7 @@ function PromptTab({ bot, onSaved }: { bot: Bot; onSaved: (updated: Partial<Bot>
                   setForm(f => ({ ...f, systemPromptTemplate: EXAMPLE_PROMPT }))
                 }
               }}
-              className="text-[10px] px-2.5 py-1 rounded-lg bg-neon-blue/10 border border-neon-blue/20 text-neon-blue hover:bg-neon-blue/20 transition-colors font-medium"
+              className="text-[10px] px-2.5 py-1 rounded-lg bg-[#233B8F]/10 border border-[#233B8F]/20 text-[#233B8F] hover:bg-[#233B8F]/20 transition-colors font-medium"
             >
               Cargar plantilla de ejemplo
             </button>
@@ -1583,28 +1583,28 @@ function PromptTab({ bot, onSaved }: { bot: Bot; onSaved: (updated: Partial<Bot>
             onChange={e => setForm(f => ({ ...f, systemPromptTemplate: e.target.value }))}
             rows={12}
             placeholder={`Escribe aquí las instrucciones de tu vendedor.\n\nEjemplo:\n- Su nombre, estilo de comunicación y tono\n- Cómo identificar el problema del cliente\n- Cómo presentar y cerrar la venta\n- Reglas de negocio especiales\n\nUsa el botón "Cargar plantilla de ejemplo" para ver una plantilla lista.`}
-            className="w-full bg-dark-900/50 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-dark-500 focus:outline-none focus:border-neon-blue/40 font-mono resize-y min-h-[200px]"
+            className="w-full bg-[#F4F6FA]0 border border-[#E4E9F0] rounded-xl px-4 py-3 text-sm text-[#111827] placeholder-dark-500 focus:outline-none focus:border-[#233B8F]/40 font-mono resize-y min-h-[200px]"
           />
-          <p className="text-xs text-dark-500 mt-1">
+          <p className="text-xs text-[#9CA3AF] mt-1">
             Estas instrucciones se combinan con las reglas del bot y la base de conocimiento de productos.
           </p>
         </div>
 
         {/* Char limits */}
         <div>
-          <label className="block text-xs font-medium text-dark-300 mb-3">
+          <label className="block text-xs font-medium text-[#374151] mb-3">
             Límite de caracteres por mensaje (opcional)
           </label>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             {(['maxCharsMensaje1', 'maxCharsMensaje2', 'maxCharsMensaje3'] as const).map((field, i) => (
               <div key={field}>
-                <label className="block text-[10px] text-dark-400 mb-1">Mensaje {i + 1}</label>
+                <label className="block text-[10px] text-[#6B7280] mb-1">Mensaje {i + 1}</label>
                 <input
                   type="number"
                   value={form[field]}
                   onChange={e => setForm(f => ({ ...f, [field]: e.target.value }))}
                   placeholder="Sin límite"
-                  className="w-full bg-dark-900/50 border border-white/10 rounded-xl px-3 py-2 text-sm text-white placeholder-dark-500 focus:outline-none focus:border-neon-blue/40"
+                  className="w-full bg-[#F4F6FA]0 border border-[#E4E9F0] rounded-xl px-3 py-2 text-sm text-[#111827] placeholder-dark-500 focus:outline-none focus:border-[#233B8F]/40"
                 />
               </div>
             ))}
@@ -1612,11 +1612,11 @@ function PromptTab({ bot, onSaved }: { bot: Bot; onSaved: (updated: Partial<Bot>
         </div>
 
         {/* Strict JSON badge */}
-        <div className="flex items-center gap-3 bg-neon-green/5 border border-neon-green/20 rounded-xl px-4 py-3">
-          <CheckCircle2 className="w-4 h-4 text-neon-green shrink-0" />
+        <div className="flex items-center gap-3 bg-[#16A34A]/5 border border-[#16A34A]/20 rounded-xl px-4 py-3">
+          <CheckCircle2 className="w-4 h-4 text-[#16A34A] shrink-0" />
           <div>
-            <div className="text-xs font-bold text-neon-green">strictJsonOutput: ACTIVO</div>
-            <div className="text-xs text-dark-400">
+            <div className="text-xs font-bold text-[#16A34A]">strictJsonOutput: ACTIVO</div>
+            <div className="text-xs text-[#6B7280]">
               El bot siempre devuelve JSON válido con el schema requerido.
             </div>
           </div>
@@ -1625,7 +1625,7 @@ function PromptTab({ bot, onSaved }: { bot: Bot; onSaved: (updated: Partial<Bot>
         <button
           type="submit"
           disabled={loading}
-          className="w-full py-3 bg-neon-blue text-dark-950 font-bold rounded-xl hover:bg-neon-blue/90 disabled:opacity-50 flex items-center justify-center gap-2 transition-colors"
+          className="w-full py-3 bg-[#233B8F] text-dark-950 font-bold rounded-xl hover:bg-[#233B8F]/90 disabled:opacity-50 flex items-center justify-center gap-2 transition-colors"
         >
           {loading ? <Spinner /> : <Save className="w-4 h-4" />}
           Guardar plantilla
@@ -1842,20 +1842,20 @@ function ProductForm({
   }
 
   const inputClass =
-    'w-full bg-dark-900/50 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white placeholder-dark-500 focus:outline-none focus:border-neon-green/40 transition-colors'
+    'w-full bg-[#F4F6FA]0 border border-[#E4E9F0] rounded-xl px-4 py-2.5 text-sm text-[#111827] placeholder-dark-500 focus:outline-none focus:border-[#16A34A]/40 transition-colors'
   const textareaClass = `${inputClass} resize-y`
-  const labelClass = 'block text-xs font-medium text-dark-300 mb-1.5'
-  const sectionClass = 'glass-panel p-5 rounded-2xl space-y-4'
-  const sectionHeaderClass = 'flex items-center gap-2 text-xs font-bold text-white uppercase tracking-wider'
+  const labelClass = 'block text-xs font-medium text-[#374151] mb-1.5'
+  const sectionClass = 'dm-card p-5 rounded-2xl space-y-4'
+  const sectionHeaderClass = 'flex items-center gap-2 text-xs font-bold text-[#111827] uppercase tracking-wider'
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
       <div className="flex items-center justify-between">
-        <h3 className="font-bold text-white flex items-center gap-2">
-          <Package className="w-4 h-4 text-neon-green" />
+        <h3 className="font-bold text-[#111827] flex items-center gap-2">
+          <Package className="w-4 h-4 text-[#16A34A]" />
           {product ? 'Editar producto' : 'Nuevo producto'}
         </h3>
-        <button type="button" onClick={onCancel} className="text-dark-400 hover:text-white transition-colors">
+        <button type="button" onClick={onCancel} className="text-[#6B7280] hover:text-[#111827] transition-colors">
           <X className="w-5 h-5" />
         </button>
       </div>
@@ -1864,7 +1864,7 @@ function ProductForm({
 
       {/* Basic info */}
       <div className={sectionClass}>
-        <div className={sectionHeaderClass}><span className="w-1 h-3.5 bg-neon-green/70 rounded-full" />Información básica</div>
+        <div className={sectionHeaderClass}><span className="w-1 h-3.5 bg-[#16A34A]/70 rounded-full" />Información básica</div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label className={labelClass}>Nombre del producto *</label>
@@ -1881,7 +1881,7 @@ function ProductForm({
             <select
               value={form.category}
               onChange={e => setField('category', e.target.value)}
-              className={`${inputClass} appearance-none bg-dark-900/50`}
+              className={`${inputClass} appearance-none bg-[#F4F6FA]0`}
             >
               <option value="">Selecciona una categoría...</option>
               <option value="Salud y Bienestar">Salud y Bienestar</option>
@@ -1915,11 +1915,11 @@ function ProductForm({
             className="flex items-center gap-2 text-sm"
           >
             {form.active ? (
-              <ToggleRight className="w-7 h-7 text-neon-green" />
+              <ToggleRight className="w-7 h-7 text-[#16A34A]" />
             ) : (
-              <ToggleLeft className="w-7 h-7 text-dark-500" />
+              <ToggleLeft className="w-7 h-7 text-[#9CA3AF]" />
             )}
-            <span className={form.active ? 'text-neon-green font-medium' : 'text-dark-400'}>
+            <span className={form.active ? 'text-[#16A34A] font-medium' : 'text-[#6B7280]'}>
               {form.active ? 'Producto activo' : 'Producto inactivo'}
             </span>
           </button>
@@ -1928,7 +1928,7 @@ function ProductForm({
 
       {/* Details */}
       <div className={sectionClass}>
-        <div className={sectionHeaderClass}><span className="w-1 h-3.5 bg-neon-blue/70 rounded-full" />Descripción</div>
+        <div className={sectionHeaderClass}><span className="w-1 h-3.5 bg-[#233B8F]/70 rounded-full" />Descripción</div>
         <div>
           <label className={labelClass}>Beneficios</label>
           <textarea
@@ -1963,7 +1963,7 @@ function ProductForm({
 
       {/* Prices */}
       <div className={sectionClass}>
-        <div className={sectionHeaderClass}><span className="w-1 h-3.5 bg-neon-purple/70 rounded-full" />Precios</div>
+        <div className={sectionHeaderClass}><span className="w-1 h-3.5 bg-[#B735B8]/70 rounded-full" />Precios</div>
         <div>
           <label className={labelClass}>Moneda</label>
           <select
@@ -2023,7 +2023,7 @@ function ProductForm({
       {/* Images Section */}
       <div className={sectionClass}>
         <div>
-          <div className={`${sectionHeaderClass} mb-3`}><span className="w-1 h-3.5 bg-neon-green/70 rounded-full" />Imágenes principales</div>
+          <div className={`${sectionHeaderClass} mb-3`}><span className="w-1 h-3.5 bg-[#16A34A]/70 rounded-full" />Imágenes principales</div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             {(['img1', 'img2', 'img3'] as const).map(key => (
               <UploadField key={key} type="image" value={form[key]} onChange={v => setField(key, v)} placeholder="Subir foto principal" />
@@ -2032,7 +2032,7 @@ function ProductForm({
         </div>
 
         <div className="pt-2">
-          <div className={`${sectionHeaderClass} mb-3`}><span className="w-1 h-3.5 bg-neon-green/70 rounded-full" />Más fotos del producto</div>
+          <div className={`${sectionHeaderClass} mb-3`}><span className="w-1 h-3.5 bg-[#16A34A]/70 rounded-full" />Más fotos del producto</div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {(['img4', 'img5', 'img6', 'img7', 'img8'] as const).map((key, i) => (
               <UploadField key={key} type="image" value={form[key]} onChange={v => setField(key, v)} placeholder={`Foto adicional ${i + 1}`} />
@@ -2040,9 +2040,9 @@ function ProductForm({
           </div>
         </div>
 
-        <div className="pt-4 border-t border-white/5">
-          <div className={`${sectionHeaderClass} mb-3`}><span className="w-1 h-3.5 bg-neon-blue/70 rounded-full" />Videos del producto</div>
-          <p className="text-xs text-dark-500 mb-3">El agente enviará estos videos si el cliente quiere ver el producto en acción. Máximo 90 segundos.</p>
+        <div className="pt-4 border-t border-[#E4E9F0]">
+          <div className={`${sectionHeaderClass} mb-3`}><span className="w-1 h-3.5 bg-[#233B8F]/70 rounded-full" />Videos del producto</div>
+          <p className="text-xs text-[#9CA3AF] mb-3">El agente enviará estos videos si el cliente quiere ver el producto en acción. Máximo 90 segundos.</p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {(['vid1', 'vid2'] as const).map((key, i) => (
               <UploadField key={key} type="video" value={form[key as keyof ProductFormState] as string} onChange={v => setField(key, v)} placeholder={`Video del producto ${i + 1}`} />
@@ -2058,12 +2058,12 @@ function ProductForm({
           onClick={() => setShowTestimonialPhotos(v => !v)}
           className="w-full flex items-center justify-between"
         >
-          <div className="flex items-center gap-2 text-xs font-bold text-white uppercase tracking-wider">
-            <span className="w-1 h-3.5 bg-neon-blue/70 rounded-full" />
+          <div className="flex items-center gap-2 text-xs font-bold text-[#111827] uppercase tracking-wider">
+            <span className="w-1 h-3.5 bg-[#233B8F]/70 rounded-full" />
             Fotos de testimonios
-            <span className="text-[10px] normal-case font-normal text-dark-400">(el agente las envía ante dudas)</span>
+            <span className="text-[10px] normal-case font-normal text-[#6B7280]">(el agente las envía ante dudas)</span>
           </div>
-          <ChevronRight className={`w-4 h-4 text-dark-400 transition-transform ${showTestimonialPhotos ? 'rotate-90' : ''}`} />
+          <ChevronRight className={`w-4 h-4 text-[#6B7280] transition-transform ${showTestimonialPhotos ? 'rotate-90' : ''}`} />
         </button>
         {showTestimonialPhotos && (
           <div className="space-y-3 pt-2">
@@ -2093,16 +2093,16 @@ function ProductForm({
           onClick={() => setShowTestimonialVideos(v => !v)}
           className="w-full flex items-center justify-between"
         >
-          <div className="flex items-center gap-2 text-xs font-bold text-white uppercase tracking-wider">
-            <span className="w-1 h-3.5 bg-neon-purple/70 rounded-full" />
+          <div className="flex items-center gap-2 text-xs font-bold text-[#111827] uppercase tracking-wider">
+            <span className="w-1 h-3.5 bg-[#B735B8]/70 rounded-full" />
             Videos de testimonios
-            <span className="text-[10px] bg-neon-purple/20 text-neon-purple px-2 py-0.5 rounded border border-neon-purple/30 normal-case font-normal">NUEVO</span>
+            <span className="text-[10px] bg-[#B735B8]/20 text-[#B735B8] px-2 py-0.5 rounded border border-[#B735B8]/30 normal-case font-normal">NUEVO</span>
           </div>
-          <ChevronRight className={`w-4 h-4 text-dark-400 transition-transform ${showTestimonialVideos ? 'rotate-90' : ''}`} />
+          <ChevronRight className={`w-4 h-4 text-[#6B7280] transition-transform ${showTestimonialVideos ? 'rotate-90' : ''}`} />
         </button>
         {showTestimonialVideos && (
           <div className="space-y-3 pt-2">
-            <p className="text-xs text-dark-500">El agente enviará estos videos cuando el cliente necesite mayor confianza. Máximo 90 segundos por video.</p>
+            <p className="text-xs text-[#9CA3AF]">El agente enviará estos videos cuando el cliente necesite mayor confianza. Máximo 90 segundos por video.</p>
             {[1, 2, 3, 4, 5, 6, 7].map(n => {
               const vidLabelKey = `test${n}VidLabel` as keyof ProductFormState
               const vidUrlKey = `test${n}VidUrl` as keyof ProductFormState
@@ -2128,14 +2128,14 @@ function ProductForm({
         <button
           type="button"
           onClick={onCancel}
-          className="flex-1 py-3 bg-dark-800 border border-white/10 text-dark-300 font-medium rounded-xl hover:bg-dark-700 transition-colors text-sm"
+          className="flex-1 py-3 bg-[#F8FAFC] border border-[#E4E9F0] text-[#374151] font-medium rounded-xl hover:bg-dark-700 transition-colors text-sm"
         >
           Cancelar
         </button>
         <button
           type="submit"
           disabled={loading}
-          className="flex-1 py-3 bg-neon-green text-dark-950 font-bold rounded-xl hover:bg-neon-green/90 disabled:opacity-50 flex items-center justify-center gap-2 transition-colors text-sm"
+          className="flex-1 py-3 bg-[#16A34A] text-dark-950 font-bold rounded-xl hover:bg-[#16A34A]/90 disabled:opacity-50 flex items-center justify-center gap-2 transition-colors text-sm"
         >
           {loading ? <Spinner /> : <Save className="w-4 h-4" />}
           {product ? 'Actualizar' : 'Crear producto'}
@@ -2176,39 +2176,39 @@ function ShareProductModal({ product, onClose }: { product: Product; onClose: ()
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.7)' }}>
-      <div className="glass-panel rounded-2xl border border-white/10 p-6 w-full max-w-sm space-y-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(15,23,42,0.10)' }}>
+      <div className="dm-card rounded-2xl border border-[#E4E9F0] p-6 w-full max-w-sm space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Share2 className="w-4 h-4 text-neon-blue" />
-            <h3 className="font-bold text-white text-sm">Compartir producto</h3>
+            <Share2 className="w-4 h-4 text-[#233B8F]" />
+            <h3 className="font-bold text-[#111827] text-sm">Compartir producto</h3>
           </div>
-          <button onClick={onClose} className="text-dark-400 hover:text-white transition-colors">
+          <button onClick={onClose} className="text-[#6B7280] hover:text-[#111827] transition-colors">
             <X className="w-4 h-4" />
           </button>
         </div>
 
-        <div className="text-xs text-dark-400 bg-white/5 rounded-xl p-3 border border-white/5">
-          <p className="font-semibold text-white mb-1">📋 {product.name}</p>
-          El destinatario recibirá una <span className="text-neon-green">copia independiente</span> del producto.
+        <div className="text-xs text-[#6B7280] bg-[#F4F6FA] rounded-xl p-3 border border-[#E4E9F0]">
+          <p className="font-semibold text-[#111827] mb-1">📋 {product.name}</p>
+          El destinatario recibirá una <span className="text-[#16A34A]">copia independiente</span> del producto.
           Podrá editarla libremente sin afectar el tuyo.
         </div>
 
         <form onSubmit={handleShare} className="space-y-3">
           <div>
-            <label className="text-xs text-dark-400 mb-1 block">Username o email del destinatario</label>
+            <label className="text-xs text-[#6B7280] mb-1 block">Username o email del destinatario</label>
             <input
               type="text"
               value={identifier}
               onChange={e => setIdentifier(e.target.value)}
               placeholder="@usuario o correo@email.com"
-              className="w-full bg-dark-900 border border-white/10 rounded-xl px-3 py-2 text-sm text-white placeholder:text-dark-500 focus:outline-none focus:border-neon-blue/40"
+              className="w-full bg-white border border-[#E4E9F0] rounded-xl px-3 py-2 text-sm text-[#111827] placeholder:text-[#9CA3AF] focus:outline-none focus:border-[#233B8F]/40"
               disabled={loading}
             />
           </div>
 
           {result && (
-            <div className={`text-xs rounded-lg px-3 py-2 ${result.ok ? 'bg-neon-green/10 text-neon-green border border-neon-green/20' : 'bg-red-500/10 text-red-400 border border-red-500/20'}`}>
+            <div className={`text-xs rounded-lg px-3 py-2 ${result.ok ? 'bg-[#16A34A]/10 text-[#16A34A] border border-[#16A34A]/20' : 'bg-red-500/10 text-red-400 border border-red-500/20'}`}>
               {result.ok ? '✓ ' : '✕ '}{result.message}
             </div>
           )}
@@ -2217,14 +2217,14 @@ function ShareProductModal({ product, onClose }: { product: Product; onClose: ()
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 py-2 rounded-xl border border-white/10 text-dark-400 hover:text-white text-sm transition-colors"
+              className="flex-1 py-2 rounded-xl border border-[#E4E9F0] text-[#6B7280] hover:text-[#111827] text-sm transition-colors"
             >
               Cerrar
             </button>
             <button
               type="submit"
               disabled={loading || !identifier.trim()}
-              className="flex-1 py-2 rounded-xl bg-neon-blue/20 text-neon-blue border border-neon-blue/30 hover:bg-neon-blue/30 text-sm font-semibold transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+              className="flex-1 py-2 rounded-xl bg-[#233B8F]/20 text-[#233B8F] border border-[#233B8F]/30 hover:bg-[#233B8F]/30 text-sm font-semibold transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
             >
               {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <UserCheck className="w-3.5 h-3.5" />}
               Compartir
@@ -2338,12 +2338,12 @@ function ProductsTab({ bot }: { bot: Bot }) {
       )}
       {/* Header */}
       <div className="flex items-center justify-between">
-        <div className="text-sm text-dark-400">
+        <div className="text-sm text-[#6B7280]">
           {assigned.length} asignado{assigned.length !== 1 ? 's' : ''} · {available.length} disponible{available.length !== 1 ? 's' : ''} en catálogo
         </div>
         <button
           onClick={() => { setEditingProduct(null); setShowForm(true) }}
-          className="flex items-center gap-2 px-4 py-2 bg-neon-green text-dark-950 font-bold rounded-xl text-sm hover:bg-neon-green/90 transition-colors"
+          className="flex items-center gap-2 px-4 py-2 bg-[#16A34A] text-dark-950 font-bold rounded-xl text-sm hover:bg-[#16A34A]/90 transition-colors"
         >
           <Plus className="w-4 h-4" />
           Nuevo producto
@@ -2352,39 +2352,39 @@ function ProductsTab({ bot }: { bot: Bot }) {
 
       {loading ? (
         <div className="flex items-center justify-center py-12">
-          <Loader2 className="w-6 h-6 animate-spin text-dark-400" />
+          <Loader2 className="w-6 h-6 animate-spin text-[#6B7280]" />
         </div>
       ) : (
         <>
           {/* Assigned products */}
           <div>
-            <div className="text-xs font-semibold text-dark-400 uppercase tracking-wider mb-2">
+            <div className="text-xs font-semibold text-[#6B7280] uppercase tracking-wider mb-2">
               Asignados a este bot
             </div>
             {assigned.length === 0 ? (
-              <div className="glass-panel p-8 rounded-2xl text-center">
+              <div className="dm-card p-8 rounded-2xl text-center">
                 <ShoppingBag className="w-8 h-8 text-dark-600 mx-auto mb-2" />
-                <div className="text-dark-400 text-sm">Sin productos asignados</div>
-                <div className="text-dark-500 text-xs mt-1">Crea un nuevo producto o asigna uno del catálogo.</div>
+                <div className="text-[#6B7280] text-sm">Sin productos asignados</div>
+                <div className="text-[#9CA3AF] text-xs mt-1">Crea un nuevo producto o asigna uno del catálogo.</div>
               </div>
             ) : (
               <div className="space-y-2">
                 {assigned.map(product => (
                   <div
                     key={product.id}
-                    className="glass-panel p-4 rounded-xl flex items-center gap-4 group hover:bg-white/5 transition-colors"
+                    className="dm-card p-4 rounded-xl flex items-center gap-4 group hover:bg-[#F4F6FA] transition-colors"
                   >
-                    <div className={`w-2 h-2 rounded-full shrink-0 ${product.active ? 'bg-neon-green shadow-[0_0_6px_rgba(0,255,157,0.5)]' : 'bg-dark-600'}`} />
+                    <div className={`w-2 h-2 rounded-full shrink-0 ${product.active ? 'bg-[#16A34A] shadow-[0_0_6px_rgba(0,255,157,0.5)]' : 'bg-dark-600'}`} />
                     <div className="flex-1 min-w-0">
-                      <div className="font-medium text-white text-sm truncate">{product.name}</div>
-                      <div className="text-xs text-dark-400 mt-0.5 flex items-center gap-2 flex-wrap">
+                      <div className="font-medium text-[#111827] text-sm truncate">{product.name}</div>
+                      <div className="text-xs text-[#6B7280] mt-0.5 flex items-center gap-2 flex-wrap">
                         {product.category && <span>{product.category}</span>}
                         {product.priceUnit && <span>{product.currency ?? 'USD'} {product.priceUnit}</span>}
                         {product.pricePromo2 && <span className="text-orange-400">{product.currency ?? 'USD'} {product.pricePromo2} <span className="text-[10px] text-orange-400/60">oferta</span></span>}
                         {Array.isArray(product.imageMainUrls) && product.imageMainUrls.length > 0 && <span>{product.imageMainUrls.length} img</span>}
                         {!product.active && <span className="text-dark-600 italic">inactivo</span>}
                         {product.sharedByUsername && (
-                          <span className="flex items-center gap-1 text-neon-blue/70">
+                          <span className="flex items-center gap-1 text-[#233B8F]/70">
                             <Share2 className="w-2.5 h-2.5" />
                             de @{product.sharedByUsername}
                           </span>
@@ -2394,14 +2394,14 @@ function ProductsTab({ bot }: { bot: Bot }) {
                     <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                       <button
                         onClick={() => setSharingProduct(product)}
-                        className="p-2 hover:bg-neon-blue/10 rounded-lg transition-colors text-dark-400 hover:text-neon-blue"
+                        className="p-2 hover:bg-[#233B8F]/10 rounded-lg transition-colors text-[#6B7280] hover:text-[#233B8F]"
                         title="Compartir con otro usuario"
                       >
                         <Share2 className="w-3.5 h-3.5" />
                       </button>
                       <button
                         onClick={() => handleEdit(product)}
-                        className="p-2 hover:bg-white/10 rounded-lg transition-colors text-dark-400 hover:text-white"
+                        className="p-2 hover:bg-[#EEF2F7] rounded-lg transition-colors text-[#6B7280] hover:text-[#111827]"
                         title="Editar"
                       >
                         <Edit2 className="w-3.5 h-3.5" />
@@ -2409,7 +2409,7 @@ function ProductsTab({ bot }: { bot: Bot }) {
                       <button
                         onClick={() => handleUnassign(product.id)}
                         disabled={actioning === product.id}
-                        className="p-2 hover:bg-yellow-500/10 rounded-lg transition-colors text-dark-400 hover:text-yellow-400 disabled:opacity-50"
+                        className="p-2 hover:bg-yellow-500/10 rounded-lg transition-colors text-[#6B7280] hover:text-yellow-400 disabled:opacity-50"
                         title="Quitar del agente"
                       >
                         {actioning === product.id ? <Spinner /> : <X className="w-3.5 h-3.5" />}
@@ -2417,7 +2417,7 @@ function ProductsTab({ bot }: { bot: Bot }) {
                       <button
                         onClick={() => handleDeleteProduct(product.id)}
                         disabled={actioning === product.id}
-                        className="p-2 hover:bg-red-500/10 rounded-lg transition-colors text-dark-400 hover:text-red-400 disabled:opacity-50"
+                        className="p-2 hover:bg-red-500/10 rounded-lg transition-colors text-[#6B7280] hover:text-red-400 disabled:opacity-50"
                         title="Eliminar producto permanentemente"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
@@ -2432,19 +2432,19 @@ function ProductsTab({ bot }: { bot: Bot }) {
           {/* Available catalog products */}
           {available.length > 0 && (
             <div>
-              <div className="text-xs font-semibold text-dark-400 uppercase tracking-wider mb-2">
+              <div className="text-xs font-semibold text-[#6B7280] uppercase tracking-wider mb-2">
                 Del catálogo — agregar a este bot
               </div>
               <div className="space-y-2">
                 {available.map(product => (
                   <div
                     key={product.id}
-                    className="glass-panel p-4 rounded-xl flex items-center gap-4 group hover:bg-white/5 transition-colors opacity-60 hover:opacity-100"
+                    className="dm-card p-4 rounded-xl flex items-center gap-4 group hover:bg-[#F4F6FA] transition-colors opacity-60 hover:opacity-100"
                   >
-                    <div className={`w-2 h-2 rounded-full shrink-0 ${product.active ? 'bg-neon-green/50' : 'bg-dark-600'}`} />
+                    <div className={`w-2 h-2 rounded-full shrink-0 ${product.active ? 'bg-[#16A34A]/50' : 'bg-dark-600'}`} />
                     <div className="flex-1 min-w-0">
-                      <div className="font-medium text-white text-sm truncate">{product.name}</div>
-                      <div className="text-xs text-dark-400 mt-0.5 flex items-center gap-2 flex-wrap">
+                      <div className="font-medium text-[#111827] text-sm truncate">{product.name}</div>
+                      <div className="text-xs text-[#6B7280] mt-0.5 flex items-center gap-2 flex-wrap">
                         {product.category && <span>{product.category}</span>}
                         {product.priceUnit && <span>{product.currency ?? 'USD'} {product.priceUnit}</span>}
                         {product.pricePromo2 && <span className="text-orange-400">{product.currency ?? 'USD'} {product.pricePromo2} <span className="text-[10px] text-orange-400/60">oferta</span></span>}
@@ -2454,7 +2454,7 @@ function ProductsTab({ bot }: { bot: Bot }) {
                       <button
                         onClick={() => handleAssign(product)}
                         disabled={actioning === product.id}
-                        className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-neon-green/10 text-neon-green hover:bg-neon-green/20 transition-colors disabled:opacity-50"
+                        className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-[#16A34A]/10 text-[#16A34A] hover:bg-[#16A34A]/20 transition-colors disabled:opacity-50"
                       >
                         {actioning === product.id ? <Spinner /> : <Plus className="w-3 h-3" />}
                         Asignar
@@ -2462,7 +2462,7 @@ function ProductsTab({ bot }: { bot: Bot }) {
                       <button
                         onClick={() => handleDeleteProduct(product.id)}
                         disabled={actioning === product.id}
-                        className="p-2 hover:bg-red-500/10 rounded-lg transition-colors text-dark-400 hover:text-red-400 disabled:opacity-50"
+                        className="p-2 hover:bg-red-500/10 rounded-lg transition-colors text-[#6B7280] hover:text-red-400 disabled:opacity-50"
                         title="Eliminar producto permanentemente"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
@@ -2525,20 +2525,20 @@ function FollowUpTab({
 
   return (
     <div className="max-w-2xl space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300 transition-all">
-      <div className="glass-panel p-6 rounded-2xl border border-white/5 space-y-6">
+      <div className="dm-card p-6 rounded-2xl border border-[#E4E9F0] space-y-6">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-neon-green/10 border border-neon-green/20 flex items-center justify-center">
-            <Bell className="w-5 h-5 text-neon-green" />
+          <div className="w-10 h-10 rounded-xl bg-[#16A34A]/10 border border-[#16A34A]/20 flex items-center justify-center">
+            <Bell className="w-5 h-5 text-[#16A34A]" />
           </div>
           <div>
-            <h3 className="text-lg font-bold text-white">Configuración de Seguimientos</h3>
-            <p className="text-sm text-dark-400 mt-0.5">Define los intervalos para re-interactuar con clientes.</p>
+            <h3 className="text-lg font-bold text-[#111827]">Configuración de Seguimientos</h3>
+            <p className="text-sm text-[#6B7280] mt-0.5">Define los intervalos para re-interactuar con clientes.</p>
           </div>
         </div>
 
         <form onSubmit={handleSave} className="grid grid-cols-1 md:grid-cols-2 gap-6 pb-2">
           <div className="space-y-2">
-            <label className="text-[10px] font-bold text-dark-300 uppercase tracking-widest pl-1">
+            <label className="text-[10px] font-bold text-[#374151] uppercase tracking-widest pl-1">
               1er Seguimiento
             </label>
             <div className="relative group">
@@ -2547,16 +2547,16 @@ function FollowUpTab({
                 min="1"
                 value={f1}
                 onChange={e => setF1(Number(e.target.value))}
-                className="w-full bg-dark-900/50 border border-white/10 group-hover:border-white/20 focus:border-neon-green/40 rounded-xl px-4 py-3 text-sm text-white transition-all outline-none"
+                className="w-full bg-[#F4F6FA]0 border border-[#E4E9F0] group-hover:border-[#E4E9F0] focus:border-[#16A34A]/40 rounded-xl px-4 py-3 text-sm text-[#111827] transition-all outline-none"
                 placeholder="Ej: 15"
               />
-              <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[9px] text-dark-500 font-bold uppercase tracking-tighter">Minutos</span>
+              <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[9px] text-[#9CA3AF] font-bold uppercase tracking-tighter">Minutos</span>
             </div>
-            <p className="text-[10px] text-dark-500 italic pl-1">Por defecto: 15 min.</p>
+            <p className="text-[10px] text-[#9CA3AF] italic pl-1">Por defecto: 15 min.</p>
           </div>
 
           <div className="space-y-2">
-            <label className="text-[10px] font-bold text-dark-300 uppercase tracking-widest pl-1">
+            <label className="text-[10px] font-bold text-[#374151] uppercase tracking-widest pl-1">
               2do Seguimiento
             </label>
             <div className="relative group">
@@ -2565,12 +2565,12 @@ function FollowUpTab({
                 min="1"
                 value={f2}
                 onChange={e => setF2(Number(e.target.value))}
-                className="w-full bg-dark-900/50 border border-white/10 group-hover:border-white/20 focus:border-neon-green/40 rounded-xl px-4 py-3 text-sm text-white transition-all outline-none"
+                className="w-full bg-[#F4F6FA]0 border border-[#E4E9F0] group-hover:border-[#E4E9F0] focus:border-[#16A34A]/40 rounded-xl px-4 py-3 text-sm text-[#111827] transition-all outline-none"
                 placeholder="Ej: 4320"
               />
-              <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[9px] text-dark-500 font-bold uppercase tracking-tighter">Minutos</span>
+              <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[9px] text-[#9CA3AF] font-bold uppercase tracking-tighter">Minutos</span>
             </div>
-            <p className="text-[10px] text-dark-500 italic pl-1">Por defecto: 4320 min (3 días).</p>
+            <p className="text-[10px] text-[#9CA3AF] italic pl-1">Por defecto: 4320 min (3 días).</p>
           </div>
 
           <div className="md:col-span-2 flex items-center justify-between gap-4 pt-2">
@@ -2581,7 +2581,7 @@ function FollowUpTab({
             <button
               type="submit"
               disabled={saving}
-              className="flex items-center gap-2 px-6 py-3 bg-neon-green text-black rounded-xl text-sm font-bold hover:bg-neon-green/90 transition-all disabled:opacity-50 shrink-0 shadow-lg shadow-neon-green/10"
+              className="flex items-center gap-2 px-6 py-3 bg-[#16A34A] text-black rounded-xl text-sm font-bold hover:bg-[#16A34A]/90 transition-all disabled:opacity-50 shrink-0 shadow-lg shadow-[#16A34A]/10"
             >
               {saving ? <Spinner /> : <Check className="w-4 h-4" />}
               Guardar Cambios
@@ -2590,13 +2590,13 @@ function FollowUpTab({
         </form>
       </div>
 
-      <div className="bg-neon-green/5 border border-neon-green/10 rounded-2xl p-4 flex gap-4">
-        <div className="w-10 h-10 rounded-full bg-neon-green/10 flex items-center justify-center shrink-0">
-          <Zap className="w-5 h-5 text-neon-green" />
+      <div className="bg-[#16A34A]/5 border border-[#16A34A]/10 rounded-2xl p-4 flex gap-4">
+        <div className="w-10 h-10 rounded-full bg-[#16A34A]/10 flex items-center justify-center shrink-0">
+          <Zap className="w-5 h-5 text-[#16A34A]" />
         </div>
         <div>
-          <h4 className="text-sm font-bold text-white">¿Cómo funciona?</h4>
-          <p className="text-xs text-dark-300 mt-1 leading-relaxed">
+          <h4 className="text-sm font-bold text-[#111827]">¿Cómo funciona?</h4>
+          <p className="text-xs text-[#374151] mt-1 leading-relaxed">
             El sistema calculará el tiempo desde el <strong>último mensaje enviado por el bot</strong>.
             Si el cliente no responde en ese intervalo, el agente enviará un mensaje automático.
             Los seguimientos se detienen si el cliente compra o si vuelve a escribir.
@@ -2697,15 +2697,15 @@ function QRTab({ bot }: { bot: Bot }) {
   return (
     <div className="space-y-6">
       {/* Estado */}
-      <div className="glass-panel p-5 rounded-2xl flex items-center justify-between">
+      <div className="dm-card p-5 rounded-2xl flex items-center justify-between">
         <div>
-          <div className="text-sm font-bold text-white flex items-center gap-2">
+          <div className="text-sm font-bold text-[#111827] flex items-center gap-2">
             {status === 'connected'
-              ? <Wifi className="w-4 h-4 text-neon-green" />
-              : <WifiOff className="w-4 h-4 text-dark-400" />}
+              ? <Wifi className="w-4 h-4 text-[#16A34A]" />
+              : <WifiOff className="w-4 h-4 text-[#6B7280]" />}
             {status === 'connected' ? 'Conectado' : status === 'qr_ready' ? 'Esperando escaneo' : status === 'connecting' ? 'Conectando...' : 'Desconectado'}
           </div>
-          {phone && <div className="text-xs text-dark-400 mt-0.5">📱 +{phone}</div>}
+          {phone && <div className="text-xs text-[#6B7280] mt-0.5">📱 +{phone}</div>}
         </div>
         <div className="flex gap-2">
           {status === 'connected' ? (
@@ -2720,7 +2720,7 @@ function QRTab({ bot }: { bot: Bot }) {
               <button
                 onClick={handleConnect}
                 disabled={connecting || status === 'connecting' || status === 'qr_ready'}
-                className="flex items-center gap-2 px-3 py-2 bg-neon-green/10 border border-neon-green/30 text-neon-green hover:bg-neon-green/20 rounded-xl text-xs font-medium transition-colors disabled:opacity-50"
+                className="flex items-center gap-2 px-3 py-2 bg-[#16A34A]/10 border border-[#16A34A]/30 text-[#16A34A] hover:bg-[#16A34A]/20 rounded-xl text-xs font-medium transition-colors disabled:opacity-50"
               >
                 {connecting || status === 'connecting' ? <Spinner /> : <RefreshCw className="w-3.5 h-3.5" />}
                 {status === 'qr_ready' ? 'Escanea el QR' : 'Conectar'}
@@ -2744,44 +2744,44 @@ function QRTab({ bot }: { bot: Bot }) {
 
       {/* QR */}
       {status === 'qr_ready' && qrBase64 && (
-        <div className="glass-panel p-6 rounded-2xl text-center space-y-4">
-          <div className="flex items-center gap-2 justify-center text-sm font-bold text-white">
-            <QrCode className="w-4 h-4 text-neon-green" />
+        <div className="dm-card p-6 rounded-2xl text-center space-y-4">
+          <div className="flex items-center gap-2 justify-center text-sm font-bold text-[#111827]">
+            <QrCode className="w-4 h-4 text-[#16A34A]" />
             Escanea con WhatsApp
           </div>
-          <p className="text-xs text-dark-400">
+          <p className="text-xs text-[#6B7280]">
             Abre WhatsApp → Dispositivos vinculados → Vincular dispositivo
           </p>
           <div className="flex justify-center">
             <img
               src={qrBase64}
               alt="QR WhatsApp"
-              className="w-56 h-56 rounded-2xl border-4 border-neon-green/30 bg-white p-2"
+              className="w-56 h-56 rounded-2xl border-4 border-[#16A34A]/30 bg-white p-2"
             />
           </div>
-          <p className="text-[11px] text-dark-500">El QR se actualiza automáticamente cada 20 segundos.</p>
+          <p className="text-[11px] text-[#9CA3AF]">El QR se actualiza automáticamente cada 20 segundos.</p>
         </div>
       )}
 
       {/* Conectado */}
       {status === 'connected' && (
-        <div className="glass-panel p-6 rounded-2xl border border-neon-green/20 text-center space-y-2">
-          <div className="w-12 h-12 rounded-xl bg-neon-green/10 border border-neon-green/20 flex items-center justify-center mx-auto">
-            <Wifi className="w-6 h-6 text-neon-green" />
+        <div className="dm-card p-6 rounded-2xl border border-[#16A34A]/20 text-center space-y-2">
+          <div className="w-12 h-12 rounded-xl bg-[#16A34A]/10 border border-[#16A34A]/20 flex items-center justify-center mx-auto">
+            <Wifi className="w-6 h-6 text-[#16A34A]" />
           </div>
-          <div className="text-sm font-bold text-white">¡Agente conectado correctamente!</div>
-          <div className="text-xs text-dark-400">El agente está activo y respondiendo mensajes en WhatsApp.</div>
+          <div className="text-sm font-bold text-[#111827]">¡Agente conectado correctamente!</div>
+          <div className="text-xs text-[#6B7280]">El agente está activo y respondiendo mensajes en WhatsApp.</div>
         </div>
       )}
 
       {/* Desconectado - instrucciones */}
       {status === 'disconnected' && (
-        <div className="glass-panel p-6 rounded-2xl border border-white/5">
-          <h3 className="text-sm font-bold text-white mb-3">Pasos para conectar</h3>
+        <div className="dm-card p-6 rounded-2xl border border-[#E4E9F0]">
+          <h3 className="text-sm font-bold text-[#111827] mb-3">Pasos para conectar</h3>
           <ol className="space-y-3">
             {['Presiona "Conectar" arriba', 'Espera a que aparezca el código QR', 'Abre WhatsApp en tu teléfono', 'Ve a Dispositivos vinculados → Vincular dispositivo', 'Escanea el QR con tu cámara'].map((step, i) => (
-              <li key={i} className="flex gap-3 text-sm text-dark-300">
-                <span className="w-5 h-5 rounded-full bg-neon-green/10 border border-neon-green/20 text-neon-green text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">{i + 1}</span>
+              <li key={i} className="flex gap-3 text-sm text-[#374151]">
+                <span className="w-5 h-5 rounded-full bg-[#16A34A]/10 border border-[#16A34A]/20 text-[#16A34A] text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">{i + 1}</span>
                 {step}
               </li>
             ))}
@@ -2789,14 +2789,14 @@ function QRTab({ bot }: { bot: Bot }) {
         </div>
       )}
       {/* Zona peligrosa: limpiar memoria */}
-      <div className="glass-panel p-4 rounded-2xl border border-red-500/10">
+      <div className="dm-card p-4 rounded-2xl border border-red-500/10">
         <div className="flex items-center justify-between gap-4">
           <div>
-            <div className="text-sm font-bold text-white flex items-center gap-2">
+            <div className="text-sm font-bold text-[#111827] flex items-center gap-2">
               <Trash2 className="w-3.5 h-3.5 text-red-400" />
               Limpiar memoria
             </div>
-            <p className="text-xs text-dark-400 mt-0.5">
+            <p className="text-xs text-[#6B7280] mt-0.5">
               Elimina el historial de conversaciones de todos los clientes.
             </p>
           </div>
@@ -3002,9 +3002,9 @@ function ChatsTab({ bot }: { bot: Bot }) {
         >
           {/* Header lista */}
           <div className="flex items-center justify-between px-4 py-3 shrink-0" style={{ background: theme.headerBg }}>
-            <span className="text-sm font-bold text-white">{isMeta ? '💬 Messenger' : '💬 WhatsApp'}</span>
-            <button onClick={loadConvs} className="p-1.5 rounded-full hover:bg-white/10 transition-colors" title="Refrescar">
-              <RefreshCw className="w-4 h-4 text-white/60" />
+            <span className="text-sm font-bold text-[#111827]">{isMeta ? '💬 Messenger' : '💬 WhatsApp'}</span>
+            <button onClick={loadConvs} className="p-1.5 rounded-full hover:bg-[#EEF2F7] transition-colors" title="Refrescar">
+              <RefreshCw className="w-4 h-4 text-[#111827]/60" />
             </button>
           </div>
 
@@ -3016,7 +3016,7 @@ function ChatsTab({ bot }: { bot: Bot }) {
               </div>
             )}
             {!loading && convs.length === 0 && (
-              <div className="px-4 py-8 text-center text-xs text-white/30">Sin conversaciones aún</div>
+              <div className="px-4 py-8 text-center text-xs text-[#111827]/30">Sin conversaciones aún</div>
             )}
             {!loading && convs.map(c => {
               const lastMsg = c.messages[0]
@@ -3063,8 +3063,8 @@ function ChatsTab({ bot }: { bot: Bot }) {
         <div className={`flex-col min-w-0 flex-1 h-full ${showChat ? 'flex' : 'hidden'} sm:flex`}>
           {!selectedPhone ? (
             <div className="flex-1 flex flex-col items-center justify-center gap-3" style={{ background: theme.chatBg }}>
-              <div className="w-16 h-16 rounded-full flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.05)' }}>
-                <MessageSquare className="w-8 h-8" style={{ color: 'rgba(255,255,255,0.2)' }} />
+              <div className="w-16 h-16 rounded-full flex items-center justify-center" style={{ background: '#F0F3F7' }}>
+                <MessageSquare className="w-8 h-8" style={{ color: '#9CA3AF' }} />
               </div>
               <p className="text-sm font-medium" style={{ color: '#8696a0' }}>Selecciona un chat</p>
               <p className="text-xs" style={{ color: '#8696a0' }}>para ver el historial de mensajes</p>
@@ -3074,8 +3074,8 @@ function ChatsTab({ bot }: { bot: Bot }) {
               {/* ── Cabecera del chat ── */}
               <div className="px-2 sm:px-3 py-2 flex items-center gap-2 shrink-0" style={{ background: theme.headerBg }}>
                 {/* Volver — solo móvil */}
-                <button onClick={() => setSelectedPhone(null)} className="sm:hidden p-1.5 rounded-full hover:bg-white/10 transition-colors shrink-0">
-                  <ArrowLeft className="w-4 h-4 text-white/70" />
+                <button onClick={() => setSelectedPhone(null)} className="sm:hidden p-1.5 rounded-full hover:bg-[#EEF2F7] transition-colors shrink-0">
+                  <ArrowLeft className="w-4 h-4 text-[#111827]/70" />
                 </button>
 
                 {/* Avatar */}
@@ -3085,7 +3085,7 @@ function ChatsTab({ bot }: { bot: Bot }) {
 
                 {/* Nombre */}
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs sm:text-sm font-semibold truncate text-white">{selectedConv?.userName || selectedPhone}</p>
+                  <p className="text-xs sm:text-sm font-semibold truncate text-[#111827]">{selectedConv?.userName || selectedPhone}</p>
                   <p className="text-[9px] sm:text-[10px] truncate" style={{ color: '#8696a0' }}>{selectedPhone}</p>
                 </div>
 
@@ -3169,10 +3169,10 @@ function ChatsTab({ bot }: { bot: Bot }) {
                       >
                         <div className="whitespace-pre-wrap break-words">{text}</div>
                         <div className="flex items-center justify-end gap-1 mt-1">
-                          <span className="text-[10px]" style={{ color: isBot ? 'rgba(255,255,255,0.5)' : '#8696a0' }}>
+                          <span className="text-[10px]" style={{ color: isBot ? '#6B7280' : '#8696a0' }}>
                             {msg.type !== 'text' ? `📎 ${msg.type} · ` : ''}{time}
                           </span>
-                          {isBot && <span className="text-[10px]" style={{ color: 'rgba(255,255,255,0.5)' }}>✓✓</span>}
+                          {isBot && <span className="text-[10px]" style={{ color: '#6B7280' }}>✓✓</span>}
                         </div>
                       </div>
                     </div>
@@ -3184,7 +3184,7 @@ function ChatsTab({ bot }: { bot: Bot }) {
               {/* ── Input de respuesta ── */}
               {bot.type !== 'YCLOUD' ? (
                 <div className="px-4 py-3 flex items-center justify-center shrink-0" style={{ background: theme.headerBg }}>
-                  <span className="text-xs rounded-full px-3 py-1.5" style={{ background: 'rgba(255,255,255,0.05)', color: '#8696a0' }}>
+                  <span className="text-xs rounded-full px-3 py-1.5" style={{ background: '#F0F3F7', color: '#8696a0' }}>
                     Envío manual solo disponible para bots YCloud
                   </span>
                 </div>
@@ -3200,7 +3200,7 @@ function ChatsTab({ bot }: { bot: Bot }) {
                       onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendReply() } }}
                       placeholder="Escribe un mensaje…"
                       rows={1}
-                      className="flex-1 rounded-2xl px-4 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none resize-none"
+                      className="flex-1 rounded-2xl px-4 py-2.5 text-sm text-[#111827] placeholder-white/30 focus:outline-none resize-none"
                       style={{ background: theme.inputBg, border: `1px solid ${theme.inputBorder}`, maxHeight: 100 }}
                     />
                     <button
@@ -3211,8 +3211,8 @@ function ChatsTab({ bot }: { bot: Bot }) {
                       title="Enviar"
                     >
                       {sending
-                        ? <Loader2 className="w-4 h-4 animate-spin text-white" />
-                        : <svg viewBox="0 0 24 24" className="w-5 h-5 text-white fill-current" style={{ transform: 'rotate(45deg)', marginLeft: '-2px' }}><path d="M2 21L23 12 2 3v7l15 2-15 2z"/></svg>}
+                        ? <Loader2 className="w-4 h-4 animate-spin text-[#111827]" />
+                        : <svg viewBox="0 0 24 24" className="w-5 h-5 text-[#111827] fill-current" style={{ transform: 'rotate(45deg)', marginLeft: '-2px' }}><path d="M2 21L23 12 2 3v7l15 2-15 2z"/></svg>}
                     </button>
                   </div>
                 </div>
@@ -3226,7 +3226,7 @@ function ChatsTab({ bot }: { bot: Bot }) {
     {/* ── Modal: Marcar Venta Manual ── */}
     {markSoldModal && (
       <div
-        style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}
+        style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,0.10)', zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}
         onClick={e => { if (e.target === e.currentTarget) setMarkSoldModal(false) }}
       >
         <div style={{ background: '#0D0F1E', border: '1px solid rgba(0,255,136,0.2)', borderRadius: 16, padding: 24, width: '100%', maxWidth: 480 }}>
@@ -3235,7 +3235,7 @@ function ChatsTab({ bot }: { bot: Bot }) {
               <ShoppingBag size={18} color="#00FF88" />
               <span style={{ color: '#fff', fontWeight: 700, fontSize: 15 }}>Registrar venta por llamada</span>
             </div>
-            <button onClick={() => setMarkSoldModal(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.4)' }}>
+            <button onClick={() => setMarkSoldModal(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#6B7280' }}>
               <X size={18} />
             </button>
           </div>
@@ -3248,14 +3248,14 @@ function ChatsTab({ bot }: { bot: Bot }) {
             rows={6}
             style={{
               width: '100%', borderRadius: 10, padding: '10px 12px', fontSize: 13,
-              background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.12)',
+              background: '#F0F3F7', border: '1px solid rgba(255,255,255,0.12)',
               color: '#fff', resize: 'vertical', outline: 'none', fontFamily: 'inherit',
             }}
           />
           <div style={{ display: 'flex', gap: 8, marginTop: 14, justifyContent: 'flex-end' }}>
             <button
               onClick={() => setMarkSoldModal(false)}
-              style={{ padding: '8px 16px', borderRadius: 8, border: '1px solid rgba(255,255,255,0.12)', background: 'transparent', color: 'rgba(255,255,255,0.5)', cursor: 'pointer', fontSize: 13 }}
+              style={{ padding: '8px 16px', borderRadius: 8, border: '1px solid rgba(255,255,255,0.12)', background: 'transparent', color: '#6B7280', cursor: 'pointer', fontSize: 13 }}
             >
               Cancelar
             </button>
@@ -3363,13 +3363,13 @@ function BotDetailView({
       <div className="flex items-center gap-4">
         <button
           onClick={onBack}
-          className="p-2 hover:bg-white/5 rounded-lg transition-colors text-dark-400 hover:text-white"
+          className="p-2 hover:bg-[#F4F6FA] rounded-lg transition-colors text-[#6B7280] hover:text-[#111827]"
         >
           <ArrowLeft className="w-5 h-5" />
         </button>
         <div className="flex-1 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-neon-green/10 border border-neon-green/20 flex items-center justify-center shrink-0">
-            <Bot className="w-5 h-5 text-neon-green" />
+          <div className="w-10 h-10 rounded-xl bg-[#16A34A]/10 border border-[#16A34A]/20 flex items-center justify-center shrink-0">
+            <Bot className="w-5 h-5 text-[#16A34A]" />
           </div>
           {editingName ? (
             <div className="flex items-center gap-2 flex-1">
@@ -3378,21 +3378,21 @@ function BotDetailView({
                 onChange={e => setNewName(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && saveName()}
                 autoFocus
-                className="bg-dark-900/50 border border-white/20 rounded-lg px-3 py-1.5 text-sm text-white focus:outline-none focus:border-neon-green/40 flex-1 max-w-xs"
+                className="bg-[#F4F6FA]0 border border-[#E4E9F0] rounded-lg px-3 py-1.5 text-sm text-[#111827] focus:outline-none focus:border-[#16A34A]/40 flex-1 max-w-xs"
               />
-              <button onClick={saveName} disabled={savingName} className="text-neon-green hover:text-neon-green/80">
+              <button onClick={saveName} disabled={savingName} className="text-[#16A34A] hover:text-[#16A34A]/80">
                 {savingName ? <Spinner /> : <Check className="w-4 h-4" />}
               </button>
-              <button onClick={() => setEditingName(false)} className="text-dark-400 hover:text-white">
+              <button onClick={() => setEditingName(false)} className="text-[#6B7280] hover:text-[#111827]">
                 <X className="w-4 h-4" />
               </button>
             </div>
           ) : (
             <div className="flex items-center gap-2">
-              <h2 className="font-bold text-white">{bot.name}</h2>
+              <h2 className="font-bold text-[#111827]">{bot.name}</h2>
               <button
                 onClick={() => { setNewName(bot.name); setEditingName(true) }}
-                className="text-dark-500 hover:text-white transition-colors"
+                className="text-[#9CA3AF] hover:text-[#111827] transition-colors"
               >
                 <Edit2 className="w-3.5 h-3.5" />
               </button>
@@ -3404,8 +3404,8 @@ function BotDetailView({
           disabled={savingStatus}
           title={bot.status === 'ACTIVE' ? 'Pausar agente' : 'Activar agente'}
           className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[10px] font-bold transition-all disabled:opacity-50 ${bot.status === 'ACTIVE'
-            ? 'bg-neon-green/10 text-neon-green border-neon-green/20 hover:bg-red-500/10 hover:text-red-400 hover:border-red-500/30'
-            : 'bg-dark-700/50 text-dark-400 border-dark-600 hover:bg-neon-green/10 hover:text-neon-green hover:border-neon-green/20'
+            ? 'bg-[#16A34A]/10 text-[#16A34A] border-[#16A34A]/20 hover:bg-red-500/10 hover:text-red-400 hover:border-red-500/30'
+            : 'bg-dark-700/50 text-[#6B7280] border-[#E4E9F0] hover:bg-[#16A34A]/10 hover:text-[#16A34A] hover:border-[#16A34A]/20'
             }`}
         >
           {savingStatus ? (
@@ -3421,21 +3421,21 @@ function BotDetailView({
           onClick={handleDelete}
           disabled={deleting}
           title="Eliminar agente"
-          className="p-2 hover:bg-red-500/10 rounded-lg transition-colors text-dark-500 hover:text-red-400 disabled:opacity-50"
+          className="p-2 hover:bg-red-500/10 rounded-lg transition-colors text-[#9CA3AF] hover:text-red-400 disabled:opacity-50"
         >
           {deleting ? <Spinner /> : <Trash2 className="w-4 h-4" />}
         </button>
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 bg-dark-900/50 p-1 rounded-xl border border-white/5 overflow-x-auto scrollbar-hide">
+      <div className="flex gap-1 bg-[#F4F6FA]0 p-1 rounded-xl border border-[#E4E9F0] overflow-x-auto scrollbar-hide">
         {tabs.map(t => (
           <button
             key={t.id}
             onClick={() => setTab(t.id)}
             className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium transition-all whitespace-nowrap ${tab === t.id
-              ? 'bg-dark-700 text-white shadow-sm border border-white/10'
-              : 'text-dark-400 hover:text-dark-200 hover:bg-white/5'
+              ? 'bg-dark-700 text-[#111827] shadow-sm border border-[#E4E9F0]'
+              : 'text-[#6B7280] hover:text-[#374151] hover:bg-[#F4F6FA]'
               }`}
           >
             {t.icon}
@@ -3546,27 +3546,28 @@ export default function WhatsAppPage() {
   const activeBots = bots.filter(b => b.status === 'ACTIVE').length
 
   return (
-    <div className="px-4 sm:px-6 pt-6 max-w-screen-2xl mx-auto pb-20 fade-in">
+    <div className="font-ui" style={{ background: 'linear-gradient(135deg, #F8FAFC 0%, #F5F7FA 45%, #EEF2F7 100%)', minHeight: '100vh', color: '#111827' }}>
+    <div className="px-4 sm:px-6 lg:px-8 pt-8 max-w-screen-2xl mx-auto pb-20 fade-in">
       {/* Page Header */}
       <div className="flex items-center gap-3 mb-5">
         <Link
           href="/dashboard/services"
-          className="p-1.5 hover:bg-white/5 rounded-lg transition-colors group shrink-0"
+          className="p-1.5 hover:bg-[#F4F6FA] rounded-lg transition-colors group shrink-0"
         >
-          <ArrowLeft className="w-4.5 h-4.5 text-dark-400 group-hover:text-white transition-colors" />
+          <ArrowLeft className="w-4.5 h-4.5 text-[#6B7280] group-hover:text-[#111827] transition-colors" />
         </Link>
         <div className="flex items-center gap-3 flex-1 min-w-0">
           <div className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style={{ background: 'rgba(34,183,255,0.12)', border: '1px solid rgba(34,183,255,0.28)', boxShadow: '0 0 14px -4px rgba(34,183,255,0.4)' }}>
             <MessageCircle className="w-4.5 h-4.5" style={{ color: '#22B7FF' }} />
           </div>
           <div className="min-w-0">
-            <h1 className="text-lg font-bold text-white flex items-center gap-2 leading-tight" style={{ letterSpacing: '-0.02em' }}>
+            <h1 className="text-lg font-bold text-[#111827] flex items-center gap-2 leading-tight" style={{ letterSpacing: '-0.02em' }}>
               <span className="truncate">WhatsApp Bots</span>
               <span className="text-[9px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded-md shrink-0" style={{ background: 'rgba(34,183,255,0.12)', color: '#22B7FF', border: '1px solid rgba(34,183,255,0.28)' }}>
                 Multi-Tenant
               </span>
             </h1>
-            <p className="text-[11px] text-dark-400 truncate">Configura y gestiona tus agentes AI de ventas.</p>
+            <p className="text-[11px] text-[#6B7280] truncate">Configura y gestiona tus agentes AI de ventas.</p>
           </div>
         </div>
         <AIKeySelector compact />
@@ -3583,33 +3584,33 @@ export default function WhatsAppPage() {
         <div className="space-y-4">
           {/* Stats */}
           <div className="grid grid-cols-3 gap-2.5">
-            <div className="glass-panel px-3 py-2.5 rounded-xl flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center shrink-0">
-                <Bot className="w-4 h-4 text-dark-300" />
+            <div className="dm-card px-3 py-2.5 rounded-xl flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-lg bg-[#F4F6FA] border border-[#E4E9F0] flex items-center justify-center shrink-0">
+                <Bot className="w-4 h-4 text-[#374151]" />
               </div>
               <div className="min-w-0">
-                <div className="text-lg font-bold text-white leading-none">{bots.length}</div>
-                <div className="text-[10px] text-dark-400 mt-0.5 truncate">Total agentes</div>
+                <div className="text-lg font-bold text-[#111827] leading-none">{bots.length}</div>
+                <div className="text-[10px] text-[#6B7280] mt-0.5 truncate">Total agentes</div>
               </div>
             </div>
-            <div className="glass-panel px-3 py-2.5 rounded-xl flex items-center gap-2.5" style={{ border: '1px solid rgba(34,183,255,0.14)' }}>
+            <div className="dm-card px-3 py-2.5 rounded-xl flex items-center gap-2.5" style={{ border: '1px solid rgba(34,183,255,0.14)' }}>
               <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ background: 'rgba(34,183,255,0.12)', border: '1px solid rgba(34,183,255,0.28)' }}>
                 <Zap className="w-4 h-4" style={{ color: '#22B7FF' }} />
               </div>
               <div className="min-w-0">
                 <div className="text-lg font-bold leading-none" style={{ color: '#22B7FF' }}>{activeBots}</div>
-                <div className="text-[10px] text-dark-400 mt-0.5 truncate">Activos ahora</div>
+                <div className="text-[10px] text-[#6B7280] mt-0.5 truncate">Activos ahora</div>
               </div>
             </div>
-            <div className="glass-panel px-3 py-2.5 rounded-xl flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-neon-blue/10 border border-neon-blue/20 flex items-center justify-center shrink-0">
-                <ShoppingBag className="w-4 h-4 text-neon-blue" />
+            <div className="dm-card px-3 py-2.5 rounded-xl flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-lg bg-[#233B8F]/10 border border-[#233B8F]/20 flex items-center justify-center shrink-0">
+                <ShoppingBag className="w-4 h-4 text-[#233B8F]" />
               </div>
               <div className="min-w-0">
-                <div className="text-lg font-bold text-neon-blue leading-none">
+                <div className="text-lg font-bold text-[#233B8F] leading-none">
                   {bots.reduce((acc, b) => acc + (b._count?.assignedProducts ?? 0), 0)}
                 </div>
-                <div className="text-[10px] text-dark-400 mt-0.5 truncate">Productos totales</div>
+                <div className="text-[10px] text-[#6B7280] mt-0.5 truncate">Productos totales</div>
               </div>
             </div>
           </div>
@@ -3623,15 +3624,15 @@ export default function WhatsAppPage() {
           {/* Bot list */}
           {loading ? (
             <div className="flex items-center justify-center py-12">
-              <Loader2 className="w-6 h-6 animate-spin text-dark-400" />
+              <Loader2 className="w-6 h-6 animate-spin text-[#6B7280]" />
             </div>
           ) : bots.length === 0 ? (
-            <div className="glass-panel p-12 rounded-2xl text-center border border-white/5">
-              <div className="w-16 h-16 rounded-2xl bg-neon-green/5 border border-neon-green/10 flex items-center justify-center mx-auto mb-4 shadow-[0_0_20px_rgba(0,255,157,0.08)]">
-                <Bot className="w-8 h-8 text-dark-500" />
+            <div className="dm-card p-12 rounded-2xl text-center border border-[#E4E9F0]">
+              <div className="w-16 h-16 rounded-2xl bg-[#16A34A]/5 border border-[#16A34A]/10 flex items-center justify-center mx-auto mb-4 shadow-[0_0_20px_rgba(0,255,157,0.08)]">
+                <Bot className="w-8 h-8 text-[#9CA3AF]" />
               </div>
-              <div className="text-white font-semibold mb-1">Sin agentes configurados</div>
-              <div className="text-dark-400 text-sm max-w-xs mx-auto">
+              <div className="text-[#111827] font-semibold mb-1">Sin agentes configurados</div>
+              <div className="text-[#6B7280] text-sm max-w-xs mx-auto">
                 Crea tu primer agente AI de ventas usando el formulario de arriba.
               </div>
             </div>
@@ -3646,9 +3647,9 @@ export default function WhatsAppPage() {
           {/* How it works — compact onboarding strip */}
           <div className="rounded-2xl px-4 py-3.5"
             style={{
-              background: 'radial-gradient(120% 80% at 50% -10%, rgba(34,183,255,0.10), rgba(255,255,255,0) 58%), linear-gradient(180deg, rgba(16,18,38,0.78), rgba(11,12,26,0.76))',
+              background: 'radial-gradient(120% 80% at 50% -10%, rgba(34,183,255,0.10), rgba(255,255,255,0) 58%), linear-gradient(180deg, rgba(255,255,255,0.78), rgba(255,255,255,0.76))',
               border: '1px solid rgba(255,255,255,0.07)',
-              boxShadow: '0 14px 32px -22px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.04)',
+              boxShadow: '0 14px 32px -22px rgba(15,23,42,0.10), inset 0 1px 0 rgba(255,255,255,0.04)',
             }}>
             <h3 className="text-[11px] font-bold uppercase tracking-[0.18em] mb-3 flex items-center gap-2" style={{ color: 'rgba(255,255,255,0.55)' }}>
               <Zap className="w-3 h-3" style={{ color: '#22B7FF' }} />
@@ -3672,8 +3673,8 @@ export default function WhatsAppPage() {
                       style={{ background: '#0b0c1a', color: step.c, border: `1px solid ${step.c}55` }}>{i + 1}</span>
                   </div>
                   <div className="min-w-0">
-                    <div className="text-[11px] font-bold text-white leading-tight truncate" style={{ letterSpacing: '-0.01em' }}>{step.title}</div>
-                    <div className="text-[10px] truncate" style={{ color: 'rgba(255,255,255,0.35)' }}>{step.desc}</div>
+                    <div className="text-[11px] font-bold text-[#111827] leading-tight truncate" style={{ letterSpacing: '-0.01em' }}>{step.title}</div>
+                    <div className="text-[10px] truncate" style={{ color: '#6B7280' }}>{step.desc}</div>
                   </div>
                 </div>
               ))}
@@ -3681,6 +3682,7 @@ export default function WhatsAppPage() {
           </div>
         </div>
       )}
+    </div>
     </div>
   )
 }
