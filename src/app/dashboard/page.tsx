@@ -246,170 +246,122 @@ export default function DashboardPage() {
       </div>
 
       {/* ═══════════════════════════════════════════════════════════
-           DESKTOP VIEW
+           DESKTOP VIEW — Premium light (MY DIAMOND)
       ═══════════════════════════════════════════════════════════ */}
       <div className="hidden lg:flex w-full flex-1">
-        <main className="d-main">
+        <main className="d-main font-ui" style={{ background: 'linear-gradient(135deg, #F8FAFC 0%, #F5F7FA 45%, #EEF2F7 100%)', color: '#111827', minHeight: '100vh', gap: '24px' }}>
 
-          {/* Banner + Profile */}
-          <div style={{ position: 'relative', borderRadius: '22px', overflow: 'hidden', height: '200px', flexShrink: 0 }}>
-            {IMAGES.map((img, i) => (
-              <div key={i} style={{ position: 'absolute', inset: 0, backgroundImage: `url('${img}')`, backgroundSize: 'cover', backgroundPosition: 'center', opacity: imgIdx === i ? 1 : 0, transition: 'opacity 1.3s ease' }} />
-            ))}
-            <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to right, rgba(10,0,48,0.88) 0%, rgba(13,30,121,0.25) 100%)' }} />
-            <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', gap: '20px', padding: '0 28px' }}>
-              <div className="avatar-wrap" style={{ marginTop: 0 }}>
-                <div className="avatar-ring" />
-                <label htmlFor="avatar-file-desktop" className="avatar" style={{ cursor: uploading ? 'not-allowed' : 'pointer', width: 80, height: 80 }}>
+          {/* ── TOPBAR ── */}
+          <header style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, flexWrap: 'wrap' }}>
+            <div style={{ position: 'relative', flex: 1, minWidth: 240, maxWidth: 460 }}>
+              <i className="fa-solid fa-magnifying-glass" style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', color: '#9CA3AF', fontSize: 13 }} />
+              <input placeholder="Buscar en la plataforma…" className="dm-input" style={{ paddingLeft: 40, height: 48, boxShadow: '0 8px 24px rgba(15,23,42,0.04)' }} />
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+              <NotificationBell />
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, background: 'rgba(255,255,255,0.9)', border: '1px solid #E4E9F0', borderRadius: 16, padding: '7px 12px', boxShadow: '0 8px 24px rgba(15,23,42,0.04)' }}>
+                <label htmlFor="avatar-file-desktop" style={{ cursor: uploading ? 'not-allowed' : 'pointer', width: 38, height: 38, borderRadius: '50%', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--dm-grad)', color: '#fff', flexShrink: 0 }}>
                   <input id="avatar-file-desktop" type="file" accept="image/*" disabled={uploading} style={{ display: 'none' }} onChange={uploadAvatar} />
                   {data.user.avatarUrl
-                    ? <img src={data.user.avatarUrl} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
-                    : <i className="fa-solid fa-user" style={{ fontSize: '1.8rem' }} />}
+                    ? <img src={data.user.avatarUrl} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    : <i className="fa-solid fa-user" style={{ fontSize: 14 }} />}
                 </label>
-                <div className="avatar__status" />
+                <div style={{ lineHeight: 1.25 }}>
+                  <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: '#111827' }}>{data.user.fullName}</p>
+                  <p style={{ margin: 0, fontSize: 11, fontWeight: 600, color: '#FF096C' }}>{data.user.rank || 'Plan'} · {data.user.isActive ? 'Activo' : 'Inactivo'}</p>
+                </div>
               </div>
-              <div>
-                <p style={{ fontSize: '1.5rem', fontWeight: 800, color: '#fff', margin: 0, lineHeight: 1.2 }}>{data.user.fullName}</p>
-                <p style={{ fontSize: '0.78rem', color: 'rgba(255,255,255,0.45)', margin: '5px 0 10px' }}>@{data.user.username} · MY DIAMOND</p>
-                <span className="u-pill u-pill--accent" style={{ fontSize: '.72rem' }}>
-                  <span className="u-live-dot" />&nbsp;{data.user.rank || 'Plan'} · {data.user.isActive ? 'Activo' : 'Inactivo'}
-                </span>
-              </div>
-            </div>
-            <div className="cover__dots">
-              {IMAGES.map((_, i) => (
-                <button key={i} onClick={() => setImgIdx(i)} className={`cover__dot ${imgIdx === i ? 'cover__dot--active' : ''}`} aria-label={`Slide ${i + 1}`} />
-              ))}
-            </div>
-          </div>
-
-          {/* Topbar */}
-          <header className="topbar">
-            <div>
-              <h1 className="topbar__title">Dashboard</h1>
-              <p className="topbar__sub">MY DIAMOND &nbsp;·&nbsp; <span className="tag-active"><span className="u-live-dot"></span>&nbsp;{data.user.rank || 'Plan'} {data.user.isActive ? 'Activo' : 'Inactivo'}</span></p>
             </div>
           </header>
 
-          {/* Countdown / CTA Plan */}
+          {/* ── HERO premium ── */}
+          <div className="dm-hero" style={{ display: 'flex', alignItems: 'stretch', minHeight: 240 }}>
+            <div style={{ position: 'relative', zIndex: 2, flex: 1, padding: '38px 42px', display: 'flex', flexDirection: 'column', justifyContent: 'center', minWidth: 0 }}>
+              <p style={{ margin: 0, fontSize: 12, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: '#FF6FA8' }}>Bienvenido de nuevo</p>
+              <h1 className="font-display text-silver-gradient" style={{ margin: '4px 0 0', fontSize: 'clamp(34px, 4vw, 52px)', fontWeight: 600, lineHeight: 1, letterSpacing: '-0.01em' }}>{data.user.fullName}</h1>
+              <p style={{ margin: '12px 0 16px', fontSize: 13.5, color: 'rgba(255,255,255,0.5)' }}>@{data.user.username} · MY DIAMOND</p>
+              <Link href="/dashboard/planes" className="dm-badge" style={{ width: 'fit-content', textDecoration: 'none' }}>
+                <i className="fa-solid fa-crown" style={{ fontSize: 11 }} /> {data.user.rank || 'Plan'} · {data.user.isActive ? 'Activo' : 'Inactivo'}
+              </Link>
+            </div>
+            <div className="hidden xl:flex" style={{ position: 'relative', width: 340, alignItems: 'center', justifyContent: 'center', padding: '0 36px 0 0' }}>
+              <div style={{ position: 'absolute', right: 60, top: '50%', transform: 'translateY(-50%)', width: 220, height: 220, borderRadius: '50%', background: 'radial-gradient(circle, rgba(255,9,108,0.28), transparent 60%)', filter: 'blur(8px)' }} />
+              <i className="fa-solid fa-gem" style={{ position: 'relative', fontSize: 96, background: 'var(--dm-silver)', WebkitBackgroundClip: 'text', backgroundClip: 'text', color: 'transparent', filter: 'drop-shadow(0 18px 40px rgba(255,9,108,0.35))' }} />
+            </div>
+          </div>
+
+          {/* ── STAT CARDS (datos reales) ── */}
+          <div className="d-grid d-grid-4">
+            {[
+              { icon: 'fa-crown',        label: 'Tu Plan',         value: data.user.rank || '—',                          href: '/dashboard/planes', cta: 'Ver planes' },
+              { icon: 'fa-clock',        label: 'Días restantes',  value: countdown ? String(countdown.d) : '—',          href: '/dashboard/planes', cta: 'Renovar' },
+              { icon: 'fa-layer-group',  label: 'Servicios',       value: String(SERVICES.filter(s => !s.hidden).length), href: '/dashboard/services', cta: 'Explorar' },
+              { icon: 'fa-circle-check', label: 'Estado',          value: data.user.isActive ? 'Activo' : 'Inactivo',     href: '/dashboard/profile', cta: 'Mi perfil' },
+            ].map((st, i) => (
+              <div key={i} className="dm-card dm-card--hover" style={{ padding: 22, display: 'flex', flexDirection: 'column', gap: 14 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+                  <div style={{ width: 50, height: 50, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--dm-grad)', color: '#fff', boxShadow: '0 12px 28px rgba(255,9,108,0.24)', flexShrink: 0 }}>
+                    <i className={`fa-solid ${st.icon}`} style={{ fontSize: 18 }} />
+                  </div>
+                  <div style={{ minWidth: 0 }}>
+                    <p style={{ margin: 0, fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#6B7280' }}>{st.label}</p>
+                    <p className="font-display" style={{ margin: '2px 0 0', fontSize: 28, fontWeight: 600, color: '#111827', lineHeight: 1.05 }}>{st.value}</p>
+                  </div>
+                </div>
+                <Link href={st.href} style={{ fontSize: 12.5, fontWeight: 700, color: '#FF096C', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 6 }}>{st.cta} <i className="fa-solid fa-arrow-right" style={{ fontSize: 10 }} /></Link>
+              </div>
+            ))}
+          </div>
+
+          {/* ── CTA Plan (countdown o comprar) ── */}
           {data.user.rank && data.user.rank !== 'NONE' && data.user.planExpiresAt ? (
-            <div className="d-card-comp countdown-row">
+            <div className="dm-card" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 20, padding: '22px 26px' }}>
               <div>
-                <p className="d-card__label" style={{ marginBottom: 'var(--sp-3)' }}>
-                  <i className="fa-solid fa-clock" style={{ color: 'var(--clr-accent-lt)' }}></i>&nbsp; Plan {data.user.rank} · Vence en
+                <p style={{ margin: 0, fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#6B7280' }}>
+                  <i className="fa-solid fa-clock" style={{ color: '#FF096C' }} />&nbsp; Plan {data.user.rank} · Vence en
                 </p>
-                <div className="countdown-units">
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 12 }}>
                   {[{ v: countdown?.d, l: 'Días' }, { v: countdown?.h, l: 'Horas' }, { v: countdown?.m, l: 'Min' }, { v: countdown?.s, l: 'Seg' }].map((u, i) => (
-                    <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 'var(--sp-2)' }}>
-                      {i > 0 && <span className="countdown-sep">:</span>}
-                      <div className="countdown-unit">
-                        <span className="countdown-num">{u.v !== undefined ? String(u.v).padStart(2, '0') : '00'}</span>
-                        <span className="countdown-lbl">{u.l}</span>
+                    <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                      {i > 0 && <span style={{ fontSize: 20, fontWeight: 700, color: '#B735B8', marginBottom: 16 }}>:</span>}
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 5 }}>
+                        <span className="font-display" style={{ fontSize: 30, fontWeight: 600, color: '#111827', background: '#F0F3F7', border: '1px solid #E4E9F0', borderRadius: 12, padding: '6px 14px', minWidth: 58, textAlign: 'center', lineHeight: 1 }}>{u.v !== undefined ? String(u.v).padStart(2, '0') : '00'}</span>
+                        <span style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#9CA3AF' }}>{u.l}</span>
                       </div>
                     </div>
                   ))}
                 </div>
               </div>
-              <Link href="/dashboard/planes" className="renew-btn"><i className="fa-solid fa-rotate"></i> Renovar Plan</Link>
+              <Link href="/dashboard/planes" className="dm-btn" style={{ textDecoration: 'none' }}><i className="fa-solid fa-rotate" /> Renovar Plan</Link>
             </div>
           ) : (
-            <div className="d-card-comp" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 20, background: 'linear-gradient(135deg, rgba(210,3,221,0.08) 0%, rgba(13,30,121,0.12) 100%)', border: '1px solid rgba(210,3,221,0.2)' }}>
+            <div className="dm-card-dark" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 20, padding: 26 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-                <div className="icon-chip chip--accent" style={{ width: 50, height: 50, fontSize: '1.3rem', flexShrink: 0 }}>
-                  <i className="fa-solid fa-crown"></i>
-                </div>
+                <div className="dm-icon" style={{ width: 50, height: 50 }}><i className="fa-solid fa-crown" style={{ fontSize: 20 }} /></div>
                 <div>
-                  <p style={{ fontSize: '1rem', fontWeight: 700, color: '#fff', margin: 0 }}>¡Activa tu Plan MY DIAMOND!</p>
-                  <p style={{ fontSize: '.78rem', color: 'rgba(255,255,255,0.4)', margin: '4px 0 0' }}>Desbloquea acceso completo a todos los servicios.</p>
+                  <p className="font-display" style={{ fontSize: 22, fontWeight: 600, color: '#fff', margin: 0 }}>Lleva tu cuenta al siguiente nivel</p>
+                  <p style={{ fontSize: 13.5, color: 'rgba(255,255,255,0.55)', margin: '4px 0 0' }}>Desbloquea acceso completo a todos los servicios MY DIAMOND.</p>
                 </div>
               </div>
-              <Link href="/dashboard/planes" style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '11px 24px', borderRadius: 12, background: 'linear-gradient(135deg, #D203DD 0%, #0D1E79 100%)', color: '#fff', fontWeight: 800, fontSize: '.85rem', textDecoration: 'none', whiteSpace: 'nowrap', flexShrink: 0 }}>
-                <i className="fa-solid fa-crown"></i> Comprar Plan
-              </Link>
+              <Link href="/dashboard/planes" className="dm-btn" style={{ textDecoration: 'none', whiteSpace: 'nowrap' }}><i className="fa-solid fa-crown" /> Comprar Plan</Link>
             </div>
           )}
 
-          {/* Services Grid — desktop */}
+          {/* ── SERVICIOS — cards claras premium ── */}
           <section>
-            <p className="section-label" style={{ marginBottom: 6 }}><i className="fa-solid fa-th-large"></i>Servicios</p>
-            <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.35)', margin: '0 0 44px', lineHeight: 1.5 }}>
-              Activa tu sistema de automatización.
-            </p>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', columnGap: 18, rowGap: 44 }}>
-              {SERVICES.filter(s => !s.hidden).map((s, i) => (
-                <Link key={s.href} href={s.href} style={{ textDecoration: 'none', display: 'block' }}>
-                  <div
-                    style={{
-                      position: 'relative', borderRadius: 20,
-                      padding: '44px 20px 24px',
-                      background: `radial-gradient(120% 72% at 50% -4%, ${s.accent}24, rgba(255,255,255,0) 58%), linear-gradient(180deg, rgba(17,19,40,0.78) 0%, rgba(10,11,24,0.66) 52%, rgba(14,16,34,0.55) 100%)`,
-                      border: '1px solid rgba(255,255,255,0.10)',
-                      boxShadow: '0 26px 54px -24px rgba(0,0,0,0.82), 0 6px 18px -10px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.06)',
-                      display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 7,
-                      transition: 'transform 0.32s cubic-bezier(0.22,1,0.36,1), border-color 0.32s ease, box-shadow 0.32s ease, background 0.32s ease',
-                      cursor: 'pointer',
-                    }}
-                    onMouseEnter={e => {
-                      const el = e.currentTarget as HTMLElement
-                      el.style.transform = 'translateY(-5px)'
-                      el.style.borderColor = `${s.accent}55`
-                      el.style.boxShadow = `0 34px 64px -24px rgba(0,0,0,0.88), 0 0 30px -8px ${s.accent}40, inset 0 1px 0 rgba(255,255,255,0.09)`
-                      el.style.background = `radial-gradient(120% 72% at 50% -4%, ${s.accent}33, rgba(255,255,255,0) 60%), linear-gradient(180deg, rgba(20,22,46,0.82) 0%, rgba(11,12,26,0.7) 52%, rgba(16,18,38,0.58) 100%)`
-                    }}
-                    onMouseLeave={e => {
-                      const el = e.currentTarget as HTMLElement
-                      el.style.transform = 'translateY(0)'
-                      el.style.borderColor = 'rgba(255,255,255,0.10)'
-                      el.style.boxShadow = '0 26px 54px -24px rgba(0,0,0,0.82), 0 6px 18px -10px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.06)'
-                      el.style.background = `radial-gradient(120% 72% at 50% -4%, ${s.accent}24, rgba(255,255,255,0) 58%), linear-gradient(180deg, rgba(17,19,40,0.78) 0%, rgba(10,11,24,0.66) 52%, rgba(14,16,34,0.55) 100%)`
-                    }}
-                  >
-                    {/* figura gigante del servicio integrada en el fondo (recortada a la card) */}
-                    <div style={{ position: 'absolute', inset: 0, borderRadius: 20, overflow: 'hidden', pointerEvents: 'none' }}>
-                      <i className={s.icon} style={{
-                        position: 'absolute', right: -14, bottom: -22, fontSize: 132,
-                        color: s.accent, opacity: 0.07, filter: 'blur(1.5px)',
-                        transform: 'rotate(-8deg)',
-                      }} />
-                    </div>
-                    {/* reflejo glass diagonal tenue */}
-                    <div style={{ position: 'absolute', inset: 0, borderRadius: 20, background: 'linear-gradient(152deg, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0) 36%)', pointerEvents: 'none' }} />
-                    {/* línea de reflejo superior */}
-                    <div style={{ position: 'absolute', top: 0, left: 16, right: 16, height: 1, background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.14), transparent)', pointerEvents: 'none' }} />
-                    {/* halo ambiental cinematográfico detrás del icono */}
-                    <div className="svc-glow-pulse" style={{ position: 'absolute', top: -22, left: '50%', transform: 'translateX(-50%)', width: 140, height: 92, borderRadius: '50%', background: `radial-gradient(ellipse, ${s.accent}3a, transparent 72%)`, filter: 'blur(15px)', pointerEvents: 'none' }} />
-                    {/* icono premium sobresaliendo desde arriba */}
-                    <div className="svc-float" style={{
-                      position: 'absolute', top: -26, left: '50%', transform: 'translateX(-50%)',
-                      width: 56, height: 56, borderRadius: 18,
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      background: `linear-gradient(155deg, rgba(255,255,255,0.13), rgba(255,255,255,0.02)), rgba(18,15,32,0.72)`,
-                      border: `1px solid ${s.accent}55`,
-                      boxShadow: `0 16px 34px -10px rgba(0,0,0,0.7), 0 0 16px -2px ${s.accent}3a, inset 0 1px 0 rgba(255,255,255,0.14)`,
-                      fontSize: 22, color: s.accent,
-                      WebkitFontSmoothing: 'antialiased',
-                    }}>
-                      <i className={s.icon} style={{ filter: `drop-shadow(0 0 7px ${s.accent}55)` }} />
-                    </div>
-                    <p style={{ fontSize: 15, fontWeight: 700, color: '#fff', margin: 0, lineHeight: 1.22, textAlign: 'center', letterSpacing: '-0.02em', textShadow: '0 1px 14px rgba(0,0,0,0.45)' }}>{s.label}</p>
-                    <p style={{ fontSize: 10.5, fontWeight: 400, color: 'rgba(255,255,255,0.52)', margin: 0, lineHeight: 1.4, textAlign: 'center', letterSpacing: '0.02em' }}>{s.desc}</p>
-                    {/* wave glow inferior — energía elegante difuminada */}
-                    <svg width="100%" height="34" viewBox="0 0 200 34" preserveAspectRatio="none" className="svc-wave"
-                      style={{ position: 'absolute', bottom: 0, left: 0, right: 0, pointerEvents: 'none' }}>
-                      <defs>
-                        <linearGradient id={`svcw-d-${i}`} x1="0" y1="0" x2="1" y2="0">
-                          <stop offset="0" stopColor={s.accent} stopOpacity="0" />
-                          <stop offset="0.5" stopColor={s.accent} stopOpacity="0.85" />
-                          <stop offset="1" stopColor={s.accent} stopOpacity="0" />
-                        </linearGradient>
-                        <filter id={`svcwb-d-${i}`} x="-20%" y="-60%" width="140%" height="240%">
-                          <feGaussianBlur stdDeviation="2.4" />
-                        </filter>
-                      </defs>
-                      <path d="M0 20 Q 100 4 200 22 L 200 27 Q 100 11 0 26 Z" fill={`url(#svcw-d-${i})`} opacity="0.55" filter={`url(#svcwb-d-${i})`} />
-                      <path d="M0 21 Q 100 6 200 23" stroke={`url(#svcw-d-${i})`} strokeWidth="1.4" fill="none" strokeLinecap="round" />
-                    </svg>
+            <h2 className="font-display" style={{ fontSize: 28, fontWeight: 600, color: '#111827', margin: 0 }}>Servicios</h2>
+            <p style={{ fontSize: 13.5, color: '#6B7280', margin: '4px 0 22px' }}>Gestiona tus herramientas digitales para crecer tu negocio.</p>
+            <div className="d-grid d-grid-4">
+              {SERVICES.filter(s => !s.hidden).map((s) => (
+                <Link key={s.href} href={s.href} className="dm-card dm-card--hover" style={{ padding: 22, display: 'flex', flexDirection: 'column', gap: 14, textDecoration: 'none', minHeight: 168 }}>
+                  <div style={{ width: 54, height: 54, borderRadius: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', background: `linear-gradient(145deg, ${s.accent}, ${s.accent}cc)`, color: '#fff', boxShadow: `0 12px 28px ${s.accent}3a`, fontSize: 20, flexShrink: 0 }}>
+                    <i className={s.icon} />
                   </div>
+                  <div style={{ flex: 1 }}>
+                    <p style={{ margin: 0, fontSize: 16, fontWeight: 700, color: '#111827' }}>{s.label}</p>
+                    <p style={{ margin: '4px 0 0', fontSize: 12.5, color: '#6B7280', lineHeight: 1.4 }}>{s.desc}</p>
+                  </div>
+                  <span style={{ fontSize: 12.5, fontWeight: 700, color: '#FF096C', display: 'inline-flex', alignItems: 'center', gap: 6 }}>Abrir servicio <i className="fa-solid fa-arrow-right" style={{ fontSize: 10 }} /></span>
                 </Link>
               ))}
             </div>
@@ -417,6 +369,7 @@ export default function DashboardPage() {
 
         </main>
       </div>
+
     </>
   )
 }
