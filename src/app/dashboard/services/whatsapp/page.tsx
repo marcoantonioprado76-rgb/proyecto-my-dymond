@@ -336,7 +336,7 @@ function GlobalBotChart({ bots }: { bots: Bot[] }) {
   const yVals = [0, Math.round(maxVal / 2), maxVal]
 
   return (
-    <div className="rounded-2xl" style={{ padding: '14px 16px 10px', background: 'radial-gradient(120% 80% at 50% -10%, rgba(106,53,217,0.12), rgba(255,255,255,0) 58%), linear-gradient(180deg, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.8) 55%, rgba(255,255,255,0.74) 100%)', border: '1px solid rgba(255,255,255,0.08)', boxShadow: '0 18px 40px -22px rgba(15,23,42,0.10), inset 0 1px 0 rgba(255,255,255,0.04)' }}>
+    <div className="rounded-2xl" style={{ padding: '14px 16px 10px', background: 'radial-gradient(120% 80% at 50% -10%, rgba(183,53,184,0.18), rgba(255,255,255,0) 58%), linear-gradient(180deg, #0B1B2B 0%, #081624 55%, #050B14 100%)', border: '1px solid rgba(255,255,255,0.08)', boxShadow: '0 22px 50px -24px rgba(8,22,36,0.6), inset 0 1px 0 rgba(255,255,255,0.06)' }}>
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 8, flexWrap: 'wrap', gap: 8 }}>
         <div>
@@ -345,18 +345,18 @@ function GlobalBotChart({ bots }: { bots: Bot[] }) {
               ? `${fmtChartDate(visibleDays[0].date)} — ${fmtChartDate(visibleDays[visibleDays.length - 1].date)}`
               : 'Últimos 7 días'}
           </p>
-          <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.28)', margin: '4px 0 0' }}>
-            <span style={{ color: '#D203DD', fontWeight: 700 }}>{visibleDays.reduce((s, d) => s + d.conversations, 0)}</span> personas ·{' '}
-            <span style={{ color: '#6A35D9', fontWeight: 700 }}>{visibleDays.reduce((s, d) => s + d.sales, 0)}</span> ventas
+          <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.6)', margin: '4px 0 0' }}>
+            <span style={{ color: '#7DD3FC', fontWeight: 700 }}>{visibleDays.reduce((s, d) => s + d.conversations, 0)}</span> personas ·{' '}
+            <span style={{ color: '#A78BFA', fontWeight: 700 }}>{visibleDays.reduce((s, d) => s + d.sales, 0)}</span> ventas
           </p>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-          <span style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 11, color: 'rgba(255,255,255,0.45)' }}>
-            <span style={{ display: 'inline-block', width: 10, height: 3, borderRadius: 99, background: '#0D1E79' }} />
+          <span style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 11, color: 'rgba(255,255,255,0.6)' }}>
+            <span style={{ display: 'inline-block', width: 10, height: 3, borderRadius: 99, background: '#7DD3FC' }} />
             ● Personas
           </span>
-          <span style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 11, color: 'rgba(255,255,255,0.45)' }}>
-            <span style={{ display: 'inline-block', width: 10, height: 3, borderRadius: 99, background: '#6A35D9' }} />
+          <span style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 11, color: 'rgba(255,255,255,0.6)' }}>
+            <span style={{ display: 'inline-block', width: 10, height: 3, borderRadius: 99, background: '#A78BFA' }} />
             ✦ Ventas
           </span>
         </div>
@@ -368,16 +368,16 @@ function GlobalBotChart({ bots }: { bots: Bot[] }) {
           {bots.map(b => (
             <button key={b.id} onClick={() => setSelectedBotId(b.id)}
               style={{ padding: '4px 12px', borderRadius: 99, fontSize: 11, fontWeight: 600, cursor: 'pointer', border: '1px solid', transition: 'all 0.15s',
-                background: selectedBotId === b.id ? 'rgba(255,45,247,0.1)' : 'transparent',
-                borderColor: selectedBotId === b.id ? 'rgba(255,45,247,0.4)' : 'rgba(255,255,255,0.08)',
-                color: selectedBotId === b.id ? '#FF2DF7' : '#6B7280',
+                background: selectedBotId === b.id ? 'rgba(255,9,108,0.15)' : 'rgba(255,255,255,0.04)',
+                borderColor: selectedBotId === b.id ? 'rgba(255,9,108,0.45)' : 'rgba(255,255,255,0.10)',
+                color: selectedBotId === b.id ? '#FF096C' : 'rgba(255,255,255,0.6)',
               }}>
               🤖 {b.name}
               {(b.salesCount ?? 0) > 0 && (
                 <span style={{
                   display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
                   minWidth: 16, height: 16, borderRadius: 99,
-                  background: '#0D1E79', color: '#000',
+                  background: 'linear-gradient(135deg, #FF2D95, #B735B8, #233B8F)', color: '#fff',
                   fontSize: 9, fontWeight: 800, padding: '0 4px', marginLeft: 4,
                 }}>
                   {b.salesCount}
@@ -449,7 +449,7 @@ function GlobalBotChart({ bots }: { bots: Bot[] }) {
             return (
               <g key={i}>
                 <line x1={padL} y1={y} x2={W - padR} y2={y}
-                  stroke="#F0F3F7" strokeWidth="1"
+                  stroke="rgba(255,255,255,0.07)" strokeWidth="1"
                   strokeDasharray={i === 0 ? undefined : '3 7'} />
                 <text x={padL - 6} y={y + 4} textAnchor="end"
                   fontSize="8" fill="rgba(255,255,255,0.18)" fontFamily="monospace">{v}</text>
@@ -501,9 +501,9 @@ function GlobalBotChart({ bots }: { bots: Bot[] }) {
             onClick={() => { setShowSalesModal(true); setSalesSeen(true) }}
             style={{
               display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 12,
-              fontWeight: 700, color: '#0D1E79',
-              background: 'rgba(13,30,121,0.08)',
-              border: '1px solid rgba(13,30,121,0.25)',
+              fontWeight: 700, color: '#fff',
+              background: 'rgba(255,255,255,0.08)',
+              border: '1px solid rgba(255,255,255,0.18)',
               borderRadius: 10, padding: '7px 16px',
               cursor: 'pointer', transition: 'all 0.15s',
             }}
@@ -513,7 +513,7 @@ function GlobalBotChart({ bots }: { bots: Bot[] }) {
               <span style={{
                 display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
                 minWidth: 18, height: 18, borderRadius: 99,
-                background: '#0D1E79', color: '#000',
+                background: 'linear-gradient(135deg, #FF2D95, #B735B8, #233B8F)', color: '#fff',
                 fontSize: 10, fontWeight: 800, padding: '0 5px',
               }}>
                 {recentSales.length}
