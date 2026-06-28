@@ -42,12 +42,7 @@ export default function Navbar() {
       {/* ── SIDEBAR DESKTOP ── */}
       <aside className="sidebar hidden lg:flex" aria-label="Barra lateral">
         <Link href="/dashboard" className="sidebar__logo">
-          <div className="sidebar__logo-ring">
-            <img src="/logo.png" alt="MY DIAMOND" />
-          </div>
-          <div className="sidebar__logo-info">
-            <img src="/wordmark-mydiamond.png" alt="MY DIAMOND" className="sidebar__logo-wordmark" />
-          </div>
+          <img src="/logo-oficial-mydiamond.png" alt="MY DIAMOND" className="sidebar__logo-official" />
         </Link>
 
         <nav className="sidebar__nav" aria-label="Menú">
