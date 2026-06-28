@@ -726,8 +726,22 @@
     overflow: hidden;
 }
 
-/* sin línea ni glow — el header comparte el fondo del sidebar */
-.sidebar__logo::before { display: none; }
+/* línea divisoria plata degradada (elegante) al borde del área del logo */
+.sidebar__logo::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 16px;
+    right: 16px;
+    height: 1px;
+    background: linear-gradient(90deg,
+        transparent 0%,
+        rgba(184,192,204,0.40) 18%,
+        rgba(248,250,252,0.80) 50%,
+        rgba(184,192,204,0.40) 82%,
+        transparent 100%
+    );
+}
 .sidebar__logo::after { display: none; }
 
 /* logo oficial único (diamante plata + MY DIAMOND) */
