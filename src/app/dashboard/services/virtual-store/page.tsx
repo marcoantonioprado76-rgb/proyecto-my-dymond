@@ -142,7 +142,7 @@ function ShareStoreModal({ store, onClose }: { store: StoreRecord; onClose: () =
                         <button type="button" onClick={onClose} className="flex-1 py-3 text-[#374151] font-bold rounded-xl border border-purple-500/25 hover:bg-[#F4F6FA] transition-all text-sm">
                             Cancelar
                         </button>
-                        <button type="submit" disabled={loading} className="flex-1 py-3 bg-[#233B8F] text-dark-950 font-bold rounded-xl disabled:opacity-50 flex items-center justify-center gap-2 text-sm transition-all">
+                        <button type="submit" disabled={loading} className="flex-1 py-3 bg-gradient-to-r from-[#FF2D95] via-[#B735B8] to-[#233B8F] text-white font-bold rounded-xl disabled:opacity-50 flex items-center justify-center gap-2 text-sm transition-all">
                             {loading ? <Loader2 size={14} className="animate-spin" /> : <Share2 size={14} />}
                             Compartir
                         </button>
@@ -418,7 +418,7 @@ export default function VirtualStorePage() {
                     </div>
                     <button
                         onClick={() => { resetProductForm(); setShowProductModal(true); }}
-                        className="bg-[#233B8F] text-dark-950 px-6 py-3 rounded-xl font-bold flex items-center gap-2 hover:bg-[#233B8F]/90"
+                        className="bg-gradient-to-r from-[#FF2D95] via-[#B735B8] to-[#233B8F] text-white px-6 py-3 rounded-xl font-bold flex items-center gap-2 hover:bg-[#233B8F]/90"
                     >
                         <Plus size={20} /> Añadir Producto
                     </button>
@@ -679,7 +679,7 @@ export default function VirtualStorePage() {
                                 </div>
                                 <div className="flex gap-3 pt-4">
                                     <button type="button" onClick={() => setShowProductModal(false)} className="flex-1 py-3 sm:py-4 text-[#374151] font-bold rounded-xl border border-purple-500/25 hover:bg-[#F4F6FA] transition-all">Cancelar</button>
-                                    <button type="submit" className="flex-1 py-3 sm:py-4 bg-[#233B8F] text-dark-950 font-bold rounded-xl shadow-lg shadow-[#233B8F]/20 transition-all active:scale-95">Guardar</button>
+                                    <button type="submit" className="flex-1 py-3 sm:py-4 bg-gradient-to-r from-[#FF2D95] via-[#B735B8] to-[#233B8F] text-white font-bold rounded-xl shadow-lg shadow-[#233B8F]/20 transition-all active:scale-95">Guardar</button>
                                 </div>
                             </form>
                         </div>
@@ -959,8 +959,8 @@ export default function VirtualStorePage() {
                                             className="px-2.5 rounded-lg flex items-center justify-center transition-all active:scale-[0.98] hover:bg-white/8"
                                             style={{
                                                 background: '#F0F3F7',
-                                                border: '1px solid rgba(255,255,255,0.10)',
-                                                color: 'rgba(255,255,255,0.88)',
+                                                border: '1px solid #E4E9F0',
+                                                color: '#374151',
                                             }}
                                             title="Abrir tienda pública">
                                             <ExternalLink className="w-3 h-3" />
@@ -1265,7 +1265,7 @@ export default function VirtualStorePage() {
                                 })()}
                             </div>
 
-                            <button type="submit" className="w-full bg-[#233B8F] text-dark-950 font-bold py-4 rounded-xl shadow-lg active:scale-[0.98] transition-all">
+                            <button type="submit" className="w-full bg-gradient-to-r from-[#FF2D95] via-[#B735B8] to-[#233B8F] text-white font-bold py-4 rounded-xl shadow-lg active:scale-[0.98] transition-all">
                                 {editStore ? 'Guardar Cambios' : 'Crear Tienda'}
                             </button>
                         </form>
