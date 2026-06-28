@@ -232,35 +232,36 @@ export default function DashboardPage() {
             {IMAGES.map((img, i) => (
               <div key={i} style={{ position: 'absolute', inset: 0, backgroundImage: `url('${img}')`, backgroundSize: 'cover', backgroundPosition: 'center', opacity: imgIdx === i ? 1 : 0, transition: 'opacity 1s ease' }} />
             ))}
-            {/* overlay para legibilidad + tinte diamante */}
-            <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(8,22,36,0.10) 0%, rgba(8,22,36,0.40) 52%, rgba(8,22,36,0.84) 100%)' }} />
-            <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(circle at 88% 10%, rgba(255,9,108,0.24), transparent 40%)' }} />
+            {/* overlay tipo referencia: oscuro a la IZQUIERDA → transparente a la DERECHA, color del sidebar (navy, sin rosa) */}
+            <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(90deg, rgba(5,11,20,0.95) 0%, rgba(7,21,34,0.82) 26%, rgba(11,27,43,0.35) 50%, rgba(7,21,34,0) 72%)' }} />
+            <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, transparent 72%, rgba(5,11,20,0.45) 100%)' }} />
 
-            {/* dots del carrusel */}
-            <div style={{ position: 'absolute', top: 16, right: 18, display: 'flex', gap: 7, zIndex: 3 }}>
+            {/* dots del carrusel (abajo-centro, como la referencia) */}
+            <div style={{ position: 'absolute', bottom: 15, left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: 7, zIndex: 3 }}>
               {IMAGES.map((_, i) => (
-                <button key={i} onClick={() => setImgIdx(i)} aria-label={`Slide ${i + 1}`} style={{ width: imgIdx === i ? 24 : 8, height: 8, borderRadius: 999, border: 'none', cursor: 'pointer', padding: 0, background: imgIdx === i ? 'linear-gradient(90deg,#FF2D95,#B735B8,#233B8F)' : 'rgba(255,255,255,0.55)', transition: 'all .3s ease' }} />
+                <button key={i} onClick={() => setImgIdx(i)} aria-label={`Slide ${i + 1}`} style={{ width: imgIdx === i ? 24 : 8, height: 8, borderRadius: 999, border: 'none', cursor: 'pointer', padding: 0, background: imgIdx === i ? 'linear-gradient(90deg,#FF2D95,#B735B8,#233B8F)' : 'rgba(255,255,255,0.6)', transition: 'all .3s ease' }} />
               ))}
             </div>
 
-            {/* perfil sobre el banner (abajo-izquierda) */}
-            <div style={{ position: 'absolute', left: 32, right: 32, bottom: 26, zIndex: 3, display: 'flex', alignItems: 'flex-end', gap: 20 }}>
+            {/* perfil sobre el banner (centro-izquierda, como la referencia) */}
+            <div style={{ position: 'absolute', left: 34, top: '50%', transform: 'translateY(-50%)', zIndex: 3, display: 'flex', alignItems: 'center', gap: 22, maxWidth: '72%' }}>
               <label htmlFor="avatar-file-cover" style={{ cursor: uploading ? 'not-allowed' : 'pointer', position: 'relative', flexShrink: 0 }} title="Cambiar foto">
                 <input id="avatar-file-cover" type="file" accept="image/*" disabled={uploading} style={{ display: 'none' }} onChange={uploadAvatar} />
-                <div style={{ width: 108, height: 108, borderRadius: '50%', padding: 3, background: 'linear-gradient(135deg,#FF2D95,#B735B8,#233B8F)', boxShadow: '0 14px 34px rgba(255,9,108,0.42)' }}>
+                <div style={{ width: 104, height: 104, borderRadius: '50%', padding: 3, background: 'linear-gradient(135deg,#FF2D95,#B735B8,#233B8F)', boxShadow: '0 14px 34px rgba(255,9,108,0.45)' }}>
                   <div style={{ width: '100%', height: '100%', borderRadius: '50%', overflow: 'hidden', background: '#0B1B2B', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '3px solid #fff' }}>
                     {data.user.avatarUrl
                       ? <img src={data.user.avatarUrl} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                      : <i className="fa-solid fa-user" style={{ fontSize: 40, color: 'rgba(255,255,255,0.6)' }} />}
+                      : <i className="fa-solid fa-user" style={{ fontSize: 38, color: 'rgba(255,255,255,0.6)' }} />}
                   </div>
                 </div>
-                <span style={{ position: 'absolute', right: 7, bottom: 7, width: 18, height: 18, borderRadius: '50%', background: '#16A34A', border: '3px solid #fff' }} title="En línea" />
+                <span style={{ position: 'absolute', right: 6, bottom: 6, width: 17, height: 17, borderRadius: '50%', background: '#16A34A', border: '3px solid #fff' }} title="En línea" />
               </label>
-              <div style={{ minWidth: 0, paddingBottom: 6 }}>
-                <h1 className="font-display" style={{ margin: 0, fontSize: 'clamp(28px, 3.4vw, 44px)', fontWeight: 600, lineHeight: 1.05, color: '#fff', letterSpacing: '-0.01em', textShadow: '0 2px 18px rgba(0,0,0,0.55)' }}>{data.user.fullName}</h1>
-                <p style={{ margin: '6px 0 11px', fontSize: 14, color: 'rgba(255,255,255,0.85)', textShadow: '0 1px 10px rgba(0,0,0,0.5)' }}>@{data.user.username} · MY DIAMOND</p>
-                <Link href="/dashboard/planes" className="dm-badge" style={{ width: 'fit-content', textDecoration: 'none' }}>
-                  <i className="fa-solid fa-crown" style={{ fontSize: 11 }} /> {data.user.rank || 'Plan'} · {data.user.isActive ? 'Activo' : 'Inactivo'}
+              <div style={{ minWidth: 0 }}>
+                <h1 style={{ margin: 0, fontSize: 'clamp(30px, 3.6vw, 46px)', fontWeight: 800, lineHeight: 1.04, color: '#fff', letterSpacing: '-0.02em', textShadow: '0 2px 18px rgba(0,0,0,0.6)' }}>{data.user.fullName}</h1>
+                <p style={{ margin: '7px 0 12px', fontSize: 14.5, fontWeight: 500, color: 'rgba(255,255,255,0.88)', textShadow: '0 1px 10px rgba(0,0,0,0.55)' }}>@{data.user.username} · MY DIAMOND</p>
+                <Link href="/dashboard/planes" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '7px 15px', borderRadius: 999, border: '1px solid rgba(255,255,255,0.38)', background: 'rgba(8,22,36,0.42)', backdropFilter: 'blur(4px)', WebkitBackdropFilter: 'blur(4px)', color: '#fff', fontSize: 12.5, fontWeight: 700, letterSpacing: '0.02em', textDecoration: 'none', width: 'fit-content' }}>
+                  <span style={{ width: 7, height: 7, borderRadius: '50%', background: data.user.isActive ? '#16A34A' : '#9CA3AF', boxShadow: data.user.isActive ? '0 0 8px rgba(22,163,74,0.9)' : 'none', flexShrink: 0 }} />
+                  {data.user.rank || 'Plan'} · {data.user.isActive ? 'Activo' : 'Inactivo'}
                 </Link>
               </div>
             </div>
