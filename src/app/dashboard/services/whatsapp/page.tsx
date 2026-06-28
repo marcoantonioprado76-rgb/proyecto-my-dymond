@@ -801,7 +801,7 @@ function WebhookTab({ bot }: { bot: Bot }) {
     <div className="space-y-6">
       <div className="dm-card-dark p-6 rounded-2xl border border-[#233B8F]/20">
         <h3 className="text-sm font-bold text-white mb-1 flex items-center gap-2">
-          <Webhook className="w-4 h-4 text-[#233B8F]" />
+          <Webhook className="w-4 h-4 text-[#7DD3FC]" />
           URL del Webhook
         </h3>
         <p className="text-xs text-white/50 mb-4">
@@ -810,7 +810,7 @@ function WebhookTab({ bot }: { bot: Bot }) {
             : 'Configura esta URL en tu panel de YCloud como Webhook URL para mensajes entrantes.'}
         </p>
         <div className="bg-white/70 border border-white/10 rounded-xl p-3 flex items-center gap-2">
-          <code className="flex-1 text-xs text-[#233B8F] break-all font-mono">{webhookUrl}</code>
+          <code className="flex-1 text-xs text-[#7DD3FC] break-all font-mono">{webhookUrl}</code>
           <CopyButton text={webhookUrl} />
         </div>
         {isMeta && (
@@ -883,7 +883,7 @@ function WebhookTab({ bot }: { bot: Bot }) {
                 'Envía un mensaje de prueba al número configurado',
               ].map((step, i) => (
                 <li key={i} className="flex gap-3 text-sm text-white/75">
-                  <span className="w-5 h-5 rounded-full bg-[#233B8F]/10 border border-[#233B8F]/20 text-[#233B8F] text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">
+                  <span className="w-5 h-5 rounded-full bg-[#233B8F]/10 border border-[#233B8F]/20 text-[#7DD3FC] text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">
                     {i + 1}
                   </span>
                   {step}
@@ -1172,7 +1172,7 @@ function CredentialsTab({ bot, onStatusChange }: { bot: Bot; onStatusChange: (st
           {[
             { id: 'gpt-5.2',     label: 'GPT-5.2',     desc: 'Último modelo · Máxima capacidad', color: 'text-[#B735B8]' },
             { id: 'gpt-5.1',     label: 'GPT-5.1',     desc: 'Más inteligente · Mayor costo',    color: 'text-[#B735B8]' },
-            { id: 'gpt-4o',      label: 'GPT-4o',       desc: 'Equilibrado · Costo moderado',     color: 'text-[#233B8F]' },
+            { id: 'gpt-4o',      label: 'GPT-4o',       desc: 'Equilibrado · Costo moderado',     color: 'text-[#7DD3FC]' },
             { id: 'gpt-4o-mini', label: 'GPT-4o Mini',  desc: 'Más económico · Muy capaz',        color: 'text-[#16A34A]' },
           ].map(m => (
             <button
@@ -1260,7 +1260,7 @@ function VoiceCard({ bot }: { bot: Bot }) {
         </div>
       )}
       <h3 className="text-sm font-bold text-white flex items-center gap-2">
-        <Volume2 className="w-4 h-4 text-[#233B8F]" />
+        <Volume2 className="w-4 h-4 text-[#7DD3FC]" />
         Voz del agente
         <span className="text-xs font-normal text-white/50 ml-1">— responde con notas de voz</span>
       </h3>
@@ -1275,7 +1275,7 @@ function VoiceCard({ bot }: { bot: Bot }) {
           <p className="text-xs text-white/50 mt-0.5">Notas de voz reales con IA (voces en español).</p>
         </div>
         {voiceEnabled
-          ? <ToggleRight className="w-7 h-7 text-[#233B8F] shrink-0" />
+          ? <ToggleRight className="w-7 h-7 text-[#7DD3FC] shrink-0" />
           : <ToggleLeft className="w-7 h-7 text-white/50 shrink-0" />}
       </button>
 
@@ -1296,10 +1296,10 @@ function VoiceCard({ bot }: { bot: Bot }) {
                 }`}
               >
                 <div>
-                  <span className={`text-sm font-semibold ${voiceMode === m.id ? 'text-[#233B8F]' : 'text-white'}`}>{m.label}</span>
+                  <span className={`text-sm font-semibold ${voiceMode === m.id ? 'text-[#7DD3FC]' : 'text-white'}`}>{m.label}</span>
                   <p className="text-xs text-white/50 mt-0.5">{m.desc}</p>
                 </div>
-                {voiceMode === m.id && <CheckCircle2 className="w-4 h-4 text-[#233B8F] shrink-0" />}
+                {voiceMode === m.id && <CheckCircle2 className="w-4 h-4 text-[#7DD3FC] shrink-0" />}
               </button>
             ))}
           </div>
@@ -1315,10 +1315,10 @@ function VoiceCard({ bot }: { bot: Bot }) {
               >
                 <button type="button" onClick={() => setVoiceId(v.id)} className="flex items-center gap-3 text-left flex-1 min-w-0">
                   {voiceId === v.id
-                    ? <CheckCircle2 className="w-4 h-4 text-[#233B8F] shrink-0" />
+                    ? <CheckCircle2 className="w-4 h-4 text-[#7DD3FC] shrink-0" />
                     : <span className="w-4 h-4 rounded-full border border-white/10 shrink-0" />}
                   <span className="min-w-0">
-                    <span className={`text-sm font-semibold ${voiceId === v.id ? 'text-[#233B8F]' : 'text-white'}`}>{v.name}</span>
+                    <span className={`text-sm font-semibold ${voiceId === v.id ? 'text-[#7DD3FC]' : 'text-white'}`}>{v.name}</span>
                     <span className="block text-xs text-white/50 truncate">{v.desc}</span>
                   </span>
                 </button>
@@ -1333,9 +1333,9 @@ function VoiceCard({ bot }: { bot: Bot }) {
                   }`}
                 >
                   {loadingVoice === v.id
-                    ? <Loader2 className="w-3.5 h-3.5 text-[#233B8F] animate-spin" />
+                    ? <Loader2 className="w-3.5 h-3.5 text-[#7DD3FC] animate-spin" />
                     : playingVoice === v.id
-                      ? <Pause className="w-3.5 h-3.5 text-[#233B8F]" />
+                      ? <Pause className="w-3.5 h-3.5 text-[#7DD3FC]" />
                       : <Play className="w-3.5 h-3.5 text-white/50" />}
                 </button>
               </div>
@@ -1553,7 +1553,7 @@ function PromptTab({ bot, onSaved }: { bot: Bot; onSaved: (updated: Partial<Bot>
     <form onSubmit={handleSave} className="space-y-6">
       <div className="dm-card-dark p-6 rounded-2xl space-y-5">
         <h3 className="text-sm font-bold text-white flex items-center gap-2">
-          <FileText className="w-4 h-4 text-[#233B8F]" />
+          <FileText className="w-4 h-4 text-[#7DD3FC]" />
           Prompt del vendedor
         </h3>
 
@@ -1573,7 +1573,7 @@ function PromptTab({ bot, onSaved }: { bot: Bot; onSaved: (updated: Partial<Bot>
                   setForm(f => ({ ...f, systemPromptTemplate: EXAMPLE_PROMPT }))
                 }
               }}
-              className="text-[10px] px-2.5 py-1 rounded-lg bg-[#233B8F]/10 border border-[#233B8F]/20 text-[#233B8F] hover:bg-[#233B8F]/20 transition-colors font-medium"
+              className="text-[10px] px-2.5 py-1 rounded-lg bg-[#B735B8]/15 border border-[#B735B8]/35 text-[#C9A7FF] hover:bg-[#B735B8]/25 transition-colors font-medium"
             >
               Cargar plantilla de ejemplo
             </button>
@@ -1625,7 +1625,7 @@ function PromptTab({ bot, onSaved }: { bot: Bot; onSaved: (updated: Partial<Bot>
         <button
           type="submit"
           disabled={loading}
-          className="w-full py-3 bg-[#233B8F] text-white font-bold rounded-xl hover:bg-[#233B8F]/90 disabled:opacity-50 flex items-center justify-center gap-2 transition-colors"
+          className="w-full py-3 bg-gradient-to-r from-[#FF2D95] via-[#B735B8] to-[#233B8F] text-white font-bold rounded-xl hover:opacity-90 disabled:opacity-50 flex items-center justify-center gap-2 transition-colors"
         >
           {loading ? <Spinner /> : <Save className="w-4 h-4" />}
           Guardar plantilla
@@ -1849,7 +1849,7 @@ function ProductForm({
   const sectionHeaderClass = 'flex items-center gap-2 text-xs font-bold text-white uppercase tracking-wider'
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-5">
+    <form onSubmit={handleSubmit} className="dm-card-dark p-5 rounded-2xl space-y-5">
       <div className="flex items-center justify-between">
         <h3 className="font-bold text-white flex items-center gap-2">
           <Package className="w-4 h-4 text-[#B735B8]" />
@@ -2180,7 +2180,7 @@ function ShareProductModal({ product, onClose }: { product: Product; onClose: ()
       <div className="dm-card-dark rounded-2xl border border-white/10 p-6 w-full max-w-sm space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Share2 className="w-4 h-4 text-[#233B8F]" />
+            <Share2 className="w-4 h-4 text-[#7DD3FC]" />
             <h3 className="font-bold text-white text-sm">Compartir producto</h3>
           </div>
           <button onClick={onClose} className="text-white/50 hover:text-white transition-colors">
@@ -2224,7 +2224,7 @@ function ShareProductModal({ product, onClose }: { product: Product; onClose: ()
             <button
               type="submit"
               disabled={loading || !identifier.trim()}
-              className="flex-1 py-2 rounded-xl bg-[#233B8F]/20 text-[#233B8F] border border-[#233B8F]/30 hover:bg-[#233B8F]/30 text-sm font-semibold transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+              className="flex-1 py-2 rounded-xl bg-[#233B8F]/20 text-[#7DD3FC] border border-[#233B8F]/30 hover:bg-[#233B8F]/30 text-sm font-semibold transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
             >
               {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <UserCheck className="w-3.5 h-3.5" />}
               Compartir
@@ -2338,7 +2338,7 @@ function ProductsTab({ bot }: { bot: Bot }) {
       )}
       {/* Header */}
       <div className="flex items-center justify-between">
-        <div className="text-sm text-white/50">
+        <div className="text-sm text-[#6B7280]">
           {assigned.length} asignado{assigned.length !== 1 ? 's' : ''} · {available.length} disponible{available.length !== 1 ? 's' : ''} en catálogo
         </div>
         <button
@@ -2352,13 +2352,13 @@ function ProductsTab({ bot }: { bot: Bot }) {
 
       {loading ? (
         <div className="flex items-center justify-center py-12">
-          <Loader2 className="w-6 h-6 animate-spin text-white/50" />
+          <Loader2 className="w-6 h-6 animate-spin text-[#9CA3AF]" />
         </div>
       ) : (
         <>
           {/* Assigned products */}
           <div>
-            <div className="text-xs font-semibold text-white/50 uppercase tracking-wider mb-2">
+            <div className="text-xs font-semibold text-[#6B7280] uppercase tracking-wider mb-2">
               Asignados a este bot
             </div>
             {assigned.length === 0 ? (
@@ -2384,7 +2384,7 @@ function ProductsTab({ bot }: { bot: Bot }) {
                         {Array.isArray(product.imageMainUrls) && product.imageMainUrls.length > 0 && <span>{product.imageMainUrls.length} img</span>}
                         {!product.active && <span className="text-dark-600 italic">inactivo</span>}
                         {product.sharedByUsername && (
-                          <span className="flex items-center gap-1 text-[#233B8F]/70">
+                          <span className="flex items-center gap-1 text-[#7DD3FC]/70">
                             <Share2 className="w-2.5 h-2.5" />
                             de @{product.sharedByUsername}
                           </span>
@@ -2394,7 +2394,7 @@ function ProductsTab({ bot }: { bot: Bot }) {
                     <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                       <button
                         onClick={() => setSharingProduct(product)}
-                        className="p-2 hover:bg-[#233B8F]/10 rounded-lg transition-colors text-white/50 hover:text-[#233B8F]"
+                        className="p-2 hover:bg-[#233B8F]/10 rounded-lg transition-colors text-white/50 hover:text-[#7DD3FC]"
                         title="Compartir con otro usuario"
                       >
                         <Share2 className="w-3.5 h-3.5" />
@@ -2432,7 +2432,7 @@ function ProductsTab({ bot }: { bot: Bot }) {
           {/* Available catalog products */}
           {available.length > 0 && (
             <div>
-              <div className="text-xs font-semibold text-white/50 uppercase tracking-wider mb-2">
+              <div className="text-xs font-semibold text-[#6B7280] uppercase tracking-wider mb-2">
                 Del catálogo — agregar a este bot
               </div>
               <div className="space-y-2">
