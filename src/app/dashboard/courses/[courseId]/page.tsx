@@ -400,7 +400,7 @@ export default function CourseDetailPage() {
 
       {/* Title & price */}
       <div style={{ marginBottom: 16 }}>
-        <h1 style={{ fontSize: 22, fontWeight: 800, color: '#fff', marginBottom: 8 }}>{course.title}</h1>
+        <h1 style={{ fontSize: 22, fontWeight: 800, color: '#111827', marginBottom: 8 }}>{course.title}</h1>
         <p style={{ fontSize: 13, color: '#6B7280', lineHeight: 1.6, marginBottom: 16 }}>{course.description}</p>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
           <span style={{ fontSize: 24, fontWeight: 900, color: course.freeForPlan ? '#00FF88' : '#F5A623' }}>
@@ -422,11 +422,11 @@ export default function CourseDetailPage() {
 
       {/* Locked — no plan */}
       {isLocked && (
-        <div style={{ padding: '16px 18px', borderRadius: 14, marginBottom: 20, background: 'linear-gradient(135deg, rgba(154,203,255,0.12) 0%, rgba(255,125,224,0.12) 50%, rgba(162,102,255,0.12) 100%)', border: '1px solid #E4E9F0', textAlign: 'center' }}>
+        <div style={{ padding: '16px 18px', borderRadius: 14, marginBottom: 20, background: 'linear-gradient(180deg, #0B1B2B 0%, #081624 60%, #050B14 100%)', border: '1px solid rgba(255,255,255,0.1)', textAlign: 'center' }}>
           <p style={{ fontSize: 22, marginBottom: 8 }}>🔒</p>
           <p style={{ fontSize: 14, color: '#fff', fontWeight: 700, marginBottom: 6 }}>Curso no disponible</p>
-          <p style={{ fontSize: 12, color: '#6B7280', marginBottom: 14 }}>Necesitas un plan activo para acceder a los cursos.</p>
-          <Link href="/dashboard/planes" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '10px 20px', borderRadius: 10, background: 'linear-gradient(135deg, #D203DD 0%, #00FF88 100%)', color: '#000', fontWeight: 700, fontSize: 13, textDecoration: 'none' }}>
+          <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.55)', marginBottom: 14 }}>Necesitas un plan activo para acceder a los cursos.</p>
+          <Link href="/dashboard/planes" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '10px 20px', borderRadius: 10, background: 'linear-gradient(135deg, #FF2D95 0%, #B735B8 48%, #233B8F 100%)', color: '#fff', fontWeight: 700, fontSize: 13, textDecoration: 'none' }}>
             Ver planes
           </Link>
         </div>
@@ -449,7 +449,7 @@ export default function CourseDetailPage() {
         <div style={{ padding: '12px 16px', borderRadius: 12, marginBottom: 20, background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)' }}>
           <p style={{ fontSize: 13, color: '#ef4444', fontWeight: 600 }}>✕ Solicitud rechazada</p>
           {enrollment.notes && <p style={{ fontSize: 12, color: '#6B7280', marginTop: 2 }}>{enrollment.notes}</p>}
-          <button onClick={() => setShowModal(true)} style={{ marginTop: 8, fontSize: 12, color: '#D203DD', background: 'none', border: 'none', cursor: 'pointer', padding: 0, textDecoration: 'underline' }}>
+          <button onClick={() => setShowModal(true)} style={{ marginTop: 8, fontSize: 12, color: '#FF096C', background: 'none', border: 'none', cursor: 'pointer', padding: 0, textDecoration: 'underline' }}>
             Volver a intentar
           </button>
         </div>
@@ -459,12 +459,12 @@ export default function CourseDetailPage() {
       {!isLocked && !enrollment && (
         course.freeForPlan ? (
           <button onClick={handleFreeEnroll} disabled={submitting}
-            style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '12px 24px', borderRadius: 12, fontWeight: 700, fontSize: 14, background: submitting ? 'rgba(0,255,136,0.3)' : 'linear-gradient(135deg, #00FF88 0%, #D203DD 100%)', color: '#000', border: 'none', cursor: submitting ? 'not-allowed' : 'pointer', marginBottom: 28 }}>
+            style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '12px 24px', borderRadius: 12, fontWeight: 700, fontSize: 14, background: submitting ? 'rgba(183,53,184,0.4)' : 'linear-gradient(90deg, #FF2D95 0%, #B735B8 50%, #233B8F 100%)', color: '#fff', border: 'none', cursor: submitting ? 'not-allowed' : 'pointer', marginBottom: 28 }}>
             {submitting ? 'Activando...' : '✓ Acceder gratis con mi plan'}
           </button>
         ) : (
           <button onClick={() => setShowModal(true)}
-            style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '12px 24px', borderRadius: 12, fontWeight: 700, fontSize: 14, background: 'linear-gradient(135deg, #F5A623 0%, #f97316 100%)', color: '#000', border: 'none', cursor: 'pointer', marginBottom: 28 }}>
+            style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '12px 24px', borderRadius: 12, fontWeight: 700, fontSize: 14, background: 'linear-gradient(90deg, #FF2D95 0%, #B735B8 50%, #233B8F 100%)', color: '#fff', border: 'none', cursor: 'pointer', marginBottom: 28 }}>
             ₮ Comprar con USDT — {course.price.toFixed(2)} USDT
           </button>
         )
@@ -479,10 +479,10 @@ export default function CourseDetailPage() {
           <div style={{ marginBottom: 16 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 6 }}>
               <span style={{ fontSize: 12, fontWeight: 700, color: '#6B7280' }}>Tu progreso</span>
-              <span style={{ fontSize: 12, fontWeight: 800, color: coursePct === 100 ? '#00FF88' : '#D203DD' }}>{doneCount} de {course.videos.length} · {coursePct}%</span>
+              <span style={{ fontSize: 12, fontWeight: 800, color: coursePct === 100 ? '#16A34A' : '#B735B8' }}>{doneCount} de {course.videos.length} · {coursePct}%</span>
             </div>
-            <div style={{ height: 7, borderRadius: 7, background: 'rgba(255,255,255,0.08)', overflow: 'hidden' }}>
-              <div style={{ height: '100%', width: `${coursePct}%`, borderRadius: 7, background: coursePct === 100 ? '#00FF88' : 'linear-gradient(90deg,#D203DD,#00FF88)', transition: 'width 0.3s' }} />
+            <div style={{ height: 7, borderRadius: 7, background: 'rgba(8,22,36,0.1)', overflow: 'hidden' }}>
+              <div style={{ height: '100%', width: `${coursePct}%`, borderRadius: 7, background: coursePct === 100 ? '#16A34A' : 'linear-gradient(90deg,#FF2D95,#B735B8,#233B8F)', transition: 'width 0.3s' }} />
             </div>
             {coursePct === 100 && (
               <div style={{ marginTop: 12, padding: '14px 16px', borderRadius: 14, background: 'rgba(0,255,136,0.08)', border: '1px solid rgba(0,255,136,0.25)', display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
@@ -491,7 +491,7 @@ export default function CourseDetailPage() {
                   <p style={{ fontSize: 14, fontWeight: 800, color: '#00FF88', margin: 0 }}>¡Completaste el curso!</p>
                   <p style={{ fontSize: 12, color: '#6B7280', margin: '2px 0 0' }}>Descargá tu certificado de finalización.</p>
                 </div>
-                <button onClick={downloadCertificate} style={{ padding: '10px 18px', borderRadius: 10, fontSize: 13, fontWeight: 700, color: '#000', background: 'linear-gradient(135deg,#00FF88,#D203DD)', border: 'none', cursor: 'pointer' }}>
+                <button onClick={downloadCertificate} style={{ padding: '10px 18px', borderRadius: 10, fontSize: 13, fontWeight: 700, color: '#fff', background: 'linear-gradient(90deg,#FF2D95,#B735B8,#233B8F)', border: 'none', cursor: 'pointer' }}>
                   🎓 Descargar certificado
                 </button>
               </div>
@@ -504,10 +504,10 @@ export default function CourseDetailPage() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12, minWidth: 0 }}>
           {/* Player activo */}
           {selectedVideo && (
-            <div style={{ borderRadius: 14, overflow: 'hidden', border: '1px solid #E4E9F0' }}>
+            <div style={{ borderRadius: 14, overflow: 'hidden', border: '1px solid rgba(255,255,255,0.1)', background: 'linear-gradient(180deg, #0B1B2B 0%, #081624 60%, #050B14 100%)' }}>
               {/* Título del video activo */}
-              <div style={{ background: 'rgba(255,255,255,0.06)', padding: '10px 16px', display: 'flex', alignItems: 'center', gap: 10 }}>
-                <span style={{ fontSize: 11, fontWeight: 700, color: '#D203DD', background: '#E4E9F0', border: '1px solid #E4E9F0', padding: '2px 8px', borderRadius: 6 }}>
+              <div style={{ background: 'rgba(255,255,255,0.04)', padding: '10px 16px', display: 'flex', alignItems: 'center', gap: 10 }}>
+                <span style={{ fontSize: 11, fontWeight: 700, color: '#FF096C', background: 'rgba(255,9,108,0.12)', border: '1px solid rgba(255,9,108,0.25)', padding: '2px 8px', borderRadius: 6 }}>
                   {selectedIdx + 1} / {course.videos.length}
                 </span>
                 <p style={{ fontSize: 13, fontWeight: 700, color: '#fff', margin: 0, flex: 1 }}>{selectedVideo.title}</p>
@@ -519,7 +519,7 @@ export default function CourseDetailPage() {
               </div>
               {/* Aviso "continuá donde quedaste" (video propio, con posición guardada) */}
               {player?.kind === 'supabase' && (player.pos || 0) > 3 && !(completedVideos.has(selectedVideo.id) || selectedVideo.completed) && (
-                <div style={{ background: 'rgba(210,3,221,0.08)', borderBottom: '1px solid rgba(255,255,255,0.08)', padding: '6px 16px', fontSize: 11, color: '#D203DD', display: 'flex', alignItems: 'center', gap: 6 }}>
+                <div style={{ background: 'rgba(255,9,108,0.1)', borderBottom: '1px solid rgba(255,255,255,0.08)', padding: '6px 16px', fontSize: 11, color: '#FF096C', display: 'flex', alignItems: 'center', gap: 6 }}>
                   ▶ Continuás donde quedaste — {fmtTime(player.pos)}
                 </div>
               )}
@@ -564,7 +564,7 @@ export default function CourseDetailPage() {
           {selectedVideo && (
             <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
               <button onClick={() => prevVideo && selectVideo(prevVideo)} disabled={!prevVideo}
-                style={{ flex: 1, padding: '10px', borderRadius: 10, fontSize: 12, fontWeight: 700, background: '#F0F3F7', border: '1px solid #E4E9F0', color: prevVideo ? '#374151' : '#9CA3AF', cursor: prevVideo ? 'pointer' : 'default' }}>
+                style={{ flex: 1, padding: '10px', borderRadius: 10, fontSize: 12, fontWeight: 700, background: 'linear-gradient(180deg, #0B1B2B 0%, #050B14 100%)', border: '1px solid rgba(255,255,255,0.1)', color: prevVideo ? 'rgba(255,255,255,0.78)' : 'rgba(255,255,255,0.42)', cursor: prevVideo ? 'pointer' : 'default' }}>
                 ← Anterior
               </button>
               {isApproved && !isVideoDone(selectedVideo) && (
@@ -574,7 +574,7 @@ export default function CourseDetailPage() {
                 </button>
               )}
               <button onClick={() => nextVideo && nextVideo.unlocked && selectVideo(nextVideo)} disabled={!nextVideo || !nextVideo.unlocked}
-                style={{ flex: 1, padding: '10px', borderRadius: 10, fontSize: 12, fontWeight: 700, background: (nextVideo && nextVideo.unlocked) ? 'linear-gradient(135deg,#D203DD,#00FF88)' : '#F0F3F7', border: 'none', color: (nextVideo && nextVideo.unlocked) ? '#000' : '#9CA3AF', cursor: (nextVideo && nextVideo.unlocked) ? 'pointer' : 'default' }}>
+                style={{ flex: 1, padding: '10px', borderRadius: 10, fontSize: 12, fontWeight: 700, background: (nextVideo && nextVideo.unlocked) ? 'linear-gradient(90deg,#FF2D95,#B735B8,#233B8F)' : 'linear-gradient(180deg, #0B1B2B 0%, #050B14 100%)', border: (nextVideo && nextVideo.unlocked) ? 'none' : '1px solid rgba(255,255,255,0.1)', color: (nextVideo && nextVideo.unlocked) ? '#fff' : 'rgba(255,255,255,0.42)', cursor: (nextVideo && nextVideo.unlocked) ? 'pointer' : 'default' }}>
                 {nextVideo && !nextVideo.unlocked ? '🔒 Siguiente' : 'Siguiente →'}
               </button>
             </div>
@@ -582,21 +582,21 @@ export default function CourseDetailPage() {
 
           {/* Notas + recursos descargables de la lección */}
           {selectedVideo && (selectedVideo.descripcion || (selectedVideo.recursos && selectedVideo.recursos.length > 0)) && (
-            <div style={{ borderRadius: 14, border: '1px solid rgba(255,255,255,0.12)', padding: '14px 16px', background: 'rgba(255,255,255,0.02)' }}>
+            <div style={{ borderRadius: 14, border: '1px solid rgba(255,255,255,0.1)', padding: '14px 16px', background: 'linear-gradient(180deg, #0B1B2B 0%, #081624 60%, #050B14 100%)' }}>
               {selectedVideo.descripcion && (
                 <div style={{ marginBottom: (selectedVideo.recursos && selectedVideo.recursos.length) ? 14 : 0 }}>
-                  <p style={{ fontSize: 11, fontWeight: 700, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.06em', margin: '0 0 6px' }}>Notas</p>
-                  <p style={{ fontSize: 13, color: '#374151', lineHeight: 1.6, margin: 0, whiteSpace: 'pre-wrap' }}>{selectedVideo.descripcion}</p>
+                  <p style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.55)', textTransform: 'uppercase', letterSpacing: '0.06em', margin: '0 0 6px' }}>Notas</p>
+                  <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.78)', lineHeight: 1.6, margin: 0, whiteSpace: 'pre-wrap' }}>{selectedVideo.descripcion}</p>
                 </div>
               )}
               {selectedVideo.recursos && selectedVideo.recursos.length > 0 && (
                 <div>
-                  <p style={{ fontSize: 11, fontWeight: 700, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.06em', margin: '0 0 8px' }}>Recursos descargables</p>
+                  <p style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.55)', textTransform: 'uppercase', letterSpacing: '0.06em', margin: '0 0 8px' }}>Recursos descargables</p>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                     {selectedVideo.recursos.map(r => (
                       <a key={r.id} href={r.archivoUrl} target="_blank" rel="noreferrer" download
-                        style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: '#fff', textDecoration: 'none', background: 'rgba(210,3,221,0.08)', border: '1px solid rgba(210,3,221,0.25)', borderRadius: 10, padding: '10px 12px' }}>
-                        <span>📎</span><span style={{ flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.titulo}</span><span style={{ fontSize: 11, color: '#D203DD', whiteSpace: 'nowrap' }}>Descargar ↓</span>
+                        style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: '#fff', textDecoration: 'none', background: 'rgba(255,9,108,0.1)', border: '1px solid rgba(255,9,108,0.25)', borderRadius: 10, padding: '10px 12px' }}>
+                        <span>📎</span><span style={{ flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.titulo}</span><span style={{ fontSize: 11, color: '#FF096C', whiteSpace: 'nowrap' }}>Descargar ↓</span>
                       </a>
                     ))}
                   </div>
@@ -607,9 +607,9 @@ export default function CourseDetailPage() {
             </div>{/* cierra columna izquierda */}
 
           {/* Playlist (columna derecha) */}
-          <div style={{ borderRadius: 14, overflow: 'hidden', border: '1px solid #E4E9F0' }} className="lg:sticky lg:top-4">
-            <div style={{ background: 'linear-gradient(135deg, rgba(154,203,255,0.12) 0%, rgba(255,125,224,0.12) 50%, rgba(162,102,255,0.12) 100%)', padding: '10px 16px', borderBottom: '1px solid #E4E9F0' }}>
-              <p style={{ fontSize: 12, fontWeight: 700, color: '#6B7280', margin: 0, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+          <div style={{ borderRadius: 14, overflow: 'hidden', border: '1px solid rgba(255,255,255,0.1)', background: 'linear-gradient(180deg, #0B1B2B 0%, #081624 60%, #050B14 100%)' }} className="lg:sticky lg:top-4">
+            <div style={{ background: 'linear-gradient(135deg, rgba(255,45,149,0.16) 0%, rgba(183,53,184,0.16) 50%, rgba(35,59,143,0.16) 100%)', padding: '10px 16px', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+              <p style={{ fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.55)', margin: 0, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
                 Contenido del curso
               </p>
             </div>
@@ -624,7 +624,7 @@ export default function CourseDetailPage() {
                 return (
                   <Fragment key={video.id}>
                   {showHeader && (
-                    <div style={{ padding: '11px 16px 7px', fontSize: 11, fontWeight: 800, color: '#D203DD', textTransform: 'uppercase', letterSpacing: '0.06em', background: 'rgba(210,3,221,0.05)', borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
+                    <div style={{ padding: '11px 16px 7px', fontSize: 11, fontWeight: 800, color: '#FF096C', textTransform: 'uppercase', letterSpacing: '0.06em', background: 'rgba(255,9,108,0.06)', borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
                       {video.moduloTitulo}
                     </div>
                   )}
@@ -634,8 +634,8 @@ export default function CourseDetailPage() {
                     style={{
                       display: 'flex', alignItems: 'center', gap: 12,
                       padding: '12px 16px',
-                      background: isActive ? '#E4E9F0' : 'rgba(0,0,0,0.15)',
-                      borderLeft: isActive ? '3px solid #D203DD' : '3px solid transparent',
+                      background: isActive ? 'rgba(255,9,108,0.12)' : 'transparent',
+                      borderLeft: isActive ? '3px solid #FF096C' : '3px solid transparent',
                       borderRight: 'none', borderTop: 'none',
                       borderBottom: idx < course.videos.length - 1 ? '1px solid rgba(255,255,255,0.07)' : 'none',
                       cursor: isUnlocked ? 'pointer' : 'default',
@@ -648,35 +648,35 @@ export default function CourseDetailPage() {
                     <div style={{
                       width: 28, height: 28, borderRadius: '50%', flexShrink: 0,
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      background: isDone ? 'rgba(0,255,136,0.15)' : isActive ? '#E4E9F0' : 'rgba(255,255,255,0.06)',
-                      border: `1px solid ${isDone ? 'rgba(0,255,136,0.3)' : isActive ? 'rgba(210,3,221,0.4)' : '#E4E9F0'}`,
+                      background: isDone ? 'rgba(0,255,136,0.15)' : isActive ? 'rgba(255,9,108,0.15)' : 'rgba(255,255,255,0.06)',
+                      border: `1px solid ${isDone ? 'rgba(0,255,136,0.3)' : isActive ? 'rgba(255,9,108,0.4)' : 'rgba(255,255,255,0.1)'}`,
                       fontSize: 11, fontWeight: 700,
-                      color: isDone ? '#00FF88' : isActive ? '#D203DD' : '#6B7280',
+                      color: isDone ? '#00FF88' : isActive ? '#FF096C' : 'rgba(255,255,255,0.55)',
                     }}>
                       {isDone ? '✓' : !isUnlocked ? '🔒' : idx + 1}
                     </div>
 
                     {/* Título + barra de avance */}
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <span style={{ fontSize: 13, fontWeight: isActive ? 700 : 500, color: isActive ? '#fff' : isUnlocked ? 'rgba(255,255,255,0.75)' : '#6B7280', lineHeight: 1.4, display: 'block' }}>
+                      <span style={{ fontSize: 13, fontWeight: isActive ? 700 : 500, color: isActive ? '#fff' : isUnlocked ? 'rgba(255,255,255,0.75)' : 'rgba(255,255,255,0.4)', lineHeight: 1.4, display: 'block' }}>
                         {video.title}
                       </span>
                       {(video.isPreview || video.duracionSegundos) && (
                         <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 2 }}>
                           {video.isPreview && <span style={{ fontSize: 9, fontWeight: 800, color: '#00FF88', letterSpacing: '0.05em' }}>GRATIS</span>}
-                          {video.duracionSegundos ? <span style={{ fontSize: 10, color: '#6B7280' }}>{fmtTime(video.duracionSegundos)}</span> : null}
+                          {video.duracionSegundos ? <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.42)' }}>{fmtTime(video.duracionSegundos)}</span> : null}
                         </div>
                       )}
                       {isUnlocked && !isDone && (video.percent ?? 0) > 0 && (
-                        <div style={{ height: 3, borderRadius: 3, background: '#E4E9F0', marginTop: 5, overflow: 'hidden' }}>
-                          <div style={{ height: '100%', width: `${video.percent}%`, background: '#D203DD', borderRadius: 3 }} />
+                        <div style={{ height: 3, borderRadius: 3, background: 'rgba(255,255,255,0.1)', marginTop: 5, overflow: 'hidden' }}>
+                          <div style={{ height: '100%', width: `${video.percent}%`, background: '#FF096C', borderRadius: 3 }} />
                         </div>
                       )}
                     </div>
 
                     {/* Play icon si está activo */}
                     {isActive && (
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="#D203DD" style={{ flexShrink: 0 }}>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="#FF096C" style={{ flexShrink: 0 }}>
                         <path d="M8 5v14l11-7z" />
                       </svg>
                     )}
@@ -691,8 +691,8 @@ export default function CourseDetailPage() {
       )}
 
       {!isApproved && !isPending && !isPendingVerification && !isRejected && !isLocked && (
-        <div style={{ padding: '24px', borderRadius: 14, textAlign: 'center', background: 'rgba(245,166,35,0.03)', border: '1px solid rgba(245,166,35,0.08)' }}>
-          <p style={{ fontSize: 13, color: '#6B7280' }}>Los videos están disponibles después de verificar tu pago.</p>
+        <div style={{ padding: '24px', borderRadius: 14, textAlign: 'center', background: 'linear-gradient(180deg, #0B1B2B 0%, #081624 60%, #050B14 100%)', border: '1px solid rgba(255,255,255,0.1)' }}>
+          <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.55)' }}>Los videos están disponibles después de verificar tu pago.</p>
         </div>
       )}
 

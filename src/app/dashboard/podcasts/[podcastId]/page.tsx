@@ -64,7 +64,7 @@ export default function PodcastDetailPage() {
       </Link>
 
       {/* Player */}
-      <div style={{ borderRadius: 14, overflow: 'hidden', border: '1px solid #E4E9F0', marginBottom: 20 }}>
+      <div style={{ borderRadius: 14, overflow: 'hidden', border: '1px solid rgba(255,255,255,0.1)', marginBottom: 20, background: 'linear-gradient(180deg, #0B1B2B 0%, #081624 60%, #050B14 100%)', boxShadow: '0 18px 40px -24px rgba(8,22,36,0.6), inset 0 1px 0 rgba(255,255,255,0.05)' }}>
         <div style={{ background: 'rgba(210,3,221,0.08)', padding: '12px 16px', display: 'flex', alignItems: 'center', gap: 10 }}>
           <i className="fa-solid fa-microphone" style={{ fontSize: 14, color: '#D203DD' }} />
           <p style={{ fontSize: 14, fontWeight: 700, color: '#fff', margin: 0 }}>{podcast.title}</p>
@@ -72,7 +72,7 @@ export default function PodcastDetailPage() {
         {isDirectAudio(podcast.embedUrl) ? (
           <div style={{ background: 'linear-gradient(135deg, rgba(210,3,221,0.08), rgba(13,11,26,1))', padding: '28px 20px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
             {podcast.coverUrl && (
-              <img src={podcast.coverUrl} alt={podcast.title} style={{ width: 100, height: 100, borderRadius: 12, objectFit: 'cover', border: '1px solid #E4E9F0' }} />
+              <img src={podcast.coverUrl} alt={podcast.title} style={{ width: 100, height: 100, borderRadius: 12, objectFit: 'cover', border: '1px solid rgba(255,255,255,0.1)' }} />
             )}
             <audio
               controls
@@ -97,8 +97,8 @@ export default function PodcastDetailPage() {
 
       {/* Info */}
       {podcast.description && (
-        <div style={{ padding: '16px', borderRadius: 12, background: 'linear-gradient(135deg, rgba(154,203,255,0.12) 0%, rgba(255,125,224,0.12) 50%, rgba(162,102,255,0.12) 100%)', border: '1px solid #E4E9F0' }}>
-          <p style={{ fontSize: 13, color: '#6B7280', lineHeight: 1.7, margin: 0 }}>{podcast.description}</p>
+        <div style={{ padding: '16px', borderRadius: 12, background: 'linear-gradient(180deg, #0B1B2B 0%, #081624 60%, #050B14 100%)', border: '1px solid rgba(255,255,255,0.1)', boxShadow: '0 18px 40px -24px rgba(8,22,36,0.6), inset 0 1px 0 rgba(255,255,255,0.05)' }}>
+          <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.78)', lineHeight: 1.7, margin: 0 }}>{podcast.description}</p>
         </div>
       )}
     </div>

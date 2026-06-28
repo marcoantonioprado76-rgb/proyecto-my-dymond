@@ -29,14 +29,14 @@ const MEDIA_FILTERS = [
 ]
 
 const PLATFORM_COLORS: Record<string, string> = {
-    META: '#233B8F',
+    META: '#7DD3FC',
     TIKTOK: '#EE1D52',
     GOOGLE_ADS: '#4285F4'
 }
 
 const ADVANTAGE_LABELS: Record<string, { label: string; color: string }> = {
-    advantage: { label: 'Advantage+', color: 'text-[#233B8F] bg-[#233B8F]/10 border-[#233B8F]/20' },
-    smart_segmentation: { label: 'Segmentación Smart', color: 'text-purple-400 bg-purple-500/10 border-purple-500/20' },
+    advantage: { label: 'Advantage+', color: 'text-[#7DD3FC] bg-[#233B8F]/10 border-[#233B8F]/20' },
+    smart_segmentation: { label: 'Segmentación Smart', color: 'text-[#C9A7FF] bg-purple-500/10 border-purple-500/20' },
     custom: { label: 'Personalizado', color: 'text-orange-400 bg-orange-500/10 border-orange-500/20' }
 }
 
@@ -110,23 +110,23 @@ export default function StrategiesPage() {
 
             {/* Brief status bar */}
             {brief ? (
-                <div className="mb-6 p-4 bg-green-500/5 border border-green-500/15 rounded-2xl flex items-center gap-3">
+                <div className="dm-card-dark mb-6 p-4 rounded-2xl border border-green-500/20 flex items-center gap-3">
                     <div className="w-8 h-8 rounded-xl bg-green-500/10 border border-green-500/20 flex items-center justify-center shrink-0">
                         <FileText size={14} className="text-green-400" />
                     </div>
                     <div className="flex-1 min-w-0">
                         <p className="text-[10px] font-bold uppercase tracking-widest text-green-400/70 mb-0.5">Business Brief</p>
-                        <p className="text-sm font-bold text-[#111827] truncate">{brief.name}</p>
+                        <p className="text-sm font-bold text-white truncate">{brief.name}</p>
                         {brief.industry && (
-                            <p className="text-[11px] text-[#111827]/30 truncate">{brief.industry}{brief.targetAudience ? ` · ${brief.targetAudience}` : ''}</p>
+                            <p className="text-[11px] text-white/55 truncate">{brief.industry}{brief.targetAudience ? ` · ${brief.targetAudience}` : ''}</p>
                         )}
                     </div>
-                    <Link href="/dashboard/services/ads/brief" className="flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-bold text-[#111827]/40 hover:text-[#111827] border border-purple-500/25 hover:border-purple-500/40 rounded-xl transition-all whitespace-nowrap">
+                    <Link href="/dashboard/services/ads/brief" className="flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-bold text-white/55 hover:text-white border border-white/10 hover:border-white/20 rounded-xl transition-all whitespace-nowrap">
                         <Edit2 size={11} /> Editar
                     </Link>
                 </div>
             ) : (
-                <div className="mb-6 p-4 bg-yellow-500/8 border border-yellow-500/20 rounded-2xl flex items-center gap-3">
+                <div className="dm-card-dark mb-6 p-4 rounded-2xl border border-yellow-500/25 flex items-center gap-3">
                     <div className="w-8 h-8 rounded-xl bg-yellow-500/10 border border-yellow-500/20 flex items-center justify-center shrink-0">
                         <Sparkles size={14} className="text-yellow-400" />
                     </div>
@@ -149,8 +149,8 @@ export default function StrategiesPage() {
                             key={f.id}
                             onClick={() => setPlatform(f.id)}
                             className={`px-4 py-2 rounded-xl text-xs font-bold transition-all border ${platform === f.id
-                                ? 'bg-white text-black border-white'
-                                : 'bg-[#F4F6FA] border-[#E4E9F0] text-[#111827]/50 hover:border-white/30'
+                                ? 'bg-gradient-to-r from-[#FF2D95] via-[#B735B8] to-[#233B8F] text-white border-transparent hover:opacity-90'
+                                : 'bg-[#F4F6FA] border-[#E4E9F0] text-[#111827]/50 hover:border-[#233B8F]/40'
                                 }`}
                         >
                             {f.label}
@@ -166,8 +166,8 @@ export default function StrategiesPage() {
                                 key={f.id}
                                 onClick={() => setDestination(f.id)}
                                 className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all border ${destination === f.id
-                                    ? 'bg-purple-600 text-[#111827] border-purple-600'
-                                    : 'bg-white/3 border-purple-500/20 text-[#111827]/40 hover:border-purple-500/40'
+                                    ? 'bg-gradient-to-r from-[#FF2D95] via-[#B735B8] to-[#233B8F] text-white border-transparent hover:opacity-90'
+                                    : 'bg-[#F4F6FA] border-[#E4E9F0] text-[#111827]/50 hover:border-[#233B8F]/40'
                                     }`}
                             >
                                 {f.label}
@@ -182,8 +182,8 @@ export default function StrategiesPage() {
                             key={f.id}
                             onClick={() => setMediaType(f.id)}
                             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all border ${mediaType === f.id
-                                ? 'bg-[#233B8F] text-[#111827] border-[#233B8F]'
-                                : 'bg-white/3 border-purple-500/20 text-[#111827]/40 hover:border-purple-500/40'
+                                ? 'bg-gradient-to-r from-[#FF2D95] via-[#B735B8] to-[#233B8F] text-white border-transparent hover:opacity-90'
+                                : 'bg-[#F4F6FA] border-[#E4E9F0] text-[#111827]/50 hover:border-[#233B8F]/40'
                                 }`}
                         >
                             {f.id === 'image' && <ImageIcon size={11} />}
@@ -191,7 +191,7 @@ export default function StrategiesPage() {
                             {f.label}
                         </button>
                     ))}
-                    <span className="text-xs text-[#111827]/20 flex items-center gap-1 ml-auto">
+                    <span className="text-xs text-[#6B7280] flex items-center gap-1 ml-auto">
                         <Filter size={11} />
                         {loading ? '...' : `${strategies.length} estrategias`}
                     </span>
@@ -204,12 +204,12 @@ export default function StrategiesPage() {
                     <Loader2 className="animate-spin text-purple-400" size={28} />
                 </div>
             ) : strategies.length === 0 ? (
-                <div className="text-center py-20 bg-white/[0.015] border border-dashed border-purple-500/20 rounded-3xl px-6">
-                    <Sparkles className="text-purple-400 mx-auto mb-4" size={28} />
-                    <p className="font-bold text-sm text-[#111827] mb-1">Sin estrategias generadas</p>
-                    <p className="text-xs text-[#111827]/30 mb-6">La IA generará estrategias personalizadas según tu Brief de negocio</p>
+                <div className="dm-card-dark text-center py-20 border border-dashed border-white/15 rounded-3xl px-6">
+                    <Sparkles className="text-[#C9A7FF] mx-auto mb-4" size={28} />
+                    <p className="font-bold text-sm text-white mb-1">Sin estrategias generadas</p>
+                    <p className="text-xs text-white/55 mb-6">La IA generará estrategias personalizadas según tu Brief de negocio</p>
                     <Link href="/dashboard/services/ads/wizard"
-                        className="inline-flex items-center gap-2 bg-purple-600 text-[#111827] text-sm font-bold px-5 py-2.5 rounded-xl hover:bg-purple-500 transition-all">
+                        className="inline-flex items-center gap-2 bg-gradient-to-r from-[#FF2D95] via-[#B735B8] to-[#233B8F] text-white text-sm font-bold px-5 py-2.5 rounded-xl hover:opacity-90 transition-all">
                         <Sparkles size={14} /> Generar estrategias con IA
                     </Link>
                 </div>
@@ -221,7 +221,7 @@ export default function StrategiesPage() {
                         return (
                             <div
                                 key={strategy.id}
-                                className="group relative bg-white/40 border border-purple-500/15 rounded-[24px] p-5 hover:border-[#E4E9F0] hover:bg-white/60 transition-all overflow-hidden"
+                                className="dm-card-dark group relative border border-white/10 rounded-[24px] p-5 hover:border-white/20 transition-all overflow-hidden"
                             >
                                 <div className="absolute -top-8 -right-8 w-24 h-24 rounded-full blur-[50px] opacity-5 group-hover:opacity-15 transition-opacity"
                                     style={{ background: platformColor }} />
@@ -242,31 +242,31 @@ export default function StrategiesPage() {
                                 </div>
 
                                 {/* Name */}
-                                <h3 className="font-black text-sm leading-tight mb-2 group-hover:text-[#111827] transition-colors">
+                                <h3 className="font-black text-sm leading-tight mb-2 text-white transition-colors">
                                     {strategy.name}
                                 </h3>
                                 {strategy.description && (
-                                    <p className="text-xs text-[#111827]/30 mb-4 leading-relaxed line-clamp-2">
+                                    <p className="text-xs text-white/55 mb-4 leading-relaxed line-clamp-2">
                                         {strategy.description}
                                     </p>
                                 )}
 
                                 {/* Stats row */}
                                 <div className="flex items-center gap-3 mb-5">
-                                    <div className="flex items-center gap-1.5 text-xs text-[#111827]/40">
+                                    <div className="flex items-center gap-1.5 text-xs text-white/55">
                                         {strategy.mediaType === 'video'
-                                            ? <Video size={12} className="text-[#233B8F]" />
-                                            : <ImageIcon size={12} className="text-purple-400" />
+                                            ? <Video size={12} className="text-[#7DD3FC]" />
+                                            : <ImageIcon size={12} className="text-[#C9A7FF]" />
                                         }
                                         <span className="font-bold">{strategy.mediaCount}</span>
                                         <span>{strategy.mediaType === 'video' ? 'videos' : 'imágenes'}</span>
                                     </div>
-                                    <div className="w-1 h-1 rounded-full bg-[#EEF2F7]" />
-                                    <span className="text-xs text-[#111827]/40">
+                                    <div className="w-1 h-1 rounded-full bg-white/10" />
+                                    <span className="text-xs text-white/55">
                                         {DESTINATION_LABELS[strategy.destination] || strategy.destination}
                                     </span>
-                                    <div className="w-1 h-1 rounded-full bg-[#EEF2F7]" />
-                                    <span className="text-xs text-[#111827]/40 capitalize">
+                                    <div className="w-1 h-1 rounded-full bg-white/10" />
+                                    <span className="text-xs text-white/55 capitalize">
                                         {OBJECTIVE_LABELS[strategy.objective] || strategy.objective}
                                     </span>
                                 </div>
@@ -274,15 +274,15 @@ export default function StrategiesPage() {
                                 {/* Budget */}
                                 <div className="flex items-center justify-between mb-4">
                                     <div>
-                                        <p className="text-[10px] text-[#111827]/20 font-bold uppercase">Presupuesto mínimo</p>
-                                        <p className="text-lg font-black text-[#111827]">${strategy.minBudgetUSD}<span className="text-xs text-[#111827]/30 font-medium">/USD</span></p>
+                                        <p className="text-[10px] text-white/42 font-bold uppercase">Presupuesto mínimo</p>
+                                        <p className="text-lg font-black text-white">${strategy.minBudgetUSD}<span className="text-xs text-white/55 font-medium">/USD</span></p>
                                     </div>
                                 </div>
 
                                 {/* CTA */}
                                 <button
                                     onClick={() => handleSelect(strategy)}
-                                    className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-[#F4F6FA] border border-purple-500/25 text-sm font-bold text-[#111827]/70 group-hover:bg-purple-600 group-hover:border-purple-600 group-hover:text-[#111827] transition-all"
+                                    className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-white/5 border border-white/10 text-sm font-bold text-white/75 group-hover:bg-gradient-to-r group-hover:from-[#FF2D95] group-hover:via-[#B735B8] group-hover:to-[#233B8F] group-hover:border-transparent group-hover:text-white transition-all"
                                 >
                                     Usar esta estrategia <ArrowRight size={14} />
                                 </button>

@@ -63,12 +63,13 @@ export default function PresentacionesPage() {
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
         {visibles.map(t => (
           <Link key={t.id} href={`/dashboard/recursos/presentaciones/${t.id}`}
-            className="group rounded-2xl overflow-hidden border border-[#E4E9F0] bg-white hover:border-[#D203DD]/40 transition-all active:scale-[0.98]">
+            className="group rounded-2xl overflow-hidden border border-white/10 hover:border-[#D203DD]/40 transition-all active:scale-[0.98]"
+            style={{ background: 'linear-gradient(180deg, #0B1B2B 0%, #081624 60%, #050B14 100%)' }}>
             <div className="relative w-full bg-black/30 flex items-center justify-center" style={{ aspectRatio: '3 / 4' }}>
               {t.portadaUrl
                 // eslint-disable-next-line @next/next/no-img-element
                 ? <img src={t.portadaUrl} alt={t.titulo} className="w-full h-full object-cover" loading="lazy" />
-                : <i className="fa-solid fa-file-pdf text-4xl text-[#111827]/20"></i>}
+                : <i className="fa-solid fa-file-pdf text-4xl text-white/20"></i>}
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center pb-3">
                 <span className="text-xs font-black text-white px-3 py-1.5 rounded-full" style={{ background: 'linear-gradient(135deg,#0D1E79,#D203DD)' }}>
                   <i className="fa-solid fa-eye mr-1"></i> Ver
@@ -76,8 +77,8 @@ export default function PresentacionesPage() {
               </div>
             </div>
             <div className="p-2.5">
-              <p className="text-xs font-bold text-[#111827] truncate">{t.titulo}</p>
-              <p className="text-[10px] text-[#111827]/35">{t.categoria}{t.paginas ? ` · ${t.paginas} pág.` : ''}</p>
+              <p className="text-xs font-bold text-white truncate">{t.titulo}</p>
+              <p className="text-[10px] text-white/40">{t.categoria}{t.paginas ? ` · ${t.paginas} pág.` : ''}</p>
             </div>
           </Link>
         ))}

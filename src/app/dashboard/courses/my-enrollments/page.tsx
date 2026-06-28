@@ -96,7 +96,7 @@ export default function MyEnrollmentsPage() {
             const course = e.course
             return (
               <div key={e.id}
-                style={{ background: 'linear-gradient(135deg, rgba(154,203,255,0.12) 0%, rgba(255,125,224,0.12) 50%, rgba(162,102,255,0.12) 100%)', border: '1px solid #E4E9F0', borderRadius: 14, overflow: 'hidden' }}>
+                style={{ background: 'linear-gradient(180deg, #0B1B2B 0%, #081624 60%, #050B14 100%)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 14, overflow: 'hidden' }}>
 
                 <div style={{ display: 'flex', gap: 14, padding: 16 }}>
                   {/* Cover */}
@@ -104,7 +104,7 @@ export default function MyEnrollmentsPage() {
                     <img src={course.coverUrl} alt={course.title}
                       style={{ width: 76, height: 76, objectFit: 'cover', borderRadius: 10, flexShrink: 0 }} />
                   ) : (
-                    <div style={{ width: 76, height: 76, borderRadius: 10, flexShrink: 0, background: 'rgba(210,3,221,0.06)', border: '1px solid #E4E9F0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <div style={{ width: 76, height: 76, borderRadius: 10, flexShrink: 0, background: 'rgba(210,3,221,0.06)', border: '1px solid rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                       <svg style={{ width: 28, height: 28, opacity: 0.3 }} viewBox="0 0 24 24" fill="none" stroke="#D203DD" strokeWidth="1.5">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M4.26 10.147a60.436 60.436 0 00-.491 6.347A48.627 48.627 0 0112 20.904a48.627 48.627 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.57 50.57 0 00-2.658-.813A59.905 59.905 0 0112 3.493a59.902 59.902 0 0110.399 5.84c-.896.248-1.783.52-2.658.814" />
                       </svg>
@@ -127,13 +127,13 @@ export default function MyEnrollmentsPage() {
                       </span>
                     </div>
 
-                    <p style={{ margin: '4px 0 0', fontSize: 12, color: '#9CA3AF', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    <p style={{ margin: '4px 0 0', fontSize: 12, color: 'rgba(255,255,255,0.55)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {course.freeForPlan ? 'Gratis con plan' : `${course.price.toFixed(2)} USDT`}
                       {' · '}
                       {course._count.videos} video{course._count.videos !== 1 ? 's' : ''}
                     </p>
 
-                    <p style={{ margin: '3px 0 0', fontSize: 11, color: 'rgba(255,255,255,0.18)' }}>
+                    <p style={{ margin: '3px 0 0', fontSize: 11, color: 'rgba(255,255,255,0.42)' }}>
                       Inscrito el {new Date(e.createdAt).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' })}
                     </p>
 
@@ -146,10 +146,10 @@ export default function MyEnrollmentsPage() {
                 </div>
 
                 {/* Footer actions */}
-                <div style={{ borderTop: '1px solid #F0F3F7', padding: '10px 16px', display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center' }}>
+                <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', padding: '10px 16px', display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center' }}>
                   {e.status === 'APPROVED' && (
                     <Link href={`/dashboard/courses/${course.id}`}
-                      style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 12, fontWeight: 700, color: '#000', textDecoration: 'none', background: 'linear-gradient(135deg, #D203DD 0%, #00FF88 100%)', borderRadius: 8, padding: '7px 14px', whiteSpace: 'nowrap' }}>
+                      style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 12, fontWeight: 700, color: '#fff', textDecoration: 'none', background: 'linear-gradient(90deg, #FF2D95 0%, #B735B8 50%, #233B8F 100%)', borderRadius: 8, padding: '7px 14px', whiteSpace: 'nowrap' }}>
                       ▶ Ver videos
                     </Link>
                   )}
@@ -160,7 +160,7 @@ export default function MyEnrollmentsPage() {
                     </Link>
                   )}
                   {e.status === 'PENDING' && (
-                    <span style={{ fontSize: 12, color: '#6B7280' }}>
+                    <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.55)' }}>
                       Comprobante en revisión por el administrador
                     </span>
                   )}

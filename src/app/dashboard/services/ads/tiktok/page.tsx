@@ -50,8 +50,8 @@ function TikTokAdsDashboardInner() {
                 <div className="relative flex flex-col sm:flex-row sm:items-center justify-between gap-5">
                     <div className="flex items-center gap-4">
                         <div className="rounded-2xl flex items-center justify-center shrink-0"
-                            style={{ background: `linear-gradient(135deg, ${PLATFORM.accent}40, ${PLATFORM.accentSecondary}30)`, border: `1px solid ${PLATFORM.accentSoftBorder}`, width: 52, height: 52 }}>
-                            <Music2 className="text-rose-300" size={22} />
+                            style={{ background: 'linear-gradient(135deg, #FF2D95 0%, #B735B8 48%, #233B8F 100%)', border: `1px solid ${PLATFORM.accentSoftBorder}`, width: 52, height: 52 }}>
+                            <Music2 className="text-white" size={22} />
                         </div>
                         <div>
                             <div className="flex items-center gap-2 mb-0.5">
@@ -94,7 +94,7 @@ function TikTokAdsDashboardInner() {
             {/* ── BANNER PRÓXIMAMENTE ─────────────────────────────── */}
             <div className="relative rounded-3xl overflow-hidden mb-6 p-6 md:p-8"
                 style={{
-                    background: `radial-gradient(120% 80% at 50% -10%, ${PLATFORM.accent}1f, rgba(255,255,255,0) 60%), radial-gradient(80% 80% at 100% 100%, ${PLATFORM.accentSecondary}18, rgba(255,255,255,0) 62%), linear-gradient(180deg, rgba(20,24,48,0.94) 0%, rgba(255,255,255,0.94) 100%)`,
+                    background: `radial-gradient(120% 80% at 50% -10%, ${PLATFORM.accent}1f, rgba(255,255,255,0) 60%), radial-gradient(80% 80% at 100% 100%, ${PLATFORM.accentSecondary}18, rgba(255,255,255,0) 62%), linear-gradient(180deg, #0B1B2B 0%, #081624 60%, #050B14 100%)`,
                     border: '1px solid rgba(255,255,255,0.10)',
                     boxShadow: `0 22px 44px -22px rgba(0,0,0,0.78), 0 0 30px -14px ${PLATFORM.accent}38`,
                 }}>
@@ -112,12 +112,12 @@ function TikTokAdsDashboardInner() {
                                 style={{ background: 'rgba(251,146,60,0.14)', border: '1px solid rgba(251,146,60,0.3)', color: '#fb923c' }}>
                                 PRÓXIMAMENTE
                             </span>
-                            <span className="text-[10px] text-[#111827]/30 font-medium">Adapter en desarrollo</span>
+                            <span className="text-[10px] text-white/40 font-medium">Adapter en desarrollo</span>
                         </div>
-                        <h2 className="text-lg md:text-xl font-black text-[#111827] leading-tight mb-1.5" style={{ letterSpacing: '-0.02em' }}>
+                        <h2 className="text-lg md:text-xl font-black text-white leading-tight mb-1.5" style={{ letterSpacing: '-0.02em' }}>
                             TikTok Ads estará disponible muy pronto
                         </h2>
-                        <p className="text-sm text-[#111827]/55 leading-relaxed max-w-2xl">
+                        <p className="text-sm text-white/55 leading-relaxed max-w-2xl">
                             Estamos integrando TikTok for Business con MY DIAMOND. Pronto vas a poder conectar tu cuenta, crear campañas con IA y medir resultados directo desde acá.
                         </p>
                     </div>
@@ -137,11 +137,11 @@ function TikTokAdsDashboardInner() {
                 <div className="space-y-6 pointer-events-none opacity-50">
 
                     {/* Setup preview */}
-                    <div className="rounded-3xl p-5 md:p-6" style={{ background: `linear-gradient(135deg, rgba(238,29,82,0.10) 0%, rgba(105,201,208,0.10) 50%, rgba(238,29,82,0.10) 100%)`, border: '1px solid rgba(255,255,255,0.10)' }}>
+                    <div className="rounded-3xl p-5 md:p-6" style={{ background: 'linear-gradient(180deg, #0B1B2B 0%, #081624 60%, #050B14 100%)', border: '1px solid rgba(255,255,255,0.10)' }}>
                         <div className="flex items-center justify-between mb-4">
                             <div className="flex items-center gap-2.5">
                                 <Rocket size={15} className="text-rose-400" />
-                                <span className="font-bold text-sm">Configura TikTok Ads</span>
+                                <span className="font-bold text-sm text-white">Configura TikTok Ads</span>
                             </div>
                             <div className="flex items-center gap-2">
                                 <div className="flex gap-1">
@@ -149,7 +149,7 @@ function TikTokAdsDashboardInner() {
                                         <div key={i} className="h-1 w-8 rounded-full bg-white/8" />
                                     ))}
                                 </div>
-                                <span className="text-[10px] text-[#111827]/30 font-bold tabular-nums">0/3</span>
+                                <span className="text-[10px] text-white/40 font-bold tabular-nums">0/3</span>
                             </div>
                         </div>
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
@@ -163,13 +163,13 @@ function TikTokAdsDashboardInner() {
                                     <div key={idx}
                                         className="flex items-center gap-3 p-3.5 rounded-2xl border bg-white/2 border-white/6">
                                         <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 bg-white/4">
-                                            <Icon size={15} className="text-[#111827]/35" />
+                                            <Icon size={15} className="text-white/40" />
                                         </div>
                                         <div className="flex-1 min-w-0">
-                                            <p className="text-xs font-bold truncate">{step.label}</p>
-                                            <p className="text-[10px] text-[#111827]/25 truncate">{step.desc}</p>
+                                            <p className="text-xs font-bold truncate text-white">{step.label}</p>
+                                            <p className="text-[10px] text-white/40 truncate">{step.desc}</p>
                                         </div>
-                                        <ChevronRight size={12} className="text-[#111827]/15 shrink-0" />
+                                        <ChevronRight size={12} className="text-white/30 shrink-0" />
                                     </div>
                                 )
                             })}
@@ -178,14 +178,14 @@ function TikTokAdsDashboardInner() {
 
                     {/* Empty state preview */}
                     <div className="flex flex-col items-center justify-center py-20 gap-4 rounded-3xl text-center px-4"
-                        style={{ background: 'rgba(255,255,255,0.015)', border: '1px dashed rgba(255,255,255,0.07)' }}>
+                        style={{ background: 'linear-gradient(180deg, #0B1B2B 0%, #081624 60%, #050B14 100%)', border: '1px dashed rgba(255,255,255,0.10)' }}>
                         <div className="w-14 h-14 rounded-full flex items-center justify-center"
                             style={{ background: `${PLATFORM.accent}15`, border: `1px solid ${PLATFORM.accent}30` }}>
                             <Sparkles className="text-rose-400" size={22} />
                         </div>
                         <div>
-                            <p className="text-[#111827]/40 text-sm font-bold mb-1">Sin campañas todavía</p>
-                            <p className="text-[#111827]/20 text-xs">Pronto vas a poder crear campañas de TikTok con IA</p>
+                            <p className="text-white/55 text-sm font-bold mb-1">Sin campañas todavía</p>
+                            <p className="text-white/40 text-xs">Pronto vas a poder crear campañas de TikTok con IA</p>
                         </div>
                     </div>
                 </div>

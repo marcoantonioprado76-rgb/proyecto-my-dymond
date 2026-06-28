@@ -78,9 +78,9 @@ export default function MyOrdersPage() {
           {orders.map(order => {
             const st = STATUS[order.status] ?? STATUS['PENDING']
             return (
-              <div key={order.id} style={{ background: 'linear-gradient(135deg, rgba(154,203,255,0.12) 0%, rgba(255,125,224,0.12) 50%, rgba(162,102,255,0.12) 100%)', border: '1px solid #E4E9F0', borderRadius: 16, overflow: 'hidden' }}>
+              <div key={order.id} style={{ background: 'linear-gradient(180deg, #0B1B2B 0%, #081624 60%, #050B14 100%)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 16, overflow: 'hidden' }}>
                 {/* Header */}
-                <div style={{ padding: '14px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8, borderBottom: '1px solid #E4E9F0' }}>
+                <div style={{ padding: '14px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8, borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
                   <div>
                     <p style={{ fontSize: 12, fontWeight: 700, color: '#fff', letterSpacing: '0.05em' }}>#{order.id.slice(0, 8).toUpperCase()}</p>
                     <p style={{ fontSize: 11, color: '#9CA3AF', marginTop: 2 }}>
@@ -104,7 +104,7 @@ export default function MyOrdersPage() {
                         </div>
                         <div style={{ flex: 1, minWidth: 0 }}>
                           <p style={{ fontSize: 13, fontWeight: 600, color: '#fff', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{oi.item.title}</p>
-                          <p style={{ fontSize: 11, color: '#6B7280' }}>
+                          <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.55)' }}>
                             {Object.entries(oi.selectedVariants).map(([k, v]) => `${k}: ${v}`).join(' · ')}
                             {Object.keys(oi.selectedVariants).length > 0 && ' · '}
                             x{oi.quantity} · {(oi.priceSnapshot * oi.quantity).toFixed(2)} USDT
@@ -116,7 +116,7 @@ export default function MyOrdersPage() {
                 </div>
 
                 {/* Footer */}
-                <div style={{ padding: '10px 16px', borderTop: '1px solid #F0F3F7', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8 }}>
+                <div style={{ padding: '10px 16px', borderTop: '1px solid rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8 }}>
                   <div>
                     <span style={{ fontSize: 13, fontWeight: 800, color: '#F5A623' }}>{order.totalPrice.toFixed(2)} USDT</span>
                   </div>

@@ -258,8 +258,8 @@ export default function NewCrmCampaignPage() {
                     <ArrowLeft size={16} />
                 </Link>
                 <div className="w-11 h-11 rounded-2xl flex items-center justify-center shrink-0"
-                    style={{ background: 'linear-gradient(135deg, #25D366, #128C7E)', boxShadow: '0 4px 16px rgba(37,211,102,0.3)' }}>
-                    <MessageCircle size={20} className="text-[#111827]" />
+                    style={{ background: 'linear-gradient(135deg, #FF2D95 0%, #B735B8 48%, #233B8F 100%)', boxShadow: '0 4px 16px rgba(183,53,184,0.3)' }}>
+                    <MessageCircle size={20} className="text-white" />
                 </div>
                 <div>
                     <h1 className="text-xl font-black uppercase tracking-tighter">Nueva campaña</h1>
@@ -278,28 +278,28 @@ export default function NewCrmCampaignPage() {
             <form onSubmit={handleSubmit} className="space-y-6">
 
                 {/* Nombre */}
-                <div className="bg-white border border-[#E4E9F0] rounded-2xl p-5">
-                    <label className="block text-xs font-black uppercase tracking-widest text-[#111827]/40 mb-3">Nombre de la campaña</label>
+                <div className="dm-card-dark border border-white/10 rounded-2xl p-5">
+                    <label className="block text-xs font-black uppercase tracking-widest text-white/55 mb-3">Nombre de la campaña</label>
                     <input
                         value={form.name}
                         onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
                         placeholder="Ej: Promo Navidad 2025"
                         required
-                        className="w-full bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-4 py-3 text-sm text-[#111827] placeholder-white/20 focus:outline-none focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/10"
+                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-white/35 focus:outline-none focus:border-[#B735B8]/50 focus:ring-1 focus:ring-[#B735B8]/10"
                     />
                 </div>
 
                 {/* Prompt */}
-                <div className="bg-white border border-[#E4E9F0] rounded-2xl p-5">
+                <div className="dm-card-dark border border-white/10 rounded-2xl p-5">
                     <div className="flex items-center justify-between mb-1">
-                        <label className="text-xs font-black uppercase tracking-widest text-[#111827]/40 flex items-center gap-2">
+                        <label className="text-xs font-black uppercase tracking-widest text-white/55 flex items-center gap-2">
                             <Sparkles size={12} /> Prompt para la IA
                         </label>
                         {templates.length > 0 && (
                             <button
                                 type="button"
                                 onClick={() => setShowTemplates(!showTemplates)}
-                                className="flex items-center gap-1.5 text-[11px] font-bold text-purple-400/70 hover:text-purple-400 transition-all"
+                                className="flex items-center gap-1.5 text-[11px] font-bold text-[#FF096C]/80 hover:text-[#FF096C] transition-all"
                             >
                                 <FileText size={12} />
                                 Usar plantilla
@@ -307,25 +307,25 @@ export default function NewCrmCampaignPage() {
                             </button>
                         )}
                     </div>
-                    <p className="text-[11px] text-[#111827]/25 mb-3">
+                    <p className="text-[11px] text-white/45 mb-3">
                         La IA usará esto como base para generar un mensaje único para cada contacto.
                     </p>
 
                     {showTemplates && templates.length > 0 && (
-                        <div className="mb-3 space-y-2 max-h-48 overflow-y-auto rounded-xl border border-purple-500/20 bg-purple-500/5 p-3">
+                        <div className="mb-3 space-y-2 max-h-48 overflow-y-auto rounded-xl border border-[#FF096C]/20 bg-[#FF096C]/5 p-3">
                             {templates.map(t => (
                                 <button
                                     key={t.id}
                                     type="button"
                                     onClick={() => applyTemplate(t)}
-                                    className="w-full text-left p-3 rounded-xl bg-[#F4F6FA] border border-[#E4E9F0] hover:border-purple-500/40 hover:bg-purple-500/5 transition-all group"
+                                    className="w-full text-left p-3 rounded-xl bg-white/5 border border-white/10 hover:border-[#FF096C]/40 hover:bg-[#FF096C]/5 transition-all group"
                                 >
                                     <div className="flex items-center justify-between">
-                                        <p className="text-sm font-bold text-[#111827] group-hover:text-purple-400 transition-all">{t.name}</p>
-                                        <span className="text-[10px] text-[#111827]/20">{t.usageCount} usos</span>
+                                        <p className="text-sm font-bold text-white group-hover:text-[#FF096C] transition-all">{t.name}</p>
+                                        <span className="text-[10px] text-white/40">{t.usageCount} usos</span>
                                     </div>
-                                    {t.description && <p className="text-[11px] text-[#111827]/30 mt-0.5">{t.description}</p>}
-                                    <p className="text-[11px] text-[#111827]/20 mt-1 line-clamp-2">{t.content.slice(0, 120)}...</p>
+                                    {t.description && <p className="text-[11px] text-white/55 mt-0.5">{t.description}</p>}
+                                    <p className="text-[11px] text-white/40 mt-1 line-clamp-2">{t.content.slice(0, 120)}...</p>
                                 </button>
                             ))}
                         </div>
@@ -337,14 +337,14 @@ export default function NewCrmCampaignPage() {
                         placeholder="Ej: Promoción especial de fin de año, descuento del 30% en todos nuestros productos, solo por esta semana. Tono cálido y urgente."
                         required
                         rows={4}
-                        className="w-full bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-4 py-3 text-sm text-[#111827] placeholder-white/20 focus:outline-none focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/10 resize-none leading-relaxed"
+                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-white/35 focus:outline-none focus:border-[#B735B8]/50 focus:ring-1 focus:ring-[#B735B8]/10 resize-none leading-relaxed"
                     />
 
                     <div className="mt-4">
-                        <label className="block text-xs font-black uppercase tracking-widest text-[#111827]/40 mb-1">
-                            Ejemplar de mensaje <span className="text-[#111827]/20 normal-case font-normal">(opcional)</span>
+                        <label className="block text-xs font-black uppercase tracking-widest text-white/55 mb-1">
+                            Ejemplar de mensaje <span className="text-white/40 normal-case font-normal">(opcional)</span>
                         </label>
-                        <p className="text-[11px] text-[#111827]/25 mb-2">
+                        <p className="text-[11px] text-white/45 mb-2">
                             La IA seguirá el estilo, tono y formato de este ejemplo para cada mensaje generado.
                         </p>
                         <textarea
@@ -352,21 +352,21 @@ export default function NewCrmCampaignPage() {
                             onChange={e => setForm(f => ({ ...f, messageExample: e.target.value }))}
                             placeholder="Ej: ¡Hola! 👋 Tenemos una oferta increíble para vos esta semana. No te la perdás 🔥"
                             rows={3}
-                            className="w-full bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-4 py-3 text-sm text-[#111827] placeholder-white/20 focus:outline-none focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/10 resize-none leading-relaxed"
+                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-white/35 focus:outline-none focus:border-[#B735B8]/50 focus:ring-1 focus:ring-[#B735B8]/10 resize-none leading-relaxed"
                         />
                     </div>
                 </div>
 
                 {/* Imágenes */}
-                <div className="bg-white border border-[#E4E9F0] rounded-2xl p-5">
-                    <label className="block text-xs font-black uppercase tracking-widest text-[#111827]/40 mb-1 flex items-center gap-2">
+                <div className="dm-card-dark border border-white/10 rounded-2xl p-5">
+                    <label className="block text-xs font-black uppercase tracking-widest text-white/55 mb-1 flex items-center gap-2">
                         <ImageIcon size={12} /> Imágenes ({mediaFiles.length})
                     </label>
-                    <p className="text-[11px] text-[#111827]/25 mb-3">Se rotarán automáticamente entre contactos.</p>
+                    <p className="text-[11px] text-white/45 mb-3">Se rotarán automáticamente entre contactos.</p>
 
                     <div className="flex gap-2 flex-wrap">
                         {mediaFiles.map((media, i) => (
-                            <div key={i} className="relative w-20 h-20 rounded-xl overflow-hidden border border-[#E4E9F0] group">
+                            <div key={i} className="relative w-20 h-20 rounded-xl overflow-hidden border border-white/10 group">
                                 <img src={media.preview} alt="" className="w-full h-full object-cover" />
                                 <button
                                     type="button"
@@ -381,19 +381,19 @@ export default function NewCrmCampaignPage() {
                         <button
                             type="button"
                             onClick={() => fileInputRef.current?.click()}
-                            className="w-20 h-20 rounded-xl border-2 border-dashed border-[#E4E9F0] hover:border-purple-500/40 flex flex-col items-center justify-center gap-1 text-[#111827]/30 hover:text-purple-400 transition-all"
+                            className="w-20 h-20 rounded-xl border-2 border-dashed border-white/10 hover:border-[#FF096C]/40 flex flex-col items-center justify-center gap-1 text-white/45 hover:text-[#FF096C] transition-all"
                         >
                             <Upload size={16} />
                             <span className="text-[9px] font-bold">Agregar</span>
                         </button>
                     </div>
                     <input ref={fileInputRef} type="file" accept="image/*" multiple className="hidden" onChange={e => handleMediaSelect(e.target.files)} />
-                    <p className="text-[10px] text-[#111827]/20 mt-2">Formatos: JPG, PNG, WEBP, GIF</p>
+                    <p className="text-[10px] text-white/40 mt-2">Formatos: JPG, PNG, WEBP, GIF</p>
                 </div>
 
                 {/* Delay */}
-                <div className="bg-white border border-[#E4E9F0] rounded-2xl p-5">
-                    <label className="block text-xs font-black uppercase tracking-widest text-[#111827]/40 mb-3 flex items-center gap-2">
+                <div className="dm-card-dark border border-white/10 rounded-2xl p-5">
+                    <label className="block text-xs font-black uppercase tracking-widest text-white/55 mb-3 flex items-center gap-2">
                         <Clock size={12} /> Delay entre mensajes
                     </label>
                     <div className="flex gap-3">
@@ -403,18 +403,18 @@ export default function NewCrmCampaignPage() {
                             max="3600"
                             value={form.delayValue}
                             onChange={e => setForm(f => ({ ...f, delayValue: e.target.value }))}
-                            className="w-28 bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-4 py-3 text-sm text-[#111827] focus:outline-none focus:border-purple-500/50"
+                            className="w-28 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-[#B735B8]/50"
                         />
                         <select
                             value={form.delayUnit}
                             onChange={e => setForm(f => ({ ...f, delayUnit: e.target.value }))}
-                            className="flex-1 bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-4 py-3 text-sm text-[#111827] focus:outline-none focus:border-purple-500/50"
+                            className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-[#B735B8]/50"
                         >
                             <option value="seconds">Segundos</option>
                             <option value="minutes">Minutos</option>
                         </select>
                     </div>
-                    <p className="text-[11px] text-[#111827]/25 mt-2">
+                    <p className="text-[11px] text-white/45 mt-2">
                         Recomendado: mínimo 30 segundos para evitar bloqueos de WhatsApp
                     </p>
                     <p className="text-[11px] mt-2 flex items-start gap-1.5" style={{ color: 'rgba(74,222,128,0.7)' }}>
@@ -423,39 +423,39 @@ export default function NewCrmCampaignPage() {
                 </div>
 
                 {/* Programar */}
-                <div className="bg-white border border-[#E4E9F0] rounded-2xl p-5">
-                    <label className="block text-xs font-black uppercase tracking-widest text-[#111827]/40 mb-1 flex items-center gap-2">
+                <div className="dm-card-dark border border-white/10 rounded-2xl p-5">
+                    <label className="block text-xs font-black uppercase tracking-widest text-white/55 mb-1 flex items-center gap-2">
                         <Calendar size={12} /> Programar envío (opcional)
                     </label>
-                    <p className="text-[11px] text-[#111827]/25 mb-3">Dejá vacío para enviar manualmente cuando quieras</p>
+                    <p className="text-[11px] text-white/45 mb-3">Dejá vacío para enviar manualmente cuando quieras</p>
                     <input
                         type="datetime-local"
                         value={form.scheduledAt}
                         onChange={e => setForm(f => ({ ...f, scheduledAt: e.target.value }))}
-                        className="w-full bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-4 py-3 text-sm text-[#111827] focus:outline-none focus:border-purple-500/50"
+                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-[#B735B8]/50"
                         style={{ colorScheme: 'dark' }}
                     />
                 </div>
 
                 {/* Remarketing recurrente */}
-                <div className="rounded-2xl p-5 border transition-all"
-                    style={{ background: recurring ? 'rgba(168,85,247,0.06)' : 'rgba(255,255,255,0.03)', borderColor: recurring ? 'rgba(168,85,247,0.3)' : 'rgba(255,255,255,0.08)' }}>
+                <div className="dm-card-dark rounded-2xl p-5 border transition-all"
+                    style={{ borderColor: recurring ? 'rgba(255,9,108,0.3)' : 'rgba(255,255,255,0.1)' }}>
                     <div className="flex items-center justify-between gap-3">
-                        <label className="text-xs font-black uppercase tracking-widest text-[#111827]/40 flex items-center gap-2">
-                            <RefreshCw size={12} /> Remarketing recurrente <span className="text-[#111827]/20 normal-case font-normal">(opcional)</span>
+                        <label className="text-xs font-black uppercase tracking-widest text-white/55 flex items-center gap-2">
+                            <RefreshCw size={12} /> Remarketing recurrente <span className="text-white/40 normal-case font-normal">(opcional)</span>
                         </label>
                         <button type="button" onClick={() => setRecurring(v => !v)} role="switch" aria-checked={recurring}
                             className="relative w-12 h-6 rounded-full transition-all shrink-0"
-                            style={{ background: recurring ? 'linear-gradient(135deg,#6d28d9,#a855f7)' : '#E4E9F0', border: '1px solid #E4E9F0' }}>
+                            style={{ background: recurring ? 'linear-gradient(135deg, #FF2D95 0%, #B735B8 48%, #233B8F 100%)' : 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.1)' }}>
                             <span className="absolute top-0.5 w-5 h-5 rounded-full bg-white transition-all duration-200" style={{ left: recurring ? '24px' : '2px' }} />
                         </button>
                     </div>
-                    <p className="text-[11px] text-[#111827]/25 mt-1">Re-envía a TODA la lista los días que elijas, en automático. Respeta a quien responde <b className="text-[#111827]/40">BAJA</b>.</p>
+                    <p className="text-[11px] text-white/45 mt-1">Re-envía a TODA la lista los días que elijas, en automático. Respeta a quien responde <b className="text-white/55">BAJA</b>.</p>
 
                     {recurring && (
                         <div className="mt-4 space-y-3">
                             <div>
-                                <p className="text-[10px] text-[#111827]/40 uppercase font-black tracking-widest mb-1.5">Días</p>
+                                <p className="text-[10px] text-white/55 uppercase font-black tracking-widest mb-1.5">Días</p>
                                 <div className="flex gap-1.5 flex-wrap">
                                     {['D', 'L', 'M', 'M', 'J', 'V', 'S'].map((lbl, d) => {
                                         const on = recDays.includes(d)
@@ -463,7 +463,7 @@ export default function NewCrmCampaignPage() {
                                             <button key={d} type="button"
                                                 onClick={() => setRecDays(prev => on ? prev.filter(x => x !== d) : [...prev, d])}
                                                 className="w-9 h-9 rounded-lg text-xs font-black transition-all"
-                                                style={{ background: on ? 'linear-gradient(135deg,#6d28d9,#a855f7)' : '#F0F3F7', color: on ? '#fff' : '#6B7280', border: `1px solid ${on ? 'transparent' : '#E4E9F0'}` }}>
+                                                style={{ background: on ? 'linear-gradient(135deg, #FF2D95 0%, #B735B8 48%, #233B8F 100%)' : 'rgba(255,255,255,0.05)', color: on ? '#fff' : 'rgba(255,255,255,0.55)', border: `1px solid ${on ? 'transparent' : 'rgba(255,255,255,0.1)'}` }}>
                                                 {lbl}
                                             </button>
                                         )
@@ -471,94 +471,94 @@ export default function NewCrmCampaignPage() {
                                 </div>
                             </div>
                             <div>
-                                <p className="text-[10px] text-[#111827]/40 uppercase font-black tracking-widest mb-1.5">Hora (Bolivia)</p>
+                                <p className="text-[10px] text-white/55 uppercase font-black tracking-widest mb-1.5">Hora (Bolivia)</p>
                                 <input type="time" value={recTime} onChange={e => setRecTime(e.target.value)}
-                                    className="w-40 bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-4 py-3 text-sm text-[#111827] focus:outline-none focus:border-purple-500/50" style={{ colorScheme: 'dark' }} />
+                                    className="w-40 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-[#B735B8]/50" style={{ colorScheme: 'dark' }} />
                             </div>
                         </div>
                     )}
                 </div>
 
                 {/* Contactos */}
-                <div className="bg-white border border-[#E4E9F0] rounded-2xl p-5">
+                <div className="dm-card-dark border border-white/10 rounded-2xl p-5">
                     <div className="flex items-center justify-between mb-3">
-                        <label className="text-xs font-black uppercase tracking-widest text-[#111827]/40 flex items-center gap-2">
+                        <label className="text-xs font-black uppercase tracking-widest text-white/55 flex items-center gap-2">
                             <Users size={12} /> Contactos ({contacts.length})
                         </label>
                         <button
                             type="button"
                             onClick={() => setShowAddContact(v => !v)}
-                            className="flex items-center gap-1.5 text-[11px] font-bold px-3 py-1.5 rounded-lg bg-purple-500/10 border border-purple-500/20 text-purple-400 hover:bg-purple-500/20 transition-all"
+                            className="flex items-center gap-1.5 text-[11px] font-bold px-3 py-1.5 rounded-lg bg-[#FF096C]/10 border border-[#FF096C]/20 text-[#FF096C] hover:bg-[#FF096C]/20 transition-all"
                         >
                             <Plus size={12} /> Agregar manual
                         </button>
                     </div>
 
                     {showAddContact && (
-                        <div className="flex gap-2 mb-3 p-3 rounded-xl bg-[#F4F6FA] border border-purple-500/20">
+                        <div className="flex gap-2 mb-3 p-3 rounded-xl bg-white/5 border border-[#FF096C]/20">
                             <input
                                 value={newPhone}
                                 onChange={e => setNewPhone(e.target.value)}
                                 onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), addManualContact())}
                                 placeholder="Teléfono (+591...)"
-                                className="flex-1 bg-transparent text-xs text-[#111827] placeholder-white/20 focus:outline-none px-2 border-r border-[#E4E9F0]"
+                                className="flex-1 bg-transparent text-xs text-white placeholder-white/35 focus:outline-none px-2 border-r border-white/10"
                             />
                             <input
                                 value={newName}
                                 onChange={e => setNewName(e.target.value)}
                                 onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), addManualContact())}
                                 placeholder="Nombre (opcional)"
-                                className="flex-1 bg-transparent text-xs text-[#111827] placeholder-white/20 focus:outline-none px-2"
+                                className="flex-1 bg-transparent text-xs text-white placeholder-white/35 focus:outline-none px-2"
                             />
                             <button type="button" onClick={addManualContact} className="text-green-400 hover:text-green-300 px-1">
                                 <CheckCircle2 size={15} />
                             </button>
-                            <button type="button" onClick={() => { setShowAddContact(false); setNewPhone(''); setNewName('') }} className="text-[#111827]/30 hover:text-red-400 px-1">
+                            <button type="button" onClick={() => { setShowAddContact(false); setNewPhone(''); setNewName('') }} className="text-white/45 hover:text-red-400 px-1">
                                 <X size={15} />
                             </button>
                         </div>
                     )}
 
-                    <p className="text-[11px] text-[#111827]/25 mb-3">
+                    <p className="text-[11px] text-white/45 mb-3">
                         Subí un Excel con tus contactos (columnas: teléfono, nombre).
                     </p>
 
                     <button
                         type="button"
                         onClick={() => excelInputRef.current?.click()}
-                        className={`w-full flex items-center gap-3 p-4 rounded-xl border-2 border-dashed transition-all ${excelFile ? 'border-green-500/40 bg-green-500/5' : 'border-[#E4E9F0] hover:border-purple-500/40'}`}
+                        className={`w-full flex items-center gap-3 p-4 rounded-xl border-2 border-dashed transition-all ${excelFile ? 'border-green-500/40 bg-green-500/5' : 'border-white/10 hover:border-[#FF096C]/40'}`}
                     >
                         {excelFile ? (
                             <>
                                 <CheckCircle2 size={18} className="text-green-400 shrink-0" />
                                 <div className="text-left">
                                     <p className="text-sm font-bold text-green-400">{excelFile.name}</p>
-                                    <p className="text-xs text-[#111827]/30">{(excelFile.size / 1024).toFixed(1)} KB · <span className="text-[#111827]/20">Columnas: teléfono · nombre</span></p>
+                                    <p className="text-xs text-white/55">{(excelFile.size / 1024).toFixed(1)} KB · <span className="text-white/40">Columnas: teléfono · nombre</span></p>
                                 </div>
-                                <button type="button" onClick={e => { e.stopPropagation(); setExcelFile(null); setContacts([]) }} className="ml-auto text-[#111827]/30 hover:text-red-400">
+                                <button type="button" onClick={e => { e.stopPropagation(); setExcelFile(null); setContacts([]) }} className="ml-auto text-white/45 hover:text-red-400">
                                     <X size={14} />
                                 </button>
                             </>
                         ) : (
                             <>
-                                <Upload size={18} className="text-[#111827]/30 shrink-0" />
-                                <p className="text-sm text-[#111827]/30">Seleccionar archivo Excel (.xlsx, .xls, .csv)</p>
+                                <Upload size={18} className="text-white/45 shrink-0" />
+                                <p className="text-sm text-white/45">Seleccionar archivo Excel (.xlsx, .xls, .csv)</p>
                             </>
                         )}
                     </button>
                     <input ref={excelInputRef} type="file" accept=".xlsx,.xls,.csv" className="hidden" onChange={e => handleExcelSelect(e.target.files)} />
                     {parsingExcel && (
-                        <div className="mt-3 flex items-center gap-2 text-xs text-[#111827]/40">
+                        <div className="mt-3 flex items-center gap-2 text-xs text-white/55">
                             <Loader2 size={12} className="animate-spin" /> Leyendo contactos...
                         </div>
                     )}
 
                     {contacts.length > 0 && (
                         <div className="mt-4">
-                            <p className="text-[11px] text-[#111827]/30 mb-2">
+                            <p className="text-[11px] text-white/55 mb-2">
                                 <span className="text-green-400 font-bold">{contacts.length} contactos</span> cargados
                             </p>
-                            <div className="max-h-60 overflow-y-auto rounded-xl border border-[#E4E9F0] divide-y divide-white/5">
+                            <div className="max-h-60 overflow-y-auto rounded-xl border border-white/10 divide-y divide-white/5">
                                 {contacts.map((c, i) => (
                                     <div key={i} className="flex items-center gap-2 px-3 py-2 group">
                                         {editingIdx === i ? (
@@ -566,32 +566,32 @@ export default function NewCrmCampaignPage() {
                                                 <input
                                                     value={editPhone}
                                                     onChange={e => setEditPhone(e.target.value)}
-                                                    className="flex-1 bg-[#F4F6FA] rounded px-2 py-1 text-xs text-[#111827] focus:outline-none"
+                                                    className="flex-1 bg-white/5 rounded px-2 py-1 text-xs text-white focus:outline-none"
                                                 />
                                                 <input
                                                     value={editName}
                                                     onChange={e => setEditName(e.target.value)}
                                                     placeholder="Nombre"
-                                                    className="flex-1 bg-[#F4F6FA] rounded px-2 py-1 text-xs text-[#111827] placeholder-white/20 focus:outline-none"
+                                                    className="flex-1 bg-white/5 rounded px-2 py-1 text-xs text-white placeholder-white/35 focus:outline-none"
                                                 />
                                                 <button type="button" onClick={saveEdit} className="text-green-400 hover:text-green-300">
                                                     <CheckCircle2 size={13} />
                                                 </button>
-                                                <button type="button" onClick={() => setEditingIdx(null)} className="text-[#111827]/30 hover:text-red-400">
+                                                <button type="button" onClick={() => setEditingIdx(null)} className="text-white/45 hover:text-red-400">
                                                     <X size={13} />
                                                 </button>
                                             </>
                                         ) : (
                                             <>
-                                                <Phone size={10} className="text-[#111827]/20 shrink-0" />
+                                                <Phone size={10} className="text-white/40 shrink-0" />
                                                 <div className="flex-1 min-w-0">
-                                                    {c.name && <p className="text-xs font-bold text-[#111827]/80 truncate">{c.name}</p>}
-                                                    <p className="text-xs text-[#111827]/60">{c.phone}</p>
+                                                    {c.name && <p className="text-xs font-bold text-white/90 truncate">{c.name}</p>}
+                                                    <p className="text-xs text-white/65">{c.phone}</p>
                                                 </div>
-                                                <button type="button" onClick={() => startEdit(i)} className="opacity-0 group-hover:opacity-100 text-[#111827]/30 hover:text-purple-400 transition-all">
+                                                <button type="button" onClick={() => startEdit(i)} className="opacity-0 group-hover:opacity-100 text-white/45 hover:text-[#FF096C] transition-all">
                                                     <Pencil size={12} />
                                                 </button>
-                                                <button type="button" onClick={() => deleteContact(i)} className="opacity-0 group-hover:opacity-100 text-[#111827]/30 hover:text-red-400 transition-all">
+                                                <button type="button" onClick={() => deleteContact(i)} className="opacity-0 group-hover:opacity-100 text-white/45 hover:text-red-400 transition-all">
                                                     <Trash2 size={12} />
                                                 </button>
                                             </>
@@ -603,7 +603,7 @@ export default function NewCrmCampaignPage() {
                     )}
 
                     {contacts.length === 0 && !parsingExcel && (
-                        <p className="mt-3 text-[11px] text-[#111827]/20 text-center">
+                        <p className="mt-3 text-[11px] text-white/40 text-center">
                             Sin contactos — subí un Excel o agregá manualmente
                         </p>
                     )}
@@ -613,8 +613,8 @@ export default function NewCrmCampaignPage() {
                 <button
                     type="submit"
                     disabled={loading}
-                    className="w-full flex items-center justify-center gap-2 py-4 rounded-2xl text-sm font-black uppercase tracking-widest text-[#111827] transition-all disabled:opacity-50"
-                    style={{ background: 'linear-gradient(135deg, #D203DD, #00FF88)' }}
+                    className="w-full flex items-center justify-center gap-2 py-4 rounded-2xl text-sm font-black uppercase tracking-widest text-white transition-all disabled:opacity-50 hover:opacity-90"
+                    style={{ background: 'linear-gradient(135deg, #FF2D95 0%, #B735B8 48%, #233B8F 100%)' }}
                 >
                     {loading ? (
                         <>

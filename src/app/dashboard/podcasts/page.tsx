@@ -76,7 +76,7 @@ export default function PodcastsPage() {
 
       {/* Search */}
       <div className="relative mb-6">
-        <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#111827]/25 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
           <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
         </svg>
         <input
@@ -84,18 +84,19 @@ export default function PodcastsPage() {
           value={search}
           onChange={e => setSearch(e.target.value)}
           placeholder="Buscar episodio por nombre..."
+          className="placeholder-white/35"
           style={{
             width: '100%', paddingLeft: 36, paddingRight: 16, paddingTop: 10, paddingBottom: 10,
             borderRadius: 12, fontSize: 13, color: '#fff', outline: 'none',
-            background: 'rgba(255,255,255,0.04)', border: '1px solid #E4E9F0',
+            background: 'rgba(8,22,36,0.96)', border: '1px solid rgba(255,255,255,0.1)',
             boxSizing: 'border-box',
           }}
-          onFocus={e => (e.currentTarget.style.borderColor = '#E4E9F0')}
-          onBlur={e => (e.currentTarget.style.borderColor = '#E4E9F0')}
+          onFocus={e => (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)')}
+          onBlur={e => (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)')}
         />
         {search && (
           <button onClick={() => setSearch('')}
-            style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: '#6B7280', fontSize: 16, lineHeight: 1 }}>✕</button>
+            style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.55)', fontSize: 16, lineHeight: 1 }}>✕</button>
         )}
       </div>
 
@@ -119,12 +120,12 @@ export default function PodcastsPage() {
               className="hover:scale-[1.01] transition-transform">
               <div style={{
                 borderRadius: 16, overflow: 'hidden',
-                background: 'linear-gradient(135deg, rgba(154,203,255,0.12) 0%, rgba(255,125,224,0.12) 50%, rgba(162,102,255,0.12) 100%)',
-                border: '1px solid #E4E9F0',
+                background: 'linear-gradient(180deg, #0B1B2B 0%, #081624 60%, #050B14 100%)',
+                border: '1px solid rgba(255,255,255,0.1)',
                 cursor: 'pointer', display: 'flex', flexDirection: 'column', height: '100%',
               }}>
                 {/* Cover */}
-                <div style={{ aspectRatio: '16/9', background: 'rgba(210,3,221,0.05)', position: 'relative', overflow: 'hidden', flexShrink: 0 }}>
+                <div style={{ aspectRatio: '16/9', background: 'rgba(210,3,221,0.1)', position: 'relative', overflow: 'hidden', flexShrink: 0 }}>
                   {podcast.coverUrl ? (
                     <img src={podcast.coverUrl} alt={podcast.title} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                   ) : (
@@ -145,13 +146,13 @@ export default function PodcastsPage() {
                     {podcast.title}
                   </p>
                   <p style={{
-                    color: '#6B7280', fontSize: 11, lineHeight: 1.5, marginBottom: 12, flex: 1,
+                    color: 'rgba(255,255,255,0.55)', fontSize: 11, lineHeight: 1.5, marginBottom: 12, flex: 1,
                     display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden',
                   }}>
                     {podcast.description ?? 'Episodio exclusivo de MY DIAMOND.'}
                   </p>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', marginTop: 'auto' }}>
-                    <span style={{ color: '#9CA3AF', fontSize: 11 }}>
+                    <span style={{ color: 'rgba(255,255,255,0.42)', fontSize: 11 }}>
                       <i className="fa-solid fa-microphone" style={{ marginRight: 4 }} />Podcast
                     </span>
                   </div>

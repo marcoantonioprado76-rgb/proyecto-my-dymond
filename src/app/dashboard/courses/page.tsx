@@ -75,7 +75,7 @@ export default function CoursesPage() {
   if (loading) {
     return (
       <div className="px-4 sm:px-6 pt-6 max-w-screen-xl mx-auto min-h-[60vh] flex items-center justify-center">
-        <div className="w-6 h-6 border-2 border-cyan-500 border-t-transparent rounded-full animate-spin" />
+        <div className="w-6 h-6 border-2 border-[#FF2DF7] border-t-transparent rounded-full animate-spin" />
       </div>
     )
   }
@@ -96,7 +96,7 @@ export default function CoursesPage() {
       <Link href="/dashboard/academy" className="academy-back" style={{ display: 'inline-flex', alignItems: 'center', gap: 10, marginBottom: 16, textDecoration: 'none' }}>
         <span style={{
           display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 30, height: 30, borderRadius: 9,
-          background: '#F0F3F7', border: '1px solid rgba(255,255,255,0.12)', color: '#374151',
+          background: '#F0F3F7', border: '1px solid #E4E9F0', color: '#374151',
         }}>
           <i className="fa-solid fa-arrow-left" style={{ fontSize: 12 }} />
         </span>
@@ -111,8 +111,8 @@ export default function CoursesPage() {
           <p className="text-xs text-[#111827]/30 mt-2">Accede a cursos exclusivos de MY DIAMOND.</p>
           {courses.length > 0 && (
             <div className="flex flex-wrap gap-x-4 gap-y-1 mt-3">
-              <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)' }}>
-                <b style={{ color: '#fff' }}>{courses.length}</b> curso{courses.length !== 1 ? 's' : ''}
+              <span style={{ fontSize: 11, color: '#6B7280' }}>
+                <b style={{ color: '#111827' }}>{courses.length}</b> curso{courses.length !== 1 ? 's' : ''}
               </span>
               {courses.some(c => c.enrollment?.status === 'APPROVED') && (
                 <span style={{ fontSize: 11, color: 'rgba(0,255,136,0.7)' }}>
@@ -120,7 +120,7 @@ export default function CoursesPage() {
                 </span>
               )}
               {courses.some(c => c.freeForPlan) && (
-                <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)' }}>
+                <span style={{ fontSize: 11, color: '#6B7280' }}>
                   <b style={{ color: '#D203DD' }}>{courses.filter(c => c.freeForPlan).length}</b> gratis con tu plan
                 </span>
               )}
@@ -142,7 +142,7 @@ export default function CoursesPage() {
 
       {/* Search */}
       <div className="relative mb-6">
-        <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#111827]/25 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/35 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
           <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
         </svg>
         <input
@@ -150,19 +150,20 @@ export default function CoursesPage() {
           value={search}
           onChange={e => setSearch(e.target.value)}
           placeholder="Buscar curso por nombre..."
+          className="placeholder-white/35"
           style={{
             width: '100%', paddingLeft: 36, paddingRight: 16, paddingTop: 10, paddingBottom: 10,
             borderRadius: 12, fontSize: 13, color: '#fff', outline: 'none',
-            background: 'rgba(255,255,255,0.04)', border: '1px solid #E4E9F0',
+            background: 'linear-gradient(180deg, #0B1B2B 0%, #081624 60%, #050B14 100%)', border: '1px solid rgba(255,255,255,0.1)',
             boxSizing: 'border-box',
           }}
-          onFocus={e => (e.currentTarget.style.borderColor = '#E4E9F0')}
-          onBlur={e => (e.currentTarget.style.borderColor = '#E4E9F0')}
+          onFocus={e => (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.22)')}
+          onBlur={e => (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)')}
         />
         {search && (
           <button
             onClick={() => setSearch('')}
-            style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: '#6B7280', fontSize: 16, lineHeight: 1 }}
+            style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.55)', fontSize: 16, lineHeight: 1 }}
           >✕</button>
         )}
       </div>
@@ -179,9 +180,9 @@ export default function CoursesPage() {
                 className="shrink-0 whitespace-nowrap transition-colors"
                 style={{
                   fontSize: 12, fontWeight: 700, padding: '7px 14px', borderRadius: 999,
-                  color: active ? '#fff' : 'rgba(255,255,255,0.45)',
-                  background: active ? 'linear-gradient(135deg, #D203DD, #FF2DF7)' : 'rgba(255,255,255,0.04)',
-                  border: `1px solid ${active ? 'transparent' : '#E4E9F0'}`,
+                  color: active ? '#fff' : 'rgba(255,255,255,0.6)',
+                  background: active ? 'linear-gradient(135deg, #D203DD, #FF2DF7)' : 'linear-gradient(180deg, #0B1B2B 0%, #081624 60%, #050B14 100%)',
+                  border: `1px solid ${active ? 'transparent' : 'rgba(255,255,255,0.1)'}`,
                 }}>
                 {cat}
               </button>
@@ -205,7 +206,7 @@ export default function CoursesPage() {
           <p className="text-sm text-[#111827]/30">
             Sin resultados{search ? <> para <span className="text-[#111827]/60">"{search}"</span></> : activeCat !== 'Todos' ? <> en <span className="text-[#111827]/60">{activeCat}</span></> : ''}
           </p>
-          <button onClick={() => { setSearch(''); setActiveCat('Todos') }} className="mt-3 text-xs text-cyan-400 hover:underline">Limpiar filtros</button>
+          <button onClick={() => { setSearch(''); setActiveCat('Todos') }} className="mt-3 text-xs text-[#FF096C] hover:underline">Limpiar filtros</button>
         </div>
       ) : (
         <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
@@ -219,8 +220,8 @@ export default function CoursesPage() {
                 style={{
                   borderRadius: 16,
                   overflow: 'hidden',
-                  background: isLocked ? 'linear-gradient(135deg, rgba(154,203,255,0.12) 0%, rgba(255,125,224,0.12) 50%, rgba(162,102,255,0.12) 100%)' : 'linear-gradient(135deg, rgba(154,203,255,0.12) 0%, rgba(255,125,224,0.12) 50%, rgba(162,102,255,0.12) 100%)',
-                  border: `1px solid ${isLocked ? 'rgba(210,3,221,0.08)' : '#E4E9F0'}`,
+                  background: 'linear-gradient(180deg, #0B1B2B 0%, #081624 60%, #050B14 100%)',
+                  border: `1px solid ${isLocked ? 'rgba(210,3,221,0.18)' : 'rgba(255,255,255,0.1)'}`,
                   opacity: isLocked ? 0.7 : 1,
                   cursor: isLocked ? 'default' : 'pointer',
                   transition: 'border-color 0.2s, transform 0.15s',
@@ -278,7 +279,7 @@ export default function CoursesPage() {
                   {(course.categoria || course.nivel) && (
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5, marginBottom: 7 }}>
                       {course.categoria && (
-                        <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.04em', textTransform: 'uppercase', padding: '2px 7px', borderRadius: 5, color: 'rgba(255,255,255,0.55)', background: 'rgba(255,255,255,0.06)', border: '1px solid #E4E9F0' }}>
+                        <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.04em', textTransform: 'uppercase', padding: '2px 7px', borderRadius: 5, color: 'rgba(255,255,255,0.55)', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)' }}>
                           {course.categoria}
                         </span>
                       )}
@@ -293,7 +294,7 @@ export default function CoursesPage() {
                     {course.title}
                   </p>
                   <p style={{
-                    color: '#6B7280', fontSize: 11, lineHeight: 1.5, marginBottom: 12, flex: 1,
+                    color: 'rgba(255,255,255,0.55)', fontSize: 11, lineHeight: 1.5, marginBottom: 12, flex: 1,
                     display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden',
                   }}>
                     {course.description}
@@ -308,7 +309,7 @@ export default function CoursesPage() {
                         {course.freeForPlan ? 'GRATIS' : `${course.price.toFixed(2)} USDT`}
                       </span>
                     )}
-                    <span style={{ color: '#9CA3AF', fontSize: 11 }}>
+                    <span style={{ color: 'rgba(255,255,255,0.42)', fontSize: 11 }}>
                       {course.videosCount} vid{course.videosCount !== 1 ? 's' : ''}
                     </span>
                   </div>
