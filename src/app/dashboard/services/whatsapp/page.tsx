@@ -799,24 +799,24 @@ function WebhookTab({ bot }: { bot: Bot }) {
 
   return (
     <div className="space-y-6">
-      <div className="dm-card p-6 rounded-2xl border border-[#233B8F]/20">
-        <h3 className="text-sm font-bold text-[#111827] mb-1 flex items-center gap-2">
+      <div className="dm-card-dark p-6 rounded-2xl border border-[#233B8F]/20">
+        <h3 className="text-sm font-bold text-white mb-1 flex items-center gap-2">
           <Webhook className="w-4 h-4 text-[#233B8F]" />
           URL del Webhook
         </h3>
-        <p className="text-xs text-[#6B7280] mb-4">
+        <p className="text-xs text-white/50 mb-4">
           {isMeta
             ? 'Configura esta URL en developers.facebook.com → tu App → Messenger → Webhooks. El Verify Token es el de abajo.'
             : 'Configura esta URL en tu panel de YCloud como Webhook URL para mensajes entrantes.'}
         </p>
-        <div className="bg-white/70 border border-[#E4E9F0] rounded-xl p-3 flex items-center gap-2">
+        <div className="bg-white/70 border border-white/10 rounded-xl p-3 flex items-center gap-2">
           <code className="flex-1 text-xs text-[#233B8F] break-all font-mono">{webhookUrl}</code>
           <CopyButton text={webhookUrl} />
         </div>
         {isMeta && (
           <div className="mt-3">
-            <p className="text-xs text-[#6B7280] mb-2">Verify Token (pégalo en Meta al configurar el webhook):</p>
-            <div className="bg-white/70 border border-[#E4E9F0] rounded-xl p-3 flex items-center gap-2">
+            <p className="text-xs text-white/50 mb-2">Verify Token (pégalo en Meta al configurar el webhook):</p>
+            <div className="bg-white/70 border border-white/10 rounded-xl p-3 flex items-center gap-2">
               <code className="flex-1 text-xs text-purple-400 break-all font-mono">{bot.webhookToken}</code>
               <CopyButton text={bot.webhookToken} />
             </div>
@@ -825,17 +825,17 @@ function WebhookTab({ bot }: { bot: Bot }) {
       </div>
 
       {!isMeta && (
-        <div className="dm-card p-6 rounded-2xl">
-          <h3 className="text-sm font-bold text-[#111827] mb-1 flex items-center gap-2">
+        <div className="dm-card-dark p-6 rounded-2xl">
+          <h3 className="text-sm font-bold text-white mb-1 flex items-center gap-2">
             <Key className="w-4 h-4 text-[#B735B8]" />
             Webhook Token (secreto)
           </h3>
-          <p className="text-xs text-[#6B7280] mb-4">
+          <p className="text-xs text-white/50 mb-4">
             Este token valida que el webhook viene de YCloud. Ya está incluido en la URL anterior como{' '}
             <code className="text-[#B735B8]">?token=...</code>
           </p>
-          <div className="bg-white/70 border border-[#E4E9F0] rounded-xl p-3 flex items-center gap-2">
-            <code className="flex-1 text-xs text-[#374151] font-mono truncate">
+          <div className="bg-white/70 border border-white/10 rounded-xl p-3 flex items-center gap-2">
+            <code className="flex-1 text-xs text-white/75 font-mono truncate">
               {bot.webhookToken.slice(0, 8)}{'*'.repeat(20)}{bot.webhookToken.slice(-4)}
             </code>
             <CopyButton text={bot.webhookToken} />
@@ -843,10 +843,10 @@ function WebhookTab({ bot }: { bot: Bot }) {
         </div>
       )}
 
-      <div className="dm-card p-6 rounded-2xl border border-[#E4E9F0]">
+      <div className="dm-card-dark p-6 rounded-2xl border border-white/10">
         {isMeta ? (
           <>
-            <h3 className="text-sm font-bold text-[#111827] mb-3 flex items-center gap-2">
+            <h3 className="text-sm font-bold text-white mb-3 flex items-center gap-2">
               <span className="text-base">💬</span> Pasos de configuración en Meta (Facebook Messenger)
             </h3>
             <ol className="space-y-3">
@@ -861,7 +861,7 @@ function WebhookTab({ bot }: { bot: Bot }) {
                 'En "Tokens de acceso" genera el token para tu Página y guárdalo en Credenciales',
                 'Envía un mensaje de prueba a tu Página de Facebook',
               ].map((step, i) => (
-                <li key={i} className="flex gap-3 text-sm text-[#374151]">
+                <li key={i} className="flex gap-3 text-sm text-white/75">
                   <span className="w-5 h-5 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-400 text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">
                     {i + 1}
                   </span>
@@ -872,7 +872,7 @@ function WebhookTab({ bot }: { bot: Bot }) {
           </>
         ) : (
           <>
-            <h3 className="text-sm font-bold text-[#111827] mb-3">Pasos de configuración en YCloud</h3>
+            <h3 className="text-sm font-bold text-white mb-3">Pasos de configuración en YCloud</h3>
             <ol className="space-y-3">
               {[
                 'Inicia sesión en https://app.ycloud.com',
@@ -882,7 +882,7 @@ function WebhookTab({ bot }: { bot: Bot }) {
                 'Guarda la configuración',
                 'Envía un mensaje de prueba al número configurado',
               ].map((step, i) => (
-                <li key={i} className="flex gap-3 text-sm text-[#374151]">
+                <li key={i} className="flex gap-3 text-sm text-white/75">
                   <span className="w-5 h-5 rounded-full bg-[#233B8F]/10 border border-[#233B8F]/20 text-[#233B8F] text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">
                     {i + 1}
                   </span>
@@ -895,12 +895,12 @@ function WebhookTab({ bot }: { bot: Bot }) {
       </div>
 
       {/* ── Zona de riesgo ── */}
-      <div className="dm-card p-6 rounded-2xl border border-red-500/20">
+      <div className="dm-card-dark p-6 rounded-2xl border border-red-500/20">
         <h3 className="text-sm font-bold text-red-400 flex items-center gap-2 mb-1">
           <Trash2 className="w-4 h-4" />
           Zona de riesgo
         </h3>
-        <p className="text-xs text-[#6B7280] mb-4">
+        <p className="text-xs text-white/50 mb-4">
           Elimina permanentemente todo el historial de conversaciones y mensajes de este bot.
           Los productos y la configuración no se verán afectados.
         </p>
@@ -998,10 +998,10 @@ function CredentialsTab({ bot, onStatusChange }: { bot: Bot; onStatusChange: (st
   return (
     <div className="space-y-6">
       {/* Status toggle */}
-      <div className="dm-card p-5 rounded-2xl flex items-center justify-between gap-3">
+      <div className="dm-card-dark p-5 rounded-2xl flex items-center justify-between gap-3">
         <div className="min-w-0">
-          <div className="text-sm font-bold text-[#111827]">Estado del Agente</div>
-          <div className="text-xs text-[#6B7280] mt-0.5 truncate">
+          <div className="text-sm font-bold text-white">Estado del Agente</div>
+          <div className="text-xs text-white/50 mt-0.5 truncate">
             {bot.status === 'ACTIVE' ? 'El bot está respondiendo mensajes' : 'El bot está pausado'}
           </div>
         </div>
@@ -1015,17 +1015,17 @@ function CredentialsTab({ bot, onStatusChange }: { bot: Bot; onStatusChange: (st
           ) : bot.status === 'ACTIVE' ? (
             <ToggleRight className="w-8 h-8 text-[#16A34A]" />
           ) : (
-            <ToggleLeft className="w-8 h-8 text-[#9CA3AF]" />
+            <ToggleLeft className="w-8 h-8 text-white/40" />
           )}
-          <span className={bot.status === 'ACTIVE' ? 'text-[#16A34A]' : 'text-[#6B7280]'}>
+          <span className={bot.status === 'ACTIVE' ? 'text-[#16A34A]' : 'text-white/50'}>
             {bot.status === 'ACTIVE' ? 'Activo' : 'Pausado'}
           </span>
         </button>
       </div>
 
       {/* Credentials form */}
-      <form onSubmit={handleSave} className="dm-card p-6 rounded-2xl space-y-5">
-        <h3 className="text-sm font-bold text-[#111827] flex items-center gap-2">
+      <form onSubmit={handleSave} className="dm-card-dark p-6 rounded-2xl space-y-5">
+        <h3 className="text-sm font-bold text-white flex items-center gap-2">
           <Key className="w-4 h-4 text-[#B735B8]" />
           Claves de API
         </h3>
@@ -1035,7 +1035,7 @@ function CredentialsTab({ bot, onStatusChange }: { bot: Bot; onStatusChange: (st
         {/* YCloud API Key — solo para bots YCloud */}
         {!isBaileys && !isMeta && (
           <div>
-            <label className="block text-xs font-medium text-[#374151] mb-1.5">
+            <label className="block text-xs font-medium text-white/75 mb-1.5">
               YCloud API Key{' '}
               {creds?.hasYcloudKey && (
                 <span className="text-[#16A34A] ml-1">✓ configurada</span>
@@ -1047,12 +1047,12 @@ function CredentialsTab({ bot, onStatusChange }: { bot: Bot; onStatusChange: (st
                 value={form.ycloudApiKey}
                 onChange={e => setForm(f => ({ ...f, ycloudApiKey: e.target.value }))}
                 placeholder={creds?.hasYcloudKey ? '(dejar vacío para mantener)' : 'yk_live_...'}
-                className="w-full bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-4 py-2.5 pr-10 text-sm text-[#111827] placeholder-dark-500 focus:outline-none focus:border-[#B735B8]/40"
+                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 pr-10 text-sm text-white placeholder-dark-500 focus:outline-none focus:border-[#B735B8]/40"
               />
               <button
                 type="button"
                 onClick={() => setShowYcloud(s => !s)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#6B7280] hover:text-[#111827]"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-white/50 hover:text-white"
               >
                 {showYcloud ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
@@ -1063,7 +1063,7 @@ function CredentialsTab({ bot, onStatusChange }: { bot: Bot; onStatusChange: (st
         {/* Meta Page Access Token — solo para bots META */}
         {isMeta && (
           <div>
-            <label className="block text-xs font-medium text-[#374151] mb-1.5">
+            <label className="block text-xs font-medium text-white/75 mb-1.5">
               Meta Page Access Token{' '}
               {creds?.hasMetaToken && (
                 <span className="text-[#16A34A] ml-1">✓ configurado ({creds.metaPageTokenHint})</span>
@@ -1075,23 +1075,23 @@ function CredentialsTab({ bot, onStatusChange }: { bot: Bot; onStatusChange: (st
                 value={form.metaPageToken}
                 onChange={e => setForm(f => ({ ...f, metaPageToken: e.target.value }))}
                 placeholder={creds?.hasMetaToken ? '(dejar vacío para mantener)' : 'EAAxxxxxxx...'}
-                className="w-full bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-4 py-2.5 pr-10 text-sm text-[#111827] placeholder-dark-500 focus:outline-none focus:border-purple-400/40"
+                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 pr-10 text-sm text-white placeholder-dark-500 focus:outline-none focus:border-purple-400/40"
               />
               <button
                 type="button"
                 onClick={() => setShowMeta(s => !s)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#6B7280] hover:text-[#111827]"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-white/50 hover:text-white"
               >
                 {showMeta ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
             </div>
-            <p className="text-xs text-[#9CA3AF] mt-1">Obtén el token permanente desde developers.facebook.com → tu App → Messenger → Tokens de acceso.</p>
+            <p className="text-xs text-white/40 mt-1">Obtén el token permanente desde developers.facebook.com → tu App → Messenger → Tokens de acceso.</p>
           </div>
         )}
 
         {/* OpenAI API Key */}
         <div>
-          <label className="block text-xs font-medium text-[#374151] mb-1.5">
+          <label className="block text-xs font-medium text-white/75 mb-1.5">
             OpenAI API Key{' '}
             {creds?.hasOpenAIKey && (
               <span className="text-[#16A34A] ml-1">✓ configurada</span>
@@ -1103,12 +1103,12 @@ function CredentialsTab({ bot, onStatusChange }: { bot: Bot; onStatusChange: (st
               value={form.openaiApiKey}
               onChange={e => setForm(f => ({ ...f, openaiApiKey: e.target.value }))}
               placeholder={creds?.hasOpenAIKey ? '(dejar vacío para mantener)' : 'sk-proj-...'}
-              className="w-full bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-4 py-2.5 pr-10 text-sm text-[#111827] placeholder-dark-500 focus:outline-none focus:border-[#B735B8]/40"
+              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 pr-10 text-sm text-white placeholder-dark-500 focus:outline-none focus:border-[#B735B8]/40"
             />
             <button
               type="button"
               onClick={() => setShowOpenai(s => !s)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-[#6B7280] hover:text-[#111827]"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-white/50 hover:text-white"
             >
               {showOpenai ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
             </button>
@@ -1118,14 +1118,14 @@ function CredentialsTab({ bot, onStatusChange }: { bot: Bot; onStatusChange: (st
         {/* WhatsApp number — solo para bots YCloud */}
         {!isBaileys && !isMeta && (
           <div>
-            <label className="block text-xs font-medium text-[#374151] mb-1.5">
+            <label className="block text-xs font-medium text-white/75 mb-1.5">
               Número WhatsApp Business (from)
             </label>
             <input
               value={form.whatsappInstanceNumber}
               onChange={e => setForm(f => ({ ...f, whatsappInstanceNumber: e.target.value }))}
               placeholder="15551234567 (sin + ni espacios)"
-              className="w-full bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-4 py-2.5 text-sm text-[#111827] placeholder-dark-500 focus:outline-none focus:border-[#B735B8]/40"
+              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white placeholder-dark-500 focus:outline-none focus:border-[#B735B8]/40"
             />
           </div>
         )}
@@ -1133,17 +1133,17 @@ function CredentialsTab({ bot, onStatusChange }: { bot: Bot; onStatusChange: (st
         {/* Report phone — solo para bots WhatsApp (YCLOUD y BAILEYS) */}
         {!isMeta && (
           <div>
-            <label className="block text-xs font-medium text-[#374151] mb-1.5">
+            <label className="block text-xs font-medium text-white/75 mb-1.5">
               Número interno para reportes
             </label>
             <input
               value={form.reportPhone}
               onChange={e => setForm(f => ({ ...f, reportPhone: e.target.value }))}
               placeholder="15559876543"
-              className="w-full bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-4 py-2.5 text-sm text-[#111827] placeholder-dark-500 focus:outline-none focus:border-[#B735B8]/40"
+              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white placeholder-dark-500 focus:outline-none focus:border-[#B735B8]/40"
               required
             />
-            <p className="text-xs text-[#9CA3AF] mt-1">
+            <p className="text-xs text-white/40 mt-1">
               Cuando un cliente confirme su pedido, el agente enviará un reporte a este número por WhatsApp.
             </p>
           </div>
@@ -1160,13 +1160,13 @@ function CredentialsTab({ bot, onStatusChange }: { bot: Bot; onStatusChange: (st
       </form>
 
       {/* Model selector */}
-      <div className="dm-card p-6 rounded-2xl space-y-4">
-        <h3 className="text-sm font-bold text-[#111827] flex items-center gap-2">
+      <div className="dm-card-dark p-6 rounded-2xl space-y-4">
+        <h3 className="text-sm font-bold text-white flex items-center gap-2">
           <Zap className="w-4 h-4 text-[#B735B8]" />
           Modelo de IA
-          <span className="text-xs font-normal text-[#6B7280] ml-1">— para respuestas al cliente</span>
+          <span className="text-xs font-normal text-white/50 ml-1">— para respuestas al cliente</span>
         </h3>
-        <p className="text-xs text-[#9CA3AF]">Los seguimientos automáticos siempre usan GPT-4o Mini (más económico).</p>
+        <p className="text-xs text-white/40">Los seguimientos automáticos siempre usan GPT-4o Mini (más económico).</p>
 
         <div className="space-y-2">
           {[
@@ -1182,12 +1182,12 @@ function CredentialsTab({ bot, onStatusChange }: { bot: Bot; onStatusChange: (st
               className={`w-full flex items-center justify-between px-4 py-3 rounded-xl border transition-all text-left ${
                 selectedModel === m.id
                   ? 'border-[#B735B8]/60 bg-[#B735B8]/10'
-                  : 'border-[#E4E9F0] bg-white/30 hover:border-[#E4E9F0]'
+                  : 'border-white/10 bg-white/30 hover:border-white/10'
               }`}
             >
               <div>
-                <span className={`text-sm font-semibold ${selectedModel === m.id ? m.color : 'text-[#111827]'}`}>{m.label}</span>
-                <p className="text-xs text-[#6B7280] mt-0.5">{m.desc}</p>
+                <span className={`text-sm font-semibold ${selectedModel === m.id ? m.color : 'text-white'}`}>{m.label}</span>
+                <p className="text-xs text-white/50 mt-0.5">{m.desc}</p>
               </div>
               {selectedModel === m.id && <CheckCircle2 className="w-4 h-4 text-[#B735B8] shrink-0" />}
             </button>
@@ -1208,7 +1208,7 @@ function CredentialsTab({ bot, onStatusChange }: { bot: Bot; onStatusChange: (st
               setSavingModel(false)
             }
           }}
-          className="w-full py-2.5 bg-[#F8FAFC] border border-[#E4E9F0] text-[#111827] text-sm font-semibold rounded-xl hover:border-[#16A34A]/40 disabled:opacity-50 flex items-center justify-center gap-2 transition-colors"
+          className="w-full py-2.5 bg-white/5 border border-white/10 text-white text-sm font-semibold rounded-xl hover:border-[#16A34A]/40 disabled:opacity-50 flex items-center justify-center gap-2 transition-colors"
         >
           {savingModel ? <Spinner /> : <Save className="w-4 h-4" />}
           Guardar modelo
@@ -1253,36 +1253,36 @@ function VoiceCard({ bot }: { bot: Bot }) {
   }
 
   return (
-    <div className="dm-card p-6 rounded-2xl space-y-4">
+    <div className="dm-card-dark p-6 rounded-2xl space-y-4">
       {msg && (
         <div className={`text-xs px-3 py-2 rounded-lg border ${msg.type === 'success' ? 'border-[#16A34A]/40 bg-[#16A34A]/10 text-[#16A34A]' : 'border-red-500/40 bg-red-500/10 text-red-300'}`}>
           {msg.text}
         </div>
       )}
-      <h3 className="text-sm font-bold text-[#111827] flex items-center gap-2">
+      <h3 className="text-sm font-bold text-white flex items-center gap-2">
         <Volume2 className="w-4 h-4 text-[#233B8F]" />
         Voz del agente
-        <span className="text-xs font-normal text-[#6B7280] ml-1">— responde con notas de voz</span>
+        <span className="text-xs font-normal text-white/50 ml-1">— responde con notas de voz</span>
       </h3>
 
       <button
         type="button"
         onClick={() => setVoiceEnabled(v => !v)}
-        className="w-full flex items-center justify-between px-4 py-3 rounded-xl border border-[#E4E9F0] bg-white/30 text-left"
+        className="w-full flex items-center justify-between px-4 py-3 rounded-xl border border-white/10 bg-white/30 text-left"
       >
         <div>
-          <span className="text-sm font-semibold text-[#111827]">Activar voz</span>
-          <p className="text-xs text-[#6B7280] mt-0.5">Notas de voz reales con IA (voces en español).</p>
+          <span className="text-sm font-semibold text-white">Activar voz</span>
+          <p className="text-xs text-white/50 mt-0.5">Notas de voz reales con IA (voces en español).</p>
         </div>
         {voiceEnabled
           ? <ToggleRight className="w-7 h-7 text-[#233B8F] shrink-0" />
-          : <ToggleLeft className="w-7 h-7 text-[#6B7280] shrink-0" />}
+          : <ToggleLeft className="w-7 h-7 text-white/50 shrink-0" />}
       </button>
 
       {voiceEnabled && (
         <>
           <div className="space-y-2">
-            <p className="text-xs font-semibold text-[#6B7280]">¿Cuándo responde con voz?</p>
+            <p className="text-xs font-semibold text-white/50">¿Cuándo responde con voz?</p>
             {[
               { id: 'audio_in', label: 'Solo si el cliente manda audio', desc: 'Recomendado · natural y ahorra costo' },
               { id: 'always',   label: 'Siempre con voz',                 desc: 'Cada respuesta también en nota de voz' },
@@ -1292,12 +1292,12 @@ function VoiceCard({ bot }: { bot: Bot }) {
                 type="button"
                 onClick={() => setVoiceMode(m.id)}
                 className={`w-full flex items-center justify-between px-4 py-2.5 rounded-xl border text-left transition-all ${
-                  voiceMode === m.id ? 'border-[#233B8F]/60 bg-[#233B8F]/10' : 'border-[#E4E9F0] bg-white/30 hover:border-[#E4E9F0]'
+                  voiceMode === m.id ? 'border-[#233B8F]/60 bg-[#233B8F]/10' : 'border-white/10 bg-white/30 hover:border-white/10'
                 }`}
               >
                 <div>
-                  <span className={`text-sm font-semibold ${voiceMode === m.id ? 'text-[#233B8F]' : 'text-[#111827]'}`}>{m.label}</span>
-                  <p className="text-xs text-[#6B7280] mt-0.5">{m.desc}</p>
+                  <span className={`text-sm font-semibold ${voiceMode === m.id ? 'text-[#233B8F]' : 'text-white'}`}>{m.label}</span>
+                  <p className="text-xs text-white/50 mt-0.5">{m.desc}</p>
                 </div>
                 {voiceMode === m.id && <CheckCircle2 className="w-4 h-4 text-[#233B8F] shrink-0" />}
               </button>
@@ -1305,21 +1305,21 @@ function VoiceCard({ bot }: { bot: Bot }) {
           </div>
 
           <div className="space-y-2">
-            <p className="text-xs font-semibold text-[#6B7280]">Elige la voz <span className="text-[#9CA3AF]">(▶ escuchar · ⏸ tocá de nuevo para detener)</span></p>
+            <p className="text-xs font-semibold text-white/50">Elige la voz <span className="text-white/40">(▶ escuchar · ⏸ tocá de nuevo para detener)</span></p>
             {BOT_VOICES.map(v => (
               <div
                 key={v.id}
                 className={`w-full flex items-center justify-between px-4 py-2.5 rounded-xl border transition-all ${
-                  voiceId === v.id ? 'border-[#233B8F]/60 bg-[#233B8F]/10' : 'border-[#E4E9F0] bg-white/30'
+                  voiceId === v.id ? 'border-[#233B8F]/60 bg-[#233B8F]/10' : 'border-white/10 bg-white/30'
                 } ${playingVoice === v.id ? 'ring-1 ring-[#233B8F]/50' : ''}`}
               >
                 <button type="button" onClick={() => setVoiceId(v.id)} className="flex items-center gap-3 text-left flex-1 min-w-0">
                   {voiceId === v.id
                     ? <CheckCircle2 className="w-4 h-4 text-[#233B8F] shrink-0" />
-                    : <span className="w-4 h-4 rounded-full border border-[#E4E9F0] shrink-0" />}
+                    : <span className="w-4 h-4 rounded-full border border-white/10 shrink-0" />}
                   <span className="min-w-0">
-                    <span className={`text-sm font-semibold ${voiceId === v.id ? 'text-[#233B8F]' : 'text-[#111827]'}`}>{v.name}</span>
-                    <span className="block text-xs text-[#6B7280] truncate">{v.desc}</span>
+                    <span className={`text-sm font-semibold ${voiceId === v.id ? 'text-[#233B8F]' : 'text-white'}`}>{v.name}</span>
+                    <span className="block text-xs text-white/50 truncate">{v.desc}</span>
                   </span>
                 </button>
                 <button
@@ -1329,14 +1329,14 @@ function VoiceCard({ bot }: { bot: Bot }) {
                   className={`ml-2 shrink-0 w-8 h-8 rounded-lg border flex items-center justify-center transition-colors ${
                     playingVoice === v.id
                       ? 'bg-[#233B8F]/25 border-[#233B8F]/60'
-                      : 'bg-[#F4F6FA] border-[#E4E9F0] hover:border-[#233B8F]/40'
+                      : 'bg-white/5 border-white/10 hover:border-[#233B8F]/40'
                   }`}
                 >
                   {loadingVoice === v.id
                     ? <Loader2 className="w-3.5 h-3.5 text-[#233B8F] animate-spin" />
                     : playingVoice === v.id
                       ? <Pause className="w-3.5 h-3.5 text-[#233B8F]" />
-                      : <Play className="w-3.5 h-3.5 text-[#6B7280]" />}
+                      : <Play className="w-3.5 h-3.5 text-white/50" />}
                 </button>
               </div>
             ))}
@@ -1363,7 +1363,7 @@ function VoiceCard({ bot }: { bot: Bot }) {
             setSavingVoice(false)
           }
         }}
-        className="w-full py-2.5 bg-[#F8FAFC] border border-[#E4E9F0] text-[#111827] text-sm font-semibold rounded-xl hover:border-[#233B8F]/40 disabled:opacity-50 flex items-center justify-center gap-2 transition-colors"
+        className="w-full py-2.5 bg-white/5 border border-white/10 text-white text-sm font-semibold rounded-xl hover:border-[#233B8F]/40 disabled:opacity-50 flex items-center justify-center gap-2 transition-colors"
       >
         {savingVoice ? <Spinner /> : <Save className="w-4 h-4" />}
         Guardar voz
@@ -1551,8 +1551,8 @@ function PromptTab({ bot, onSaved }: { bot: Bot; onSaved: (updated: Partial<Bot>
   return (
     <div className="space-y-6">
     <form onSubmit={handleSave} className="space-y-6">
-      <div className="dm-card p-6 rounded-2xl space-y-5">
-        <h3 className="text-sm font-bold text-[#111827] flex items-center gap-2">
+      <div className="dm-card-dark p-6 rounded-2xl space-y-5">
+        <h3 className="text-sm font-bold text-white flex items-center gap-2">
           <FileText className="w-4 h-4 text-[#233B8F]" />
           Prompt del vendedor
         </h3>
@@ -1561,7 +1561,7 @@ function PromptTab({ bot, onSaved }: { bot: Bot; onSaved: (updated: Partial<Bot>
 
         <div>
           <div className="flex items-center justify-between mb-1.5">
-            <label className="block text-xs font-medium text-[#374151]">
+            <label className="block text-xs font-medium text-white/75">
               Instrucciones del vendedor (system prompt)
             </label>
             <button
@@ -1583,28 +1583,28 @@ function PromptTab({ bot, onSaved }: { bot: Bot; onSaved: (updated: Partial<Bot>
             onChange={e => setForm(f => ({ ...f, systemPromptTemplate: e.target.value }))}
             rows={12}
             placeholder={`Escribe aquí las instrucciones de tu vendedor.\n\nEjemplo:\n- Su nombre, estilo de comunicación y tono\n- Cómo identificar el problema del cliente\n- Cómo presentar y cerrar la venta\n- Reglas de negocio especiales\n\nUsa el botón "Cargar plantilla de ejemplo" para ver una plantilla lista.`}
-            className="w-full bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-4 py-3 text-sm text-[#111827] placeholder-dark-500 focus:outline-none focus:border-[#233B8F]/40 font-mono resize-y min-h-[200px]"
+            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-dark-500 focus:outline-none focus:border-[#233B8F]/40 font-mono resize-y min-h-[200px]"
           />
-          <p className="text-xs text-[#9CA3AF] mt-1">
+          <p className="text-xs text-white/40 mt-1">
             Estas instrucciones se combinan con las reglas del bot y la base de conocimiento de productos.
           </p>
         </div>
 
         {/* Char limits */}
         <div>
-          <label className="block text-xs font-medium text-[#374151] mb-3">
+          <label className="block text-xs font-medium text-white/75 mb-3">
             Límite de caracteres por mensaje (opcional)
           </label>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             {(['maxCharsMensaje1', 'maxCharsMensaje2', 'maxCharsMensaje3'] as const).map((field, i) => (
               <div key={field}>
-                <label className="block text-[10px] text-[#6B7280] mb-1">Mensaje {i + 1}</label>
+                <label className="block text-[10px] text-white/50 mb-1">Mensaje {i + 1}</label>
                 <input
                   type="number"
                   value={form[field]}
                   onChange={e => setForm(f => ({ ...f, [field]: e.target.value }))}
                   placeholder="Sin límite"
-                  className="w-full bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-3 py-2 text-sm text-[#111827] placeholder-dark-500 focus:outline-none focus:border-[#233B8F]/40"
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-sm text-white placeholder-dark-500 focus:outline-none focus:border-[#233B8F]/40"
                 />
               </div>
             ))}
@@ -1616,7 +1616,7 @@ function PromptTab({ bot, onSaved }: { bot: Bot; onSaved: (updated: Partial<Bot>
           <CheckCircle2 className="w-4 h-4 text-[#16A34A] shrink-0" />
           <div>
             <div className="text-xs font-bold text-[#16A34A]">strictJsonOutput: ACTIVO</div>
-            <div className="text-xs text-[#6B7280]">
+            <div className="text-xs text-white/50">
               El bot siempre devuelve JSON válido con el schema requerido.
             </div>
           </div>
@@ -1625,7 +1625,7 @@ function PromptTab({ bot, onSaved }: { bot: Bot; onSaved: (updated: Partial<Bot>
         <button
           type="submit"
           disabled={loading}
-          className="w-full py-3 bg-[#233B8F] text-dark-950 font-bold rounded-xl hover:bg-[#233B8F]/90 disabled:opacity-50 flex items-center justify-center gap-2 transition-colors"
+          className="w-full py-3 bg-[#233B8F] text-white font-bold rounded-xl hover:bg-[#233B8F]/90 disabled:opacity-50 flex items-center justify-center gap-2 transition-colors"
         >
           {loading ? <Spinner /> : <Save className="w-4 h-4" />}
           Guardar plantilla
@@ -1842,20 +1842,20 @@ function ProductForm({
   }
 
   const inputClass =
-    'w-full bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-4 py-2.5 text-sm text-[#111827] placeholder-dark-500 focus:outline-none focus:border-[#16A34A]/40 transition-colors'
+    'w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white placeholder-dark-500 focus:outline-none focus:border-[#16A34A]/40 transition-colors'
   const textareaClass = `${inputClass} resize-y`
-  const labelClass = 'block text-xs font-medium text-[#374151] mb-1.5'
-  const sectionClass = 'dm-card p-5 rounded-2xl space-y-4'
-  const sectionHeaderClass = 'flex items-center gap-2 text-xs font-bold text-[#111827] uppercase tracking-wider'
+  const labelClass = 'block text-xs font-medium text-white/75 mb-1.5'
+  const sectionClass = 'dm-card-dark p-5 rounded-2xl space-y-4'
+  const sectionHeaderClass = 'flex items-center gap-2 text-xs font-bold text-white uppercase tracking-wider'
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
       <div className="flex items-center justify-between">
-        <h3 className="font-bold text-[#111827] flex items-center gap-2">
+        <h3 className="font-bold text-white flex items-center gap-2">
           <Package className="w-4 h-4 text-[#B735B8]" />
           {product ? 'Editar producto' : 'Nuevo producto'}
         </h3>
-        <button type="button" onClick={onCancel} className="text-[#6B7280] hover:text-[#111827] transition-colors">
+        <button type="button" onClick={onCancel} className="text-white/50 hover:text-white transition-colors">
           <X className="w-5 h-5" />
         </button>
       </div>
@@ -1881,7 +1881,7 @@ function ProductForm({
             <select
               value={form.category}
               onChange={e => setField('category', e.target.value)}
-              className={`${inputClass} appearance-none bg-[#F4F6FA]`}
+              className={`${inputClass} appearance-none bg-white/5`}
             >
               <option value="">Selecciona una categoría...</option>
               <option value="Salud y Bienestar">Salud y Bienestar</option>
@@ -1917,9 +1917,9 @@ function ProductForm({
             {form.active ? (
               <ToggleRight className="w-7 h-7 text-[#16A34A]" />
             ) : (
-              <ToggleLeft className="w-7 h-7 text-[#9CA3AF]" />
+              <ToggleLeft className="w-7 h-7 text-white/40" />
             )}
-            <span className={form.active ? 'text-[#16A34A] font-medium' : 'text-[#6B7280]'}>
+            <span className={form.active ? 'text-[#16A34A] font-medium' : 'text-white/50'}>
               {form.active ? 'Producto activo' : 'Producto inactivo'}
             </span>
           </button>
@@ -2040,9 +2040,9 @@ function ProductForm({
           </div>
         </div>
 
-        <div className="pt-4 border-t border-[#E4E9F0]">
+        <div className="pt-4 border-t border-white/10">
           <div className={`${sectionHeaderClass} mb-3`}><span className="w-1 h-3.5 bg-[#233B8F]/70 rounded-full" />Videos del producto</div>
-          <p className="text-xs text-[#9CA3AF] mb-3">El agente enviará estos videos si el cliente quiere ver el producto en acción. Máximo 90 segundos.</p>
+          <p className="text-xs text-white/40 mb-3">El agente enviará estos videos si el cliente quiere ver el producto en acción. Máximo 90 segundos.</p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {(['vid1', 'vid2'] as const).map((key, i) => (
               <UploadField key={key} type="video" value={form[key as keyof ProductFormState] as string} onChange={v => setField(key, v)} placeholder={`Video del producto ${i + 1}`} />
@@ -2058,12 +2058,12 @@ function ProductForm({
           onClick={() => setShowTestimonialPhotos(v => !v)}
           className="w-full flex items-center justify-between"
         >
-          <div className="flex items-center gap-2 text-xs font-bold text-[#111827] uppercase tracking-wider">
+          <div className="flex items-center gap-2 text-xs font-bold text-white uppercase tracking-wider">
             <span className="w-1 h-3.5 bg-[#233B8F]/70 rounded-full" />
             Fotos de testimonios
-            <span className="text-[10px] normal-case font-normal text-[#6B7280]">(el agente las envía ante dudas)</span>
+            <span className="text-[10px] normal-case font-normal text-white/50">(el agente las envía ante dudas)</span>
           </div>
-          <ChevronRight className={`w-4 h-4 text-[#6B7280] transition-transform ${showTestimonialPhotos ? 'rotate-90' : ''}`} />
+          <ChevronRight className={`w-4 h-4 text-white/50 transition-transform ${showTestimonialPhotos ? 'rotate-90' : ''}`} />
         </button>
         {showTestimonialPhotos && (
           <div className="space-y-3 pt-2">
@@ -2093,16 +2093,16 @@ function ProductForm({
           onClick={() => setShowTestimonialVideos(v => !v)}
           className="w-full flex items-center justify-between"
         >
-          <div className="flex items-center gap-2 text-xs font-bold text-[#111827] uppercase tracking-wider">
+          <div className="flex items-center gap-2 text-xs font-bold text-white uppercase tracking-wider">
             <span className="w-1 h-3.5 bg-[#B735B8]/70 rounded-full" />
             Videos de testimonios
             <span className="text-[10px] bg-[#B735B8]/20 text-[#B735B8] px-2 py-0.5 rounded border border-[#B735B8]/30 normal-case font-normal">NUEVO</span>
           </div>
-          <ChevronRight className={`w-4 h-4 text-[#6B7280] transition-transform ${showTestimonialVideos ? 'rotate-90' : ''}`} />
+          <ChevronRight className={`w-4 h-4 text-white/50 transition-transform ${showTestimonialVideos ? 'rotate-90' : ''}`} />
         </button>
         {showTestimonialVideos && (
           <div className="space-y-3 pt-2">
-            <p className="text-xs text-[#9CA3AF]">El agente enviará estos videos cuando el cliente necesite mayor confianza. Máximo 90 segundos por video.</p>
+            <p className="text-xs text-white/40">El agente enviará estos videos cuando el cliente necesite mayor confianza. Máximo 90 segundos por video.</p>
             {[1, 2, 3, 4, 5, 6, 7].map(n => {
               const vidLabelKey = `test${n}VidLabel` as keyof ProductFormState
               const vidUrlKey = `test${n}VidUrl` as keyof ProductFormState
@@ -2128,7 +2128,7 @@ function ProductForm({
         <button
           type="button"
           onClick={onCancel}
-          className="flex-1 py-3 bg-[#F8FAFC] border border-[#E4E9F0] text-[#374151] font-medium rounded-xl hover:bg-dark-700 transition-colors text-sm"
+          className="flex-1 py-3 bg-white/5 border border-white/10 text-white/75 font-medium rounded-xl hover:bg-dark-700 transition-colors text-sm"
         >
           Cancelar
         </button>
@@ -2177,32 +2177,32 @@ function ShareProductModal({ product, onClose }: { product: Product; onClose: ()
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(15,23,42,0.10)' }}>
-      <div className="dm-card rounded-2xl border border-[#E4E9F0] p-6 w-full max-w-sm space-y-4">
+      <div className="dm-card-dark rounded-2xl border border-white/10 p-6 w-full max-w-sm space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Share2 className="w-4 h-4 text-[#233B8F]" />
-            <h3 className="font-bold text-[#111827] text-sm">Compartir producto</h3>
+            <h3 className="font-bold text-white text-sm">Compartir producto</h3>
           </div>
-          <button onClick={onClose} className="text-[#6B7280] hover:text-[#111827] transition-colors">
+          <button onClick={onClose} className="text-white/50 hover:text-white transition-colors">
             <X className="w-4 h-4" />
           </button>
         </div>
 
-        <div className="text-xs text-[#6B7280] bg-[#F4F6FA] rounded-xl p-3 border border-[#E4E9F0]">
-          <p className="font-semibold text-[#111827] mb-1">📋 {product.name}</p>
+        <div className="text-xs text-white/50 bg-white/5 rounded-xl p-3 border border-white/10">
+          <p className="font-semibold text-white mb-1">📋 {product.name}</p>
           El destinatario recibirá una <span className="text-[#16A34A]">copia independiente</span> del producto.
           Podrá editarla libremente sin afectar el tuyo.
         </div>
 
         <form onSubmit={handleShare} className="space-y-3">
           <div>
-            <label className="text-xs text-[#6B7280] mb-1 block">Username o email del destinatario</label>
+            <label className="text-xs text-white/50 mb-1 block">Username o email del destinatario</label>
             <input
               type="text"
               value={identifier}
               onChange={e => setIdentifier(e.target.value)}
               placeholder="@usuario o correo@email.com"
-              className="w-full bg-white border border-[#E4E9F0] rounded-xl px-3 py-2 text-sm text-[#111827] placeholder:text-[#9CA3AF] focus:outline-none focus:border-[#233B8F]/40"
+              className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-sm text-white placeholder:text-white/40 focus:outline-none focus:border-[#233B8F]/40"
               disabled={loading}
             />
           </div>
@@ -2217,7 +2217,7 @@ function ShareProductModal({ product, onClose }: { product: Product; onClose: ()
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 py-2 rounded-xl border border-[#E4E9F0] text-[#6B7280] hover:text-[#111827] text-sm transition-colors"
+              className="flex-1 py-2 rounded-xl border border-white/10 text-white/50 hover:text-white text-sm transition-colors"
             >
               Cerrar
             </button>
@@ -2338,7 +2338,7 @@ function ProductsTab({ bot }: { bot: Bot }) {
       )}
       {/* Header */}
       <div className="flex items-center justify-between">
-        <div className="text-sm text-[#6B7280]">
+        <div className="text-sm text-white/50">
           {assigned.length} asignado{assigned.length !== 1 ? 's' : ''} · {available.length} disponible{available.length !== 1 ? 's' : ''} en catálogo
         </div>
         <button
@@ -2352,32 +2352,32 @@ function ProductsTab({ bot }: { bot: Bot }) {
 
       {loading ? (
         <div className="flex items-center justify-center py-12">
-          <Loader2 className="w-6 h-6 animate-spin text-[#6B7280]" />
+          <Loader2 className="w-6 h-6 animate-spin text-white/50" />
         </div>
       ) : (
         <>
           {/* Assigned products */}
           <div>
-            <div className="text-xs font-semibold text-[#6B7280] uppercase tracking-wider mb-2">
+            <div className="text-xs font-semibold text-white/50 uppercase tracking-wider mb-2">
               Asignados a este bot
             </div>
             {assigned.length === 0 ? (
-              <div className="dm-card p-8 rounded-2xl text-center">
+              <div className="dm-card-dark p-8 rounded-2xl text-center">
                 <ShoppingBag className="w-8 h-8 text-dark-600 mx-auto mb-2" />
-                <div className="text-[#6B7280] text-sm">Sin productos asignados</div>
-                <div className="text-[#9CA3AF] text-xs mt-1">Crea un nuevo producto o asigna uno del catálogo.</div>
+                <div className="text-white/50 text-sm">Sin productos asignados</div>
+                <div className="text-white/40 text-xs mt-1">Crea un nuevo producto o asigna uno del catálogo.</div>
               </div>
             ) : (
               <div className="space-y-2">
                 {assigned.map(product => (
                   <div
                     key={product.id}
-                    className="dm-card p-4 rounded-xl flex items-center gap-4 group hover:bg-[#F4F6FA] transition-colors"
+                    className="dm-card-dark p-4 rounded-xl flex items-center gap-4 group hover:bg-white/5 transition-colors"
                   >
                     <div className={`w-2 h-2 rounded-full shrink-0 ${product.active ? 'bg-[#16A34A] shadow-[0_0_6px_rgba(0,255,157,0.5)]' : 'bg-dark-600'}`} />
                     <div className="flex-1 min-w-0">
-                      <div className="font-medium text-[#111827] text-sm truncate">{product.name}</div>
-                      <div className="text-xs text-[#6B7280] mt-0.5 flex items-center gap-2 flex-wrap">
+                      <div className="font-medium text-white text-sm truncate">{product.name}</div>
+                      <div className="text-xs text-white/50 mt-0.5 flex items-center gap-2 flex-wrap">
                         {product.category && <span>{product.category}</span>}
                         {product.priceUnit && <span>{product.currency ?? 'USD'} {product.priceUnit}</span>}
                         {product.pricePromo2 && <span className="text-orange-400">{product.currency ?? 'USD'} {product.pricePromo2} <span className="text-[10px] text-orange-400/60">oferta</span></span>}
@@ -2394,14 +2394,14 @@ function ProductsTab({ bot }: { bot: Bot }) {
                     <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                       <button
                         onClick={() => setSharingProduct(product)}
-                        className="p-2 hover:bg-[#233B8F]/10 rounded-lg transition-colors text-[#6B7280] hover:text-[#233B8F]"
+                        className="p-2 hover:bg-[#233B8F]/10 rounded-lg transition-colors text-white/50 hover:text-[#233B8F]"
                         title="Compartir con otro usuario"
                       >
                         <Share2 className="w-3.5 h-3.5" />
                       </button>
                       <button
                         onClick={() => handleEdit(product)}
-                        className="p-2 hover:bg-[#EEF2F7] rounded-lg transition-colors text-[#6B7280] hover:text-[#111827]"
+                        className="p-2 hover:bg-white/5 rounded-lg transition-colors text-white/50 hover:text-white"
                         title="Editar"
                       >
                         <Edit2 className="w-3.5 h-3.5" />
@@ -2409,7 +2409,7 @@ function ProductsTab({ bot }: { bot: Bot }) {
                       <button
                         onClick={() => handleUnassign(product.id)}
                         disabled={actioning === product.id}
-                        className="p-2 hover:bg-yellow-500/10 rounded-lg transition-colors text-[#6B7280] hover:text-yellow-400 disabled:opacity-50"
+                        className="p-2 hover:bg-yellow-500/10 rounded-lg transition-colors text-white/50 hover:text-yellow-400 disabled:opacity-50"
                         title="Quitar del agente"
                       >
                         {actioning === product.id ? <Spinner /> : <X className="w-3.5 h-3.5" />}
@@ -2417,7 +2417,7 @@ function ProductsTab({ bot }: { bot: Bot }) {
                       <button
                         onClick={() => handleDeleteProduct(product.id)}
                         disabled={actioning === product.id}
-                        className="p-2 hover:bg-red-500/10 rounded-lg transition-colors text-[#6B7280] hover:text-red-400 disabled:opacity-50"
+                        className="p-2 hover:bg-red-500/10 rounded-lg transition-colors text-white/50 hover:text-red-400 disabled:opacity-50"
                         title="Eliminar producto permanentemente"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
@@ -2432,19 +2432,19 @@ function ProductsTab({ bot }: { bot: Bot }) {
           {/* Available catalog products */}
           {available.length > 0 && (
             <div>
-              <div className="text-xs font-semibold text-[#6B7280] uppercase tracking-wider mb-2">
+              <div className="text-xs font-semibold text-white/50 uppercase tracking-wider mb-2">
                 Del catálogo — agregar a este bot
               </div>
               <div className="space-y-2">
                 {available.map(product => (
                   <div
                     key={product.id}
-                    className="dm-card p-4 rounded-xl flex items-center gap-4 group hover:bg-[#F4F6FA] transition-colors opacity-60 hover:opacity-100"
+                    className="dm-card-dark p-4 rounded-xl flex items-center gap-4 group hover:bg-white/5 transition-colors opacity-60 hover:opacity-100"
                   >
                     <div className={`w-2 h-2 rounded-full shrink-0 ${product.active ? 'bg-[#16A34A]/50' : 'bg-dark-600'}`} />
                     <div className="flex-1 min-w-0">
-                      <div className="font-medium text-[#111827] text-sm truncate">{product.name}</div>
-                      <div className="text-xs text-[#6B7280] mt-0.5 flex items-center gap-2 flex-wrap">
+                      <div className="font-medium text-white text-sm truncate">{product.name}</div>
+                      <div className="text-xs text-white/50 mt-0.5 flex items-center gap-2 flex-wrap">
                         {product.category && <span>{product.category}</span>}
                         {product.priceUnit && <span>{product.currency ?? 'USD'} {product.priceUnit}</span>}
                         {product.pricePromo2 && <span className="text-orange-400">{product.currency ?? 'USD'} {product.pricePromo2} <span className="text-[10px] text-orange-400/60">oferta</span></span>}
@@ -2462,7 +2462,7 @@ function ProductsTab({ bot }: { bot: Bot }) {
                       <button
                         onClick={() => handleDeleteProduct(product.id)}
                         disabled={actioning === product.id}
-                        className="p-2 hover:bg-red-500/10 rounded-lg transition-colors text-[#6B7280] hover:text-red-400 disabled:opacity-50"
+                        className="p-2 hover:bg-red-500/10 rounded-lg transition-colors text-white/50 hover:text-red-400 disabled:opacity-50"
                         title="Eliminar producto permanentemente"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
@@ -2525,20 +2525,20 @@ function FollowUpTab({
 
   return (
     <div className="max-w-2xl space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300 transition-all">
-      <div className="dm-card p-6 rounded-2xl border border-[#E4E9F0] space-y-6">
+      <div className="dm-card-dark p-6 rounded-2xl border border-white/10 space-y-6">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-[#B735B8]/12 border border-[#B735B8]/25 flex items-center justify-center">
             <Bell className="w-5 h-5 text-[#B735B8]" />
           </div>
           <div>
-            <h3 className="text-lg font-bold text-[#111827]">Configuración de Seguimientos</h3>
-            <p className="text-sm text-[#6B7280] mt-0.5">Define los intervalos para re-interactuar con clientes.</p>
+            <h3 className="text-lg font-bold text-white">Configuración de Seguimientos</h3>
+            <p className="text-sm text-white/50 mt-0.5">Define los intervalos para re-interactuar con clientes.</p>
           </div>
         </div>
 
         <form onSubmit={handleSave} className="grid grid-cols-1 md:grid-cols-2 gap-6 pb-2">
           <div className="space-y-2">
-            <label className="text-[10px] font-bold text-[#374151] uppercase tracking-widest pl-1">
+            <label className="text-[10px] font-bold text-white/75 uppercase tracking-widest pl-1">
               1er Seguimiento
             </label>
             <div className="relative group">
@@ -2547,16 +2547,16 @@ function FollowUpTab({
                 min="1"
                 value={f1}
                 onChange={e => setF1(Number(e.target.value))}
-                className="w-full bg-[#F4F6FA] border border-[#E4E9F0] group-hover:border-[#E4E9F0] focus:border-[#16A34A]/40 rounded-xl px-4 py-3 text-sm text-[#111827] transition-all outline-none"
+                className="w-full bg-white/5 border border-white/10 group-hover:border-white/10 focus:border-[#16A34A]/40 rounded-xl px-4 py-3 text-sm text-white transition-all outline-none"
                 placeholder="Ej: 15"
               />
-              <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[9px] text-[#9CA3AF] font-bold uppercase tracking-tighter">Minutos</span>
+              <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[9px] text-white/40 font-bold uppercase tracking-tighter">Minutos</span>
             </div>
-            <p className="text-[10px] text-[#9CA3AF] italic pl-1">Por defecto: 15 min.</p>
+            <p className="text-[10px] text-white/40 italic pl-1">Por defecto: 15 min.</p>
           </div>
 
           <div className="space-y-2">
-            <label className="text-[10px] font-bold text-[#374151] uppercase tracking-widest pl-1">
+            <label className="text-[10px] font-bold text-white/75 uppercase tracking-widest pl-1">
               2do Seguimiento
             </label>
             <div className="relative group">
@@ -2565,12 +2565,12 @@ function FollowUpTab({
                 min="1"
                 value={f2}
                 onChange={e => setF2(Number(e.target.value))}
-                className="w-full bg-[#F4F6FA] border border-[#E4E9F0] group-hover:border-[#E4E9F0] focus:border-[#16A34A]/40 rounded-xl px-4 py-3 text-sm text-[#111827] transition-all outline-none"
+                className="w-full bg-white/5 border border-white/10 group-hover:border-white/10 focus:border-[#16A34A]/40 rounded-xl px-4 py-3 text-sm text-white transition-all outline-none"
                 placeholder="Ej: 4320"
               />
-              <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[9px] text-[#9CA3AF] font-bold uppercase tracking-tighter">Minutos</span>
+              <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[9px] text-white/40 font-bold uppercase tracking-tighter">Minutos</span>
             </div>
-            <p className="text-[10px] text-[#9CA3AF] italic pl-1">Por defecto: 4320 min (3 días).</p>
+            <p className="text-[10px] text-white/40 italic pl-1">Por defecto: 4320 min (3 días).</p>
           </div>
 
           <div className="md:col-span-2 flex items-center justify-between gap-4 pt-2">
@@ -2595,8 +2595,8 @@ function FollowUpTab({
           <Zap className="w-5 h-5 text-[#B735B8]" />
         </div>
         <div>
-          <h4 className="text-sm font-bold text-[#111827]">¿Cómo funciona?</h4>
-          <p className="text-xs text-[#374151] mt-1 leading-relaxed">
+          <h4 className="text-sm font-bold text-white">¿Cómo funciona?</h4>
+          <p className="text-xs text-white/75 mt-1 leading-relaxed">
             El sistema calculará el tiempo desde el <strong>último mensaje enviado por el bot</strong>.
             Si el cliente no responde en ese intervalo, el agente enviará un mensaje automático.
             Los seguimientos se detienen si el cliente compra o si vuelve a escribir.
@@ -2697,15 +2697,15 @@ function QRTab({ bot }: { bot: Bot }) {
   return (
     <div className="space-y-6">
       {/* Estado */}
-      <div className="dm-card p-5 rounded-2xl flex items-center justify-between">
+      <div className="dm-card-dark p-5 rounded-2xl flex items-center justify-between">
         <div>
-          <div className="text-sm font-bold text-[#111827] flex items-center gap-2">
+          <div className="text-sm font-bold text-white flex items-center gap-2">
             {status === 'connected'
               ? <Wifi className="w-4 h-4 text-[#16A34A]" />
-              : <WifiOff className="w-4 h-4 text-[#6B7280]" />}
+              : <WifiOff className="w-4 h-4 text-white/50" />}
             {status === 'connected' ? 'Conectado' : status === 'qr_ready' ? 'Esperando escaneo' : status === 'connecting' ? 'Conectando...' : 'Desconectado'}
           </div>
-          {phone && <div className="text-xs text-[#6B7280] mt-0.5">📱 +{phone}</div>}
+          {phone && <div className="text-xs text-white/50 mt-0.5">📱 +{phone}</div>}
         </div>
         <div className="flex gap-2">
           {status === 'connected' ? (
@@ -2744,12 +2744,12 @@ function QRTab({ bot }: { bot: Bot }) {
 
       {/* QR */}
       {status === 'qr_ready' && qrBase64 && (
-        <div className="dm-card p-6 rounded-2xl text-center space-y-4">
-          <div className="flex items-center gap-2 justify-center text-sm font-bold text-[#111827]">
+        <div className="dm-card-dark p-6 rounded-2xl text-center space-y-4">
+          <div className="flex items-center gap-2 justify-center text-sm font-bold text-white">
             <QrCode className="w-4 h-4 text-[#B735B8]" />
             Escanea con WhatsApp
           </div>
-          <p className="text-xs text-[#6B7280]">
+          <p className="text-xs text-white/50">
             Abre WhatsApp → Dispositivos vinculados → Vincular dispositivo
           </p>
           <div className="flex justify-center">
@@ -2759,28 +2759,28 @@ function QRTab({ bot }: { bot: Bot }) {
               className="w-56 h-56 rounded-2xl border-4 border-[#16A34A]/30 bg-white p-2"
             />
           </div>
-          <p className="text-[11px] text-[#9CA3AF]">El QR se actualiza automáticamente cada 20 segundos.</p>
+          <p className="text-[11px] text-white/40">El QR se actualiza automáticamente cada 20 segundos.</p>
         </div>
       )}
 
       {/* Conectado */}
       {status === 'connected' && (
-        <div className="dm-card p-6 rounded-2xl border border-[#16A34A]/20 text-center space-y-2">
+        <div className="dm-card-dark p-6 rounded-2xl border border-[#16A34A]/20 text-center space-y-2">
           <div className="w-12 h-12 rounded-xl bg-[#B735B8]/12 border border-[#B735B8]/25 flex items-center justify-center mx-auto">
             <Wifi className="w-6 h-6 text-[#16A34A]" />
           </div>
-          <div className="text-sm font-bold text-[#111827]">¡Agente conectado correctamente!</div>
-          <div className="text-xs text-[#6B7280]">El agente está activo y respondiendo mensajes en WhatsApp.</div>
+          <div className="text-sm font-bold text-white">¡Agente conectado correctamente!</div>
+          <div className="text-xs text-white/50">El agente está activo y respondiendo mensajes en WhatsApp.</div>
         </div>
       )}
 
       {/* Desconectado - instrucciones */}
       {status === 'disconnected' && (
-        <div className="dm-card p-6 rounded-2xl border border-[#E4E9F0]">
-          <h3 className="text-sm font-bold text-[#111827] mb-3">Pasos para conectar</h3>
+        <div className="dm-card-dark p-6 rounded-2xl border border-white/10">
+          <h3 className="text-sm font-bold text-white mb-3">Pasos para conectar</h3>
           <ol className="space-y-3">
             {['Presiona "Conectar" arriba', 'Espera a que aparezca el código QR', 'Abre WhatsApp en tu teléfono', 'Ve a Dispositivos vinculados → Vincular dispositivo', 'Escanea el QR con tu cámara'].map((step, i) => (
-              <li key={i} className="flex gap-3 text-sm text-[#374151]">
+              <li key={i} className="flex gap-3 text-sm text-white/75">
                 <span className="w-5 h-5 rounded-full bg-[#16A34A]/10 border border-[#16A34A]/20 text-[#16A34A] text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">{i + 1}</span>
                 {step}
               </li>
@@ -2789,14 +2789,14 @@ function QRTab({ bot }: { bot: Bot }) {
         </div>
       )}
       {/* Zona peligrosa: limpiar memoria */}
-      <div className="dm-card p-4 rounded-2xl border border-red-500/10">
+      <div className="dm-card-dark p-4 rounded-2xl border border-red-500/10">
         <div className="flex items-center justify-between gap-4">
           <div>
-            <div className="text-sm font-bold text-[#111827] flex items-center gap-2">
+            <div className="text-sm font-bold text-white flex items-center gap-2">
               <Trash2 className="w-3.5 h-3.5 text-red-400" />
               Limpiar memoria
             </div>
-            <p className="text-xs text-[#6B7280] mt-0.5">
+            <p className="text-xs text-white/50 mt-0.5">
               Elimina el historial de conversaciones de todos los clientes.
             </p>
           </div>
@@ -3002,9 +3002,9 @@ function ChatsTab({ bot }: { bot: Bot }) {
         >
           {/* Header lista */}
           <div className="flex items-center justify-between px-4 py-3 shrink-0" style={{ background: theme.headerBg }}>
-            <span className="text-sm font-bold text-[#111827]">{isMeta ? '💬 Messenger' : '💬 WhatsApp'}</span>
-            <button onClick={loadConvs} className="p-1.5 rounded-full hover:bg-[#EEF2F7] transition-colors" title="Refrescar">
-              <RefreshCw className="w-4 h-4 text-[#111827]/60" />
+            <span className="text-sm font-bold text-white">{isMeta ? '💬 Messenger' : '💬 WhatsApp'}</span>
+            <button onClick={loadConvs} className="p-1.5 rounded-full hover:bg-white/5 transition-colors" title="Refrescar">
+              <RefreshCw className="w-4 h-4 text-white/60" />
             </button>
           </div>
 
@@ -3016,7 +3016,7 @@ function ChatsTab({ bot }: { bot: Bot }) {
               </div>
             )}
             {!loading && convs.length === 0 && (
-              <div className="px-4 py-8 text-center text-xs text-[#111827]/30">Sin conversaciones aún</div>
+              <div className="px-4 py-8 text-center text-xs text-white/30">Sin conversaciones aún</div>
             )}
             {!loading && convs.map(c => {
               const lastMsg = c.messages[0]
@@ -3074,8 +3074,8 @@ function ChatsTab({ bot }: { bot: Bot }) {
               {/* ── Cabecera del chat ── */}
               <div className="px-2 sm:px-3 py-2 flex items-center gap-2 shrink-0" style={{ background: theme.headerBg }}>
                 {/* Volver — solo móvil */}
-                <button onClick={() => setSelectedPhone(null)} className="sm:hidden p-1.5 rounded-full hover:bg-[#EEF2F7] transition-colors shrink-0">
-                  <ArrowLeft className="w-4 h-4 text-[#111827]/70" />
+                <button onClick={() => setSelectedPhone(null)} className="sm:hidden p-1.5 rounded-full hover:bg-white/5 transition-colors shrink-0">
+                  <ArrowLeft className="w-4 h-4 text-white/70" />
                 </button>
 
                 {/* Avatar */}
@@ -3085,7 +3085,7 @@ function ChatsTab({ bot }: { bot: Bot }) {
 
                 {/* Nombre */}
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs sm:text-sm font-semibold truncate text-[#111827]">{selectedConv?.userName || selectedPhone}</p>
+                  <p className="text-xs sm:text-sm font-semibold truncate text-white">{selectedConv?.userName || selectedPhone}</p>
                   <p className="text-[9px] sm:text-[10px] truncate" style={{ color: '#8696a0' }}>{selectedPhone}</p>
                 </div>
 
@@ -3114,7 +3114,7 @@ function ChatsTab({ bot }: { bot: Bot }) {
                       setMarkSoldModal(true)
                     }}
                     className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1.5 rounded-full text-xs font-bold transition-all shrink-0"
-                    style={{ background: 'rgba(0,255,136,0.12)', color: '#00FF88', border: '1px solid rgba(0,255,136,0.35)' }}
+                    style={{ background: 'rgba(22,163,74,0.12)', color: '#16A34A', border: '1px solid rgba(22,163,74,0.35)' }}
                   >
                     <ShoppingBag className="w-3.5 h-3.5" />
                     <span className="hidden sm:inline">Marcar Venta</span>
@@ -3200,7 +3200,7 @@ function ChatsTab({ bot }: { bot: Bot }) {
                       onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendReply() } }}
                       placeholder="Escribe un mensaje…"
                       rows={1}
-                      className="flex-1 rounded-2xl px-4 py-2.5 text-sm text-[#111827] placeholder-white/30 focus:outline-none resize-none"
+                      className="flex-1 rounded-2xl px-4 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none resize-none"
                       style={{ background: theme.inputBg, border: `1px solid ${theme.inputBorder}`, maxHeight: 100 }}
                     />
                     <button
@@ -3211,8 +3211,8 @@ function ChatsTab({ bot }: { bot: Bot }) {
                       title="Enviar"
                     >
                       {sending
-                        ? <Loader2 className="w-4 h-4 animate-spin text-[#111827]" />
-                        : <svg viewBox="0 0 24 24" className="w-5 h-5 text-[#111827] fill-current" style={{ transform: 'rotate(45deg)', marginLeft: '-2px' }}><path d="M2 21L23 12 2 3v7l15 2-15 2z"/></svg>}
+                        ? <Loader2 className="w-4 h-4 animate-spin text-white" />
+                        : <svg viewBox="0 0 24 24" className="w-5 h-5 text-white fill-current" style={{ transform: 'rotate(45deg)', marginLeft: '-2px' }}><path d="M2 21L23 12 2 3v7l15 2-15 2z"/></svg>}
                     </button>
                   </div>
                 </div>
@@ -3229,10 +3229,10 @@ function ChatsTab({ bot }: { bot: Bot }) {
         style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,0.10)', zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}
         onClick={e => { if (e.target === e.currentTarget) setMarkSoldModal(false) }}
       >
-        <div style={{ background: '#0D0F1E', border: '1px solid rgba(0,255,136,0.2)', borderRadius: 16, padding: 24, width: '100%', maxWidth: 480 }}>
+        <div style={{ background: '#0D0F1E', border: '1px solid rgba(22,163,74,0.2)', borderRadius: 16, padding: 24, width: '100%', maxWidth: 480 }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <ShoppingBag size={18} color="#00FF88" />
+              <ShoppingBag size={18} color="#16A34A" />
               <span style={{ color: '#fff', fontWeight: 700, fontSize: 15 }}>Registrar venta por llamada</span>
             </div>
             <button onClick={() => setMarkSoldModal(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#6B7280' }}>
@@ -3262,7 +3262,7 @@ function ChatsTab({ bot }: { bot: Bot }) {
             <button
               onClick={handleMarkAsSold}
               disabled={markingSold}
-              style={{ padding: '8px 20px', borderRadius: 8, border: 'none', background: '#00FF88', color: '#000', fontWeight: 700, cursor: 'pointer', fontSize: 13, display: 'flex', alignItems: 'center', gap: 6, opacity: markingSold ? 0.6 : 1 }}
+              style={{ padding: '8px 20px', borderRadius: 8, border: 'none', background: 'linear-gradient(135deg, #FF2D95 0%, #B735B8 48%, #233B8F 100%)', color: '#fff', fontWeight: 700, cursor: 'pointer', fontSize: 13, display: 'flex', alignItems: 'center', gap: 6, opacity: markingSold ? 0.6 : 1 }}
             >
               {markingSold ? <Loader2 size={14} className="animate-spin" /> : <CheckCircle2 size={14} />}
               Confirmar Venta
@@ -3428,15 +3428,16 @@ function BotDetailView({
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 bg-[#F4F6FA] p-1 rounded-xl border border-[#E4E9F0] overflow-x-auto scrollbar-hide">
+      <div className="flex gap-1 bg-white p-1 rounded-xl border border-[#E4E9F0] overflow-x-auto scrollbar-hide" style={{ boxShadow: '0 8px 24px rgba(15,23,42,0.05)' }}>
         {tabs.map(t => (
           <button
             key={t.id}
             onClick={() => setTab(t.id)}
-            className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium transition-all whitespace-nowrap ${tab === t.id
-              ? 'bg-dark-700 text-[#111827] shadow-sm border border-[#E4E9F0]'
-              : 'text-[#6B7280] hover:text-[#374151] hover:bg-[#F4F6FA]'
+            className={`flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-bold transition-all whitespace-nowrap ${tab === t.id
+              ? 'text-white'
+              : 'text-[#6B7280] hover:text-[#111827] hover:bg-[#F4F6FA]'
               }`}
+            style={tab === t.id ? { background: 'linear-gradient(135deg, #FF2D95 0%, #B735B8 48%, #233B8F 100%)', boxShadow: '0 8px 20px rgba(255,9,108,0.28)' } : undefined}
           >
             {t.icon}
             {t.label}
