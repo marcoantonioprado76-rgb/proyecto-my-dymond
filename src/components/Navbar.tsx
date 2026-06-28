@@ -30,8 +30,6 @@ async function logout() {
   window.location.href = '/login'
 }
 
-const GROUP_LABEL_STYLE = { padding: '14px 12px 6px' } as const
-
 export default function Navbar() {
   const pathname = usePathname()
   const isInAcademy  = pathname.startsWith('/dashboard/courses') || pathname.startsWith('/dashboard/podcasts') || pathname === '/dashboard/academy'
@@ -51,8 +49,6 @@ export default function Navbar() {
 
         <nav className="sidebar__nav" aria-label="Menú">
 
-          {/* ── PRINCIPAL ── */}
-          <p className="section-label" style={{ padding: '4px 12px 6px' }}>Principal</p>
           <Link href="/dashboard" className={`nav-item ${pathname === '/dashboard' ? 'nav-item--active' : ''}`}>
             <span className="nav-item__icon"><i className="fa-solid fa-house"></i></span>
             <span className="nav-item__label">Inicio</span>
@@ -64,8 +60,6 @@ export default function Navbar() {
             <span className="nav-item__dot"></span>
           </Link>
 
-          {/* ── SERVICIOS ── */}
-          <p className="section-label" style={GROUP_LABEL_STYLE}>Servicios</p>
           {serviceItems.map(item => {
             const isActive = pathname === item.href || pathname.startsWith(item.href)
             return (
@@ -80,8 +74,6 @@ export default function Navbar() {
             )
           })}
 
-          {/* ── ACADEMIA ── */}
-          <p className="section-label" style={GROUP_LABEL_STYLE}>Academia</p>
           <Link href="/dashboard/academy" className={`nav-item ${isInAcademy ? 'nav-item--active' : ''}`}>
             <span className="nav-item__icon"><i className="fa-solid fa-graduation-cap"></i></span>
             <span className="nav-item__label">Academy</span>
@@ -93,8 +85,6 @@ export default function Navbar() {
             <span className="nav-item__dot"></span>
           </Link>
 
-          {/* ── CUENTA ── */}
-          <p className="section-label" style={GROUP_LABEL_STYLE}>Cuenta</p>
           <Link href="/dashboard/store" className={`nav-item ${pathname.startsWith('/dashboard/store') ? 'nav-item--active' : ''}`}>
             <span className="nav-item__icon"><i className="fa-solid fa-bag-shopping"></i></span>
             <span className="nav-item__label">Shop</span>
