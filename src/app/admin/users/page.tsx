@@ -41,7 +41,7 @@ interface UserRow {
 }
 
 const PLAN_BADGE: Record<string, string> = {
-  NONE: 'text-white/30 bg-white/5 border-white/10',
+  NONE: 'text-[#111827]/30 bg-[#F4F6FA] border-[#E4E9F0]',
   BASIC: 'text-cyan-400 bg-cyan-500/10 border-cyan-500/25',
   PRO: 'text-purple-400 bg-purple-500/10 border-purple-500/25',
   ELITE: 'text-yellow-400 bg-yellow-500/10 border-yellow-500/25',
@@ -160,6 +160,7 @@ export default function AdminUsersPage() {
   }
 
   return (
+  <div className="dm-page font-ui">
     <div className="space-y-5">
       {/* Header */}
       <div className="flex items-center justify-between">
@@ -167,41 +168,41 @@ export default function AdminUsersPage() {
           <h1 className="text-xl font-black uppercase tracking-tighter flex items-center gap-2">
             <Users size={18} className="text-cyan-400" /> Usuarios
           </h1>
-          <p className="text-xs text-white/30 mt-0.5">{total} usuarios registrados</p>
+          <p className="text-xs text-[#111827]/30 mt-0.5">{total} usuarios registrados</p>
         </div>
       </div>
 
       {/* Search */}
       <div className="relative">
-        <Search size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-white/25" />
+        <Search size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#111827]/25" />
         <input
           type="text"
           placeholder="Buscar por nombre, usuario o email..."
           value={search}
           onChange={e => { setSearch(e.target.value); setPage(1) }}
-          className="w-full bg-white/5 border border-white/10 rounded-xl pl-9 pr-4 py-2.5 text-sm text-white placeholder-white/25 outline-none focus:border-purple-500/50"
+          className="w-full bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl pl-9 pr-4 py-2.5 text-sm text-[#111827] placeholder-white/25 outline-none focus:border-purple-500/50"
         />
       </div>
 
       {/* Table */}
-      <div className="bg-white/[0.025] border border-white/8 rounded-2xl overflow-hidden">
+      <div className="bg-white/[0.025] border border-[#E4E9F0] rounded-2xl overflow-hidden">
         {loading ? (
           <div className="flex items-center justify-center py-16">
             <Loader2 className="animate-spin text-purple-400" size={22} />
           </div>
         ) : users.length === 0 ? (
           <div className="text-center py-16">
-            <p className="text-xs text-white/20">No se encontraron usuarios</p>
+            <p className="text-xs text-[#111827]/20">No se encontraron usuarios</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-white/5">
-                  <th className="text-left px-4 py-3 text-[10px] font-black uppercase tracking-widest text-white/30">Usuario</th>
-                  <th className="text-left px-4 py-3 text-[10px] font-black uppercase tracking-widest text-white/30">Plan</th>
-                  <th className="text-left px-4 py-3 text-[10px] font-black uppercase tracking-widest text-white/30">Estado</th>
-                  <th className="text-right px-4 py-3 text-[10px] font-black uppercase tracking-widest text-white/30">Acciones</th>
+                <tr className="border-b border-[#E4E9F0]">
+                  <th className="text-left px-4 py-3 text-[10px] font-black uppercase tracking-widest text-[#111827]/30">Usuario</th>
+                  <th className="text-left px-4 py-3 text-[10px] font-black uppercase tracking-widest text-[#111827]/30">Plan</th>
+                  <th className="text-left px-4 py-3 text-[10px] font-black uppercase tracking-widest text-[#111827]/30">Estado</th>
+                  <th className="text-right px-4 py-3 text-[10px] font-black uppercase tracking-widest text-[#111827]/30">Acciones</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5">
@@ -222,7 +223,7 @@ export default function AdminUsersPage() {
                               </span>
                             )}
                           </div>
-                          <p className="text-[10px] text-white/30 truncate max-w-[120px]">@{u.username}</p>
+                          <p className="text-[10px] text-[#111827]/30 truncate max-w-[120px]">@{u.username}</p>
                         </div>
                       </div>
                     </td>
@@ -239,13 +240,13 @@ export default function AdminUsersPage() {
                     <td className="px-4 py-3">
                       <div className="flex items-center justify-end gap-1.5">
                         {updating === u.id ? (
-                          <Loader2 size={14} className="animate-spin text-white/40" />
+                          <Loader2 size={14} className="animate-spin text-[#111827]/40" />
                         ) : (
                           <>
                             <button
                               onClick={() => updateUser(u.id, { isActive: !u.isActive })}
                               title={u.isActive ? 'Desactivar' : 'Activar'}
-                              className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
+                              className="p-1.5 rounded-lg bg-[#F4F6FA] hover:bg-[#EEF2F7] transition-colors"
                             >
                               {u.isActive
                                 ? <UserX size={13} className="text-red-400" />
@@ -255,17 +256,17 @@ export default function AdminUsersPage() {
                             <button
                               onClick={() => updateUser(u.id, { isAdmin: !u.isAdmin })}
                               title={u.isAdmin ? 'Quitar admin' : 'Hacer admin'}
-                              className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
+                              className="p-1.5 rounded-lg bg-[#F4F6FA] hover:bg-[#EEF2F7] transition-colors"
                             >
                               {u.isAdmin
                                 ? <ShieldOff size={13} className="text-yellow-400" />
-                                : <Shield size={13} className="text-white/30" />
+                                : <Shield size={13} className="text-[#111827]/30" />
                               }
                             </button>
                             <select
                               value={u.plan}
                               onChange={e => updateUser(u.id, { plan: e.target.value })}
-                              className="text-[10px] bg-[#0d0d1a] border border-white/10 rounded-lg px-1.5 py-1 text-white outline-none cursor-pointer hover:border-white/20 [&>option]:bg-[#0d0d1a] [&>option]:text-white"
+                              className="text-[10px] bg-[#0d0d1a] border border-[#E4E9F0] rounded-lg px-1.5 py-1 text-[#111827] outline-none cursor-pointer hover:border-[#E4E9F0] [&>option]:bg-[#0d0d1a] [&>option]:text-[#111827]"
                             >
                               <option value="NONE">NONE</option>
                               <option value="BASIC">BASIC</option>
@@ -275,12 +276,12 @@ export default function AdminUsersPage() {
                             <div className="flex items-center gap-0.5" title="Bots extra otorgados por admin">
                               <button
                                 onClick={() => updateUser(u.id, { extraBots: Math.max(0, (u.extraBots ?? 0) - 1) })}
-                                className="w-5 h-5 rounded bg-white/5 hover:bg-white/10 text-white/50 hover:text-white transition-colors flex items-center justify-center text-xs font-black leading-none"
+                                className="w-5 h-5 rounded bg-[#F4F6FA] hover:bg-[#EEF2F7] text-[#111827]/50 hover:text-[#111827] transition-colors flex items-center justify-center text-xs font-black leading-none"
                               >−</button>
                               <span className="text-[10px] font-black text-[#00FF88] min-w-[1.5rem] text-center" title={`+${u.extraBots ?? 0} bots extra`}>+{u.extraBots ?? 0}</span>
                               <button
                                 onClick={() => updateUser(u.id, { extraBots: (u.extraBots ?? 0) + 1 })}
-                                className="w-5 h-5 rounded bg-white/5 hover:bg-[#00FF88]/20 text-white/50 hover:text-[#00FF88] transition-colors flex items-center justify-center text-xs font-black leading-none"
+                                className="w-5 h-5 rounded bg-[#F4F6FA] hover:bg-[#00FF88]/20 text-[#111827]/50 hover:text-[#00FF88] transition-colors flex items-center justify-center text-xs font-black leading-none"
                               >+</button>
                             </div>
                             <button
@@ -317,17 +318,17 @@ export default function AdminUsersPage() {
           <button
             onClick={() => setPage(p => Math.max(1, p - 1))}
             disabled={page === 1}
-            className="p-2 rounded-lg bg-white/5 border border-white/10 disabled:opacity-30 hover:bg-white/10 transition-colors"
+            className="p-2 rounded-lg bg-[#F4F6FA] border border-[#E4E9F0] disabled:opacity-30 hover:bg-[#EEF2F7] transition-colors"
           >
             <ChevronLeft size={14} />
           </button>
-          <span className="text-xs text-white/40">
+          <span className="text-xs text-[#111827]/40">
             Página {page} de {totalPages}
           </span>
           <button
             onClick={() => setPage(p => Math.min(totalPages, p + 1))}
             disabled={page === totalPages}
-            className="p-2 rounded-lg bg-white/5 border border-white/10 disabled:opacity-30 hover:bg-white/10 transition-colors"
+            className="p-2 rounded-lg bg-[#F4F6FA] border border-[#E4E9F0] disabled:opacity-30 hover:bg-[#EEF2F7] transition-colors"
           >
             <ChevronRight size={14} />
           </button>
@@ -349,8 +350,8 @@ export default function AdminUsersPage() {
                   <Smartphone size={15} className="text-amber-400" />
                 </div>
                 <div>
-                  <p className="text-xs font-black text-white">{devicesModal.fullName}</p>
-                  <p className="text-[10px] text-white/30">@{devicesModal.username}</p>
+                  <p className="text-xs font-black text-[#111827]">{devicesModal.fullName}</p>
+                  <p className="text-[10px] text-[#111827]/30">@{devicesModal.username}</p>
                 </div>
               </div>
               <div className="flex items-center gap-1.5">
@@ -361,17 +362,17 @@ export default function AdminUsersPage() {
                 <button
                   onClick={() => loadDevices(devicesModal.id)}
                   title="Actualizar ahora"
-                  className="p-1.5 rounded-lg hover:bg-white/10 transition-colors"
+                  className="p-1.5 rounded-lg hover:bg-[#EEF2F7] transition-colors"
                 >
-                  <RefreshCw size={13} className="text-white/30 hover:text-white/60" />
+                  <RefreshCw size={13} className="text-[#111827]/30 hover:text-[#111827]/60" />
                 </button>
-                <button onClick={() => setDevicesModal(null)} className="p-1.5 rounded-lg hover:bg-white/10 transition-colors">
-                  <X size={14} className="text-white/40" />
+                <button onClick={() => setDevicesModal(null)} className="p-1.5 rounded-lg hover:bg-[#EEF2F7] transition-colors">
+                  <X size={14} className="text-[#111827]/40" />
                 </button>
               </div>
             </div>
 
-            <p className="text-[10px] font-black uppercase tracking-widest text-white/25 mb-3">Dispositivos de confianza</p>
+            <p className="text-[10px] font-black uppercase tracking-widest text-[#111827]/25 mb-3">Dispositivos de confianza</p>
 
             {devicesLoading ? (
               <div className="flex justify-center py-8">
@@ -379,14 +380,14 @@ export default function AdminUsersPage() {
               </div>
             ) : devices.length === 0 ? (
               <div className="text-center py-8">
-                <Smartphone size={28} className="text-white/10 mx-auto mb-2" />
-                <p className="text-xs text-white/25">Sin dispositivos registrados</p>
-                <p className="text-[10px] text-white/15 mt-1">El usuario deberá verificar en su próximo inicio de sesión</p>
+                <Smartphone size={28} className="text-[#111827]/10 mx-auto mb-2" />
+                <p className="text-xs text-[#111827]/25">Sin dispositivos registrados</p>
+                <p className="text-[10px] text-[#111827]/15 mt-1">El usuario deberá verificar en su próximo inicio de sesión</p>
               </div>
             ) : (
               <div className="space-y-3">
                 {devices.map(d => (
-                  <div key={d.id} className="bg-white/[0.03] border border-white/8 rounded-2xl overflow-hidden">
+                  <div key={d.id} className="bg-white border border-[#E4E9F0] rounded-2xl overflow-hidden">
 
                     {/* Location changed banner */}
                     {d.locationChanged && (
@@ -407,8 +408,8 @@ export default function AdminUsersPage() {
                             <Smartphone size={13} className="text-amber-400" />
                           </div>
                           <div>
-                            <p className="text-xs font-bold text-white/80">{d.label ?? 'Dispositivo'}</p>
-                            <p className="text-[10px] text-white/25 font-mono">{d.deviceId.slice(0, 14)}…</p>
+                            <p className="text-xs font-bold text-[#111827]/80">{d.label ?? 'Dispositivo'}</p>
+                            <p className="text-[10px] text-[#111827]/25 font-mono">{d.deviceId.slice(0, 14)}…</p>
                           </div>
                         </div>
                         <button
@@ -430,7 +431,7 @@ export default function AdminUsersPage() {
                         <div className="flex items-start gap-1.5 bg-white/[0.025] rounded-lg px-2 py-1.5">
                           <Globe size={10} className="text-cyan-400 mt-0.5 shrink-0" />
                           <div>
-                            <p className="text-[9px] text-white/25 uppercase font-bold">IP</p>
+                            <p className="text-[9px] text-[#111827]/25 uppercase font-bold">IP</p>
                             <p className="text-[10px] text-cyan-300 font-mono">{d.ip ?? '—'}</p>
                           </div>
                         </div>
@@ -439,8 +440,8 @@ export default function AdminUsersPage() {
                         <div className="flex items-start gap-1.5 bg-white/[0.025] rounded-lg px-2 py-1.5">
                           <MapPin size={10} className="text-green-400 mt-0.5 shrink-0" />
                           <div>
-                            <p className="text-[9px] text-white/25 uppercase font-bold">Ubicación</p>
-                            <p className="text-[10px] text-white/70">{d.city ?? '—'}{d.country ? `, ${d.country}` : ''}</p>
+                            <p className="text-[9px] text-[#111827]/25 uppercase font-bold">Ubicación</p>
+                            <p className="text-[10px] text-[#111827]/70">{d.city ?? '—'}{d.country ? `, ${d.country}` : ''}</p>
                           </div>
                         </div>
 
@@ -448,8 +449,8 @@ export default function AdminUsersPage() {
                         <div className="flex items-start gap-1.5 bg-white/[0.025] rounded-lg px-2 py-1.5">
                           <Monitor size={10} className="text-purple-400 mt-0.5 shrink-0" />
                           <div>
-                            <p className="text-[9px] text-white/25 uppercase font-bold">Dispositivo</p>
-                            <p className="text-[10px] text-white/70">{d.deviceType ?? '—'} · {d.os ?? '—'}</p>
+                            <p className="text-[9px] text-[#111827]/25 uppercase font-bold">Dispositivo</p>
+                            <p className="text-[10px] text-[#111827]/70">{d.deviceType ?? '—'} · {d.os ?? '—'}</p>
                           </div>
                         </div>
 
@@ -457,8 +458,8 @@ export default function AdminUsersPage() {
                         <div className="flex items-start gap-1.5 bg-white/[0.025] rounded-lg px-2 py-1.5">
                           <Smartphone size={10} className="text-blue-400 mt-0.5 shrink-0" />
                           <div>
-                            <p className="text-[9px] text-white/25 uppercase font-bold">Navegador</p>
-                            <p className="text-[10px] text-white/70">{d.browser ?? '—'}</p>
+                            <p className="text-[9px] text-[#111827]/25 uppercase font-bold">Navegador</p>
+                            <p className="text-[10px] text-[#111827]/70">{d.browser ?? '—'}</p>
                           </div>
                         </div>
 
@@ -466,8 +467,8 @@ export default function AdminUsersPage() {
                         <div className="col-span-2 flex items-start gap-1.5 bg-white/[0.025] rounded-lg px-2 py-1.5">
                           <Clock size={10} className="text-amber-400 mt-0.5 shrink-0" />
                           <div>
-                            <p className="text-[9px] text-white/25 uppercase font-bold">Último acceso</p>
-                            <p className="text-[10px] text-white/70">
+                            <p className="text-[9px] text-[#111827]/25 uppercase font-bold">Último acceso</p>
+                            <p className="text-[10px] text-[#111827]/70">
                               {new Date(d.lastSeen).toLocaleString('es', { dateStyle: 'medium', timeStyle: 'short' })}
                             </p>
                           </div>
@@ -504,7 +505,7 @@ export default function AdminUsersPage() {
               </div>
             )}
 
-            <p className="text-[10px] text-white/20 text-center mt-4">
+            <p className="text-[10px] text-[#111827]/20 text-center mt-4">
               Al desvincular, el usuario tendrá que verificar de nuevo su dispositivo
             </p>
           </div>
@@ -525,12 +526,12 @@ export default function AdminUsersPage() {
               <div className="w-14 h-14 rounded-2xl bg-red-500/10 border border-red-500/25 flex items-center justify-center mb-4">
                 <AlertTriangle size={26} className="text-red-400" />
               </div>
-              <h3 className="text-base font-black text-white mb-1">Eliminar usuario</h3>
-              <p className="text-xs text-white/40 mb-1">
+              <h3 className="text-base font-black text-[#111827] mb-1">Eliminar usuario</h3>
+              <p className="text-xs text-[#111827]/40 mb-1">
                 Estás a punto de eliminar a
               </p>
-              <p className="text-sm font-black text-white mb-0.5">{deleteModal.fullName}</p>
-              <p className="text-xs text-white/30 mb-4">@{deleteModal.username}</p>
+              <p className="text-sm font-black text-[#111827] mb-0.5">{deleteModal.fullName}</p>
+              <p className="text-xs text-[#111827]/30 mb-4">@{deleteModal.username}</p>
 
               <div className="w-full flex items-start gap-2 bg-red-500/8 border border-red-500/15 rounded-xl px-3 py-2.5 mb-5 text-left">
                 <AlertTriangle size={12} className="text-red-400 shrink-0 mt-0.5" />
@@ -543,14 +544,14 @@ export default function AdminUsersPage() {
                 <button
                   onClick={() => setDeleteModal(null)}
                   disabled={deleting}
-                  className="flex-1 py-2.5 rounded-xl bg-white/5 border border-white/10 text-sm text-white/50 hover:bg-white/10 transition-colors disabled:opacity-40"
+                  className="flex-1 py-2.5 rounded-xl bg-[#F4F6FA] border border-[#E4E9F0] text-sm text-[#111827]/50 hover:bg-[#EEF2F7] transition-colors disabled:opacity-40"
                 >
                   Cancelar
                 </button>
                 <button
                   onClick={confirmDelete}
                   disabled={deleting}
-                  className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-red-600/80 border border-red-500/30 text-sm font-black text-white hover:bg-red-600 transition-colors disabled:opacity-50"
+                  className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-red-600/80 border border-red-500/30 text-sm font-black text-[#111827] hover:bg-red-600 transition-colors disabled:opacity-50"
                 >
                   {deleting
                     ? <Loader2 size={14} className="animate-spin" />
@@ -563,5 +564,6 @@ export default function AdminUsersPage() {
         </div>
       )}
     </div>
+  </div>
   )
 }

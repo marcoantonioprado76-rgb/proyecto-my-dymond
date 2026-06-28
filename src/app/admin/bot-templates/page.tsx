@@ -19,8 +19,8 @@ interface BotTemplate {
   createdAt: string
 }
 
-const INPUT = 'w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm outline-none'
-const LABEL = 'block text-[11px] text-white/40 mb-1'
+const INPUT = 'w-full bg-[#F4F6FA] border border-[#E4E9F0] rounded-lg px-3 py-2 text-[#111827] text-sm outline-none'
+const LABEL = 'block text-[11px] text-[#111827]/40 mb-1'
 
 const AI_MODELS = ['gpt-4o', 'gpt-4o-mini', 'gpt-4-turbo', 'gpt-3.5-turbo', 'claude-opus-4-7', 'claude-sonnet-4-6', 'claude-haiku-4-5-20251001']
 
@@ -144,18 +144,19 @@ export default function AdminBotTemplatesPage() {
   }
 
   return (
+  <div className="dm-page font-ui">
     <div className="px-4 sm:px-6 pt-6 pb-10 max-w-5xl mx-auto">
       {/* Header */}
       <div className="mb-6">
-        <h1 className="text-xl font-bold text-white uppercase tracking-widest">Plantillas AI</h1>
+        <h1 className="text-xl font-bold text-[#111827] uppercase tracking-widest">Plantillas AI</h1>
         <div className="h-px w-20 mt-2 rounded-full" style={{ background: 'linear-gradient(90deg, transparent, #D203DD, #FF2DF7, transparent)' }} />
-        <p className="text-xs text-white/30 mt-1">Plantillas de prompts que los usuarios pueden aplicar a sus agentes AI</p>
+        <p className="text-xs text-[#111827]/30 mt-1">Plantillas de prompts que los usuarios pueden aplicar a sus agentes AI</p>
       </div>
 
       {/* Toolbar */}
       <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, marginBottom: 18 }}>
         <button onClick={fetchTemplates} style={{ padding: '7px 10px', borderRadius: 9, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', cursor: 'pointer' }}>
-          <RefreshCw size={13} className="text-white/40" />
+          <RefreshCw size={13} className="text-[#111827]/40" />
         </button>
         <button onClick={openCreate} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 16px', borderRadius: 9, background: 'linear-gradient(135deg, #D203DD, #00FF88)', border: 'none', cursor: 'pointer', fontWeight: 700, fontSize: 13, color: '#000' }}>
           <Plus size={14} /> Nueva plantilla
@@ -164,9 +165,9 @@ export default function AdminBotTemplatesPage() {
 
       {/* List */}
       {loading ? (
-        <div className="flex justify-center py-16"><Loader2 size={20} className="animate-spin text-white/30" /></div>
+        <div className="flex justify-center py-16"><Loader2 size={20} className="animate-spin text-[#111827]/30" /></div>
       ) : templates.length === 0 ? (
-        <div className="text-center py-16 text-white/30 text-sm">No hay plantillas. Crea la primera.</div>
+        <div className="text-center py-16 text-[#111827]/30 text-sm">No hay plantillas. Crea la primera.</div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           {templates.map(t => (
@@ -174,20 +175,20 @@ export default function AdminBotTemplatesPage() {
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 5 }}>
                   <span style={{ fontWeight: 700, color: '#fff', fontSize: 14 }}>{t.name}</span>
-                  {t.category && <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)', background: 'rgba(255,255,255,0.05)', padding: '2px 8px', borderRadius: 5 }}>{t.category}</span>}
+                  {t.category && <span style={{ fontSize: 11, color: '#6B7280', background: '#F0F3F7', padding: '2px 8px', borderRadius: 5 }}>{t.category}</span>}
                   <span style={{ fontSize: 10, fontWeight: 700, color: '#a78bfa', background: 'rgba(167,139,250,0.08)', border: '1px solid rgba(167,139,250,0.2)', padding: '2px 7px', borderRadius: 5 }}>{t.aiModel}</span>
                   <button
                     onClick={() => toggleActive(t)}
                     style={{ fontSize: 10, fontWeight: 700, padding: '2px 8px', borderRadius: 5, border: '1px solid', cursor: 'pointer', background: 'none',
-                      ...(t.active ? { color: '#00FF88', borderColor: 'rgba(0,255,136,0.2)' } : { color: 'rgba(255,255,255,0.25)', borderColor: 'rgba(255,255,255,0.08)' }) }}>
+                      ...(t.active ? { color: '#00FF88', borderColor: 'rgba(0,255,136,0.2)' } : { color: '#9CA3AF', borderColor: 'rgba(255,255,255,0.08)' }) }}>
                     {t.active ? 'Activa' : 'Inactiva'}
                   </button>
                 </div>
-                {t.description && <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', marginBottom: 4 }}>{t.description}</p>}
-                <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.25)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '100%' }}>
+                {t.description && <p style={{ fontSize: 12, color: '#6B7280', marginBottom: 4 }}>{t.description}</p>}
+                <p style={{ fontSize: 11, color: '#9CA3AF', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '100%' }}>
                   Prompt: {t.systemPromptTemplate.slice(0, 100)}{t.systemPromptTemplate.length > 100 ? '...' : ''}
                 </p>
-                <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.2)', marginTop: 4 }}>
+                <p style={{ fontSize: 11, color: '#9CA3AF', marginTop: 4 }}>
                   Follow-up: {t.followUp1Delay}min / {t.followUp2Delay}min
                   {(t.maxCharsMensaje1 != null || t.maxCharsMensaje2 != null || t.maxCharsMensaje3 != null) && ` · Chars: ${t.maxCharsMensaje1 ?? '–'} / ${t.maxCharsMensaje2 ?? '–'} / ${t.maxCharsMensaje3 ?? '–'}`}
                 </p>
@@ -208,10 +209,10 @@ export default function AdminBotTemplatesPage() {
       {/* ═══ CREATE / EDIT MODAL ═══ */}
       {modal && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.78)', zIndex: 50, display: 'flex', alignItems: 'flex-start', justifyContent: 'center', overflowY: 'auto', padding: '40px 16px' }}>
-          <div style={{ background: '#0d1117', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 18, width: '100%', maxWidth: 620, padding: 28 }}>
+          <div style={{ background: '#0d1117', border: '1px solid #E4E9F0', borderRadius: 18, width: '100%', maxWidth: 620, padding: 28 }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
               <h2 style={{ fontSize: 16, fontWeight: 700, color: '#fff' }}>{editing ? 'Editar plantilla' : 'Nueva plantilla AI'}</h2>
-              <button onClick={() => setModal(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.4)' }}><X size={18} /></button>
+              <button onClick={() => setModal(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#6B7280' }}><X size={18} /></button>
             </div>
 
             {error && <p style={{ fontSize: 12, color: '#ef4444', marginBottom: 14, background: 'rgba(239,68,68,0.08)', borderRadius: 8, padding: '7px 12px' }}>{error}</p>}
@@ -240,7 +241,7 @@ export default function AdminBotTemplatesPage() {
                   value={form.systemPromptTemplate}
                   onChange={e => setF('systemPromptTemplate', e.target.value)}
                   placeholder="Eres un asistente especializado en ventas de suplementos. Tu objetivo es ayudar a los clientes a elegir el producto correcto..." />
-                <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.2)', marginTop: 4 }}>{form.systemPromptTemplate.length} caracteres</p>
+                <p style={{ fontSize: 10, color: '#9CA3AF', marginTop: 4 }}>{form.systemPromptTemplate.length} caracteres</p>
               </div>
 
               <div>
@@ -265,12 +266,12 @@ export default function AdminBotTemplatesPage() {
 
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                 <input type="checkbox" id="tpl-active" checked={form.active} onChange={e => setF('active', e.target.checked)} style={{ width: 16, height: 16, cursor: 'pointer' }} />
-                <label htmlFor="tpl-active" style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)', cursor: 'pointer' }}>Plantilla activa (visible para usuarios)</label>
+                <label htmlFor="tpl-active" style={{ fontSize: 13, color: '#6B7280', cursor: 'pointer' }}>Plantilla activa (visible para usuarios)</label>
               </div>
 
               <button onClick={save} disabled={saving}
                 style={{ padding: '12px 0', borderRadius: 10, fontWeight: 700, fontSize: 14, cursor: saving ? 'not-allowed' : 'pointer', border: 'none',
-                  background: saving ? 'rgba(255,255,255,0.06)' : 'linear-gradient(135deg, #D203DD, #00FF88)', color: saving ? 'rgba(255,255,255,0.3)' : '#000' }}>
+                  background: saving ? 'rgba(255,255,255,0.06)' : 'linear-gradient(135deg, #D203DD, #00FF88)', color: saving ? '#6B7280' : '#000' }}>
                 {saving ? 'Guardando...' : (editing ? 'Guardar cambios' : 'Crear plantilla')}
               </button>
             </div>
@@ -281,12 +282,12 @@ export default function AdminBotTemplatesPage() {
       {/* ═══ DELETE CONFIRM ═══ */}
       {deleteConfirm && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)', zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
-          <div style={{ background: '#0d1117', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 16, padding: 28, maxWidth: 380, width: '100%' }}>
+          <div style={{ background: '#0d1117', border: '1px solid #E4E9F0', borderRadius: 16, padding: 28, maxWidth: 380, width: '100%' }}>
             <p style={{ fontSize: 15, fontWeight: 700, color: '#fff', marginBottom: 6 }}>¿Eliminar plantilla?</p>
-            <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)', fontWeight: 600, marginBottom: 4 }}>{deleteConfirm.name}</p>
-            <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.3)', marginBottom: 20 }}>Esta acción no se puede deshacer.</p>
+            <p style={{ fontSize: 13, color: '#6B7280', fontWeight: 600, marginBottom: 4 }}>{deleteConfirm.name}</p>
+            <p style={{ fontSize: 12, color: '#6B7280', marginBottom: 20 }}>Esta acción no se puede deshacer.</p>
             <div style={{ display: 'flex', gap: 10 }}>
-              <button onClick={() => setDeleteConfirm(null)} style={{ flex: 1, padding: '9px 0', borderRadius: 8, border: '1px solid rgba(255,255,255,0.1)', background: 'transparent', color: 'rgba(255,255,255,0.4)', cursor: 'pointer', fontWeight: 600, fontSize: 13 }}>Cancelar</button>
+              <button onClick={() => setDeleteConfirm(null)} style={{ flex: 1, padding: '9px 0', borderRadius: 8, border: '1px solid #E4E9F0', background: 'transparent', color: '#6B7280', cursor: 'pointer', fontWeight: 600, fontSize: 13 }}>Cancelar</button>
               <button onClick={doDelete} disabled={deleting} style={{ flex: 1, padding: '9px 0', borderRadius: 8, border: 'none', background: '#ef4444', color: '#fff', cursor: 'pointer', fontWeight: 700, fontSize: 13 }}>
                 {deleting ? 'Eliminando...' : 'Eliminar'}
               </button>
@@ -295,5 +296,6 @@ export default function AdminBotTemplatesPage() {
         </div>
       )}
     </div>
+  </div>
   )
 }

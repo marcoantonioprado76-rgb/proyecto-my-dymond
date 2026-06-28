@@ -86,6 +86,7 @@ export default function AdminWithdrawalsPage() {
   }
 
   return (
+  <div className="dm-page font-ui">
     <div className="space-y-5">
       {/* Header */}
       <div className="flex items-center justify-between">
@@ -93,21 +94,21 @@ export default function AdminWithdrawalsPage() {
           <h1 className="text-xl font-black uppercase tracking-tighter flex items-center gap-2">
             <Wallet size={18} className="text-pink-400" /> Solicitudes de Retiro
           </h1>
-          <p className="text-xs text-white/30 mt-0.5">{requests.length} solicitudes</p>
+          <p className="text-xs text-[#111827]/30 mt-0.5">{requests.length} solicitudes</p>
         </div>
-        <button onClick={fetchRequests} className="p-2 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-colors">
-          <RefreshCw size={14} className="text-white/40" />
+        <button onClick={fetchRequests} className="p-2 rounded-xl bg-[#F4F6FA] border border-[#E4E9F0] hover:bg-[#EEF2F7] transition-colors">
+          <RefreshCw size={14} className="text-[#111827]/40" />
         </button>
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 bg-white/5 rounded-xl p-1 w-fit flex-wrap">
+      <div className="flex gap-1 bg-[#F4F6FA] rounded-xl p-1 w-fit flex-wrap">
         {STATUS_TABS.map(tab => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
             className={`px-3 py-1.5 rounded-lg text-[11px] font-bold uppercase tracking-wider transition-all ${
-              activeTab === tab ? 'bg-purple-600 text-white' : 'text-white/40 hover:text-white/70'
+              activeTab === tab ? 'bg-purple-600 text-[#111827]' : 'text-[#111827]/40 hover:text-[#111827]/70'
             }`}
           >
             {STATUS_LABEL[tab]}
@@ -116,15 +117,15 @@ export default function AdminWithdrawalsPage() {
       </div>
 
       {/* List */}
-      <div className="bg-white/[0.025] border border-white/8 rounded-2xl overflow-hidden">
+      <div className="bg-white/[0.025] border border-[#E4E9F0] rounded-2xl overflow-hidden">
         {loading ? (
           <div className="flex items-center justify-center py-16">
             <Loader2 className="animate-spin text-purple-400" size={22} />
           </div>
         ) : requests.length === 0 ? (
           <div className="text-center py-16">
-            <Wallet size={24} className="text-white/15 mx-auto mb-2" />
-            <p className="text-xs text-white/20">No hay solicitudes en esta categoría</p>
+            <Wallet size={24} className="text-[#111827]/15 mx-auto mb-2" />
+            <p className="text-xs text-[#111827]/20">No hay solicitudes en esta categoría</p>
           </div>
         ) : (
           <div className="divide-y divide-white/5">
@@ -138,20 +139,20 @@ export default function AdminWithdrawalsPage() {
                         {STATUS_LABEL[r.status] ?? r.status}
                       </span>
                     </div>
-                    <p className="text-[11px] text-white/30 mb-2">@{r.user.username} · {r.user.email}</p>
+                    <p className="text-[11px] text-[#111827]/30 mb-2">@{r.user.username} · {r.user.email}</p>
 
                     <div className="flex items-center gap-4 flex-wrap mb-2">
                       <span className="text-xl font-black text-yellow-400">${r.amount.toFixed(2)}</span>
-                      <span className="text-[10px] text-white/25 flex items-center gap-1">
+                      <span className="text-[10px] text-[#111827]/25 flex items-center gap-1">
                         <Clock size={9} />
                         {new Date(r.createdAt).toLocaleDateString('es', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
                       </span>
                     </div>
 
                     {r.walletAddress && (
-                      <div className="flex items-center gap-2 bg-white/5 border border-white/8 rounded-xl px-3 py-2 mb-2 max-w-sm">
-                        <span className="text-[10px] text-white/40 font-bold">WALLET:</span>
-                        <span className="text-[11px] font-mono text-white/60 truncate">{r.walletAddress}</span>
+                      <div className="flex items-center gap-2 bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-3 py-2 mb-2 max-w-sm">
+                        <span className="text-[10px] text-[#111827]/40 font-bold">WALLET:</span>
+                        <span className="text-[11px] font-mono text-[#111827]/60 truncate">{r.walletAddress}</span>
                       </div>
                     )}
 
@@ -178,13 +179,13 @@ export default function AdminWithdrawalsPage() {
                     )}
 
                     {r.notes && (
-                      <p className="text-[11px] text-white/30 italic">Nota: {r.notes}</p>
+                      <p className="text-[11px] text-[#111827]/30 italic">Nota: {r.notes}</p>
                     )}
                   </div>
 
                   {/* Actions */}
                   {processing === r.id || uploading ? (
-                    <Loader2 size={16} className="animate-spin text-white/40 shrink-0" />
+                    <Loader2 size={16} className="animate-spin text-[#111827]/40 shrink-0" />
                   ) : (
                     <div className="flex flex-col gap-2 shrink-0">
                       {r.status === 'PENDING' && (
@@ -224,20 +225,20 @@ export default function AdminWithdrawalsPage() {
       {rejectModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => setRejectModal(null)} />
-          <div className="relative bg-[#13131f] border border-white/10 rounded-2xl p-5 w-full max-w-sm z-10">
+          <div className="relative bg-[#13131f] border border-[#E4E9F0] rounded-2xl p-5 w-full max-w-sm z-10">
             <h3 className="text-sm font-black mb-3 text-red-400">Rechazar retiro</h3>
             <textarea
               placeholder="Motivo del rechazo (opcional)..."
               value={rejectNotes}
               onChange={e => setRejectNotes(e.target.value)}
               rows={3}
-              className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm text-white placeholder-white/25 outline-none resize-none mb-3"
+              className="w-full bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-3 py-2.5 text-sm text-[#111827] placeholder-white/25 outline-none resize-none mb-3"
             />
             <div className="flex gap-2">
-              <button onClick={() => setRejectModal(null)} className="flex-1 py-2 rounded-xl bg-white/5 text-sm text-white/50">Cancelar</button>
+              <button onClick={() => setRejectModal(null)} className="flex-1 py-2 rounded-xl bg-[#F4F6FA] text-sm text-[#111827]/50">Cancelar</button>
               <button
                 onClick={() => handleAction(rejectModal.id, 'reject', rejectNotes ? { notes: rejectNotes } : {})}
-                className="flex-1 py-2 rounded-xl bg-red-600/80 text-sm font-bold text-white hover:bg-red-600"
+                className="flex-1 py-2 rounded-xl bg-red-600/80 text-sm font-bold text-[#111827] hover:bg-red-600"
               >
                 Confirmar
               </button>
@@ -250,9 +251,9 @@ export default function AdminWithdrawalsPage() {
       {proofModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => setProofModal(null)} />
-          <div className="relative bg-[#13131f] border border-white/10 rounded-2xl p-5 w-full max-w-sm z-10">
+          <div className="relative bg-[#13131f] border border-[#E4E9F0] rounded-2xl p-5 w-full max-w-sm z-10">
             <h3 className="text-sm font-black mb-1">Subir comprobante de pago</h3>
-            <p className="text-xs text-white/30 mb-4">El retiro se marcará como PAGADO automáticamente.</p>
+            <p className="text-xs text-[#111827]/30 mb-4">El retiro se marcará como PAGADO automáticamente.</p>
             <input
               ref={proofInputRef}
               type="file"
@@ -265,14 +266,15 @@ export default function AdminWithdrawalsPage() {
             />
             <button
               onClick={() => proofInputRef.current?.click()}
-              className="w-full py-3 rounded-xl border-2 border-dashed border-white/15 text-white/40 hover:border-purple-500/40 hover:text-purple-400 transition-colors text-sm mb-3"
+              className="w-full py-3 rounded-xl border-2 border-dashed border-[#E4E9F0] text-[#111827]/40 hover:border-purple-500/40 hover:text-purple-400 transition-colors text-sm mb-3"
             >
               {uploading ? <Loader2 size={16} className="animate-spin mx-auto" /> : '📎 Seleccionar archivo'}
             </button>
-            <button onClick={() => setProofModal(null)} className="w-full py-2 rounded-xl bg-white/5 text-sm text-white/40">Cancelar</button>
+            <button onClick={() => setProofModal(null)} className="w-full py-2 rounded-xl bg-[#F4F6FA] text-sm text-[#111827]/40">Cancelar</button>
           </div>
         </div>
       )}
     </div>
+  </div>
   )
 }

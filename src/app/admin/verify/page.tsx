@@ -93,6 +93,7 @@ export default function AdminVerifyPage() {
   }
 
   return (
+  <div className="dm-page font-ui">
     <div className="min-h-screen flex items-center justify-center p-4" style={{ background: '#07080F' }}>
 
       {/* Glows */}
@@ -108,8 +109,8 @@ export default function AdminVerifyPage() {
           <div className="w-12 h-12 rounded-2xl flex items-center justify-center mb-3" style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.25)' }}>
             <Shield size={22} className="text-red-400" />
           </div>
-          <p className="text-[10px] font-black uppercase tracking-[0.25em] text-white/25">Panel de administración</p>
-          <h1 className="text-lg font-black text-white mt-1">Verificación de seguridad</h1>
+          <p className="text-[10px] font-black uppercase tracking-[0.25em] text-[#111827]/25">Panel de administración</p>
+          <h1 className="text-lg font-black text-[#111827] mt-1">Verificación de seguridad</h1>
         </div>
 
         {/* Card */}
@@ -122,15 +123,15 @@ export default function AdminVerifyPage() {
               <div className="flex flex-col items-center gap-3 py-4">
                 <CheckCircle2 size={32} className="text-green-400" />
                 <p className="text-sm font-bold text-green-400">Acceso concedido</p>
-                <p className="text-[11px] text-white/30">Entrando al panel...</p>
+                <p className="text-[11px] text-[#111827]/30">Entrando al panel...</p>
               </div>
             ) : step === 'request' ? (
               <>
                 <div className="flex items-center gap-2 mb-2">
                   <Mail size={15} className="text-red-400" />
-                  <p className="text-sm font-black text-white">Enviar código por email</p>
+                  <p className="text-sm font-black text-[#111827]">Enviar código por email</p>
                 </div>
-                <p className="text-[12px] text-white/35 leading-relaxed mb-6">
+                <p className="text-[12px] text-[#111827]/35 leading-relaxed mb-6">
                   Te enviaremos un código de 6 dígitos a tu correo de administrador. Válido por 15 minutos.
                 </p>
 
@@ -154,9 +155,9 @@ export default function AdminVerifyPage() {
               <>
                 <div className="flex items-center gap-2 mb-1">
                   <Shield size={15} className="text-red-400" />
-                  <p className="text-sm font-black text-white">Ingresa el código</p>
+                  <p className="text-sm font-black text-[#111827]">Ingresa el código</p>
                 </div>
-                <p className="text-[12px] text-white/35 leading-relaxed mb-6">
+                <p className="text-[12px] text-[#111827]/35 leading-relaxed mb-6">
                   Revisa tu correo e ingresa el código de 6 dígitos.
                 </p>
 
@@ -175,7 +176,7 @@ export default function AdminVerifyPage() {
                       className="w-11 h-13 text-center text-lg font-black rounded-xl outline-none transition-all"
                       style={{
                         background: d ? 'rgba(239,68,68,0.1)' : 'rgba(255,255,255,0.04)',
-                        border: d ? '1px solid rgba(239,68,68,0.4)' : '1px solid rgba(255,255,255,0.1)',
+                        border: d ? '1px solid rgba(239,68,68,0.4)' : '1px solid #E4E9F0',
                         color: d ? '#f87171' : '#fff',
                         height: '52px',
                       }}
@@ -204,7 +205,7 @@ export default function AdminVerifyPage() {
                 <button
                   onClick={() => { setStep('request'); setCode(['','','','','','']); setError('') }}
                   disabled={countdown > 0}
-                  className="w-full flex items-center justify-center gap-1.5 text-[11px] text-white/30 hover:text-white/60 transition-colors disabled:opacity-40"
+                  className="w-full flex items-center justify-center gap-1.5 text-[11px] text-[#111827]/30 hover:text-[#111827]/60 transition-colors disabled:opacity-40"
                 >
                   <RefreshCw size={11} />
                   {countdown > 0 ? `Reenviar en ${countdown}s` : 'Reenviar código'}
@@ -214,10 +215,11 @@ export default function AdminVerifyPage() {
           </div>
         </div>
 
-        <p className="text-center text-[10px] text-white/15 mt-4">
+        <p className="text-center text-[10px] text-[#111827]/15 mt-4">
           La sesión admin dura 4 horas
         </p>
       </div>
     </div>
+  </div>
   )
 }

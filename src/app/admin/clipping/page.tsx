@@ -326,6 +326,7 @@ export default function AdminClippingPage() {
   }
 
   return (
+  <div className="dm-page font-ui">
     <div className="space-y-6">
 
       {/* Toast */}
@@ -346,7 +347,7 @@ export default function AdminClippingPage() {
           <h1 className="text-2xl font-black uppercase tracking-tighter flex items-center gap-2">
             <Play size={20} className="text-pink-400" /> Clipping
           </h1>
-          <p className="text-xs text-white/30 mt-0.5">Gestión de campañas y videos</p>
+          <p className="text-xs text-[#111827]/30 mt-0.5">Gestión de campañas y videos</p>
         </div>
         <button onClick={runSync} disabled={syncing}
           className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all disabled:opacity-50"
@@ -367,7 +368,7 @@ export default function AdminClippingPage() {
             <div key={label} className="rounded-xl p-3 text-center"
               style={{ background: `${color}08`, border: `1px solid ${color}18` }}>
               <p className="text-xl font-black" style={{ color }}>{value}</p>
-              <p className="text-[10px] text-white/30 uppercase tracking-widest mt-0.5">{label}</p>
+              <p className="text-[10px] text-[#111827]/30 uppercase tracking-widest mt-0.5">{label}</p>
             </div>
           ))}
         </div>
@@ -385,7 +386,7 @@ export default function AdminClippingPage() {
             style={{ background: `${color}08`, border: `1px solid ${color}18` }}>
             <Icon size={14} style={{ color }} className="mb-2" />
             <p className="text-xl font-black" style={{ color }}>{value}</p>
-            <p className="text-[10px] text-white/30 uppercase tracking-widest mt-0.5">{label}</p>
+            <p className="text-[10px] text-[#111827]/30 uppercase tracking-widest mt-0.5">{label}</p>
           </div>
         ))}
       </div>
@@ -401,7 +402,7 @@ export default function AdminClippingPage() {
             className="px-4 py-2 rounded-lg text-xs font-semibold transition-all"
             style={tab === key
               ? { background: 'rgba(147,51,234,0.2)', color: '#a855f7', border: '1px solid rgba(147,51,234,0.3)' }
-              : { color: 'rgba(255,255,255,0.35)' }}>
+              : { color: '#6B7280' }}>
             {label}
           </button>
         ))}
@@ -420,9 +421,9 @@ export default function AdminClippingPage() {
 
           {campaigns.length === 0 ? (
             <div className="text-center py-16 rounded-2xl"
-              style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)' }}>
+              style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid #F0F3F7' }}>
               <Play size={32} className="mx-auto mb-3 opacity-20 text-pink-400" />
-              <p className="text-sm text-white/25">No hay campañas. Creá la primera.</p>
+              <p className="text-sm text-[#111827]/25">No hay campañas. Creá la primera.</p>
             </div>
           ) : (
             <div className="space-y-3">
@@ -438,28 +439,28 @@ export default function AdminClippingPage() {
 
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
-                        <p className="text-sm font-semibold text-white">{c.title}</p>
+                        <p className="text-sm font-semibold text-[#111827]">{c.title}</p>
                         <span className="text-[10px] px-2 py-0.5 rounded-full"
                           style={c.isActive
                             ? { background: 'rgba(0,255,136,0.1)', color: '#00FF88', border: '1px solid rgba(0,255,136,0.2)' }
-                            : { background: 'rgba(255,255,255,0.04)', color: 'rgba(255,255,255,0.3)', border: '1px solid rgba(255,255,255,0.08)' }}>
+                            : { background: 'rgba(255,255,255,0.04)', color: '#6B7280', border: '1px solid rgba(255,255,255,0.08)' }}>
                           {c.isActive ? 'Activa' : 'Pausada'}
                         </span>
                       </div>
-                      <p className="text-[11px] text-white/35 mt-0.5">
+                      <p className="text-[11px] text-[#111827]/35 mt-0.5">
                         ${Number(c.cpmUSD).toFixed(4)} CPM · Hold {c.holdHours}h · {c.minViews.toLocaleString()} vistas mín
                         {c.endsAt && ` · Vence ${new Date(c.endsAt).toLocaleDateString()}`}
                       </p>
                     </div>
 
-                    <div className="flex items-center gap-1 text-xs text-white/40 shrink-0">
+                    <div className="flex items-center gap-1 text-xs text-[#111827]/40 shrink-0">
                       <Users size={12} />
                       {c._count.submissions}
                     </div>
 
                     <div className="flex items-center gap-1 shrink-0">
                       <button onClick={() => toggleActive(c)}
-                        className="p-2 rounded-lg transition-colors hover:bg-white/8 text-white/40 hover:text-white/70"
+                        className="p-2 rounded-lg transition-colors hover:bg-white/8 text-[#111827]/40 hover:text-[#111827]/70"
                         title={c.isActive ? 'Pausar' : 'Activar'}>
                         {c.isActive
                           ? <XCircle size={14} />
@@ -467,7 +468,7 @@ export default function AdminClippingPage() {
                         }
                       </button>
                       <button onClick={() => openEdit(c)}
-                        className="p-2 rounded-lg transition-colors hover:bg-white/8 text-white/40 hover:text-white/70">
+                        className="p-2 rounded-lg transition-colors hover:bg-white/8 text-[#111827]/40 hover:text-[#111827]/70">
                         <Pencil size={14} />
                       </button>
                       <button onClick={() => deleteCampaign(c.id)}
@@ -493,7 +494,7 @@ export default function AdminClippingPage() {
                 className="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all"
                 style={statusFilter === s
                   ? { background: 'rgba(147,51,234,0.2)', color: '#a855f7', border: '1px solid rgba(147,51,234,0.3)' }
-                  : { background: 'rgba(255,255,255,0.04)', color: 'rgba(255,255,255,0.35)', border: '1px solid rgba(255,255,255,0.06)' }}>
+                  : { background: 'rgba(255,255,255,0.04)', color: '#6B7280', border: '1px solid rgba(255,255,255,0.06)' }}>
                 {s === 'ALL' ? 'Todos' : STATUS_CONFIG[s].label}
               </button>
             ))}
@@ -501,8 +502,8 @@ export default function AdminClippingPage() {
 
           {filteredSubmissions.length === 0 ? (
             <div className="text-center py-16 rounded-2xl"
-              style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)' }}>
-              <p className="text-sm text-white/25">No hay submissions en esta categoría</p>
+              style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid #F0F3F7' }}>
+              <p className="text-sm text-[#111827]/25">No hay submissions en esta categoría</p>
             </div>
           ) : (
             <div className="space-y-3">
@@ -523,16 +524,16 @@ export default function AdminClippingPage() {
                             style={{ background: `${platformColor}15`, color: platformColor, border: `1px solid ${platformColor}25` }}>
                             {sub.platform}
                           </span>
-                          <span className="text-xs font-semibold text-white/70">{sub.user.fullName}</span>
-                          <span className="text-[10px] text-white/35">@{sub.user.username}</span>
+                          <span className="text-xs font-semibold text-[#111827]/70">{sub.user.fullName}</span>
+                          <span className="text-[10px] text-[#111827]/35">@{sub.user.username}</span>
                         </div>
                         <a href={sub.videoUrl} target="_blank" rel="noopener noreferrer"
-                          className="flex items-center gap-1.5 text-sm font-semibold hover:text-white truncate transition-colors group"
+                          className="flex items-center gap-1.5 text-sm font-semibold hover:text-[#111827] truncate transition-colors group"
                           style={{ color: platformColor }}>
                           <ExternalLink size={12} className="shrink-0 opacity-60 group-hover:opacity-100" />
                           <span className="truncate">{sub.videoTitle || sub.videoId}</span>
                         </a>
-                        <p className="text-[10px] text-white/30 mt-0.5">Campaña: {sub.campaign.title}</p>
+                        <p className="text-[10px] text-[#111827]/30 mt-0.5">Campaña: {sub.campaign.title}</p>
                       </div>
 
                       <div className="text-right shrink-0">
@@ -549,8 +550,8 @@ export default function AdminClippingPage() {
                     {/* Metrics row */}
                     <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5">
                       {[
-                        { Icon: Eye, label: 'Base', value: sub.baseViews, color: 'rgba(255,255,255,0.35)' },
-                        { Icon: TrendingUp, label: 'Actuales', value: sub.currentViews, color: 'rgba(255,255,255,0.35)' },
+                        { Icon: Eye, label: 'Base', value: sub.baseViews, color: '#6B7280' },
+                        { Icon: TrendingUp, label: 'Actuales', value: sub.currentViews, color: '#6B7280' },
                         { Icon: Play, label: 'Nuevas', value: sub.deltaViews, color: '#D203DD' },
                         { Icon: Heart, label: 'Likes', value: sub.likes ?? 0, color: '#FF3388' },
                         { Icon: MessageCircle, label: 'Comentarios', value: sub.comments ?? 0, color: '#a855f7' },
@@ -606,95 +607,95 @@ export default function AdminClippingPage() {
             style={{ background: '#0d0d15', border: '1px solid rgba(255,255,255,0.08)' }}>
 
             <div className="flex items-center justify-between">
-              <h2 className="text-sm font-black uppercase tracking-widest text-white/80">
+              <h2 className="text-sm font-black uppercase tracking-widest text-[#111827]/80">
                 {editingId ? 'Editar campaña' : 'Nueva campaña'}
               </h2>
-              <button onClick={() => setShowForm(false)} className="p-1.5 rounded-lg hover:bg-white/8 text-white/40">
+              <button onClick={() => setShowForm(false)} className="p-1.5 rounded-lg hover:bg-white/8 text-[#111827]/40">
                 <X size={15} />
               </button>
             </div>
 
             <div className="space-y-3">
               <div>
-                <label className="text-[11px] font-semibold text-white/40 uppercase tracking-widest block mb-1.5">
+                <label className="text-[11px] font-semibold text-[#111827]/40 uppercase tracking-widest block mb-1.5">
                   Título
                 </label>
                 <input value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))}
                   placeholder="Ej: Campaña Marzo YouTube"
-                  className="w-full px-3 py-2.5 rounded-lg text-sm text-white outline-none"
-                  style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }} />
+                  className="w-full px-3 py-2.5 rounded-lg text-sm text-[#111827] outline-none"
+                  style={{ background: '#F0F3F7', border: '1px solid #E4E9F0' }} />
               </div>
 
               <div>
-                <label className="text-[11px] font-semibold text-white/40 uppercase tracking-widest block mb-1.5">
+                <label className="text-[11px] font-semibold text-[#111827]/40 uppercase tracking-widest block mb-1.5">
                   Descripción (opcional)
                 </label>
                 <textarea value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
                   placeholder="Instrucciones para el usuario..."
                   rows={2}
-                  className="w-full px-3 py-2.5 rounded-lg text-sm text-white outline-none resize-none"
-                  style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }} />
+                  className="w-full px-3 py-2.5 rounded-lg text-sm text-[#111827] outline-none resize-none"
+                  style={{ background: '#F0F3F7', border: '1px solid #E4E9F0' }} />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-[11px] font-semibold text-white/40 uppercase tracking-widest block mb-1.5">
+                  <label className="text-[11px] font-semibold text-[#111827]/40 uppercase tracking-widest block mb-1.5">
                     Plataforma
                   </label>
                   <select value={form.platform} onChange={e => setForm(f => ({ ...f, platform: e.target.value as Platform }))}
-                    className="w-full px-3 py-2.5 rounded-lg text-sm text-white outline-none"
-                    style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}>
+                    className="w-full px-3 py-2.5 rounded-lg text-sm text-[#111827] outline-none"
+                    style={{ background: '#F0F3F7', border: '1px solid #E4E9F0' }}>
                     <option value="YOUTUBE">YouTube</option>
                     <option value="TIKTOK">TikTok</option>
                     <option value="FACEBOOK">Facebook</option>
                   </select>
                 </div>
                 <div>
-                  <label className="text-[11px] font-semibold text-white/40 uppercase tracking-widest block mb-1.5">
+                  <label className="text-[11px] font-semibold text-[#111827]/40 uppercase tracking-widest block mb-1.5">
                     CPM (USD/1000 vistas)
                   </label>
                   <input type="number" step="0.01" min="0" value={form.cpmUSD}
                     onChange={e => setForm(f => ({ ...f, cpmUSD: e.target.value }))}
                     placeholder="1.50"
-                    className="w-full px-3 py-2.5 rounded-lg text-sm text-white outline-none"
-                    style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }} />
+                    className="w-full px-3 py-2.5 rounded-lg text-sm text-[#111827] outline-none"
+                    style={{ background: '#F0F3F7', border: '1px solid #E4E9F0' }} />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-[11px] font-semibold text-white/40 uppercase tracking-widest block mb-1.5">
+                  <label className="text-[11px] font-semibold text-[#111827]/40 uppercase tracking-widest block mb-1.5">
                     Hold (horas)
                   </label>
                   <input type="number" min="1" value={form.holdHours}
                     onChange={e => setForm(f => ({ ...f, holdHours: e.target.value }))}
-                    className="w-full px-3 py-2.5 rounded-lg text-sm text-white outline-none"
-                    style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }} />
+                    className="w-full px-3 py-2.5 rounded-lg text-sm text-[#111827] outline-none"
+                    style={{ background: '#F0F3F7', border: '1px solid #E4E9F0' }} />
                 </div>
                 <div>
-                  <label className="text-[11px] font-semibold text-white/40 uppercase tracking-widest block mb-1.5">
+                  <label className="text-[11px] font-semibold text-[#111827]/40 uppercase tracking-widest block mb-1.5">
                     Vistas mínimas
                   </label>
                   <input type="number" min="0" value={form.minViews}
                     onChange={e => setForm(f => ({ ...f, minViews: e.target.value }))}
-                    className="w-full px-3 py-2.5 rounded-lg text-sm text-white outline-none"
-                    style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }} />
+                    className="w-full px-3 py-2.5 rounded-lg text-sm text-[#111827] outline-none"
+                    style={{ background: '#F0F3F7', border: '1px solid #E4E9F0' }} />
                 </div>
               </div>
 
               <div>
-                <label className="text-[11px] font-semibold text-white/40 uppercase tracking-widest block mb-1.5">
+                <label className="text-[11px] font-semibold text-[#111827]/40 uppercase tracking-widest block mb-1.5">
                   Fecha de vencimiento (opcional)
                 </label>
                 <input type="datetime-local" value={form.endsAt}
                   onChange={e => setForm(f => ({ ...f, endsAt: e.target.value }))}
-                  className="w-full px-3 py-2.5 rounded-lg text-sm text-white outline-none"
-                  style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }} />
+                  className="w-full px-3 py-2.5 rounded-lg text-sm text-[#111827] outline-none"
+                  style={{ background: '#F0F3F7', border: '1px solid #E4E9F0' }} />
               </div>
 
               {/* Images */}
               <div>
-                <label className="text-[11px] font-semibold text-white/40 uppercase tracking-widest block mb-2">
+                <label className="text-[11px] font-semibold text-[#111827]/40 uppercase tracking-widest block mb-2">
                   Imágenes ({form.imageUrls.length})
                 </label>
 
@@ -703,12 +704,12 @@ export default function AdminClippingPage() {
                   <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 mb-2">
                     {form.imageUrls.map((url, idx) => (
                       <div key={idx} className="relative group aspect-square rounded-lg overflow-hidden"
-                        style={{ border: '1px solid rgba(255,255,255,0.1)' }}>
+                        style={{ border: '1px solid #E4E9F0' }}>
                         <img src={url} alt={`img-${idx}`} className="w-full h-full object-cover" />
                         <button type="button" onClick={() => removeImage(idx)}
                           className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
                           style={{ background: 'rgba(255,51,102,0.6)' }}>
-                          <Trash size={14} className="text-white" />
+                          <Trash size={14} className="text-[#111827]" />
                         </button>
                       </div>
                     ))}
@@ -734,23 +735,23 @@ export default function AdminClippingPage() {
                     }}
                   />
                 </label>
-                <p className="text-[10px] text-white/25 mt-1">JPG, PNG, WEBP · Máx. 10 imágenes</p>
+                <p className="text-[10px] text-[#111827]/25 mt-1">JPG, PNG, WEBP · Máx. 10 imágenes</p>
               </div>
 
               <label className="flex items-center gap-3 cursor-pointer">
                 <div onClick={() => setForm(f => ({ ...f, isActive: !f.isActive }))}
                   className="w-9 h-5 rounded-full transition-colors relative"
-                  style={{ background: form.isActive ? 'rgba(0,255,136,0.4)' : 'rgba(255,255,255,0.1)' }}>
+                  style={{ background: form.isActive ? 'rgba(0,255,136,0.4)' : '#E4E9F0' }}>
                   <div className="absolute top-0.5 w-4 h-4 rounded-full bg-white transition-all"
                     style={{ left: form.isActive ? '18px' : '2px' }} />
                 </div>
-                <span className="text-xs text-white/50">Campaña activa</span>
+                <span className="text-xs text-[#111827]/50">Campaña activa</span>
               </label>
             </div>
 
             <div className="flex gap-2 pt-2">
               <button onClick={() => setShowForm(false)}
-                className="flex-1 py-2.5 rounded-xl text-xs font-semibold text-white/40"
+                className="flex-1 py-2.5 rounded-xl text-xs font-semibold text-[#111827]/40"
                 style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)' }}>
                 Cancelar
               </button>
@@ -772,18 +773,18 @@ export default function AdminClippingPage() {
             style={{ background: '#0d0d15', border: '1px solid rgba(255,51,102,0.2)' }}>
             <h2 className="text-sm font-black uppercase tracking-widest text-red-400">Rechazar submission</h2>
             <div>
-              <label className="text-[11px] font-semibold text-white/40 uppercase tracking-widest block mb-1.5">
+              <label className="text-[11px] font-semibold text-[#111827]/40 uppercase tracking-widest block mb-1.5">
                 Motivo (opcional)
               </label>
               <textarea value={rejectReason} onChange={e => setRejectReason(e.target.value)}
                 placeholder="Ej: Vistas artificiales detectadas..."
                 rows={3}
-                className="w-full px-3 py-2.5 rounded-lg text-sm text-white outline-none resize-none"
-                style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }} />
+                className="w-full px-3 py-2.5 rounded-lg text-sm text-[#111827] outline-none resize-none"
+                style={{ background: '#F0F3F7', border: '1px solid #E4E9F0' }} />
             </div>
             <div className="flex gap-2">
               <button onClick={() => setRejectModal(null)}
-                className="flex-1 py-2.5 rounded-xl text-xs font-semibold text-white/40"
+                className="flex-1 py-2.5 rounded-xl text-xs font-semibold text-[#111827]/40"
                 style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)' }}>
                 Cancelar
               </button>
@@ -798,5 +799,6 @@ export default function AdminClippingPage() {
         </div>
       )}
     </div>
+  </div>
   )
 }

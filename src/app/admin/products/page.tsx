@@ -141,8 +141,8 @@ function formToPayload(f: FormState, existing?: Product | null) {
 }
 
 // ── Styles ─────────────────────────────────────────────────────────────────────
-const INPUT: React.CSSProperties = { width: '100%', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 10, padding: '10px 14px', color: '#fff', fontSize: 13, outline: 'none' }
-const LABEL: React.CSSProperties = { display: 'block', fontSize: 11, color: 'rgba(255,255,255,0.4)', marginBottom: 5 }
+const INPUT: React.CSSProperties = { width: '100%', background: '#F0F3F7', border: '1px solid #E4E9F0', borderRadius: 10, padding: '10px 14px', color: '#fff', fontSize: 13, outline: 'none' }
+const LABEL: React.CSSProperties = { display: 'block', fontSize: 11, color: '#6B7280', marginBottom: 5 }
 const SECTION: React.CSSProperties = { background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 14, padding: '18px 18px', marginBottom: 14 }
 const SEC_TITLE: React.CSSProperties = { fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.55)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 14, display: 'flex', alignItems: 'center', gap: 7 }
 
@@ -200,14 +200,14 @@ function ProductFormModal({
 
   return (
     <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.82)', zIndex: 50, display: 'flex', alignItems: 'flex-start', justifyContent: 'center', overflowY: 'auto', padding: '32px 16px 60px' }}>
-      <div style={{ background: '#0d1117', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 20, width: '100%', maxWidth: 660 }}>
+      <div style={{ background: '#0d1117', border: '1px solid #E4E9F0', borderRadius: 20, width: '100%', maxWidth: 660 }}>
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px 24px 16px', borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <Package size={18} style={{ color: '#D203DD' }} />
             <span style={{ fontWeight: 700, color: '#fff', fontSize: 16 }}>{isNew ? 'Nuevo producto' : 'Editar producto'}</span>
           </div>
-          <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.4)', padding: 4 }}><X size={18} /></button>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#6B7280', padding: 4 }}><X size={18} /></button>
         </div>
 
         <div style={{ padding: '20px 24px' }}>
@@ -233,8 +233,8 @@ function ProductFormModal({
             </div>
           )}
           {!isNew && (
-            <div style={{ marginBottom: 14, padding: '8px 14px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 10, fontSize: 12, color: 'rgba(255,255,255,0.4)' }}>
-              Usuario: <span style={{ color: 'rgba(255,255,255,0.7)', fontWeight: 600 }}>{editing!.user.fullName} (@{editing!.user.username})</span>
+            <div style={{ marginBottom: 14, padding: '8px 14px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 10, fontSize: 12, color: '#6B7280' }}>
+              Usuario: <span style={{ color: '#374151', fontWeight: 600 }}>{editing!.user.fullName} (@{editing!.user.username})</span>
             </div>
           )}
 
@@ -264,10 +264,10 @@ function ProductFormModal({
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
               <button type="button" onClick={() => setF('active', !form.active)}
-                style={{ width: 40, height: 22, borderRadius: 11, border: 'none', cursor: 'pointer', position: 'relative', background: form.active ? '#00FF88' : 'rgba(255,255,255,0.15)', transition: 'background 0.2s', flexShrink: 0 }}>
+                style={{ width: 40, height: 22, borderRadius: 11, border: 'none', cursor: 'pointer', position: 'relative', background: form.active ? '#00FF88' : '#E4E9F0', transition: 'background 0.2s', flexShrink: 0 }}>
                 <span style={{ position: 'absolute', top: 3, left: form.active ? 21 : 3, width: 16, height: 16, borderRadius: '50%', background: form.active ? '#000' : '#fff', transition: 'left 0.2s' }} />
               </button>
-              <span style={{ fontSize: 13, color: form.active ? '#00FF88' : 'rgba(255,255,255,0.4)' }}>{form.active ? 'Producto activo' : 'Producto inactivo'}</span>
+              <span style={{ fontSize: 13, color: form.active ? '#00FF88' : '#6B7280' }}>{form.active ? 'Producto activo' : 'Producto inactivo'}</span>
             </div>
           </div>
 
@@ -322,7 +322,7 @@ function ProductFormModal({
             <div style={{ ...SEC_TITLE, paddingTop: 10, borderTop: '1px solid rgba(255,255,255,0.06)' }}>
               <span style={{ width: 3, height: 14, background: '#00C2FF', borderRadius: 2, display: 'inline-block' }} />Videos del producto
             </div>
-            <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.3)', marginBottom: 10 }}>El agente enviará estos videos si el cliente quiere ver el producto en acción. Máx 90s.</p>
+            <p style={{ fontSize: 11, color: '#6B7280', marginBottom: 10 }}>El agente enviará estos videos si el cliente quiere ver el producto en acción. Máx 90s.</p>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
               {(['vid1','vid2'] as const).map((k,i) => (
                 <UploadField key={k} type="video" value={form[k]} onChange={v => setF(k, v)} placeholder={`Video ${i+1}`} />
@@ -336,9 +336,9 @@ function ProductFormModal({
               style={{ width: '100%', background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <div style={SEC_TITLE}>
                 <span style={{ width: 3, height: 14, background: '#00C2FF', borderRadius: 2, display: 'inline-block' }} />
-                Fotos de testimonios <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.3)', fontWeight: 400, textTransform: 'none', letterSpacing: 0 }}>(el agente las envía ante dudas)</span>
+                Fotos de testimonios <span style={{ fontSize: 10, color: '#6B7280', fontWeight: 400, textTransform: 'none', letterSpacing: 0 }}>(el agente las envía ante dudas)</span>
               </div>
-              {showTestPhotos ? <ChevronDown size={14} style={{ color: 'rgba(255,255,255,0.4)' }} /> : <ChevronRightIcon size={14} style={{ color: 'rgba(255,255,255,0.4)' }} />}
+              {showTestPhotos ? <ChevronDown size={14} style={{ color: '#6B7280' }} /> : <ChevronRightIcon size={14} style={{ color: '#6B7280' }} />}
             </button>
             {showTestPhotos && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10, paddingTop: 10 }}>
@@ -359,11 +359,11 @@ function ProductFormModal({
               <div style={SEC_TITLE}>
                 <span style={{ width: 3, height: 14, background: '#9B00FF', borderRadius: 2, display: 'inline-block' }} />Videos de testimonios
               </div>
-              {showTestVideos ? <ChevronDown size={14} style={{ color: 'rgba(255,255,255,0.4)' }} /> : <ChevronRightIcon size={14} style={{ color: 'rgba(255,255,255,0.4)' }} />}
+              {showTestVideos ? <ChevronDown size={14} style={{ color: '#6B7280' }} /> : <ChevronRightIcon size={14} style={{ color: '#6B7280' }} />}
             </button>
             {showTestVideos && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10, paddingTop: 10 }}>
-                <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.3)', marginBottom: 4 }}>El agente los envía para mayor confianza. Máx 90s.</p>
+                <p style={{ fontSize: 11, color: '#6B7280', marginBottom: 4 }}>El agente los envía para mayor confianza. Máx 90s.</p>
                 {[1,2,3,4,5,6,7].map(n => (
                   <div key={n} style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: 8, alignItems: 'start' }}>
                     <input style={INPUT} value={(form as any)[`test${n}VidLabel`]} onChange={e => setF(`test${n}VidLabel` as any, e.target.value)} placeholder={`Video testimonio ${n}`} />
@@ -376,13 +376,13 @@ function ProductFormModal({
 
           {/* Actions */}
           <div style={{ display: 'flex', gap: 10 }}>
-            <button onClick={onClose} style={{ flex: 1, padding: '12px 0', borderRadius: 12, border: '1px solid rgba(255,255,255,0.1)', background: 'transparent', color: 'rgba(255,255,255,0.4)', cursor: 'pointer', fontWeight: 600, fontSize: 14 }}>
+            <button onClick={onClose} style={{ flex: 1, padding: '12px 0', borderRadius: 12, border: '1px solid #E4E9F0', background: 'transparent', color: '#6B7280', cursor: 'pointer', fontWeight: 600, fontSize: 14 }}>
               Cancelar
             </button>
             <button onClick={handleSave} disabled={saving}
               style={{ flex: 2, padding: '12px 0', borderRadius: 12, border: 'none', cursor: saving ? 'not-allowed' : 'pointer', fontWeight: 700, fontSize: 14,
                 background: saving ? 'rgba(255,255,255,0.06)' : 'linear-gradient(135deg, #D203DD, #00FF88)',
-                color: saving ? 'rgba(255,255,255,0.3)' : '#000' }}>
+                color: saving ? '#6B7280' : '#000' }}>
               {saving ? 'Guardando...' : isNew ? 'Crear producto' : 'Guardar cambios'}
             </button>
           </div>
@@ -452,19 +452,20 @@ export default function AdminProductsPage() {
   }
 
   return (
+  <div className="dm-page font-ui">
     <div className="px-4 sm:px-6 pt-6 pb-10 max-w-5xl mx-auto">
       {/* Header */}
       <div className="mb-6">
-        <h1 className="text-xl font-bold text-white uppercase tracking-widest">Productos de Bots</h1>
+        <h1 className="text-xl font-bold text-[#111827] uppercase tracking-widest">Productos de Bots</h1>
         <div className="h-px w-20 mt-2 rounded-full" style={{ background: 'linear-gradient(90deg, transparent, #D203DD, #FF2DF7, transparent)' }} />
-        <p className="text-xs text-white/30 mt-1">Todos los productos añadidos por usuarios para sus agentes AI</p>
+        <p className="text-xs text-[#111827]/30 mt-1">Todos los productos añadidos por usuarios para sus agentes AI</p>
       </div>
 
       {/* Search + actions */}
       <div style={{ display: 'flex', gap: 8, marginBottom: 18 }}>
         <div style={{ flex: 1, display: 'flex', gap: 6 }}>
           <div style={{ flex: 1, position: 'relative' }}>
-            <Search size={13} style={{ position: 'absolute', left: 11, top: '50%', transform: 'translateY(-50%)', color: 'rgba(255,255,255,0.3)' }} />
+            <Search size={13} style={{ position: 'absolute', left: 11, top: '50%', transform: 'translateY(-50%)', color: '#6B7280' }} />
             <input value={searchInput} onChange={e => setSearchInput(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleSearch()}
               placeholder="Buscar por nombre, categoría, usuario..."
               style={{ width: '100%', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.09)', borderRadius: 9, padding: '8px 10px 8px 32px', color: '#fff', fontSize: 13, outline: 'none' }} />
@@ -474,7 +475,7 @@ export default function AdminProductsPage() {
           </button>
         </div>
         <button onClick={fetchProducts} style={{ padding: '0 10px', borderRadius: 9, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', cursor: 'pointer' }}>
-          <RefreshCw size={13} className="text-white/40" />
+          <RefreshCw size={13} className="text-[#111827]/40" />
         </button>
         <button onClick={openCreate}
           style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '0 14px', borderRadius: 9, border: 'none', background: 'linear-gradient(135deg, #D203DD, #00FF88)', color: '#000', fontWeight: 700, fontSize: 13, cursor: 'pointer' }}>
@@ -482,13 +483,13 @@ export default function AdminProductsPage() {
         </button>
       </div>
 
-      <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.25)', marginBottom: 12 }}>{total} producto{total !== 1 ? 's' : ''} en total</p>
+      <p style={{ fontSize: 12, color: '#9CA3AF', marginBottom: 12 }}>{total} producto{total !== 1 ? 's' : ''} en total</p>
 
       {/* List */}
       {loading ? (
-        <div className="flex justify-center py-16"><Loader2 size={20} className="animate-spin text-white/30" /></div>
+        <div className="flex justify-center py-16"><Loader2 size={20} className="animate-spin text-[#111827]/30" /></div>
       ) : products.length === 0 ? (
-        <div className="text-center py-16 text-white/30 text-sm">No se encontraron productos.</div>
+        <div className="text-center py-16 text-[#111827]/30 text-sm">No se encontraron productos.</div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           {products.map(p => {
@@ -505,30 +506,30 @@ export default function AdminProductsPage() {
                 <div style={{ display: 'flex', alignItems: 'flex-start', gap: 14 }}>
                   {/* First image as thumbnail */}
                   {allImages[0] ? (
-                    <img src={allImages[0]} alt="" style={{ width: 56, height: 56, borderRadius: 10, objectFit: 'cover', flexShrink: 0, border: '1px solid rgba(255,255,255,0.1)' }} />
+                    <img src={allImages[0]} alt="" style={{ width: 56, height: 56, borderRadius: 10, objectFit: 'cover', flexShrink: 0, border: '1px solid #E4E9F0' }} />
                   ) : (
                     <div style={{ width: 56, height: 56, borderRadius: 10, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      <Package size={20} style={{ color: 'rgba(255,255,255,0.2)' }} />
+                      <Package size={20} style={{ color: '#9CA3AF' }} />
                     </div>
                   )}
 
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 4 }}>
                       <span style={{ fontWeight: 700, color: '#fff', fontSize: 14 }}>{p.name}</span>
-                      {p.category && <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)', background: 'rgba(255,255,255,0.05)', padding: '2px 7px', borderRadius: 5 }}>{p.category}</span>}
-                      <span style={{ fontSize: 10, fontWeight: 700, padding: '2px 7px', borderRadius: 5, border: '1px solid', ...(p.active ? { color: '#00FF88', borderColor: 'rgba(0,255,136,0.2)', background: 'rgba(0,255,136,0.06)' } : { color: 'rgba(255,255,255,0.25)', borderColor: 'rgba(255,255,255,0.08)', background: 'transparent' }) }}>
+                      {p.category && <span style={{ fontSize: 11, color: '#6B7280', background: '#F0F3F7', padding: '2px 7px', borderRadius: 5 }}>{p.category}</span>}
+                      <span style={{ fontSize: 10, fontWeight: 700, padding: '2px 7px', borderRadius: 5, border: '1px solid', ...(p.active ? { color: '#00FF88', borderColor: 'rgba(0,255,136,0.2)', background: 'rgba(0,255,136,0.06)' } : { color: '#9CA3AF', borderColor: 'rgba(255,255,255,0.08)', background: 'transparent' }) }}>
                         {p.active ? 'Activo' : 'Inactivo'}
                       </span>
                     </div>
-                    <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', marginBottom: 3 }}>
+                    <p style={{ fontSize: 12, color: '#6B7280', marginBottom: 3 }}>
                       <span style={{ color: 'rgba(255,255,255,0.65)', fontWeight: 600 }}>{p.user.fullName}</span>
-                      <span style={{ color: 'rgba(255,255,255,0.25)' }}> · @{p.user.username}</span>
+                      <span style={{ color: '#9CA3AF' }}> · @{p.user.username}</span>
                     </p>
                     {p.bots.length > 0 && (
-                      <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.25)' }}>Bots: {p.bots.map(b => b.bot.name).join(', ')}</p>
+                      <p style={{ fontSize: 11, color: '#9CA3AF' }}>Bots: {p.bots.map(b => b.bot.name).join(', ')}</p>
                     )}
                     {(p.priceUnit != null || p.pricePromo2 != null) && (
-                      <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.3)', marginTop: 3 }}>
+                      <p style={{ fontSize: 11, color: '#6B7280', marginTop: 3 }}>
                         {[p.priceUnit != null && `${p.priceUnit} ${p.currency}`, p.pricePromo2 != null && `Oferta: ${p.pricePromo2} ${p.currency}`].filter(Boolean).join(' · ')}
                       </p>
                     )}
@@ -549,14 +550,14 @@ export default function AdminProductsPage() {
                   <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap', marginTop: 10 }}>
                     {allImages.slice(1, 7).map((url, i) => (
                       <a key={i} href={url} target="_blank" rel="noreferrer"
-                        style={{ width: 46, height: 46, borderRadius: 7, overflow: 'hidden', border: '1px solid rgba(255,255,255,0.1)', display: 'block', flexShrink: 0 }}>
+                        style={{ width: 46, height: 46, borderRadius: 7, overflow: 'hidden', border: '1px solid #E4E9F0', display: 'block', flexShrink: 0 }}>
                         <img src={url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                       </a>
                     ))}
                     {allImages.length > 7 && (
-                      <div style={{ width: 46, height: 46, borderRadius: 7, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 1 }}>
-                        <ImageIcon size={12} style={{ color: 'rgba(255,255,255,0.3)' }} />
-                        <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.35)', fontWeight: 700 }}>+{allImages.length - 7}</span>
+                      <div style={{ width: 46, height: 46, borderRadius: 7, background: '#F0F3F7', border: '1px solid #E4E9F0', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 1 }}>
+                        <ImageIcon size={12} style={{ color: '#6B7280' }} />
+                        <span style={{ fontSize: 9, color: '#6B7280', fontWeight: 700 }}>+{allImages.length - 7}</span>
                       </div>
                     )}
                     {allVideos.slice(0, 3).map((url, i) => (
@@ -587,12 +588,12 @@ export default function AdminProductsPage() {
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, marginTop: 20 }}>
           <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1}
             style={{ padding: '6px 10px', borderRadius: 8, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', cursor: page === 1 ? 'not-allowed' : 'pointer', opacity: page === 1 ? 0.4 : 1 }}>
-            <ChevronLeft size={14} className="text-white/50" />
+            <ChevronLeft size={14} className="text-[#111827]/50" />
           </button>
-          <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)' }}>Página {page} de {totalPages}</span>
+          <span style={{ fontSize: 12, color: '#6B7280' }}>Página {page} de {totalPages}</span>
           <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages}
             style={{ padding: '6px 10px', borderRadius: 8, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', cursor: page === totalPages ? 'not-allowed' : 'pointer', opacity: page === totalPages ? 0.4 : 1 }}>
-            <ChevronRight size={14} className="text-white/50" />
+            <ChevronRight size={14} className="text-[#111827]/50" />
           </button>
         </div>
       )}
@@ -610,14 +611,14 @@ export default function AdminProductsPage() {
       {/* Delete Confirm */}
       {deleteConfirm && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)', zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
-          <div style={{ background: '#0d1117', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 16, padding: 28, maxWidth: 380, width: '100%' }}>
+          <div style={{ background: '#0d1117', border: '1px solid #E4E9F0', borderRadius: 16, padding: 28, maxWidth: 380, width: '100%' }}>
             <p style={{ fontSize: 15, fontWeight: 700, color: '#fff', marginBottom: 6 }}>¿Eliminar producto?</p>
-            <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.4)', marginBottom: 4 }}>
+            <p style={{ fontSize: 13, color: '#6B7280', marginBottom: 4 }}>
               <span style={{ color: '#fff', fontWeight: 600 }}>{deleteConfirm.name}</span>
             </p>
-            <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.3)', marginBottom: 20 }}>Esta acción no se puede deshacer.</p>
+            <p style={{ fontSize: 12, color: '#6B7280', marginBottom: 20 }}>Esta acción no se puede deshacer.</p>
             <div style={{ display: 'flex', gap: 10 }}>
-              <button onClick={() => setDeleteConfirm(null)} style={{ flex: 1, padding: '9px 0', borderRadius: 8, border: '1px solid rgba(255,255,255,0.1)', background: 'transparent', color: 'rgba(255,255,255,0.4)', cursor: 'pointer', fontWeight: 600, fontSize: 13 }}>Cancelar</button>
+              <button onClick={() => setDeleteConfirm(null)} style={{ flex: 1, padding: '9px 0', borderRadius: 8, border: '1px solid #E4E9F0', background: 'transparent', color: '#6B7280', cursor: 'pointer', fontWeight: 600, fontSize: 13 }}>Cancelar</button>
               <button onClick={doDelete} disabled={deleting} style={{ flex: 1, padding: '9px 0', borderRadius: 8, border: 'none', background: '#ef4444', color: '#fff', cursor: 'pointer', fontWeight: 700, fontSize: 13 }}>
                 {deleting ? 'Eliminando...' : 'Eliminar'}
               </button>
@@ -626,5 +627,6 @@ export default function AdminProductsPage() {
         </div>
       )}
     </div>
+  </div>
   )
 }

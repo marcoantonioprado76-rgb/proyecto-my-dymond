@@ -94,6 +94,7 @@ export default function AdminCreditPurchasesPage() {
     }
 
     return (
+    <div className="dm-page font-ui">
         <div className="space-y-5">
             {/* Header */}
             <div className="flex items-center justify-between">
@@ -101,13 +102,13 @@ export default function AdminCreditPurchasesPage() {
                     <h1 className="text-xl font-black uppercase tracking-tighter flex items-center gap-2">
                         <Wallet size={18} className="text-violet-400" /> Compras de Saldo IA
                     </h1>
-                    <p className="text-xs text-white/30 mt-0.5">{requests.length} solicitudes</p>
+                    <p className="text-xs text-[#111827]/30 mt-0.5">{requests.length} solicitudes</p>
                 </div>
                 <button
                     onClick={fetchRequests}
-                    className="p-2 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-colors"
+                    className="p-2 rounded-xl bg-[#F4F6FA] border border-[#E4E9F0] hover:bg-[#EEF2F7] transition-colors"
                 >
-                    <RefreshCw size={14} className="text-white/40" />
+                    <RefreshCw size={14} className="text-[#111827]/40" />
                 </button>
             </div>
 
@@ -117,7 +118,7 @@ export default function AdminCreditPurchasesPage() {
                     <button
                         key={tab}
                         onClick={() => setActiveTab(tab)}
-                        className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all shrink-0 ${activeTab === tab ? 'bg-violet-500/15 border border-violet-500/35 text-violet-300' : 'bg-white/3 border border-white/8 text-white/40 hover:text-white/70 hover:bg-white/8'}`}>
+                        className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all shrink-0 ${activeTab === tab ? 'bg-violet-500/15 border border-violet-500/35 text-violet-300' : 'bg-white/3 border border-[#E4E9F0] text-[#111827]/40 hover:text-[#111827]/70 hover:bg-white/8'}`}>
                         {STATUS_LABEL[tab]}
                     </button>
                 ))}
@@ -131,7 +132,7 @@ export default function AdminCreditPurchasesPage() {
             ) : requests.length === 0 ? (
                 <div className="py-16 text-center rounded-2xl"
                     style={{ background: 'rgba(255,255,255,0.02)', border: '1px dashed rgba(255,255,255,0.07)' }}>
-                    <p className="text-sm text-white/35">Sin solicitudes {STATUS_LABEL[activeTab].toLowerCase()}</p>
+                    <p className="text-sm text-[#111827]/35">Sin solicitudes {STATUS_LABEL[activeTab].toLowerCase()}</p>
                 </div>
             ) : (
                 <div className="space-y-2.5">
@@ -141,16 +142,16 @@ export default function AdminCreditPurchasesPage() {
                             {/* Info */}
                             <div className="flex-1 min-w-0 space-y-1.5">
                                 <div className="flex items-center gap-2 flex-wrap">
-                                    <span className="text-sm font-bold text-white truncate">{r.user.fullName}</span>
-                                    <span className="text-[10px] text-white/30">@{r.user.username}</span>
+                                    <span className="text-sm font-bold text-[#111827] truncate">{r.user.fullName}</span>
+                                    <span className="text-[10px] text-[#111827]/30">@{r.user.username}</span>
                                     <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-full border ${STATUS_BADGE[r.status]}`}>
                                         {STATUS_LABEL[r.status]}
                                     </span>
                                 </div>
-                                <div className="text-[11px] text-white/40 flex items-center gap-3 flex-wrap">
+                                <div className="text-[11px] text-[#111827]/40 flex items-center gap-3 flex-wrap">
                                     <span>{r.user.email}</span>
                                     <span>·</span>
-                                    <span>Saldo actual: <b className="text-white/70">${Number(r.user.aiBalanceUsd).toFixed(2)}</b></span>
+                                    <span>Saldo actual: <b className="text-[#111827]/70">${Number(r.user.aiBalanceUsd).toFixed(2)}</b></span>
                                     <span>·</span>
                                     <span>{new Date(r.createdAt).toLocaleString()}</span>
                                 </div>
@@ -165,11 +166,11 @@ export default function AdminCreditPurchasesPage() {
                                             </span>
                                             <ExternalLink className="w-2.5 h-2.5 text-yellow-400/60" />
                                         </a>
-                                        <span className="text-[9px] text-white/30">BSC · USDT-BEP20</span>
+                                        <span className="text-[9px] text-[#111827]/30">BSC · USDT-BEP20</span>
                                     </div>
                                 )}
                                 {r.notes && (
-                                    <p className="text-[11px] italic text-white/40">Nota: {r.notes}</p>
+                                    <p className="text-[11px] italic text-[#111827]/40">Nota: {r.notes}</p>
                                 )}
                             </div>
 
@@ -177,7 +178,7 @@ export default function AdminCreditPurchasesPage() {
                             <div className="flex items-center gap-3 shrink-0">
                                 <div className="text-right">
                                     <p className="text-2xl font-black text-emerald-400 tabular-nums leading-none">+${Number(r.amountUsd).toFixed(2)}</p>
-                                    <p className="text-[10px] text-white/30 mt-1">{r.paymentMethod === 'MANUAL' ? 'Transferencia' : r.paymentMethod}</p>
+                                    <p className="text-[10px] text-[#111827]/30 mt-1">{r.paymentMethod === 'MANUAL' ? 'Transferencia' : r.paymentMethod}</p>
                                 </div>
 
                                 {r.paymentProofUrl && (
@@ -185,7 +186,7 @@ export default function AdminCreditPurchasesPage() {
                                         className="w-9 h-9 rounded-lg flex items-center justify-center transition-all hover:bg-white/8"
                                         style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.10)' }}
                                         title="Ver comprobante">
-                                        <ExternalLink className="w-3.5 h-3.5 text-white/50" />
+                                        <ExternalLink className="w-3.5 h-3.5 text-[#111827]/50" />
                                     </button>
                                 )}
 
@@ -242,20 +243,20 @@ export default function AdminCreditPurchasesPage() {
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
                     <div className="w-full max-w-md rounded-2xl p-5 space-y-4"
                         style={{ background: 'rgba(20,24,48,0.95)', border: '1px solid rgba(255,255,255,0.12)' }}>
-                        <h2 className="text-base font-black text-white">Rechazar solicitud</h2>
-                        <p className="text-xs text-white/50">Indicale al usuario por qué se rechaza la compra.</p>
+                        <h2 className="text-base font-black text-[#111827]">Rechazar solicitud</h2>
+                        <p className="text-xs text-[#111827]/50">Indicale al usuario por qué se rechaza la compra.</p>
                         <textarea
                             value={rejectNotes}
                             onChange={e => setRejectNotes(e.target.value)}
                             placeholder="Comprobante no válido, monto incorrecto, etc."
                             rows={3}
-                            className="w-full px-3.5 py-2.5 rounded-xl text-sm text-white outline-none resize-none"
-                            style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.12)' }}
+                            className="w-full px-3.5 py-2.5 rounded-xl text-sm text-[#111827] outline-none resize-none"
+                            style={{ background: '#F0F3F7', border: '1px solid rgba(255,255,255,0.12)' }}
                         />
                         <div className="flex gap-2">
                             <button onClick={() => { setRejectModal(null); setRejectNotes('') }}
                                 className="flex-1 py-2.5 rounded-xl text-sm font-bold transition-all"
-                                style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.10)', color: 'rgba(255,255,255,0.75)' }}>
+                                style={{ background: '#F0F3F7', border: '1px solid rgba(255,255,255,0.10)', color: 'rgba(255,255,255,0.75)' }}>
                                 Cancelar
                             </button>
                             <button onClick={() => handleAction(rejectModal.id, 'reject', rejectNotes)}
@@ -275,11 +276,12 @@ export default function AdminCreditPurchasesPage() {
                     onClick={() => setProofPreview(null)}>
                     <img src={proofPreview} alt="Comprobante" className="max-w-full max-h-[90vh] rounded-2xl shadow-2xl" />
                     <button onClick={() => setProofPreview(null)}
-                        className="absolute top-4 right-4 w-10 h-10 rounded-xl flex items-center justify-center bg-black/60 backdrop-blur-md border border-white/20">
-                        <X className="w-5 h-5 text-white" />
+                        className="absolute top-4 right-4 w-10 h-10 rounded-xl flex items-center justify-center bg-black/60 backdrop-blur-md border border-[#E4E9F0]">
+                        <X className="w-5 h-5 text-[#111827]" />
                     </button>
                 </div>
             )}
         </div>
+    </div>
     )
 }

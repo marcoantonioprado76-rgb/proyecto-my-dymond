@@ -119,11 +119,12 @@ export default function AdminOverviewPage() {
   ]
 
   return (
+  <div className="dm-page font-ui">
     <div className="space-y-6">
       {/* Header */}
       <div>
         <h1 className="text-2xl font-black uppercase tracking-tighter">Resumen General</h1>
-        <p className="text-xs text-white/30 mt-0.5">Panel de administración MY DIAMOND</p>
+        <p className="text-xs text-[#111827]/30 mt-0.5">Panel de administración MY DIAMOND</p>
       </div>
 
       {/* Stats */}
@@ -140,7 +141,7 @@ export default function AdminOverviewPage() {
               )}
               <Icon size={15} className={`${s.color} mb-2`} />
               <p className={`text-xl font-black ${s.color}`}>{s.value}</p>
-              <p className="text-[10px] text-white/30 font-bold uppercase tracking-widest mt-0.5">{s.label}</p>
+              <p className="text-[10px] text-[#111827]/30 font-bold uppercase tracking-widest mt-0.5">{s.label}</p>
             </div>
           )
           return s.href ? <Link href={s.href} key={i}>{card}</Link> : card
@@ -150,11 +151,11 @@ export default function AdminOverviewPage() {
       {/* Two columns */}
       <div className="grid md:grid-cols-2 gap-4">
         {/* Pending purchases */}
-        <div className="bg-white/[0.025] border border-white/8 rounded-2xl overflow-hidden">
-          <div className="flex items-center justify-between px-4 py-3 border-b border-white/5">
+        <div className="bg-white/[0.025] border border-[#E4E9F0] rounded-2xl overflow-hidden">
+          <div className="flex items-center justify-between px-4 py-3 border-b border-[#E4E9F0]">
             <div className="flex items-center gap-2">
               <ShoppingBag size={13} className="text-orange-400" />
-              <p className="text-xs font-black uppercase tracking-widest text-white/50">Compras Pendientes</p>
+              <p className="text-xs font-black uppercase tracking-widest text-[#111827]/50">Compras Pendientes</p>
             </div>
             <Link href="/admin/purchases" className="text-[10px] text-purple-400 hover:text-purple-300 flex items-center gap-1">
               Ver todo <ArrowRight size={10} />
@@ -163,7 +164,7 @@ export default function AdminOverviewPage() {
 
           {recentPurchases.length === 0 ? (
             <div className="px-4 py-8 text-center">
-              <p className="text-xs text-white/20">No hay compras pendientes</p>
+              <p className="text-xs text-[#111827]/20">No hay compras pendientes</p>
             </div>
           ) : (
             <div className="divide-y divide-white/5">
@@ -171,12 +172,12 @@ export default function AdminOverviewPage() {
                 <div key={r.id} className="flex items-center gap-3 px-4 py-3">
                   <div className="min-w-0 flex-1">
                     <p className="text-xs font-bold truncate">{r.user.fullName}</p>
-                    <p className="text-[10px] text-white/30">@{r.user.username}</p>
+                    <p className="text-[10px] text-[#111827]/30">@{r.user.username}</p>
                   </div>
-                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${PLAN_COLORS[r.plan] ?? 'text-white/40 bg-white/5 border-white/10'}`}>
+                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${PLAN_COLORS[r.plan] ?? 'text-[#111827]/40 bg-[#F4F6FA] border-[#E4E9F0]'}`}>
                     {r.plan}
                   </span>
-                  <span className="text-xs font-black text-white/70">${r.price}</span>
+                  <span className="text-xs font-black text-[#111827]/70">${r.price}</span>
                 </div>
               ))}
             </div>
@@ -184,11 +185,11 @@ export default function AdminOverviewPage() {
         </div>
 
         {/* Pending withdrawals */}
-        <div className="bg-white/[0.025] border border-white/8 rounded-2xl overflow-hidden">
-          <div className="flex items-center justify-between px-4 py-3 border-b border-white/5">
+        <div className="bg-white/[0.025] border border-[#E4E9F0] rounded-2xl overflow-hidden">
+          <div className="flex items-center justify-between px-4 py-3 border-b border-[#E4E9F0]">
             <div className="flex items-center gap-2">
               <Wallet size={13} className="text-pink-400" />
-              <p className="text-xs font-black uppercase tracking-widest text-white/50">Retiros Pendientes</p>
+              <p className="text-xs font-black uppercase tracking-widest text-[#111827]/50">Retiros Pendientes</p>
             </div>
             <Link href="/admin/withdrawals" className="text-[10px] text-purple-400 hover:text-purple-300 flex items-center gap-1">
               Ver todo <ArrowRight size={10} />
@@ -197,7 +198,7 @@ export default function AdminOverviewPage() {
 
           {recentWithdrawals.length === 0 ? (
             <div className="px-4 py-8 text-center">
-              <p className="text-xs text-white/20">No hay retiros pendientes</p>
+              <p className="text-xs text-[#111827]/20">No hay retiros pendientes</p>
             </div>
           ) : (
             <div className="divide-y divide-white/5">
@@ -205,7 +206,7 @@ export default function AdminOverviewPage() {
                 <div key={r.id} className="flex items-center gap-3 px-4 py-3">
                   <div className="min-w-0 flex-1">
                     <p className="text-xs font-bold truncate">{r.user.fullName}</p>
-                    <p className="text-[10px] text-white/30">@{r.user.username}</p>
+                    <p className="text-[10px] text-[#111827]/30">@{r.user.username}</p>
                   </div>
                   <div className="flex items-center gap-1 text-xs font-black text-yellow-400">
                     <Clock size={10} />
@@ -218,5 +219,6 @@ export default function AdminOverviewPage() {
         </div>
       </div>
     </div>
+  </div>
   )
 }

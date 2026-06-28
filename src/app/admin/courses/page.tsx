@@ -283,9 +283,10 @@ export default function AdminCoursesPage() {
 
   // 
   return (
+  <div className="dm-page font-ui">
     <div>
       <div style={{ marginBottom: 24 }}>
-        <h1 className="text-xl font-bold text-white uppercase tracking-widest">JD Academy</h1>
+        <h1 className="text-xl font-bold text-[#111827] uppercase tracking-widest">JD Academy</h1>
         <div className="h-px w-16 mt-2 rounded-full" style={{ background: 'linear-gradient(90deg, transparent, #D203DD, #FF2DF7, transparent)' }} />
       </div>
 
@@ -296,7 +297,7 @@ export default function AdminCoursesPage() {
             style={{
               padding: '8px 16px', fontSize: 13, fontWeight: 600, cursor: 'pointer', border: 'none',
               background: 'none', borderBottom: activeTab === tab ? '2px solid #D203DD' : '2px solid transparent',
-              color: activeTab === tab ? '#D203DD' : 'rgba(255,255,255,0.4)',
+              color: activeTab === tab ? '#D203DD' : '#6B7280',
               marginBottom: -1,
             }}>
             {tab === 'courses' ? 'Cursos' : 'Inscripciones'}
@@ -308,7 +309,7 @@ export default function AdminCoursesPage() {
       {activeTab === 'courses' && (
         <div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-            <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.35)' }}>{courses.length} curso{courses.length !== 1 ? 's' : ''}</p>
+            <p style={{ fontSize: 13, color: '#6B7280' }}>{courses.length} curso{courses.length !== 1 ? 's' : ''}</p>
             <button
               onClick={() => { setSaveError(null); setCourseModal({ mode: 'create', data: { ...EMPTY_COURSE, videos: [{ title: '', youtubeUrl: '' }] } }) }}
               style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px', borderRadius: 10, fontSize: 13, fontWeight: 700,
@@ -319,9 +320,9 @@ export default function AdminCoursesPage() {
           </div>
 
           {coursesLoading ? (
-            <div className="flex justify-center py-16"><Loader2 size={20} className="animate-spin text-white/30" /></div>
+            <div className="flex justify-center py-16"><Loader2 size={20} className="animate-spin text-[#111827]/30" /></div>
           ) : courses.length === 0 ? (
-            <div className="text-center py-16 text-white/30 text-sm">No hay cursos aún.</div>
+            <div className="text-center py-16 text-[#111827]/30 text-sm">No hay cursos aún.</div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               {courses.map(c => (
@@ -336,7 +337,7 @@ export default function AdminCoursesPage() {
                       <img src={c.coverUrl} alt={c.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                     ) : (
                       <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        <BookOpen size={16} className="text-white/20" />
+                        <BookOpen size={16} className="text-[#111827]/20" />
                       </div>
                     )}
                   </div>
@@ -344,7 +345,7 @@ export default function AdminCoursesPage() {
                   {/* Info */}
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <p style={{ fontSize: 14, fontWeight: 700, color: '#fff', marginBottom: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.title}</p>
-                    <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)' }}>
+                    <p style={{ fontSize: 11, color: '#6B7280' }}>
                       {Number(c.price).toFixed(2)} USDT · {c._count.videos} vid · {c._count.enrollments} inscritos
                     </p>
                   </div>
@@ -369,8 +370,8 @@ export default function AdminCoursesPage() {
                       }
                     })
                   }}
-                    style={{ padding: '6px 10px', borderRadius: 8, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)', cursor: 'pointer' }}>
-                    <Edit2 size={13} className="text-white/50" />
+                    style={{ padding: '6px 10px', borderRadius: 8, background: '#F0F3F7', border: '1px solid rgba(255,255,255,0.08)', cursor: 'pointer' }}>
+                    <Edit2 size={13} className="text-[#111827]/50" />
                   </button>
                   <button onClick={() => setDeleteId(c.id)}
                     style={{ padding: '6px 10px', borderRadius: 8, background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', cursor: 'pointer' }}>
@@ -381,8 +382,8 @@ export default function AdminCoursesPage() {
                   {/* Badges row */}
                   <div style={{ display: 'flex', gap: 6, marginTop: 10, flexWrap: 'wrap' }}>
                     <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.06em', padding: '3px 8px', borderRadius: 6,
-                      color: c.active ? '#00FF88' : 'rgba(255,255,255,0.3)',
-                      background: c.active ? 'rgba(0,255,136,0.08)' : 'rgba(255,255,255,0.05)',
+                      color: c.active ? '#00FF88' : '#6B7280',
+                      background: c.active ? 'rgba(0,255,136,0.08)' : '#F0F3F7',
                       border: `1px solid ${c.active ? 'rgba(0,255,136,0.2)' : 'rgba(255,255,255,0.08)'}` }}>
                       {c.active ? 'Activo' : 'Inactivo'}
                     </span>
@@ -410,19 +411,19 @@ export default function AdminCoursesPage() {
                 style={{ padding: '5px 12px', borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: 'pointer', border: '1px solid',
                   borderColor: enrollmentTab === s ? 'rgba(210,3,221,0.4)' : 'rgba(255,255,255,0.08)',
                   background: enrollmentTab === s ? 'rgba(210,3,221,0.08)' : 'transparent',
-                  color: enrollmentTab === s ? '#D203DD' : 'rgba(255,255,255,0.4)' }}>
+                  color: enrollmentTab === s ? '#D203DD' : '#6B7280' }}>
                 {s === 'ALL' ? 'Todas' : STATUS_LABEL[s]}
               </button>
             ))}
-            <button onClick={fetchEnrollments} style={{ marginLeft: 'auto', padding: '5px 10px', borderRadius: 8, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)', cursor: 'pointer' }}>
-              <RefreshCw size={12} className="text-white/40" />
+            <button onClick={fetchEnrollments} style={{ marginLeft: 'auto', padding: '5px 10px', borderRadius: 8, background: '#F0F3F7', border: '1px solid rgba(255,255,255,0.08)', cursor: 'pointer' }}>
+              <RefreshCw size={12} className="text-[#111827]/40" />
             </button>
           </div>
 
           {enrollmentsLoading ? (
-            <div className="flex justify-center py-16"><Loader2 size={20} className="animate-spin text-white/30" /></div>
+            <div className="flex justify-center py-16"><Loader2 size={20} className="animate-spin text-[#111827]/30" /></div>
           ) : enrollments.length === 0 ? (
-            <div className="text-center py-16 text-white/30 text-sm">No hay inscripciones.</div>
+            <div className="text-center py-16 text-[#111827]/30 text-sm">No hay inscripciones.</div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               {enrollments.map(e => (
@@ -431,12 +432,12 @@ export default function AdminCoursesPage() {
                   <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12, flexWrap: 'wrap' }}>
                     <div style={{ flex: 1, minWidth: 200 }}>
                       <p style={{ fontSize: 14, fontWeight: 700, color: '#fff' }}>{e.user.fullName}</p>
-                      <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.35)' }}>{e.user.username} · {e.user.email}</p>
-                      <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', marginTop: 4 }}>
+                      <p style={{ fontSize: 12, color: '#6B7280' }}>{e.user.username} · {e.user.email}</p>
+                      <p style={{ fontSize: 12, color: '#6B7280', marginTop: 4 }}>
                         Curso: <span style={{ color: '#D203DD' }}>{e.course.title}</span>
-                        <span style={{ color: 'rgba(255,255,255,0.3)' }}> — {Number(e.course.price).toFixed(2)} USDT</span>
+                        <span style={{ color: '#6B7280' }}> — {Number(e.course.price).toFixed(2)} USDT</span>
                       </p>
-                      <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.25)', marginTop: 2 }}>
+                      <p style={{ fontSize: 11, color: '#9CA3AF', marginTop: 2 }}>
                         {new Date(e.createdAt).toLocaleString('es-CO')}
                       </p>
                     </div>
@@ -482,7 +483,7 @@ export default function AdminCoursesPage() {
                     </div>
                   </div>
                   {e.notes && (
-                    <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.3)', marginTop: 8 }}>Nota: {e.notes}</p>
+                    <p style={{ fontSize: 11, color: '#6B7280', marginTop: 8 }}>Nota: {e.notes}</p>
                   )}
                 </div>
               ))}
@@ -496,7 +497,7 @@ export default function AdminCoursesPage() {
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(4px)',
           display: 'flex', alignItems: 'flex-start', justifyContent: 'center', zIndex: 50, padding: '24px 16px', overflowY: 'auto' }}
           onClick={e => { if (e.target === e.currentTarget) setCourseModal(null) }}>
-          <div style={{ background: '#0d0d15', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 20,
+          <div style={{ background: '#0d0d15', border: '1px solid #E4E9F0', borderRadius: 20,
             padding: 'clamp(16px, 5vw, 28px)', width: '100%', maxWidth: 540, boxSizing: 'border-box' }}>
             <h3 style={{ fontSize: 16, fontWeight: 700, color: '#fff', marginBottom: 20 }}>
               {courseModal.mode === 'create' ? 'Nuevo curso' : 'Editar curso'}
@@ -509,7 +510,7 @@ export default function AdminCoursesPage() {
               { label: 'Precio (USDT)', key: 'price', placeholder: '0.00' },
             ].map(({ label, key, placeholder, multiline }) => (
               <div key={key} style={{ marginBottom: 14 }}>
-                <label style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', display: 'block', marginBottom: 5 }}>{label}</label>
+                <label style={{ fontSize: 12, color: '#6B7280', display: 'block', marginBottom: 5 }}>{label}</label>
                 {multiline ? (
                   <textarea
                     value={(courseModal.data as any)[key]}
@@ -517,7 +518,7 @@ export default function AdminCoursesPage() {
                     placeholder={placeholder}
                     rows={3}
                     style={{ width: '100%', padding: '9px 12px', borderRadius: 10, fontSize: 13, color: '#fff',
-                      background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', outline: 'none', resize: 'vertical', boxSizing: 'border-box' }}
+                      background: '#F0F3F7', border: '1px solid #E4E9F0', outline: 'none', resize: 'vertical', boxSizing: 'border-box' }}
                   />
                 ) : (
                   <input
@@ -526,7 +527,7 @@ export default function AdminCoursesPage() {
                     onChange={e => setCourseModal({ ...courseModal, data: { ...courseModal.data, [key]: e.target.value } })}
                     placeholder={placeholder}
                     style={{ width: '100%', padding: '9px 12px', borderRadius: 10, fontSize: 13, color: '#fff',
-                      background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', outline: 'none', boxSizing: 'border-box' }}
+                      background: '#F0F3F7', border: '1px solid #E4E9F0', outline: 'none', boxSizing: 'border-box' }}
                   />
                 )}
               </div>
@@ -534,7 +535,7 @@ export default function AdminCoursesPage() {
 
             {/* Cover image upload */}
             <div style={{ marginBottom: 14 }}>
-              <label style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', display: 'block', marginBottom: 5 }}>Portada del curso</label>
+              <label style={{ fontSize: 12, color: '#6B7280', display: 'block', marginBottom: 5 }}>Portada del curso</label>
               <input
                 ref={coverInputRef}
                 type="file"
@@ -547,17 +548,17 @@ export default function AdminCoursesPage() {
                   <img src={courseModal.data.coverUrl} alt="portada" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                   <button
                     onClick={() => setCourseModal({ ...courseModal, data: { ...courseModal.data, coverUrl: '' } })}
-                    style={{ position: 'absolute', top: 6, right: 6, background: 'rgba(0,0,0,0.6)', border: 'none', borderRadius: 6, cursor: 'pointer', padding: '4px 6px' }}>
-                    <X size={12} className="text-white" />
+                    style={{ position: 'absolute', top: 6, right: 6, background: 'rgba(15,23,42,0.10)', border: 'none', borderRadius: 6, cursor: 'pointer', padding: '4px 6px' }}>
+                    <X size={12} className="text-[#111827]" />
                   </button>
                 </div>
               ) : (
                 <button
                   onClick={() => coverInputRef.current?.click()}
                   disabled={uploadingCover}
-                  style={{ width: '100%', height: 90, borderRadius: 10, border: '1.5px dashed rgba(255,255,255,0.15)',
+                  style={{ width: '100%', height: 90, borderRadius: 10, border: '1.5px dashed #E4E9F0',
                     background: 'rgba(255,255,255,0.03)', cursor: uploadingCover ? 'wait' : 'pointer',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, color: 'rgba(255,255,255,0.4)', fontSize: 13 }}>
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, color: '#6B7280', fontSize: 13 }}>
                   {uploadingCover
                     ? <><Loader2 size={15} className="animate-spin" /> Subiendo...</>
                     : <><Upload size={15} /> Subir imagen desde computadora</>}
@@ -568,7 +569,7 @@ export default function AdminCoursesPage() {
             {/* Categoría + Nivel */}
             <div style={{ display: 'flex', gap: 10, marginBottom: 14 }}>
               <div style={{ flex: 1 }}>
-                <label style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', display: 'block', marginBottom: 5 }}>Categoría</label>
+                <label style={{ fontSize: 12, color: '#6B7280', display: 'block', marginBottom: 5 }}>Categoría</label>
                 <input
                   type="text"
                   list="course-categorias"
@@ -576,19 +577,19 @@ export default function AdminCoursesPage() {
                   onChange={e => setCourseModal({ ...courseModal, data: { ...courseModal.data, categoria: e.target.value } })}
                   placeholder="Ej. Ventas, Mindset, Producto"
                   style={{ width: '100%', padding: '9px 12px', borderRadius: 10, fontSize: 13, color: '#fff',
-                    background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', outline: 'none', boxSizing: 'border-box' }}
+                    background: '#F0F3F7', border: '1px solid #E4E9F0', outline: 'none', boxSizing: 'border-box' }}
                 />
                 <datalist id="course-categorias">
                   {Array.from(new Set(courses.map(c => c.categoria).filter(Boolean))).map(cat => <option key={cat as string} value={cat as string} />)}
                 </datalist>
               </div>
               <div style={{ width: 150 }}>
-                <label style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', display: 'block', marginBottom: 5 }}>Nivel</label>
+                <label style={{ fontSize: 12, color: '#6B7280', display: 'block', marginBottom: 5 }}>Nivel</label>
                 <select
                   value={courseModal.data.nivel}
                   onChange={e => setCourseModal({ ...courseModal, data: { ...courseModal.data, nivel: e.target.value } })}
                   style={{ width: '100%', padding: '9px 12px', borderRadius: 10, fontSize: 13, color: '#fff',
-                    background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', outline: 'none', boxSizing: 'border-box' }}>
+                    background: '#F0F3F7', border: '1px solid #E4E9F0', outline: 'none', boxSizing: 'border-box' }}>
                   <option value="" style={{ background: '#1a1a1a' }}>—</option>
                   <option value="Principiante" style={{ background: '#1a1a1a' }}>Principiante</option>
                   <option value="Intermedio" style={{ background: '#1a1a1a' }}>Intermedio</option>
@@ -608,7 +609,7 @@ export default function AdminCoursesPage() {
                   cursor: 'pointer', textAlign: 'left' }}>
                 {/* Switch */}
                 <div style={{ width: 36, height: 20, borderRadius: 10, flexShrink: 0, position: 'relative', transition: 'background 0.2s',
-                  background: courseModal.data.freeForPlan ? '#00FF88' : 'rgba(255,255,255,0.15)' }}>
+                  background: courseModal.data.freeForPlan ? '#00FF88' : '#E4E9F0' }}>
                   <div style={{ position: 'absolute', top: 3, left: courseModal.data.freeForPlan ? 19 : 3, width: 14, height: 14,
                     borderRadius: '50%', background: '#fff', transition: 'left 0.2s' }} />
                 </div>
@@ -616,7 +617,7 @@ export default function AdminCoursesPage() {
                   <p style={{ fontSize: 13, fontWeight: 600, color: courseModal.data.freeForPlan ? '#00FF88' : '#fff', marginBottom: 1 }}>
                     Gratis para usuarios con plan
                   </p>
-                  <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)' }}>
+                  <p style={{ fontSize: 11, color: '#6B7280' }}>
                     {courseModal.data.freeForPlan
                       ? 'El acceso se aprueba automáticamente para usuarios con cualquier plan activo'
                       : 'Los usuarios pagan con USDT (cripto, auto-verificado) o comprobante manual'}
@@ -628,7 +629,7 @@ export default function AdminCoursesPage() {
             {/* Videos */}
             <div style={{ marginBottom: 14 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-                <label style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)' }}>Videos del curso</label>
+                <label style={{ fontSize: 12, color: '#6B7280' }}>Videos del curso</label>
                 <button onClick={addVideo}
                   style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 11, color: '#D203DD', background: 'none', border: 'none', cursor: 'pointer' }}>
                   <Plus size={12} /> Agregar
@@ -648,7 +649,7 @@ export default function AdminCoursesPage() {
                         placeholder="Sección / Módulo (opcional, ej. Introducción)"
                         style={{ width: '100%', padding: '7px 10px', borderRadius: 8, fontSize: 11, color: 'rgba(255,255,255,0.85)', marginBottom: 6,
                           background: 'rgba(210,3,221,0.05)', border: '1px solid rgba(210,3,221,0.2)', outline: 'none', boxSizing: 'border-box' }} />
-                      <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, color: v.preview ? '#00FF88' : 'rgba(255,255,255,0.5)', cursor: 'pointer', marginBottom: 6 }}>
+                      <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, color: v.preview ? '#00FF88' : '#6B7280', cursor: 'pointer', marginBottom: 6 }}>
                         <input type="checkbox" checked={!!v.preview} onChange={e => setVideo(idx, 'preview', e.target.checked)} />
                         🎁 Gratis (preview) — se puede ver sin inscribirse
                       </label>
@@ -657,12 +658,12 @@ export default function AdminCoursesPage() {
                       {hasVideo ? (
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, color: '#00FF88', background: 'rgba(0,255,136,0.08)', border: '1px solid rgba(0,255,136,0.2)', borderRadius: 8, padding: '8px 10px' }}>
                           <Check size={13} /> <span style={{ flex: 1 }}>Video subido</span>
-                          <button onClick={() => setVideo(idx, 'videoUrl', '')} style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}>cambiar</button>
+                          <button onClick={() => setVideo(idx, 'videoUrl', '')} style={{ fontSize: 11, color: '#6B7280', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}>cambiar</button>
                         </div>
                       ) : up !== null ? (
-                        <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.6)', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 8, padding: '8px 10px' }}>
+                        <div style={{ fontSize: 11, color: '#6B7280', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 8, padding: '8px 10px' }}>
                           Subiendo… {up}%
-                          <div style={{ height: 4, borderRadius: 4, background: 'rgba(255,255,255,0.1)', marginTop: 6, overflow: 'hidden' }}>
+                          <div style={{ height: 4, borderRadius: 4, background: '#E4E9F0', marginTop: 6, overflow: 'hidden' }}>
                             <div style={{ height: '100%', width: `${up}%`, background: 'linear-gradient(90deg,#D203DD,#00FF88)', transition: 'width 0.2s' }} />
                           </div>
                         </div>
@@ -691,7 +692,7 @@ export default function AdminCoursesPage() {
                       {/* Recursos descargables */}
                       <div style={{ marginTop: 6 }}>
                         {(v.recursos || []).map((r, j) => (
-                          <div key={j} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, color: 'rgba(255,255,255,0.7)', background: 'rgba(255,255,255,0.04)', borderRadius: 6, padding: '5px 8px', marginBottom: 4 }}>
+                          <div key={j} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, color: '#374151', background: 'rgba(255,255,255,0.04)', borderRadius: 6, padding: '5px 8px', marginBottom: 4 }}>
                             <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>📎 {r.titulo}</span>
                             <button onClick={() => removeResource(idx, j)} style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', fontSize: 12 }}>✕</button>
                           </div>
@@ -709,7 +710,7 @@ export default function AdminCoursesPage() {
                   </div>
                 )
               })}
-              <p style={{ fontSize: 10.5, color: 'rgba(255,255,255,0.3)', marginTop: 2 }}>Subí el video (queda en tu Supabase) o pegá un Vimeo. Si el video es muy pesado, comprimilo a 1080p.</p>
+              <p style={{ fontSize: 10.5, color: '#6B7280', marginTop: 2 }}>Subí el video (queda en tu Supabase) o pegá un Vimeo. Si el video es muy pesado, comprimilo a 1080p.</p>
             </div>
 
             {saveError && <p style={{ fontSize: 12, color: '#ef4444', marginBottom: 10 }}>{saveError}</p>}
@@ -717,7 +718,7 @@ export default function AdminCoursesPage() {
             <div style={{ display: 'flex', gap: 10, marginTop: 6 }}>
               <button onClick={() => setCourseModal(null)}
                 style={{ flex: 1, padding: '10px 0', borderRadius: 10, fontSize: 13, fontWeight: 600,
-                  background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.6)', cursor: 'pointer' }}>
+                  background: '#F0F3F7', border: '1px solid #E4E9F0', color: '#6B7280', cursor: 'pointer' }}>
                 Cancelar
               </button>
               <button onClick={saveCourse} disabled={saving}
@@ -736,16 +737,16 @@ export default function AdminCoursesPage() {
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(4px)',
           display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 50, padding: '0 16px' }}
           onClick={e => { if (e.target === e.currentTarget) setRejectModal(null) }}>
-          <div style={{ background: '#0d0d15', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 18, padding: 24, width: '100%', maxWidth: 400 }}>
+          <div style={{ background: '#0d0d15', border: '1px solid #E4E9F0', borderRadius: 18, padding: 24, width: '100%', maxWidth: 400 }}>
             <h3 style={{ fontSize: 15, fontWeight: 700, color: '#fff', marginBottom: 12 }}>Rechazar inscripción</h3>
-            <label style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', display: 'block', marginBottom: 6 }}>Motivo (opcional)</label>
+            <label style={{ fontSize: 12, color: '#6B7280', display: 'block', marginBottom: 6 }}>Motivo (opcional)</label>
             <textarea value={rejectNotes} onChange={e => setRejectNotes(e.target.value)} rows={3} placeholder="Ej: Comprobante no válido"
               style={{ width: '100%', padding: '9px 12px', borderRadius: 10, fontSize: 13, color: '#fff',
-                background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', outline: 'none', resize: 'none', boxSizing: 'border-box' }} />
+                background: '#F0F3F7', border: '1px solid #E4E9F0', outline: 'none', resize: 'none', boxSizing: 'border-box' }} />
             <div style={{ display: 'flex', gap: 10, marginTop: 16 }}>
               <button onClick={() => setRejectModal(null)}
                 style={{ flex: 1, padding: '9px 0', borderRadius: 10, fontSize: 13, fontWeight: 600,
-                  background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.6)', cursor: 'pointer' }}>
+                  background: '#F0F3F7', border: '1px solid #E4E9F0', color: '#6B7280', cursor: 'pointer' }}>
                 Cancelar
               </button>
               <button onClick={() => handleEnrollmentAction(rejectModal.id, 'reject', rejectNotes)}
@@ -766,13 +767,13 @@ export default function AdminCoursesPage() {
           onClick={e => { if (e.target === e.currentTarget) setDeleteId(null) }}>
           <div style={{ background: '#0d0d15', border: '1px solid rgba(239,68,68,0.2)', borderRadius: 18, padding: 24, width: '100%', maxWidth: 360, textAlign: 'center' }}>
             <p style={{ fontSize: 14, fontWeight: 700, color: '#fff', marginBottom: 8 }}>¿Eliminar curso?</p>
-            <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', marginBottom: 20 }}>
+            <p style={{ fontSize: 12, color: '#6B7280', marginBottom: 20 }}>
               Se eliminarán todos sus videos e inscripciones. Esta acción no se puede deshacer.
             </p>
             <div style={{ display: 'flex', gap: 10 }}>
               <button onClick={() => setDeleteId(null)}
                 style={{ flex: 1, padding: '9px 0', borderRadius: 10, fontSize: 13, fontWeight: 600,
-                  background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.6)', cursor: 'pointer' }}>
+                  background: '#F0F3F7', border: '1px solid #E4E9F0', color: '#6B7280', cursor: 'pointer' }}>
                 Cancelar
               </button>
               <button onClick={deleteCourse} disabled={deleting}
@@ -785,5 +786,6 @@ export default function AdminCoursesPage() {
         </div>
       )}
     </div>
+  </div>
   )
 }

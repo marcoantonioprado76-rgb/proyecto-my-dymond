@@ -189,7 +189,7 @@ export default function AdminSettingsPage() {
   const PriceInput = ({ settingKey, placeholder = '0' }: { settingKey: string; placeholder?: string }) => (
     <div className="flex items-center gap-2">
       <div className="relative">
-        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-white/40 text-sm font-bold">$</span>
+        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#111827]/40 text-sm font-bold">$</span>
         <input
           type="number"
           min="1"
@@ -197,13 +197,13 @@ export default function AdminSettingsPage() {
           placeholder={placeholder}
           value={prices[settingKey] ?? ''}
           onChange={e => setPrices(prev => ({ ...prev, [settingKey]: e.target.value }))}
-          className="w-28 bg-black/30 border border-white/15 rounded-xl pl-6 pr-3 py-2 text-sm font-bold text-white outline-none focus:border-white/30 text-right"
+          className="w-28 bg-black/30 border border-[#E4E9F0] rounded-xl pl-6 pr-3 py-2 text-sm font-bold text-white outline-none focus:border-white/30 text-right"
         />
       </div>
       <button
         onClick={() => saveKey(settingKey)}
         disabled={saving === settingKey}
-        className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white/10 hover:bg-white/15 border border-white/15 text-xs font-bold transition-colors disabled:opacity-50 whitespace-nowrap"
+        className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#EEF2F7] hover:bg-white/15 border border-[#E4E9F0] text-xs font-bold transition-colors disabled:opacity-50 whitespace-nowrap"
       >
         {saving === settingKey
           ? <Loader2 size={12} className="animate-spin" />
@@ -216,14 +216,15 @@ export default function AdminSettingsPage() {
   )
 
   return (
+  <div className="dm-page font-ui">
     <div className="space-y-8 max-w-2xl">
 
       {/* Header */}
       <div>
         <h1 className="text-xl font-black uppercase tracking-tighter flex items-center gap-2">
-          <Settings size={18} className="text-white/50" /> Configuración
+          <Settings size={18} className="text-[#111827]/50" /> Configuración
         </h1>
-        <p className="text-xs text-white/30 mt-0.5">Precios de planes, renovaciones y métodos de pago.</p>
+        <p className="text-xs text-[#111827]/30 mt-0.5">Precios de planes, renovaciones y métodos de pago.</p>
       </div>
 
       {loading ? (
@@ -235,26 +236,26 @@ export default function AdminSettingsPage() {
           {/* ── Plan Prices ─────────────────────────────── */}
           <section className="space-y-3">
             <div className="flex items-center gap-2 mb-1">
-              <DollarSign size={13} className="text-white/40" />
-              <p className="text-[10px] font-black uppercase tracking-widest text-white/40">Precios de Planes</p>
+              <DollarSign size={13} className="text-[#111827]/40" />
+              <p className="text-[10px] font-black uppercase tracking-widest text-[#111827]/40">Precios de Planes</p>
             </div>
 
-            <div className="rounded-2xl overflow-hidden border border-white/8">
+            <div className="rounded-2xl overflow-hidden border border-[#E4E9F0]">
               {/* Column headers */}
               <div className="grid grid-cols-3 px-5 py-2.5 border-b border-white/6"
                 style={{ background: 'rgba(255,255,255,0.03)' }}>
-                <span className="text-[10px] font-bold uppercase tracking-widest text-white/25">Plan</span>
-                <span className="text-[10px] font-bold uppercase tracking-widest text-white/25 flex items-center gap-1">
+                <span className="text-[10px] font-bold uppercase tracking-widest text-[#111827]/25">Plan</span>
+                <span className="text-[10px] font-bold uppercase tracking-widest text-[#111827]/25 flex items-center gap-1">
                   <DollarSign size={9} /> Precio inicial
                 </span>
-                <span className="text-[10px] font-bold uppercase tracking-widest text-white/25 flex items-center gap-1">
+                <span className="text-[10px] font-bold uppercase tracking-widest text-[#111827]/25 flex items-center gap-1">
                   <RefreshCw size={9} /> Renovación
                 </span>
               </div>
 
               {PLAN_PRICES.map(plan => (
                 <div key={plan.key}
-                  className="grid grid-cols-3 items-center px-5 py-4 border-b border-white/5 last:border-0"
+                  className="grid grid-cols-3 items-center px-5 py-4 border-b border-[#E4E9F0] last:border-0"
                   style={{ background: 'rgba(255,255,255,0.015)' }}>
 
                   {/* Plan name */}
@@ -273,10 +274,10 @@ export default function AdminSettingsPage() {
             </div>
 
             <div className="flex items-start gap-2 p-3 rounded-xl bg-white/[0.02] border border-white/6">
-              <Info size={12} className="text-white/25 mt-0.5 shrink-0" />
-              <p className="text-[11px] text-white/30 leading-relaxed">
-                El <strong className="text-white/45">precio inicial</strong> se cobra cuando el usuario activa el plan por primera vez.
-                La <strong className="text-white/45">renovación</strong> se cobra cuando el plan vence y el usuario quiere extenderlo.
+              <Info size={12} className="text-[#111827]/25 mt-0.5 shrink-0" />
+              <p className="text-[11px] text-[#111827]/30 leading-relaxed">
+                El <strong className="text-[#111827]/45">precio inicial</strong> se cobra cuando el usuario activa el plan por primera vez.
+                La <strong className="text-[#111827]/45">renovación</strong> se cobra cuando el plan vence y el usuario quiere extenderlo.
                 Si dejas la renovación vacía, se usará el precio inicial.
               </p>
             </div>
@@ -285,18 +286,18 @@ export default function AdminSettingsPage() {
           {/* ── Payment QR ──────────────────────────────── */}
           <section className="space-y-3">
             <div className="flex items-center gap-2 mb-1">
-              <QrCode size={13} className="text-white/40" />
-              <p className="text-[10px] font-black uppercase tracking-widest text-white/40">QR de Pago Global</p>
+              <QrCode size={13} className="text-[#111827]/40" />
+              <p className="text-[10px] font-black uppercase tracking-widest text-[#111827]/40">QR de Pago Global</p>
             </div>
 
-            <div className="bg-white/[0.025] border border-white/8 rounded-2xl p-5">
-              <p className="text-xs text-white/40 mb-4">
+            <div className="bg-white/[0.025] border border-[#E4E9F0] rounded-2xl p-5">
+              <p className="text-xs text-[#111827]/40 mb-4">
                 Este QR se muestra en el checkout para pagos manuales. Sube el QR de tu billetera USDT u otro método.
               </p>
 
               {paymentQr ? (
                 <div className="flex items-start gap-4">
-                  <div className="w-24 h-24 rounded-xl border border-white/10 overflow-hidden bg-white flex items-center justify-center shrink-0">
+                  <div className="w-24 h-24 rounded-xl border border-[#E4E9F0] overflow-hidden bg-white flex items-center justify-center shrink-0">
                     <img src={paymentQr} alt="QR de pago" className="w-full h-full object-contain" />
                   </div>
                   <div className="flex-1 space-y-2">
@@ -323,13 +324,13 @@ export default function AdminSettingsPage() {
                 </div>
               ) : (
                 <button onClick={() => qrInputRef.current?.click()} disabled={uploadingQr}
-                  className="w-full flex flex-col items-center justify-center gap-2 py-8 border-2 border-dashed border-white/10 rounded-xl text-white/30 hover:border-purple-500/40 hover:text-purple-400 transition-colors">
+                  className="w-full flex flex-col items-center justify-center gap-2 py-8 border-2 border-dashed border-[#E4E9F0] rounded-xl text-[#111827]/30 hover:border-purple-500/40 hover:text-purple-400 transition-colors">
                   {uploadingQr
                     ? <Loader2 size={20} className="animate-spin" />
                     : <>
-                        <QrCode size={24} className="text-white/20" />
+                        <QrCode size={24} className="text-[#111827]/20" />
                         <span className="text-xs font-bold">Subir imagen del QR de pago</span>
-                        <span className="text-[10px] text-white/20">PNG, JPG · USDT, Binance Pay, etc.</span>
+                        <span className="text-[10px] text-[#111827]/20">PNG, JPG · USDT, Binance Pay, etc.</span>
                       </>
                   }
                 </button>
@@ -343,23 +344,23 @@ export default function AdminSettingsPage() {
           {/* ── Plan Availability ────────────────────────── */}
           <section className="space-y-3">
             <div className="flex items-center gap-2 mb-1">
-              <ToggleLeft size={13} className="text-white/40" />
-              <p className="text-[10px] font-black uppercase tracking-widest text-white/40">Disponibilidad de Planes</p>
+              <ToggleLeft size={13} className="text-[#111827]/40" />
+              <p className="text-[10px] font-black uppercase tracking-widest text-[#111827]/40">Disponibilidad de Planes</p>
             </div>
 
-            <div className="bg-white/[0.025] border border-white/8 rounded-2xl divide-y divide-white/6 overflow-hidden">
+            <div className="bg-white/[0.025] border border-[#E4E9F0] rounded-2xl divide-y divide-white/6 overflow-hidden">
               {PLAN_TOGGLES.map(t => (
                 <div key={t.key} className="flex items-center justify-between gap-4 px-5 py-4">
                   <div className="flex items-center gap-3">
                     <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: t.dot }} />
                     <div>
-                      <p className="text-sm font-bold text-white">{t.label}</p>
-                      <p className="text-[11px] text-white/35 mt-0.5">{t.desc}</p>
+                      <p className="text-sm font-bold text-[#111827]">{t.label}</p>
+                      <p className="text-[11px] text-[#111827]/35 mt-0.5">{t.desc}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
                     {saved === t.key && <Check size={11} className="text-green-400" />}
-                    {savingToggle === t.key && <Loader2 size={11} className="text-white/40 animate-spin" />}
+                    {savingToggle === t.key && <Loader2 size={11} className="text-[#111827]/40 animate-spin" />}
                     <Toggle
                       on={toggles[t.key] ?? true}
                       onToggle={() => saveToggle(t.key, !toggles[t.key])}
@@ -371,9 +372,9 @@ export default function AdminSettingsPage() {
             </div>
 
             <div className="flex items-start gap-2 p-3 rounded-xl bg-white/[0.02] border border-white/6">
-              <Info size={12} className="text-white/25 mt-0.5 shrink-0" />
-              <p className="text-[11px] text-white/30 leading-relaxed">
-                Si <strong className="text-white/45">todos los planes están desactivados</strong>, al hacer clic en "Comprar plan" desde el dashboard, el usuario verá únicamente la opción de <strong className="text-white/45">Fase Global</strong>.
+              <Info size={12} className="text-[#111827]/25 mt-0.5 shrink-0" />
+              <p className="text-[11px] text-[#111827]/30 leading-relaxed">
+                Si <strong className="text-[#111827]/45">todos los planes están desactivados</strong>, al hacer clic en "Comprar plan" desde el dashboard, el usuario verá únicamente la opción de <strong className="text-[#111827]/45">Fase Global</strong>.
               </p>
             </div>
           </section>
@@ -381,20 +382,20 @@ export default function AdminSettingsPage() {
           {/* ── Payment Methods (Store) ──────────────────── */}
           <section className="space-y-3">
             <div className="flex items-center gap-2 mb-1">
-              <ToggleLeft size={13} className="text-white/40" />
-              <p className="text-[10px] font-black uppercase tracking-widest text-white/40">Métodos de Pago — Tienda</p>
+              <ToggleLeft size={13} className="text-[#111827]/40" />
+              <p className="text-[10px] font-black uppercase tracking-widest text-[#111827]/40">Métodos de Pago — Tienda</p>
             </div>
 
-            <div className="bg-white/[0.025] border border-white/8 rounded-2xl divide-y divide-white/6 overflow-hidden">
+            <div className="bg-white/[0.025] border border-[#E4E9F0] rounded-2xl divide-y divide-white/6 overflow-hidden">
               {PAYMENT_TOGGLES.map(t => (
                 <div key={t.key} className="flex items-center justify-between gap-4 px-5 py-4">
                   <div>
-                    <p className="text-sm font-bold text-white">{t.label}</p>
-                    <p className="text-[11px] text-white/35 mt-0.5">{t.desc}</p>
+                    <p className="text-sm font-bold text-[#111827]">{t.label}</p>
+                    <p className="text-[11px] text-[#111827]/35 mt-0.5">{t.desc}</p>
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
                     {saved === t.key && <Check size={11} className="text-green-400" />}
-                    {savingToggle === t.key && <Loader2 size={11} className="text-white/40 animate-spin" />}
+                    {savingToggle === t.key && <Loader2 size={11} className="text-[#111827]/40 animate-spin" />}
                     <Toggle
                       on={toggles[t.key] ?? false}
                       onToggle={() => saveToggle(t.key, !toggles[t.key])}
@@ -408,12 +409,13 @@ export default function AdminSettingsPage() {
 
           {/* Flow info */}
           <div className="bg-white/[0.02] border border-white/6 rounded-2xl p-4">
-            <p className="text-[11px] text-white/30 leading-relaxed">
-              <strong className="text-white/50">Flujo de compra:</strong> El usuario selecciona un plan → ve el precio y QR de pago → realiza el pago → sube su comprobante → tú revisas y apruebas desde <em>Compras</em>.
+            <p className="text-[11px] text-[#111827]/30 leading-relaxed">
+              <strong className="text-[#111827]/50">Flujo de compra:</strong> El usuario selecciona un plan → ve el precio y QR de pago → realiza el pago → sube su comprobante → tú revisas y apruebas desde <em>Compras</em>.
             </p>
           </div>
         </>
       )}
     </div>
+  </div>
   )
 }

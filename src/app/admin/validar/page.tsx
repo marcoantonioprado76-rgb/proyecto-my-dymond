@@ -91,11 +91,12 @@ export default function ValidarPage() {
   const formatDate = (d: string) => new Date(d).toLocaleString('es-ES', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })
 
   return (
+  <div className="dm-page font-ui">
     <div style={{ minHeight: '100vh', background: BG[result], transition: 'background 0.3s', display: 'flex', flexDirection: 'column' }}>
 
       {/* Top bar */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '16px 20px', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-        <Link href="/admin/entradas" style={{ display: 'flex', alignItems: 'center', gap: 6, color: 'rgba(255,255,255,0.4)', textDecoration: 'none', fontSize: 13 }}>
+        <Link href="/admin/entradas" style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#6B7280', textDecoration: 'none', fontSize: 13 }}>
           <ArrowLeft size={16} /> Entradas
         </Link>
         <span style={{ fontSize: 15, fontWeight: 900, color: '#fff', marginLeft: 'auto', marginRight: 'auto' }}>🎟 Validar entrada</span>
@@ -115,7 +116,7 @@ export default function ValidarPage() {
             inputMode="numeric"
             autoComplete="off"
             style={{
-              width: '100%', background: 'rgba(255,255,255,0.05)', border: `2px solid ${BORDER[result]}`,
+              width: '100%', background: '#F0F3F7', border: `2px solid ${BORDER[result]}`,
               borderRadius: 16, padding: '18px 20px', color: '#fff', fontSize: 22, fontWeight: 900,
               fontFamily: 'Courier New, monospace', letterSpacing: 10, textAlign: 'center',
               outline: 'none', transition: 'border-color 0.3s', boxSizing: 'border-box',
@@ -125,13 +126,13 @@ export default function ValidarPage() {
 
         {/* Result area */}
         {result === 'idle' && (
-          <div style={{ textAlign: 'center', color: 'rgba(255,255,255,0.2)' }}>
+          <div style={{ textAlign: 'center', color: '#9CA3AF' }}>
             <p style={{ fontSize: 14 }}>Escribe el código y presiona Enter</p>
           </div>
         )}
 
         {result === 'loading' && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'rgba(255,255,255,0.4)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#6B7280' }}>
             <Loader2 size={20} className="animate-spin" /> <span style={{ fontSize: 14 }}>Verificando...</span>
           </div>
         )}
@@ -146,8 +147,8 @@ export default function ValidarPage() {
             <CheckCircle2 size={64} color="#4ade80" style={{ margin: '0 auto 16px' }} />
             <p style={{ fontSize: 24, fontWeight: 900, color: '#4ade80', margin: '0 0 6px' }}>ENTRADA VÁLIDA</p>
             <p style={{ fontSize: 16, fontWeight: 700, color: '#fff', margin: '0 0 4px' }}>{ticket.customerName}</p>
-            <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.4)', margin: '0 0 4px' }}>{ticket.customerEmail}</p>
-            <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.4)', margin: '0 0 20px' }}>{ticket.ticketTypeName ?? '🎟'} · {ticket.eventTitle}</p>
+            <p style={{ fontSize: 13, color: '#6B7280', margin: '0 0 4px' }}>{ticket.customerEmail}</p>
+            <p style={{ fontSize: 13, color: '#6B7280', margin: '0 0 20px' }}>{ticket.ticketTypeName ?? '🎟'} · {ticket.eventTitle}</p>
             <button
               onClick={confirmCheckin}
               disabled={confirming}
@@ -155,7 +156,7 @@ export default function ValidarPage() {
             >
               {confirming ? <><Loader2 size={18} className="animate-spin" /> Procesando...</> : '✓ Confirmar ingreso'}
             </button>
-            <button onClick={reset} style={{ marginTop: 12, width: '100%', padding: '12px 0', borderRadius: 12, background: 'none', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.3)', fontWeight: 700, fontSize: 13, cursor: 'pointer' }}>Cancelar</button>
+            <button onClick={reset} style={{ marginTop: 12, width: '100%', padding: '12px 0', borderRadius: 12, background: 'none', border: '1px solid #E4E9F0', color: '#6B7280', fontWeight: 700, fontSize: 13, cursor: 'pointer' }}>Cancelar</button>
           </div>
         )}
 
@@ -169,7 +170,7 @@ export default function ValidarPage() {
             <CheckCircle2 size={64} color="#4ade80" style={{ margin: '0 auto 16px' }} />
             <p style={{ fontSize: 24, fontWeight: 900, color: '#4ade80', margin: '0 0 6px' }}>¡INGRESO REGISTRADO!</p>
             <p style={{ fontSize: 16, fontWeight: 700, color: '#fff', margin: '0 0 4px' }}>{ticket.customerName}</p>
-            <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)', margin: '0 0 20px' }}>{ticket.ticketTypeName ?? ''}</p>
+            <p style={{ fontSize: 13, color: '#6B7280', margin: '0 0 20px' }}>{ticket.ticketTypeName ?? ''}</p>
             <button onClick={reset} style={{ width: '100%', padding: '16px 0', borderRadius: 14, background: 'rgba(74,222,128,0.15)', border: '1px solid rgba(74,222,128,0.3)', color: '#4ade80', fontWeight: 800, fontSize: 16, cursor: 'pointer' }}>Siguiente →</button>
           </div>
         )}
@@ -178,8 +179,8 @@ export default function ValidarPage() {
           <div style={{ width: '100%', textAlign: 'center' }}>
             <XCircle size={64} color="#f87171" style={{ margin: '0 auto 16px' }} />
             <p style={{ fontSize: 24, fontWeight: 900, color: '#f87171', margin: '0 0 6px' }}>YA UTILIZADO</p>
-            <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.5)', margin: '0 0 4px' }}>{ticket.customerName}</p>
-            {ticket.checkedInAt && <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.3)', margin: '0 0 20px' }}>Ingresó el {formatDate(ticket.checkedInAt)}</p>}
+            <p style={{ fontSize: 14, color: '#6B7280', margin: '0 0 4px' }}>{ticket.customerName}</p>
+            {ticket.checkedInAt && <p style={{ fontSize: 12, color: '#6B7280', margin: '0 0 20px' }}>Ingresó el {formatDate(ticket.checkedInAt)}</p>}
             <button onClick={reset} style={{ width: '100%', padding: '16px 0', borderRadius: 14, background: 'rgba(248,113,113,0.12)', border: '1px solid rgba(248,113,113,0.25)', color: '#f87171', fontWeight: 800, fontSize: 16, cursor: 'pointer' }}>Siguiente →</button>
           </div>
         )}
@@ -188,7 +189,7 @@ export default function ValidarPage() {
           <div style={{ width: '100%', textAlign: 'center' }}>
             <Clock size={64} color="#F5A623" style={{ margin: '0 auto 16px' }} />
             <p style={{ fontSize: 24, fontWeight: 900, color: '#F5A623', margin: '0 0 6px' }}>PAGO PENDIENTE</p>
-            <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.4)', margin: '0 0 20px' }}>Este ticket aún no fue aprobado por el admin</p>
+            <p style={{ fontSize: 14, color: '#6B7280', margin: '0 0 20px' }}>Este ticket aún no fue aprobado por el admin</p>
             <button onClick={reset} style={{ width: '100%', padding: '16px 0', borderRadius: 14, background: 'rgba(245,166,35,0.1)', border: '1px solid rgba(245,166,35,0.25)', color: '#F5A623', fontWeight: 800, fontSize: 16, cursor: 'pointer' }}>Siguiente →</button>
           </div>
         )}
@@ -197,7 +198,7 @@ export default function ValidarPage() {
           <div style={{ width: '100%', textAlign: 'center' }}>
             <XCircle size={64} color="#f87171" style={{ margin: '0 auto 16px' }} />
             <p style={{ fontSize: 24, fontWeight: 900, color: '#f87171', margin: '0 0 6px' }}>TICKET RECHAZADO</p>
-            <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.4)', margin: '0 0 20px' }}>Este ticket fue rechazado</p>
+            <p style={{ fontSize: 14, color: '#6B7280', margin: '0 0 20px' }}>Este ticket fue rechazado</p>
             <button onClick={reset} style={{ width: '100%', padding: '16px 0', borderRadius: 14, background: 'rgba(248,113,113,0.12)', border: '1px solid rgba(248,113,113,0.25)', color: '#f87171', fontWeight: 800, fontSize: 16, cursor: 'pointer' }}>Siguiente →</button>
           </div>
         )}
@@ -206,16 +207,16 @@ export default function ValidarPage() {
           <div style={{ width: '100%', textAlign: 'center' }}>
             <AlertCircle size={64} color="#f87171" style={{ margin: '0 auto 16px' }} />
             <p style={{ fontSize: 24, fontWeight: 900, color: '#f87171', margin: '0 0 6px' }}>NO ENCONTRADO</p>
-            <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.4)', margin: '0 0 20px' }}>El código no existe en el sistema</p>
+            <p style={{ fontSize: 14, color: '#6B7280', margin: '0 0 20px' }}>El código no existe en el sistema</p>
             <button onClick={reset} style={{ width: '100%', padding: '16px 0', borderRadius: 14, background: 'rgba(248,113,113,0.12)', border: '1px solid rgba(248,113,113,0.25)', color: '#f87171', fontWeight: 800, fontSize: 16, cursor: 'pointer' }}>Siguiente →</button>
           </div>
         )}
 
         {result === 'error' && (
           <div style={{ width: '100%', textAlign: 'center' }}>
-            <AlertCircle size={48} color="rgba(255,255,255,0.3)" style={{ margin: '0 auto 12px' }} />
-            <p style={{ fontSize: 16, color: 'rgba(255,255,255,0.4)', margin: '0 0 16px' }}>Error de conexión</p>
-            <button onClick={reset} style={{ width: '100%', padding: '14px 0', borderRadius: 12, background: 'none', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.4)', fontWeight: 700, fontSize: 14, cursor: 'pointer' }}>Reintentar</button>
+            <AlertCircle size={48} color="#6B7280" style={{ margin: '0 auto 12px' }} />
+            <p style={{ fontSize: 16, color: '#6B7280', margin: '0 0 16px' }}>Error de conexión</p>
+            <button onClick={reset} style={{ width: '100%', padding: '14px 0', borderRadius: 12, background: 'none', border: '1px solid #E4E9F0', color: '#6B7280', fontWeight: 700, fontSize: 14, cursor: 'pointer' }}>Reintentar</button>
           </div>
         )}
 
@@ -223,12 +224,13 @@ export default function ValidarPage() {
           <button
             onClick={() => lookup()}
             disabled={!code.trim()}
-            style={{ marginTop: 16, width: '100%', padding: '16px 0', borderRadius: 14, background: code.trim() ? 'linear-gradient(135deg,#D203DD,#0D1E79)' : 'rgba(255,255,255,0.05)', color: code.trim() ? '#fff' : 'rgba(255,255,255,0.2)', fontWeight: 900, fontSize: 16, border: 'none', cursor: code.trim() ? 'pointer' : 'default', letterSpacing: 2, textTransform: 'uppercase', transition: 'all 0.2s' }}
+            style={{ marginTop: 16, width: '100%', padding: '16px 0', borderRadius: 14, background: code.trim() ? 'linear-gradient(135deg,#D203DD,#0D1E79)' : '#F0F3F7', color: code.trim() ? '#fff' : '#9CA3AF', fontWeight: 900, fontSize: 16, border: 'none', cursor: code.trim() ? 'pointer' : 'default', letterSpacing: 2, textTransform: 'uppercase', transition: 'all 0.2s' }}
           >
             Verificar código
           </button>
         )}
       </div>
     </div>
+  </div>
   )
 }

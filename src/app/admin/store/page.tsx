@@ -45,8 +45,8 @@ const CATEGORIES = ['Suplementos', 'Ropa', 'Accesorios', 'Bienestar', 'Belleza',
 
 const EMPTY_ITEM = { title: '', description: '', category: 'General', customCategory: '', price: '', memberPrice: '', stock: '0', images: [''], variants: [] as { name: string; options: string }[], active: true }
 
-const INPUT = 'w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm outline-none'
-const LABEL = 'block text-[11px] text-white/40 mb-1'
+const INPUT = 'w-full bg-[#F4F6FA] border border-[#E4E9F0] rounded-lg px-3 py-2 text-[#111827] text-sm outline-none'
+const LABEL = 'block text-[11px] text-[#111827]/40 mb-1'
 
 export default function AdminStorePage() {
   const [activeTab, setActiveTab] = useState<'items' | 'orders'>('items')
@@ -182,10 +182,11 @@ export default function AdminStorePage() {
   }
 
   return (
+  <div className="dm-page font-ui">
     <div className="px-4 sm:px-6 pt-6 pb-10 max-w-6xl mx-auto">
       {/* Header */}
       <div className="mb-6">
-        <h1 className="text-xl font-bold text-white uppercase tracking-widest">Tienda Admin</h1>
+        <h1 className="text-xl font-bold text-[#111827] uppercase tracking-widest">Tienda Admin</h1>
         <div className="h-px w-20 mt-2 rounded-full" style={{ background: 'linear-gradient(90deg, transparent, #D203DD, #FF2DF7, transparent)' }} />
       </div>
 
@@ -196,7 +197,7 @@ export default function AdminStorePage() {
             style={{ padding: '8px 18px', borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: 'pointer', border: '1px solid',
               borderColor: activeTab === t ? 'rgba(210,3,221,0.4)' : 'rgba(255,255,255,0.08)',
               background: activeTab === t ? 'rgba(210,3,221,0.08)' : 'transparent',
-              color: activeTab === t ? '#D203DD' : 'rgba(255,255,255,0.4)' }}>
+              color: activeTab === t ? '#D203DD' : '#6B7280' }}>
             {t === 'items' ? '🏷️ Productos' : '📦 Pedidos'}
           </button>
         ))}
@@ -206,8 +207,8 @@ export default function AdminStorePage() {
       {activeTab === 'items' && (
         <div>
           <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 14, gap: 8 }}>
-            <button onClick={fetchItems} style={{ padding: '7px 10px', borderRadius: 8, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)', cursor: 'pointer' }}>
-              <RefreshCw size={13} className="text-white/40" />
+            <button onClick={fetchItems} style={{ padding: '7px 10px', borderRadius: 8, background: '#F0F3F7', border: '1px solid rgba(255,255,255,0.08)', cursor: 'pointer' }}>
+              <RefreshCw size={13} className="text-[#111827]/40" />
             </button>
             <button onClick={openCreate} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 16px', borderRadius: 8, background: 'linear-gradient(135deg, #D203DD, #00FF88)', border: 'none', cursor: 'pointer', fontWeight: 700, fontSize: 13, color: '#000' }}>
               <Plus size={14} /> Nuevo producto
@@ -215,25 +216,25 @@ export default function AdminStorePage() {
           </div>
 
           {itemsLoading ? (
-            <div className="flex justify-center py-16"><Loader2 size={20} className="animate-spin text-white/30" /></div>
+            <div className="flex justify-center py-16"><Loader2 size={20} className="animate-spin text-[#111827]/30" /></div>
           ) : items.length === 0 ? (
-            <div className="text-center py-16 text-white/30 text-sm">No hay productos. Crea el primero.</div>
+            <div className="text-center py-16 text-[#111827]/30 text-sm">No hay productos. Crea el primero.</div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               {items.map(item => {
                 const img = Array.isArray(item.images) && item.images.length > 0 ? item.images[0] : null
                 return (
                   <div key={item.id} style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '12px 16px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 12 }}>
-                    <div style={{ width: 52, height: 52, borderRadius: 8, overflow: 'hidden', flexShrink: 0, background: 'rgba(255,255,255,0.05)' }}>
+                    <div style={{ width: 52, height: 52, borderRadius: 8, overflow: 'hidden', flexShrink: 0, background: '#F0F3F7' }}>
                       {img && <img src={img} alt={item.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />}
                     </div>
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <p style={{ fontWeight: 700, color: '#fff', fontSize: 14, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.title}</p>
-                      <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.35)' }}>
+                      <p style={{ fontSize: 12, color: '#6B7280' }}>
                         {item.category} · {item.price.toFixed(2)} USDT{item.memberPrice != null ? ` / ${item.memberPrice.toFixed(2)} socio` : ''} · Stock: {item.stock}
                       </p>
                     </div>
-                    <span style={{ fontSize: 11, fontWeight: 700, padding: '3px 8px', borderRadius: 6, border: '1px solid', ...(item.active ? { color: '#00FF88', borderColor: 'rgba(0,255,136,0.25)', background: 'rgba(0,255,136,0.08)' } : { color: 'rgba(255,255,255,0.3)', borderColor: 'rgba(255,255,255,0.1)', background: 'transparent' }) }}>
+                    <span style={{ fontSize: 11, fontWeight: 700, padding: '3px 8px', borderRadius: 6, border: '1px solid', ...(item.active ? { color: '#00FF88', borderColor: 'rgba(0,255,136,0.25)', background: 'rgba(0,255,136,0.08)' } : { color: '#6B7280', borderColor: '#E4E9F0', background: 'transparent' }) }}>
                       {item.active ? 'Activo' : 'Inactivo'}
                     </span>
                     <div style={{ display: 'flex', gap: 6 }}>
@@ -256,19 +257,19 @@ export default function AdminStorePage() {
               <button key={s} onClick={() => setOrderTab(s)}
                 style={{ padding: '5px 12px', borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: 'pointer', border: '1px solid', background: 'transparent',
                   borderColor: orderTab === s ? 'rgba(210,3,221,0.4)' : 'rgba(255,255,255,0.08)',
-                  color: orderTab === s ? '#D203DD' : 'rgba(255,255,255,0.4)' }}>
+                  color: orderTab === s ? '#D203DD' : '#6B7280' }}>
                 {s === 'ALL' ? 'Todos' : STATUS_LABEL[s]}
               </button>
             ))}
-            <button onClick={fetchOrders} style={{ marginLeft: 'auto', padding: '5px 10px', borderRadius: 8, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)', cursor: 'pointer' }}>
-              <RefreshCw size={12} className="text-white/40" />
+            <button onClick={fetchOrders} style={{ marginLeft: 'auto', padding: '5px 10px', borderRadius: 8, background: '#F0F3F7', border: '1px solid rgba(255,255,255,0.08)', cursor: 'pointer' }}>
+              <RefreshCw size={12} className="text-[#111827]/40" />
             </button>
           </div>
 
           {ordersLoading ? (
-            <div className="flex justify-center py-16"><Loader2 size={20} className="animate-spin text-white/30" /></div>
+            <div className="flex justify-center py-16"><Loader2 size={20} className="animate-spin text-[#111827]/30" /></div>
           ) : orders.length === 0 ? (
-            <div className="text-center py-16 text-white/30 text-sm">No hay pedidos{orderTab !== 'ALL' ? ` con estado "${STATUS_LABEL[orderTab]}"` : ''}.</div>
+            <div className="text-center py-16 text-[#111827]/30 text-sm">No hay pedidos{orderTab !== 'ALL' ? ` con estado "${STATUS_LABEL[orderTab]}"` : ''}.</div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               {orders.map(order => {
@@ -285,19 +286,19 @@ export default function AdminStorePage() {
                             {STATUS_LABEL[order.status]}
                           </span>
                         </div>
-                        <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)' }}>{order.user.fullName} · {order.user.username} · {order.user.email}</p>
-                        <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.25)', marginTop: 2 }}>
+                        <p style={{ fontSize: 12, color: '#6B7280' }}>{order.user.fullName} · {order.user.username} · {order.user.email}</p>
+                        <p style={{ fontSize: 11, color: '#9CA3AF', marginTop: 2 }}>
                           {new Date(order.createdAt).toLocaleString('es-CO')} · {order.totalPrice.toFixed(2)} USDT
                         </p>
                       </div>
-                      <span style={{ color: 'rgba(255,255,255,0.3)', fontSize: 12 }}>{isExp ? '▲' : '▼'}</span>
+                      <span style={{ color: '#6B7280', fontSize: 12 }}>{isExp ? '▲' : '▼'}</span>
                     </button>
 
                     {isExp && (
-                      <div style={{ borderTop: '1px solid rgba(255,255,255,0.05)', padding: '16px' }}>
+                      <div style={{ borderTop: '1px solid #F0F3F7', padding: '16px' }}>
                         {/* Products */}
                         <div style={{ marginBottom: 16 }}>
-                          <p style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>Productos</p>
+                          <p style={{ fontSize: 11, fontWeight: 700, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>Productos</p>
                           {order.items.map(oi => {
                             const imgs = Array.isArray(oi.item.images) ? oi.item.images : []
                             return (
@@ -307,7 +308,7 @@ export default function AdminStorePage() {
                                 </div>
                                 <div>
                                   <p style={{ fontSize: 13, fontWeight: 600, color: '#fff' }}>{oi.item.title}</p>
-                                  <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)' }}>
+                                  <p style={{ fontSize: 11, color: '#6B7280' }}>
                                     {Object.entries(oi.selectedVariants).map(([k, v]) => `${k}: ${v}`).join(' · ')}
                                     {Object.keys(oi.selectedVariants).length > 0 && ' · '}
                                     x{oi.quantity} · {(oi.priceSnapshot * oi.quantity).toFixed(2)} USDT
@@ -316,33 +317,33 @@ export default function AdminStorePage() {
                               </div>
                             )
                           })}
-                          <div style={{ borderTop: '1px solid rgba(255,255,255,0.05)', marginTop: 8, paddingTop: 8 }}>
+                          <div style={{ borderTop: '1px solid #F0F3F7', marginTop: 8, paddingTop: 8 }}>
                             <span style={{ fontSize: 13, fontWeight: 800, color: '#F5A623' }}>Total: {order.totalPrice.toFixed(2)} USDT</span>
                           </div>
                         </div>
 
                         {/* Delivery */}
                         <div style={{ background: 'rgba(255,255,255,0.02)', borderRadius: 10, padding: '12px 14px', marginBottom: 14 }}>
-                          <p style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>📦 Datos de entrega</p>
+                          <p style={{ fontSize: 11, fontWeight: 700, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>📦 Datos de entrega</p>
                           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px 16px', fontSize: 12 }}>
-                            <div><span style={{ color: 'rgba(255,255,255,0.35)' }}>Destinatario: </span><span style={{ color: '#fff', fontWeight: 600 }}>{order.recipientName}</span></div>
-                            <div><span style={{ color: 'rgba(255,255,255,0.35)' }}>Teléfono: </span><span style={{ color: '#fff' }}>{order.phone}</span></div>
-                            <div style={{ gridColumn: '1 / -1' }}><span style={{ color: 'rgba(255,255,255,0.35)' }}>Dirección: </span><span style={{ color: '#fff' }}>{order.address}</span></div>
-                            <div><span style={{ color: 'rgba(255,255,255,0.35)' }}>Ciudad: </span><span style={{ color: '#fff' }}>{order.city}</span></div>
-                            <div><span style={{ color: 'rgba(255,255,255,0.35)' }}>Estado/Dpto: </span><span style={{ color: '#fff' }}>{order.state}</span></div>
-                            <div><span style={{ color: 'rgba(255,255,255,0.35)' }}>País: </span><span style={{ color: '#fff' }}>{order.country}</span></div>
-                            {order.zipCode && <div><span style={{ color: 'rgba(255,255,255,0.35)' }}>CP: </span><span style={{ color: '#fff' }}>{order.zipCode}</span></div>}
-                            {order.deliveryNotes && <div style={{ gridColumn: '1 / -1' }}><span style={{ color: 'rgba(255,255,255,0.35)' }}>Notas: </span><span style={{ color: '#fff' }}>{order.deliveryNotes}</span></div>}
+                            <div><span style={{ color: '#6B7280' }}>Destinatario: </span><span style={{ color: '#fff', fontWeight: 600 }}>{order.recipientName}</span></div>
+                            <div><span style={{ color: '#6B7280' }}>Teléfono: </span><span style={{ color: '#fff' }}>{order.phone}</span></div>
+                            <div style={{ gridColumn: '1 / -1' }}><span style={{ color: '#6B7280' }}>Dirección: </span><span style={{ color: '#fff' }}>{order.address}</span></div>
+                            <div><span style={{ color: '#6B7280' }}>Ciudad: </span><span style={{ color: '#fff' }}>{order.city}</span></div>
+                            <div><span style={{ color: '#6B7280' }}>Estado/Dpto: </span><span style={{ color: '#fff' }}>{order.state}</span></div>
+                            <div><span style={{ color: '#6B7280' }}>País: </span><span style={{ color: '#fff' }}>{order.country}</span></div>
+                            {order.zipCode && <div><span style={{ color: '#6B7280' }}>CP: </span><span style={{ color: '#fff' }}>{order.zipCode}</span></div>}
+                            {order.deliveryNotes && <div style={{ gridColumn: '1 / -1' }}><span style={{ color: '#6B7280' }}>Notas: </span><span style={{ color: '#fff' }}>{order.deliveryNotes}</span></div>}
                           </div>
                         </div>
 
                         {/* Payment info */}
                         <div style={{ marginBottom: 14 }}>
-                          <p style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>Pago</p>
-                          <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)' }}>Método: <span style={{ color: '#fff', fontWeight: 600 }}>{order.paymentMethod === 'CRYPTO' ? '₮ Cripto (USDT-BEP20)' : '📎 Comprobante manual'}</span></p>
+                          <p style={{ fontSize: 11, fontWeight: 700, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>Pago</p>
+                          <p style={{ fontSize: 12, color: '#6B7280' }}>Método: <span style={{ color: '#fff', fontWeight: 600 }}>{order.paymentMethod === 'CRYPTO' ? '₮ Cripto (USDT-BEP20)' : '📎 Comprobante manual'}</span></p>
                           {order.txHash && (
                             <p style={{ fontSize: 11, marginTop: 4 }}>
-                              <span style={{ color: 'rgba(255,255,255,0.35)' }}>Tx: </span>
+                              <span style={{ color: '#6B7280' }}>Tx: </span>
                               <a href={`https://bscscan.com/tx/${order.txHash}`} target="_blank" rel="noreferrer" style={{ color: '#D203DD', wordBreak: 'break-all', textDecoration: 'none' }}>{order.txHash} ↗</a>
                             </p>
                           )}
@@ -405,11 +406,11 @@ export default function AdminStorePage() {
 
       {/* ═══ ITEM MODAL ═══ */}
       {itemModal && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', zIndex: 50, display: 'flex', alignItems: 'flex-start', justifyContent: 'center', overflowY: 'auto', padding: '40px 16px' }}>
-          <div style={{ background: '#0d1117', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 18, width: '100%', maxWidth: 560, padding: 28 }}>
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,0.10)', zIndex: 50, display: 'flex', alignItems: 'flex-start', justifyContent: 'center', overflowY: 'auto', padding: '40px 16px' }}>
+          <div style={{ background: '#0d1117', border: '1px solid #E4E9F0', borderRadius: 18, width: '100%', maxWidth: 560, padding: 28 }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
               <h2 style={{ fontSize: 16, fontWeight: 700, color: '#fff' }}>{editingItem ? 'Editar producto' : 'Nuevo producto'}</h2>
-              <button onClick={() => setItemModal(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.4)' }}><X size={18} /></button>
+              <button onClick={() => setItemModal(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#6B7280' }}><X size={18} /></button>
             </div>
 
             {itemError && <p style={{ fontSize: 12, color: '#ef4444', marginBottom: 14, background: 'rgba(239,68,68,0.08)', borderRadius: 8, padding: '7px 12px' }}>{itemError}</p>}
@@ -487,18 +488,18 @@ export default function AdminStorePage() {
                     <button onClick={() => removeVariant(i)} style={{ background: 'rgba(239,68,68,0.07)', border: '1px solid rgba(239,68,68,0.2)', borderRadius: 7, cursor: 'pointer', color: '#ef4444', padding: '0 8px' }}><X size={12} /></button>
                   </div>
                 ))}
-                {form.variants.length > 0 && <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.25)' }}>Opciones separadas por coma: "S, M, L"</p>}
+                {form.variants.length > 0 && <p style={{ fontSize: 10, color: '#9CA3AF' }}>Opciones separadas por coma: "S, M, L"</p>}
               </div>
 
               {/* Active toggle */}
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                 <input type="checkbox" id="active-toggle" checked={form.active} onChange={e => setF('active', e.target.checked)} style={{ width: 16, height: 16, cursor: 'pointer' }} />
-                <label htmlFor="active-toggle" style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)', cursor: 'pointer' }}>Producto activo (visible en la tienda)</label>
+                <label htmlFor="active-toggle" style={{ fontSize: 13, color: '#6B7280', cursor: 'pointer' }}>Producto activo (visible en la tienda)</label>
               </div>
 
               <button onClick={saveItem} disabled={saving}
                 style={{ padding: '12px 0', borderRadius: 10, fontWeight: 700, fontSize: 14, cursor: saving ? 'not-allowed' : 'pointer', border: 'none',
-                  background: saving ? 'rgba(255,255,255,0.06)' : 'linear-gradient(135deg, #D203DD, #00FF88)', color: saving ? 'rgba(255,255,255,0.3)' : '#000' }}>
+                  background: saving ? 'rgba(255,255,255,0.06)' : 'linear-gradient(135deg, #D203DD, #00FF88)', color: saving ? '#6B7280' : '#000' }}>
                 {saving ? 'Guardando...' : (editingItem ? 'Guardar cambios' : 'Crear producto')}
               </button>
             </div>
@@ -508,12 +509,12 @@ export default function AdminStorePage() {
 
       {/* ═══ DELETE CONFIRM ═══ */}
       {deleteConfirm && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
-          <div style={{ background: '#0d1117', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 16, padding: 28, maxWidth: 360, width: '100%' }}>
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,0.10)', zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
+          <div style={{ background: '#0d1117', border: '1px solid #E4E9F0', borderRadius: 16, padding: 28, maxWidth: 360, width: '100%' }}>
             <p style={{ fontSize: 15, fontWeight: 700, color: '#fff', marginBottom: 8 }}>¿Eliminar producto?</p>
-            <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.4)', marginBottom: 20 }}>Esta acción no se puede deshacer.</p>
+            <p style={{ fontSize: 13, color: '#6B7280', marginBottom: 20 }}>Esta acción no se puede deshacer.</p>
             <div style={{ display: 'flex', gap: 10 }}>
-              <button onClick={() => setDeleteConfirm(null)} style={{ flex: 1, padding: '9px 0', borderRadius: 8, border: '1px solid rgba(255,255,255,0.1)', background: 'transparent', color: 'rgba(255,255,255,0.4)', cursor: 'pointer', fontWeight: 600, fontSize: 13 }}>Cancelar</button>
+              <button onClick={() => setDeleteConfirm(null)} style={{ flex: 1, padding: '9px 0', borderRadius: 8, border: '1px solid #E4E9F0', background: 'transparent', color: '#6B7280', cursor: 'pointer', fontWeight: 600, fontSize: 13 }}>Cancelar</button>
               <button onClick={() => deleteItem(deleteConfirm)} style={{ flex: 1, padding: '9px 0', borderRadius: 8, border: 'none', background: '#ef4444', color: '#fff', cursor: 'pointer', fontWeight: 700, fontSize: 13 }}>Eliminar</button>
             </div>
           </div>
@@ -522,15 +523,15 @@ export default function AdminStorePage() {
 
       {/* ═══ REJECT MODAL ═══ */}
       {rejectModal && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
-          <div style={{ background: '#0d1117', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 16, padding: 28, maxWidth: 380, width: '100%' }}>
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,0.10)', zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
+          <div style={{ background: '#0d1117', border: '1px solid #E4E9F0', borderRadius: 16, padding: 28, maxWidth: 380, width: '100%' }}>
             <p style={{ fontSize: 15, fontWeight: 700, color: '#fff', marginBottom: 12 }}>Rechazar pedido</p>
-            <label style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', display: 'block', marginBottom: 6 }}>Motivo (opcional)</label>
+            <label style={{ fontSize: 12, color: '#6B7280', display: 'block', marginBottom: 6 }}>Motivo (opcional)</label>
             <textarea value={rejectNotes} onChange={e => setRejectNotes(e.target.value)}
-              style={{ width: '100%', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, padding: '10px 12px', color: '#fff', fontSize: 13, outline: 'none', resize: 'none', marginBottom: 16 }} rows={3}
+              style={{ width: '100%', background: 'rgba(255,255,255,0.04)', border: '1px solid #E4E9F0', borderRadius: 8, padding: '10px 12px', color: '#fff', fontSize: 13, outline: 'none', resize: 'none', marginBottom: 16 }} rows={3}
               placeholder="Ej: Comprobante inválido, monto incorrecto..." />
             <div style={{ display: 'flex', gap: 10 }}>
-              <button onClick={() => setRejectModal(null)} style={{ flex: 1, padding: '9px 0', borderRadius: 8, border: '1px solid rgba(255,255,255,0.1)', background: 'transparent', color: 'rgba(255,255,255,0.4)', cursor: 'pointer', fontWeight: 600, fontSize: 13 }}>Cancelar</button>
+              <button onClick={() => setRejectModal(null)} style={{ flex: 1, padding: '9px 0', borderRadius: 8, border: '1px solid #E4E9F0', background: 'transparent', color: '#6B7280', cursor: 'pointer', fontWeight: 600, fontSize: 13 }}>Cancelar</button>
               <button onClick={() => doOrderAction(rejectModal.id, 'reject', rejectNotes)}
                 style={{ flex: 1, padding: '9px 0', borderRadius: 8, border: 'none', background: '#ef4444', color: '#fff', cursor: 'pointer', fontWeight: 700, fontSize: 13 }}>Rechazar</button>
             </div>
@@ -538,5 +539,6 @@ export default function AdminStorePage() {
         </div>
       )}
     </div>
+  </div>
   )
 }

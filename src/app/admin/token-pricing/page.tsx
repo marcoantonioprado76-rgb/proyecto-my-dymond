@@ -98,18 +98,19 @@ export default function TokenPricingAdmin() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[40vh]">
-        <Loader2 className="w-7 h-7 animate-spin text-white/40" />
+        <Loader2 className="w-7 h-7 animate-spin text-[#111827]/40" />
       </div>
     )
   }
 
   if (!data) {
-    return <div className="p-6 text-white/50">No se pudieron cargar las tarifas.</div>
+    return <div className="p-6 text-[#111827]/50">No se pudieron cargar las tarifas.</div>
   }
 
   const models = Object.keys(data.defaults)
 
   return (
+  <div className="dm-page font-ui">
     <div className="px-4 sm:px-6 pt-6 max-w-3xl mx-auto pb-24 space-y-6">
       <div className="flex items-center gap-3">
         <div className="w-10 h-10 rounded-xl flex items-center justify-center"
@@ -117,8 +118,8 @@ export default function TokenPricingAdmin() {
           <Cpu className="w-5 h-5 text-violet-300" />
         </div>
         <div>
-          <h1 className="text-xl font-black text-white">Tarifas por token</h1>
-          <p className="text-xs text-white/40">USD por 1M tokens · markup 1:1 sobre OpenAI</p>
+          <h1 className="text-xl font-black text-[#111827]">Tarifas por token</h1>
+          <p className="text-xs text-[#111827]/40">USD por 1M tokens · markup 1:1 sobre OpenAI</p>
         </div>
       </div>
 
@@ -130,7 +131,7 @@ export default function TokenPricingAdmin() {
         Los valores se mergean con los defaults: solo se persisten los que difieran.
         El cache se refresca cada 60s.
         {data.updatedAt && (
-          <span className="block mt-2 text-[10px] uppercase tracking-[0.2em] text-white/30">
+          <span className="block mt-2 text-[10px] uppercase tracking-[0.2em] text-[#111827]/30">
             Última edición: {new Date(data.updatedAt).toLocaleString()}
           </span>
         )}
@@ -149,7 +150,7 @@ export default function TokenPricingAdmin() {
               }}>
               <div className="flex items-center justify-between gap-3 mb-3">
                 <div className="flex items-center gap-2">
-                  <p className="text-sm font-black text-white font-mono">{model}</p>
+                  <p className="text-sm font-black text-[#111827] font-mono">{model}</p>
                   {overridden && (
                     <span className="text-[9px] font-black uppercase tracking-[0.15em] px-2 py-0.5 rounded-full"
                       style={{ background: 'rgba(162,102,255,0.18)', border: '1px solid rgba(162,102,255,0.35)', color: '#c4b5fd' }}>
@@ -159,7 +160,7 @@ export default function TokenPricingAdmin() {
                 </div>
                 {overridden && (
                   <button onClick={() => resetField(model)}
-                    className="flex items-center gap-1 text-[10px] uppercase tracking-[0.15em] text-white/50 hover:text-white/80">
+                    className="flex items-center gap-1 text-[10px] uppercase tracking-[0.15em] text-[#111827]/50 hover:text-[#111827]/80">
                     <RotateCcw className="w-3 h-3" /> Reset
                   </button>
                 )}
@@ -167,18 +168,18 @@ export default function TokenPricingAdmin() {
 
               <div className="grid grid-cols-2 gap-3">
                 <label className="block">
-                  <span className="block text-[10px] uppercase tracking-[0.2em] text-white/40 mb-1">Input ($ / 1M tk)</span>
+                  <span className="block text-[10px] uppercase tracking-[0.2em] text-[#111827]/40 mb-1">Input ($ / 1M tk)</span>
                   <input type="number" step="0.01" min="0" value={cur.input}
                     onChange={e => updateField(model, 'input', e.target.value)}
-                    className="w-full px-3 py-2 rounded-lg bg-black/30 border border-white/10 text-sm font-mono text-white focus:border-violet-400 focus:outline-none" />
-                  <span className="block text-[10px] text-white/30 mt-1 font-mono">default: ${def.input}</span>
+                    className="w-full px-3 py-2 rounded-lg bg-black/30 border border-[#E4E9F0] text-sm font-mono text-white focus:border-violet-400 focus:outline-none" />
+                  <span className="block text-[10px] text-[#111827]/30 mt-1 font-mono">default: ${def.input}</span>
                 </label>
                 <label className="block">
-                  <span className="block text-[10px] uppercase tracking-[0.2em] text-white/40 mb-1">Output ($ / 1M tk)</span>
+                  <span className="block text-[10px] uppercase tracking-[0.2em] text-[#111827]/40 mb-1">Output ($ / 1M tk)</span>
                   <input type="number" step="0.01" min="0" value={cur.output}
                     onChange={e => updateField(model, 'output', e.target.value)}
-                    className="w-full px-3 py-2 rounded-lg bg-black/30 border border-white/10 text-sm font-mono text-white focus:border-violet-400 focus:outline-none" />
-                  <span className="block text-[10px] text-white/30 mt-1 font-mono">default: ${def.output}</span>
+                    className="w-full px-3 py-2 rounded-lg bg-black/30 border border-[#E4E9F0] text-sm font-mono text-white focus:border-violet-400 focus:outline-none" />
+                  <span className="block text-[10px] text-[#111827]/30 mt-1 font-mono">default: ${def.output}</span>
                 </label>
               </div>
             </div>
@@ -204,5 +205,6 @@ export default function TokenPricingAdmin() {
         </div>
       </div>
     </div>
+  </div>
   )
 }

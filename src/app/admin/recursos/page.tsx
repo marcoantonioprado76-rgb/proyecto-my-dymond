@@ -48,15 +48,16 @@ export default function AdminRecursosPage() {
   if (isAdmin === false) {
     return (
       <div className="max-w-md mx-auto text-center py-20">
-        <Lock className="mx-auto text-white/25 mb-3" size={28} />
-        <p className="text-white/60 text-sm">Tu cuenta no gestiona Recursos. La maneja la cuenta de administración designada.</p>
+        <Lock className="mx-auto text-[#111827]/25 mb-3" size={28} />
+        <p className="text-[#111827]/60 text-sm">Tu cuenta no gestiona Recursos. La maneja la cuenta de administración designada.</p>
       </div>
     )
   }
 
   return (
+  <div className="dm-page font-ui">
     <div>
-      <h1 className="text-xl font-black text-white flex items-center gap-2 mb-5">
+      <h1 className="text-xl font-black text-[#111827] flex items-center gap-2 mb-5">
         <LayoutTemplate size={20} className="text-purple-400" /> Recursos
       </h1>
       <RecursosTabs />
@@ -65,15 +66,15 @@ export default function AdminRecursosPage() {
 
       {/* Header de la pestaña Flyers */}
       <div className="flex items-center justify-between gap-4 mb-6">
-        <p className="text-xs text-white/40">{items.length} plantilla(s). Acá subís y administrás las plantillas editables (flyers).</p>
+        <p className="text-xs text-[#111827]/40">{items.length} plantilla(s). Acá subís y administrás las plantillas editables (flyers).</p>
         <Link href="/admin/recursos/nuevo"
-          className="shrink-0 flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold text-white bg-purple-600 hover:bg-purple-500 transition-all">
+          className="shrink-0 flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold text-[#111827] bg-purple-600 hover:bg-purple-500 transition-all">
           <Plus size={15} /> Nueva plantilla
         </Link>
       </div>
 
       {items.length === 0 ? (
-        <div className="text-center py-20 text-white/40 border border-dashed border-white/10 rounded-2xl">
+        <div className="text-center py-20 text-[#111827]/40 border border-dashed border-[#E4E9F0] rounded-2xl">
           <LayoutTemplate className="mx-auto mb-3 opacity-40" size={32} />
           <p className="text-sm">No hay plantillas todavía.</p>
           <p className="text-xs mt-1">Creá la primera con “Nueva plantilla”.</p>
@@ -81,15 +82,15 @@ export default function AdminRecursosPage() {
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
           {items.map(t => (
-            <div key={t.id} className="rounded-2xl overflow-hidden border border-white/10 bg-white/[0.03]">
+            <div key={t.id} className="rounded-2xl overflow-hidden border border-[#E4E9F0] bg-white">
               <div className="relative w-full bg-black/30" style={{ aspectRatio: `${t.ancho} / ${t.alto}` }}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={t.thumbUrl || t.fondoUrl} alt={t.nombre} className="w-full h-full object-cover" loading="lazy" />
                 {!t.activo && <span className="absolute top-2 left-2 text-[9px] font-black px-2 py-0.5 rounded-full bg-black/70 text-white/70">OCULTA</span>}
               </div>
               <div className="p-2.5">
-                <p className="text-xs font-bold text-white truncate">{t.nombre}</p>
-                <p className="text-[10px] text-white/35 capitalize mb-2">{t.categoria}</p>
+                <p className="text-xs font-bold text-[#111827] truncate">{t.nombre}</p>
+                <p className="text-[10px] text-[#111827]/35 capitalize mb-2">{t.categoria}</p>
                 <div className="flex gap-1.5">
                   <button onClick={() => toggle(t)} disabled={busy === t.id}
                     className={`flex-1 flex items-center justify-center gap-1 py-1.5 rounded-lg text-[10px] font-bold transition-all disabled:opacity-50 ${t.activo ? 'bg-amber-500/15 text-amber-300 border border-amber-500/25' : 'bg-green-500/15 text-green-300 border border-green-500/25'}`}>
@@ -106,5 +107,6 @@ export default function AdminRecursosPage() {
         </div>
       )}
     </div>
+  </div>
   )
 }
