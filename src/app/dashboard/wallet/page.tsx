@@ -259,7 +259,7 @@ export default function CreditsPage() {
       {/* Header */}
       <div className="flex items-center gap-4">
         <div className="w-11 h-11 rounded-xl flex items-center justify-center"
-          style={{ background: 'linear-gradient(135deg, rgba(154,203,255,0.15), rgba(162,102,255,0.15))', border: '1px solid #E4E9F0' }}>
+          style={{ background: 'linear-gradient(135deg, rgba(154,203,255,0.15), rgba(162,102,255,0.15))', border: '1px solid rgba(255,255,255,0.1)' }}>
           <Cpu className="w-5 h-5 text-violet-400" />
         </div>
         <div>
@@ -276,8 +276,8 @@ export default function CreditsPage() {
       {/* Credits Balance Card — USD */}
       <div className="relative rounded-2xl p-6 overflow-hidden"
         style={{
-          background: '#FFFFFF',
-          border: '1px solid #E4E9F0',
+          background: '#081624',
+          border: '1px solid rgba(255,255,255,0.1)',
           backdropFilter: 'blur(16px)',
         }}>
         <div className="absolute top-0 left-0 right-0 h-px"
@@ -288,7 +288,7 @@ export default function CreditsPage() {
         <div className="flex items-center justify-between gap-3 mb-4">
           <div className="flex items-center gap-3">
             <Wallet className="w-4 h-4 text-violet-400" />
-            <span className="text-xs font-black uppercase tracking-widest" style={{ color: '#6B7280' }}>
+            <span className="text-xs font-black uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.55)' }}>
               Saldo de IA
             </span>
           </div>
@@ -306,11 +306,11 @@ export default function CreditsPage() {
         </div>
 
         <div className="flex items-end gap-3 mb-4">
-          <span className="text-5xl font-black text-[#111827] tabular-nums">${(data?.aiBalanceUsd ?? 0).toFixed(2)}</span>
-          <span className="text-sm font-light mb-2" style={{ color: '#6B7280' }}>USD disponibles</span>
+          <span className="text-5xl font-black text-white tabular-nums">${(data?.aiBalanceUsd ?? 0).toFixed(2)}</span>
+          <span className="text-sm font-light mb-2" style={{ color: 'rgba(255,255,255,0.55)' }}>USD disponibles</span>
         </div>
 
-        <p className="text-xs font-light" style={{ color: '#6B7280' }}>
+        <p className="text-xs font-light" style={{ color: 'rgba(255,255,255,0.55)' }}>
           Tu saldo se descuenta automáticamente con cada uso de IA que pase por la key del administrador. Si usás tu propia API Key, no se descuenta nada.
         </p>
       </div>
@@ -319,13 +319,13 @@ export default function CreditsPage() {
       {purchases.length > 0 && (
         <div className="relative rounded-2xl p-5 overflow-hidden space-y-3"
           style={{
-            background: '#F8FAFC',
+            background: 'rgba(255,255,255,0.05)',
             border: '1px solid #EEF2F7',
             backdropFilter: 'blur(16px)',
           }}>
           <div className="flex items-center gap-2">
             <Receipt className="w-4 h-4 text-violet-400" />
-            <p className="text-[10px] font-black uppercase tracking-widest" style={{ color: '#6B7280' }}>
+            <p className="text-[10px] font-black uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.55)' }}>
               Mis solicitudes
             </p>
           </div>
@@ -337,11 +337,11 @@ export default function CreditsPage() {
                                           { color: '#fbbf24', bg: 'rgba(251,191,36,0.08)', border: 'rgba(251,191,36,0.22)', label: 'Pendiente' }
               return (
                 <div key={p.id} className="flex items-center gap-3 p-3 rounded-xl"
-                  style={{ background: '#F8FAFC', border: '1px solid #EEF2F7' }}>
+                  style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid #EEF2F7' }}>
                   <ArrowDownLeft className="w-3.5 h-3.5 text-violet-400 shrink-0" />
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-bold text-[#111827]">+${Number(p.amountUsd).toFixed(2)} USD</p>
-                    <p className="text-[10px]" style={{ color: '#6B7280' }}>
+                    <p className="text-sm font-bold text-white">+${Number(p.amountUsd).toFixed(2)} USD</p>
+                    <p className="text-[10px]" style={{ color: 'rgba(255,255,255,0.55)' }}>
                       {new Date(p.createdAt).toLocaleDateString()} · {p.paymentMethod === 'MANUAL' ? 'Transferencia' : p.paymentMethod}
                     </p>
                   </div>
@@ -360,13 +360,13 @@ export default function CreditsPage() {
       {data?.recentUsage && data.recentUsage.length > 0 && (
         <div className="relative rounded-2xl p-5 overflow-hidden space-y-3"
           style={{
-            background: '#F8FAFC',
+            background: 'rgba(255,255,255,0.05)',
             border: '1px solid #EEF2F7',
             backdropFilter: 'blur(16px)',
           }}>
           <div className="flex items-center gap-2">
             <Clock className="w-4 h-4 text-sky-400" />
-            <p className="text-[10px] font-black uppercase tracking-widest" style={{ color: '#6B7280' }}>
+            <p className="text-[10px] font-black uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.55)' }}>
               Movimientos recientes
             </p>
           </div>
@@ -375,12 +375,12 @@ export default function CreditsPage() {
               const isRecharge = u.costUsd < 0   // negativo = recarga (entrada)
               return (
                 <div key={u.id} className="flex items-center gap-3 px-3 py-2 rounded-lg"
-                  style={{ background: '#F8FAFC' }}>
+                  style={{ background: 'rgba(255,255,255,0.05)' }}>
                   {isRecharge
                     ? <ArrowDownLeft className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
                     : <ArrowUpRight className="w-3.5 h-3.5 text-rose-400 shrink-0" />}
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs font-bold truncate" style={{ color: 'rgba(255,255,255,0.85)' }}>
+                    <p className="text-xs font-bold truncate" style={{ color: 'rgba(8,22,36,0.96)' }}>
                       {isRecharge ? 'Recarga aprobada' : u.reason}
                     </p>
                     <p className="text-[10px] truncate" style={{ color: 'rgba(255,255,255,0.30)' }}>
@@ -408,7 +408,7 @@ export default function CreditsPage() {
             <Settings className="w-5 h-5" style={{ color: "#D203DD" }} />
           </div>
           <div className="min-w-0">
-            <p className="text-sm font-bold text-[#111827]">Configuración de IA</p>
+            <p className="text-sm font-bold text-white">Configuración de IA</p>
             <p className="text-[11px] font-light" style={{ color: "#6B7280" }}>
               Elegí cómo pagás la IA (saldo o tu propia API Key), tu modelo y los seguimientos — en Configuración.
             </p>
@@ -436,21 +436,21 @@ export default function CreditsPage() {
                   <Wallet className="w-5 h-5 text-violet-300" />
                 </div>
                 <div>
-                  <h2 className="text-base font-black text-[#111827] leading-tight">Comprar saldo de IA</h2>
-                  <p className="text-[10px] mt-0.5" style={{ color: '#6B7280' }}>
+                  <h2 className="text-base font-black text-white leading-tight">Comprar saldo de IA</h2>
+                  <p className="text-[10px] mt-0.5" style={{ color: 'rgba(255,255,255,0.55)' }}>
                     {buyMethod === 'CRYPTO' ? 'USDT-BEP20 · auto-verificado on-chain' : 'Transferencia + comprobante'}
                   </p>
                 </div>
               </div>
               <button onClick={() => setShowBuyModal(false)}
-                className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-[#F0F3F7] transition-colors">
-                <X className="w-4 h-4 text-[#6B7280]" />
+                className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-white/5 transition-colors">
+                <X className="w-4 h-4 text-white/55" />
               </button>
             </div>
 
             {/* Quick amounts + custom input */}
             <div className="space-y-2.5">
-              <label className="text-[10px] font-black uppercase tracking-widest" style={{ color: '#6B7280' }}>
+              <label className="text-[10px] font-black uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.55)' }}>
                 Monto a cargar (USD)
               </label>
               <div className="grid grid-cols-3 gap-2">
@@ -469,7 +469,7 @@ export default function CreditsPage() {
                 ))}
               </div>
               <div className="relative">
-                <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm font-bold" style={{ color: '#6B7280' }}>$</span>
+                <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm font-bold" style={{ color: 'rgba(255,255,255,0.55)' }}>$</span>
                 <input
                   type="number"
                   min="1"
@@ -477,9 +477,9 @@ export default function CreditsPage() {
                   step="0.01"
                   value={buyAmount}
                   onChange={e => setBuyAmount(e.target.value)}
-                  className="w-full pl-8 pr-3 py-3 rounded-xl text-sm font-bold text-[#111827] outline-none tabular-nums"
+                  className="w-full pl-8 pr-3 py-3 rounded-xl text-sm font-bold text-white outline-none tabular-nums"
                   placeholder="Otro monto"
-                  style={{ background: '#F0F3F7', border: '1px solid #9CA3AF' }}
+                  style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid #9CA3AF' }}
                   onFocus={e => (e.currentTarget.style.borderColor = 'rgba(162,102,255,0.50)')}
                   onBlur={e => (e.currentTarget.style.borderColor = '#9CA3AF')}
                 />
@@ -491,7 +491,7 @@ export default function CreditsPage() {
 
             {/* Tabs método de pago */}
             <div className="flex items-center gap-1 p-1 rounded-xl"
-              style={{ background: '#F0F3F7', border: '1px solid #EEF2F7' }}>
+              style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid #EEF2F7' }}>
               <button
                 onClick={() => { setBuyMethod('CRYPTO'); setBuyMsg(null) }}
                 className="flex-1 py-2.5 rounded-lg text-xs font-black transition-all flex items-center justify-center gap-1.5"
@@ -537,7 +537,7 @@ export default function CreditsPage() {
             {/* ═══ FLUJO USDT (CRYPTO) ═══ Componente compartido con checkout de planes */}
             {buyMethod === 'CRYPTO' && parseFloat(buyAmount || '0') >= 1 && (
               <div className="rounded-xl p-3"
-                style={{ background: '#F8FAFC', border: '1px solid #EEF2F7' }}>
+                style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid #EEF2F7' }}>
                 <PaymentGateway
                   plan="CREDITS"
                   productLabel="Saldo IA"
@@ -587,20 +587,20 @@ export default function CreditsPage() {
                   <div className="flex items-center gap-2">
                     <span className="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black"
                       style={{ background: 'linear-gradient(135deg, #a78bfa, #60a5fa)', color: '#fff' }}>1</span>
-                    <label className="text-[10px] font-black uppercase tracking-widest" style={{ color: '#6B7280' }}>
+                    <label className="text-[10px] font-black uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.55)' }}>
                       Escanea el QR y paga
                     </label>
                   </div>
 
                   {paymentQrUrl ? (
                     <div className="flex flex-col sm:flex-row items-center gap-4 p-4 rounded-xl"
-                      style={{ background: '#F0F3F7', border: '1px solid rgba(255,255,255,0.10)' }}>
+                      style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.10)' }}>
                       <div className="w-36 h-36 rounded-xl bg-white flex items-center justify-center shrink-0 overflow-hidden"
                         style={{ border: '1px solid rgba(255,255,255,0.20)' }}>
                         <img src={paymentQrUrl} alt="QR de pago" className="w-full h-full object-contain p-2" />
                       </div>
                       <div className="text-center sm:text-left space-y-1.5 flex-1 min-w-0">
-                        <p className="text-[11px] leading-relaxed" style={{ color: '#374151' }}>
+                        <p className="text-[11px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.78)' }}>
                           Escaneá con tu billetera y transferí exactamente:
                         </p>
                         <p className="text-2xl font-black tabular-nums"
@@ -632,7 +632,7 @@ export default function CreditsPage() {
                   <div className="flex items-center gap-2">
                     <span className="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black"
                       style={{ background: 'linear-gradient(135deg, #a78bfa, #60a5fa)', color: '#fff' }}>2</span>
-                    <label className="text-[10px] font-black uppercase tracking-widest" style={{ color: '#6B7280' }}>
+                    <label className="text-[10px] font-black uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.55)' }}>
                       Subí el comprobante
                     </label>
                   </div>
@@ -649,7 +649,7 @@ export default function CreditsPage() {
                         ? <Loader2 className="w-4 h-4 text-violet-400 animate-spin" />
                         : buyProofUrl
                           ? <CheckCircle className="w-4 h-4 text-emerald-400" />
-                          : <Upload className="w-4 h-4 text-[#6B7280]" />}
+                          : <Upload className="w-4 h-4 text-white/55" />}
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-bold" style={{ color: buyProofUrl ? '#fff' : 'rgba(255,255,255,0.75)' }}>
@@ -666,7 +666,7 @@ export default function CreditsPage() {
 
             {/* Notas opcionales */}
             <div className="space-y-2">
-              <label className="text-[10px] font-black uppercase tracking-widest" style={{ color: '#6B7280' }}>
+              <label className="text-[10px] font-black uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.55)' }}>
                 Notas (opcional)
               </label>
               <textarea
@@ -675,8 +675,8 @@ export default function CreditsPage() {
                 rows={2}
                 maxLength={500}
                 placeholder="Banco, alias, referencia..."
-                className="w-full px-3.5 py-2.5 rounded-xl text-sm text-[#111827] outline-none resize-none"
-                style={{ background: '#F0F3F7', border: '1px solid #9CA3AF' }}
+                className="w-full px-3.5 py-2.5 rounded-xl text-sm text-white outline-none resize-none"
+                style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid #9CA3AF' }}
               />
             </div>
 
@@ -716,9 +716,9 @@ export default function CreditsPage() {
 
             {/* Info de proceso */}
             <div className="flex items-start gap-2 p-3 rounded-xl"
-              style={{ background: '#F8FAFC', border: '1px solid #EEF2F7' }}>
-              <Info className="w-3.5 h-3.5 mt-0.5 shrink-0" style={{ color: '#6B7280' }} />
-              <p className="text-[11px] leading-relaxed" style={{ color: '#6B7280' }}>
+              style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid #EEF2F7' }}>
+              <Info className="w-3.5 h-3.5 mt-0.5 shrink-0" style={{ color: 'rgba(255,255,255,0.55)' }} />
+              <p className="text-[11px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.55)' }}>
                 {buyMethod === 'CRYPTO'
                   ? <>Enviá los <strong className="text-[#B735B8]">USDT-BEP20</strong> a la dirección, pegá el TX hash y dale verificar. Si la red ya confirmó (3 bloques) tu saldo se acredita al instante. Si todavía está confirmando, queda pendiente y se aprueba sola en 1-2 min.</>
                   : <>Realizá la transferencia, subí el comprobante y enviá la solicitud. El admin la verifica y acredita tu saldo. Generalmente toma menos de 24h.</>

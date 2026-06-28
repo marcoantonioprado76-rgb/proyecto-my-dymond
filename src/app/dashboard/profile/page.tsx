@@ -106,7 +106,7 @@ export default function ProfilePage() {
       <div className="grid md:grid-cols-3 gap-6">
 
         {/* Card de perfil */}
-        <div className="dm-card md:col-span-1" style={{ padding: 28, display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
+        <div className="dm-card-dark md:col-span-1" style={{ padding: 28, display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
           <div className="relative mb-4">
             <div style={{ width: 84, height: 84, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--dm-grad)', color: '#fff', boxShadow: '0 14px 32px rgba(255,9,108,0.26)' }}>
               <UserCircle className="w-12 h-12" />
@@ -138,9 +138,9 @@ export default function ProfilePage() {
             </div>
           ) : (
             <div className="group relative flex items-center justify-center gap-2 mb-1">
-              <h2 className="font-display" style={{ fontSize: 22, fontWeight: 600, color: '#111827', margin: 0 }}>{user.fullName}</h2>
+              <h2 className="font-display" style={{ fontSize: 22, fontWeight: 600, color: '#fff', margin: 0 }}>{user.fullName}</h2>
               <button onClick={startEdit} title="Editar nombre"
-                style={{ width: 28, height: 28, borderRadius: 8, background: '#F0F3F7', border: '1px solid #E4E9F0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                style={{ width: 28, height: 28, borderRadius: 8, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <Pencil className="w-3 h-3" style={{ color: '#FF096C' }} />
               </button>
             </div>
@@ -157,27 +157,27 @@ export default function ProfilePage() {
             </div>
           )}
 
-          <div style={{ width: '100%', padding: '12px 16px', borderRadius: 14, background: '#F8FAFC', border: '1px solid #E4E9F0' }}>
-            <p style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#9CA3AF', margin: 0 }}>Estado de Cuenta</p>
+          <div style={{ width: '100%', padding: '12px 16px', borderRadius: 14, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}>
+            <p style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'rgba(255,255,255,0.42)', margin: 0 }}>Estado de Cuenta</p>
             <p style={{ fontSize: 15, fontWeight: 700, color: user.isActive ? '#16A34A' : '#ef4444', margin: '3px 0 0' }}>{user.isActive ? 'Activo' : 'Inactivo'}</p>
           </div>
         </div>
 
         {/* Detalles */}
-        <div className="dm-card md:col-span-2" style={{ padding: 28 }}>
+        <div className="dm-card-dark md:col-span-2" style={{ padding: 28 }}>
           <div className="flex items-center gap-2 mb-6">
             <FileText className="w-4 h-4" style={{ color: '#B735B8' }} />
-            <h3 style={{ fontSize: 13, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#111827', margin: 0 }}>Detalles de la Cuenta</h3>
+            <h3 style={{ fontSize: 13, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#fff', margin: 0 }}>Detalles de la Cuenta</h3>
           </div>
           <div className="grid gap-3">
             {fields.map((field, i) => (
-              <div key={i} className="flex items-center gap-4 p-3.5 rounded-xl" style={{ background: '#F8FAFC', border: '1px solid #E4E9F0' }}>
+              <div key={i} className="flex items-center gap-4 p-3.5 rounded-xl" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}>
                 <div style={{ width: 38, height: 38, borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', background: `${field.color}14`, border: `1px solid ${field.color}28` }}>
                   <field.icon className="w-4 h-4" style={{ color: field.color }} />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', color: '#9CA3AF', margin: 0 }}>{field.label}</p>
-                  <p style={{ fontSize: 14, color: '#111827', margin: '2px 0 0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{field.value}</p>
+                  <p style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'rgba(255,255,255,0.42)', margin: 0 }}>{field.label}</p>
+                  <p style={{ fontSize: 14, color: '#fff', margin: '2px 0 0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{field.value}</p>
                 </div>
               </div>
             ))}
