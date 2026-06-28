@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Eye, EyeOff, AlertCircle, CheckCircle2, ArrowRight, ChevronDown, User } from 'lucide-react'
 import TurnstileWidget from '@/components/TurnstileWidget'
+import '../dashboard/dashboard.css' // .dm-* utilities (no se cargan fuera de /dashboard)
 
 const LATAM_DATA: Record<string, string[]> = {
   'Argentina': ['Buenos Aires', 'Cordoba', 'Rosario', 'Mendoza', 'La Plata', 'Tucuman', 'Mar del Plata', 'Salta', 'Santa Fe', 'San Juan'],
@@ -215,13 +216,12 @@ function RegisterForm() {
 
       <div className="w-full max-w-sm relative z-10">
 
-        {/* Logo */}
+        {/* Logo oficial */}
         <div className="flex flex-col items-center mb-6">
-          <div className="w-14 h-14 mb-3 rounded-xl overflow-hidden border border-[#E4E9F0] shadow-lg shadow-black/40">
-            <img src="/logo.png" alt="Logo" className="w-full h-full object-contain" />
+          <div style={{ padding: '14px 24px', borderRadius: 22, background: 'linear-gradient(135deg, #0B1B2B 0%, #081624 100%)', boxShadow: '0 18px 40px -14px rgba(8,22,36,0.5)' }}>
+            <img src="/logo-oficial-mydiamond.png" alt="MY DIAMOND" style={{ width: 140, height: 'auto', display: 'block' }} />
           </div>
-          <h1 className="text-lg font-black text-[#111827] tracking-tight">MY DIAMOND</h1>
-          <p className="text-xs text-[#6B7280] mt-0.5">Crea tu cuenta gratuita</p>
+          <p className="text-xs text-[#6B7280] mt-3">Crea tu cuenta gratuita</p>
         </div>
 
         {/* Card */}

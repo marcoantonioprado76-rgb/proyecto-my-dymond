@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { Mail, ArrowLeft, AlertCircle, ArrowRight, CheckCircle2 } from 'lucide-react'
+import '../dashboard/dashboard.css' // .dm-* utilities (no se cargan fuera de /dashboard)
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('')
@@ -48,11 +49,9 @@ export default function ForgotPasswordPage() {
       <div className="w-full max-w-[340px] relative z-10">
 
         <div className="flex flex-col items-center mb-7">
-          <div className="w-14 h-14 mb-3 rounded-xl overflow-hidden border border-white/10 shadow-lg shadow-black/50">
-            <img src="/logo.png" alt="Logo" className="w-full h-full object-contain" />
+          <div style={{ padding: '14px 24px', borderRadius: 22, background: 'linear-gradient(135deg, #0B1B2B 0%, #081624 100%)', boxShadow: '0 18px 40px -14px rgba(8,22,36,0.5)' }}>
+            <img src="/logo-oficial-mydiamond.png" alt="MY DIAMOND" style={{ width: 140, height: 'auto', display: 'block' }} />
           </div>
-          <h1 className="flex justify-center"><span className="font-display text-diamond-gradient" style={{fontSize:26,fontWeight:700,letterSpacing:'0.04em'}}>MY DIAMOND</span></h1>
-          <p className="text-[11px] text-[#6B7280] mt-0.5">Network Marketing Digital</p>
         </div>
 
         <div className="dm-card" style={{ padding: '1.5rem' }}>

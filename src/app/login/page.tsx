@@ -16,6 +16,13 @@ export default function LoginPage() {
   const handleTurnstile = useCallback((token: string) => setTurnstileToken(token), [])
   const handleTurnstileExpire = useCallback(() => setTurnstileToken(''), [])
 
+  // dashboard.css (.dm-*) no se carga en /login → estilos inline
+  const inputStyle: React.CSSProperties = {
+    width: '100%', background: '#FFFFFF', border: '1px solid #E4E9F0', borderRadius: 14,
+    padding: '12px 14px', fontSize: 14, color: '#111827', outline: 'none',
+    boxShadow: '0 4px 14px rgba(15,23,42,0.04)',
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
@@ -52,18 +59,15 @@ export default function LoginPage() {
 
       <div className="w-full max-w-[380px] relative z-10">
 
-        {/* Logo + Brand */}
+        {/* Logo oficial */}
         <div className="flex flex-col items-center mb-8">
-          <div className="w-16 h-16 mb-3 rounded-2xl overflow-hidden"
-            style={{ background: '#071522', border: '1px solid #E4E9F0', boxShadow: '0 14px 32px rgba(8,22,36,0.18)' }}>
-            <img src="/logo.png" alt="Logo" className="w-full h-full object-contain" />
+          <div style={{ padding: '18px 28px', borderRadius: 26, background: 'linear-gradient(135deg, #0B1B2B 0%, #081624 100%)', boxShadow: '0 20px 44px -14px rgba(8,22,36,0.55)' }}>
+            <img src="/logo-oficial-mydiamond.png" alt="MY DIAMOND" style={{ width: 168, height: 'auto', display: 'block' }} />
           </div>
-          <h1 className="font-display text-diamond-gradient" style={{ fontSize: 30, fontWeight: 700, letterSpacing: '0.04em', margin: 0 }}>MY DIAMOND</h1>
-          <p className="text-[11px] mt-1 tracking-widest uppercase" style={{ color: '#9CA3AF' }}>Network Marketing Digital</p>
         </div>
 
         {/* Card */}
-        <div className="dm-card" style={{ padding: '2rem' }}>
+        <div style={{ padding: '2rem', background: '#FFFFFF', border: '1px solid #E4E9F0', borderRadius: 24, boxShadow: '0 18px 45px rgba(15,23,42,0.08)' }}>
 
           <p className="text-[10px] font-black uppercase tracking-[0.2em] mb-5" style={{ color: '#9CA3AF' }}>Iniciar sesión</p>
 
@@ -88,7 +92,7 @@ export default function LoginPage() {
                 required
                 autoComplete="username"
                 autoFocus
-                className="dm-input text-sm"
+                style={inputStyle}
               />
             </div>
 
@@ -109,7 +113,7 @@ export default function LoginPage() {
                   onChange={e => setForm({ ...form, password: e.target.value })}
                   required
                   autoComplete="current-password"
-                  className="dm-input text-sm pr-11"
+                  style={{ ...inputStyle, paddingRight: 44 }}
                 />
                 <button
                   type="button"
@@ -127,8 +131,8 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="dm-btn w-full uppercase tracking-[0.18em] text-xs mt-2"
-              style={{ padding: '13px 20px' }}
+              className="w-full uppercase tracking-[0.18em] text-xs mt-2 flex items-center justify-center gap-2 transition-all active:scale-[0.99] disabled:opacity-60"
+              style={{ padding: '14px 20px', borderRadius: 16, fontWeight: 800, color: '#fff', border: 'none', cursor: 'pointer', background: 'linear-gradient(135deg, #FF2D95 0%, #B735B8 48%, #233B8F 100%)', boxShadow: '0 16px 36px rgba(255,9,108,0.28)' }}
             >
               {loading
                 ? <div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
