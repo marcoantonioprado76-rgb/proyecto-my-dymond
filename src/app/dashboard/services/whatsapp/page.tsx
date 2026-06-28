@@ -1047,7 +1047,7 @@ function CredentialsTab({ bot, onStatusChange }: { bot: Bot; onStatusChange: (st
                 value={form.ycloudApiKey}
                 onChange={e => setForm(f => ({ ...f, ycloudApiKey: e.target.value }))}
                 placeholder={creds?.hasYcloudKey ? '(dejar vacío para mantener)' : 'yk_live_...'}
-                className="w-full bg-[#F4F6FA]0 border border-[#E4E9F0] rounded-xl px-4 py-2.5 pr-10 text-sm text-[#111827] placeholder-dark-500 focus:outline-none focus:border-[#B735B8]/40"
+                className="w-full bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-4 py-2.5 pr-10 text-sm text-[#111827] placeholder-dark-500 focus:outline-none focus:border-[#B735B8]/40"
               />
               <button
                 type="button"
@@ -1075,7 +1075,7 @@ function CredentialsTab({ bot, onStatusChange }: { bot: Bot; onStatusChange: (st
                 value={form.metaPageToken}
                 onChange={e => setForm(f => ({ ...f, metaPageToken: e.target.value }))}
                 placeholder={creds?.hasMetaToken ? '(dejar vacío para mantener)' : 'EAAxxxxxxx...'}
-                className="w-full bg-[#F4F6FA]0 border border-[#E4E9F0] rounded-xl px-4 py-2.5 pr-10 text-sm text-[#111827] placeholder-dark-500 focus:outline-none focus:border-purple-400/40"
+                className="w-full bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-4 py-2.5 pr-10 text-sm text-[#111827] placeholder-dark-500 focus:outline-none focus:border-purple-400/40"
               />
               <button
                 type="button"
@@ -1103,7 +1103,7 @@ function CredentialsTab({ bot, onStatusChange }: { bot: Bot; onStatusChange: (st
               value={form.openaiApiKey}
               onChange={e => setForm(f => ({ ...f, openaiApiKey: e.target.value }))}
               placeholder={creds?.hasOpenAIKey ? '(dejar vacío para mantener)' : 'sk-proj-...'}
-              className="w-full bg-[#F4F6FA]0 border border-[#E4E9F0] rounded-xl px-4 py-2.5 pr-10 text-sm text-[#111827] placeholder-dark-500 focus:outline-none focus:border-[#B735B8]/40"
+              className="w-full bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-4 py-2.5 pr-10 text-sm text-[#111827] placeholder-dark-500 focus:outline-none focus:border-[#B735B8]/40"
             />
             <button
               type="button"
@@ -1125,7 +1125,7 @@ function CredentialsTab({ bot, onStatusChange }: { bot: Bot; onStatusChange: (st
               value={form.whatsappInstanceNumber}
               onChange={e => setForm(f => ({ ...f, whatsappInstanceNumber: e.target.value }))}
               placeholder="15551234567 (sin + ni espacios)"
-              className="w-full bg-[#F4F6FA]0 border border-[#E4E9F0] rounded-xl px-4 py-2.5 text-sm text-[#111827] placeholder-dark-500 focus:outline-none focus:border-[#B735B8]/40"
+              className="w-full bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-4 py-2.5 text-sm text-[#111827] placeholder-dark-500 focus:outline-none focus:border-[#B735B8]/40"
             />
           </div>
         )}
@@ -1140,7 +1140,7 @@ function CredentialsTab({ bot, onStatusChange }: { bot: Bot; onStatusChange: (st
               value={form.reportPhone}
               onChange={e => setForm(f => ({ ...f, reportPhone: e.target.value }))}
               placeholder="15559876543"
-              className="w-full bg-[#F4F6FA]0 border border-[#E4E9F0] rounded-xl px-4 py-2.5 text-sm text-[#111827] placeholder-dark-500 focus:outline-none focus:border-[#B735B8]/40"
+              className="w-full bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-4 py-2.5 text-sm text-[#111827] placeholder-dark-500 focus:outline-none focus:border-[#B735B8]/40"
               required
             />
             <p className="text-xs text-[#9CA3AF] mt-1">
@@ -1152,7 +1152,7 @@ function CredentialsTab({ bot, onStatusChange }: { bot: Bot; onStatusChange: (st
         <button
           type="submit"
           disabled={loading}
-          className="w-full py-3 bg-[#B735B8] text-white font-bold rounded-xl hover:bg-[#B735B8]/90 disabled:opacity-50 flex items-center justify-center gap-2 transition-colors"
+          className="w-full py-3 bg-gradient-to-r from-[#FF2D95] via-[#B735B8] to-[#233B8F] text-white font-bold rounded-xl hover:opacity-90 disabled:opacity-50 flex items-center justify-center gap-2 transition-colors"
         >
           {loading ? <Spinner /> : <Save className="w-4 h-4" />}
           Guardar credenciales
@@ -1162,7 +1162,7 @@ function CredentialsTab({ bot, onStatusChange }: { bot: Bot; onStatusChange: (st
       {/* Model selector */}
       <div className="dm-card p-6 rounded-2xl space-y-4">
         <h3 className="text-sm font-bold text-[#111827] flex items-center gap-2">
-          <Zap className="w-4 h-4 text-[#16A34A]" />
+          <Zap className="w-4 h-4 text-[#B735B8]" />
           Modelo de IA
           <span className="text-xs font-normal text-[#6B7280] ml-1">— para respuestas al cliente</span>
         </h3>
@@ -1583,7 +1583,7 @@ function PromptTab({ bot, onSaved }: { bot: Bot; onSaved: (updated: Partial<Bot>
             onChange={e => setForm(f => ({ ...f, systemPromptTemplate: e.target.value }))}
             rows={12}
             placeholder={`Escribe aquí las instrucciones de tu vendedor.\n\nEjemplo:\n- Su nombre, estilo de comunicación y tono\n- Cómo identificar el problema del cliente\n- Cómo presentar y cerrar la venta\n- Reglas de negocio especiales\n\nUsa el botón "Cargar plantilla de ejemplo" para ver una plantilla lista.`}
-            className="w-full bg-[#F4F6FA]0 border border-[#E4E9F0] rounded-xl px-4 py-3 text-sm text-[#111827] placeholder-dark-500 focus:outline-none focus:border-[#233B8F]/40 font-mono resize-y min-h-[200px]"
+            className="w-full bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-4 py-3 text-sm text-[#111827] placeholder-dark-500 focus:outline-none focus:border-[#233B8F]/40 font-mono resize-y min-h-[200px]"
           />
           <p className="text-xs text-[#9CA3AF] mt-1">
             Estas instrucciones se combinan con las reglas del bot y la base de conocimiento de productos.
@@ -1604,7 +1604,7 @@ function PromptTab({ bot, onSaved }: { bot: Bot; onSaved: (updated: Partial<Bot>
                   value={form[field]}
                   onChange={e => setForm(f => ({ ...f, [field]: e.target.value }))}
                   placeholder="Sin límite"
-                  className="w-full bg-[#F4F6FA]0 border border-[#E4E9F0] rounded-xl px-3 py-2 text-sm text-[#111827] placeholder-dark-500 focus:outline-none focus:border-[#233B8F]/40"
+                  className="w-full bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-3 py-2 text-sm text-[#111827] placeholder-dark-500 focus:outline-none focus:border-[#233B8F]/40"
                 />
               </div>
             ))}
@@ -1842,7 +1842,7 @@ function ProductForm({
   }
 
   const inputClass =
-    'w-full bg-[#F4F6FA]0 border border-[#E4E9F0] rounded-xl px-4 py-2.5 text-sm text-[#111827] placeholder-dark-500 focus:outline-none focus:border-[#16A34A]/40 transition-colors'
+    'w-full bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-4 py-2.5 text-sm text-[#111827] placeholder-dark-500 focus:outline-none focus:border-[#16A34A]/40 transition-colors'
   const textareaClass = `${inputClass} resize-y`
   const labelClass = 'block text-xs font-medium text-[#374151] mb-1.5'
   const sectionClass = 'dm-card p-5 rounded-2xl space-y-4'
@@ -1852,7 +1852,7 @@ function ProductForm({
     <form onSubmit={handleSubmit} className="space-y-5">
       <div className="flex items-center justify-between">
         <h3 className="font-bold text-[#111827] flex items-center gap-2">
-          <Package className="w-4 h-4 text-[#16A34A]" />
+          <Package className="w-4 h-4 text-[#B735B8]" />
           {product ? 'Editar producto' : 'Nuevo producto'}
         </h3>
         <button type="button" onClick={onCancel} className="text-[#6B7280] hover:text-[#111827] transition-colors">
@@ -1864,7 +1864,7 @@ function ProductForm({
 
       {/* Basic info */}
       <div className={sectionClass}>
-        <div className={sectionHeaderClass}><span className="w-1 h-3.5 bg-[#16A34A]/70 rounded-full" />Información básica</div>
+        <div className={sectionHeaderClass}><span className="w-1 h-3.5 bg-[#B735B8]/70 rounded-full" />Información básica</div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label className={labelClass}>Nombre del producto *</label>
@@ -1881,7 +1881,7 @@ function ProductForm({
             <select
               value={form.category}
               onChange={e => setField('category', e.target.value)}
-              className={`${inputClass} appearance-none bg-[#F4F6FA]0`}
+              className={`${inputClass} appearance-none bg-[#F4F6FA]`}
             >
               <option value="">Selecciona una categoría...</option>
               <option value="Salud y Bienestar">Salud y Bienestar</option>
@@ -2023,7 +2023,7 @@ function ProductForm({
       {/* Images Section */}
       <div className={sectionClass}>
         <div>
-          <div className={`${sectionHeaderClass} mb-3`}><span className="w-1 h-3.5 bg-[#16A34A]/70 rounded-full" />Imágenes principales</div>
+          <div className={`${sectionHeaderClass} mb-3`}><span className="w-1 h-3.5 bg-[#B735B8]/70 rounded-full" />Imágenes principales</div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             {(['img1', 'img2', 'img3'] as const).map(key => (
               <UploadField key={key} type="image" value={form[key]} onChange={v => setField(key, v)} placeholder="Subir foto principal" />
@@ -2032,7 +2032,7 @@ function ProductForm({
         </div>
 
         <div className="pt-2">
-          <div className={`${sectionHeaderClass} mb-3`}><span className="w-1 h-3.5 bg-[#16A34A]/70 rounded-full" />Más fotos del producto</div>
+          <div className={`${sectionHeaderClass} mb-3`}><span className="w-1 h-3.5 bg-[#B735B8]/70 rounded-full" />Más fotos del producto</div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {(['img4', 'img5', 'img6', 'img7', 'img8'] as const).map((key, i) => (
               <UploadField key={key} type="image" value={form[key]} onChange={v => setField(key, v)} placeholder={`Foto adicional ${i + 1}`} />
@@ -2135,7 +2135,7 @@ function ProductForm({
         <button
           type="submit"
           disabled={loading}
-          className="flex-1 py-3 bg-[#16A34A] text-dark-950 font-bold rounded-xl hover:bg-[#16A34A]/90 disabled:opacity-50 flex items-center justify-center gap-2 transition-colors text-sm"
+          className="flex-1 py-3 bg-gradient-to-r from-[#FF2D95] via-[#B735B8] to-[#233B8F] text-white font-bold rounded-xl hover:opacity-90 disabled:opacity-50 flex items-center justify-center gap-2 transition-colors text-sm"
         >
           {loading ? <Spinner /> : <Save className="w-4 h-4" />}
           {product ? 'Actualizar' : 'Crear producto'}
@@ -2343,7 +2343,7 @@ function ProductsTab({ bot }: { bot: Bot }) {
         </div>
         <button
           onClick={() => { setEditingProduct(null); setShowForm(true) }}
-          className="flex items-center gap-2 px-4 py-2 bg-[#16A34A] text-dark-950 font-bold rounded-xl text-sm hover:bg-[#16A34A]/90 transition-colors"
+          className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#FF2D95] via-[#B735B8] to-[#233B8F] text-white font-bold rounded-xl text-sm hover:opacity-90 transition-colors"
         >
           <Plus className="w-4 h-4" />
           Nuevo producto
@@ -2454,7 +2454,7 @@ function ProductsTab({ bot }: { bot: Bot }) {
                       <button
                         onClick={() => handleAssign(product)}
                         disabled={actioning === product.id}
-                        className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-[#16A34A]/10 text-[#16A34A] hover:bg-[#16A34A]/20 transition-colors disabled:opacity-50"
+                        className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-[#FF096C]/10 text-[#FF096C] hover:bg-[#FF096C]/20 transition-colors disabled:opacity-50"
                       >
                         {actioning === product.id ? <Spinner /> : <Plus className="w-3 h-3" />}
                         Asignar
@@ -2527,8 +2527,8 @@ function FollowUpTab({
     <div className="max-w-2xl space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300 transition-all">
       <div className="dm-card p-6 rounded-2xl border border-[#E4E9F0] space-y-6">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-[#16A34A]/10 border border-[#16A34A]/20 flex items-center justify-center">
-            <Bell className="w-5 h-5 text-[#16A34A]" />
+          <div className="w-10 h-10 rounded-xl bg-[#B735B8]/12 border border-[#B735B8]/25 flex items-center justify-center">
+            <Bell className="w-5 h-5 text-[#B735B8]" />
           </div>
           <div>
             <h3 className="text-lg font-bold text-[#111827]">Configuración de Seguimientos</h3>
@@ -2547,7 +2547,7 @@ function FollowUpTab({
                 min="1"
                 value={f1}
                 onChange={e => setF1(Number(e.target.value))}
-                className="w-full bg-[#F4F6FA]0 border border-[#E4E9F0] group-hover:border-[#E4E9F0] focus:border-[#16A34A]/40 rounded-xl px-4 py-3 text-sm text-[#111827] transition-all outline-none"
+                className="w-full bg-[#F4F6FA] border border-[#E4E9F0] group-hover:border-[#E4E9F0] focus:border-[#16A34A]/40 rounded-xl px-4 py-3 text-sm text-[#111827] transition-all outline-none"
                 placeholder="Ej: 15"
               />
               <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[9px] text-[#9CA3AF] font-bold uppercase tracking-tighter">Minutos</span>
@@ -2565,7 +2565,7 @@ function FollowUpTab({
                 min="1"
                 value={f2}
                 onChange={e => setF2(Number(e.target.value))}
-                className="w-full bg-[#F4F6FA]0 border border-[#E4E9F0] group-hover:border-[#E4E9F0] focus:border-[#16A34A]/40 rounded-xl px-4 py-3 text-sm text-[#111827] transition-all outline-none"
+                className="w-full bg-[#F4F6FA] border border-[#E4E9F0] group-hover:border-[#E4E9F0] focus:border-[#16A34A]/40 rounded-xl px-4 py-3 text-sm text-[#111827] transition-all outline-none"
                 placeholder="Ej: 4320"
               />
               <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[9px] text-[#9CA3AF] font-bold uppercase tracking-tighter">Minutos</span>
@@ -2581,7 +2581,7 @@ function FollowUpTab({
             <button
               type="submit"
               disabled={saving}
-              className="flex items-center gap-2 px-6 py-3 bg-[#16A34A] text-black rounded-xl text-sm font-bold hover:bg-[#16A34A]/90 transition-all disabled:opacity-50 shrink-0 shadow-lg shadow-[#16A34A]/10"
+              className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-[#FF2D95] via-[#B735B8] to-[#233B8F] text-white rounded-xl text-sm font-bold hover:opacity-90 transition-all disabled:opacity-50 shrink-0 shadow-lg shadow-[#16A34A]/10"
             >
               {saving ? <Spinner /> : <Check className="w-4 h-4" />}
               Guardar Cambios
@@ -2590,9 +2590,9 @@ function FollowUpTab({
         </form>
       </div>
 
-      <div className="bg-[#16A34A]/5 border border-[#16A34A]/10 rounded-2xl p-4 flex gap-4">
-        <div className="w-10 h-10 rounded-full bg-[#16A34A]/10 flex items-center justify-center shrink-0">
-          <Zap className="w-5 h-5 text-[#16A34A]" />
+      <div className="bg-[#B735B8]/6 border border-[#B735B8]/14 rounded-2xl p-4 flex gap-4">
+        <div className="w-10 h-10 rounded-full bg-[#B735B8]/12 flex items-center justify-center shrink-0">
+          <Zap className="w-5 h-5 text-[#B735B8]" />
         </div>
         <div>
           <h4 className="text-sm font-bold text-[#111827]">¿Cómo funciona?</h4>
@@ -2720,7 +2720,7 @@ function QRTab({ bot }: { bot: Bot }) {
               <button
                 onClick={handleConnect}
                 disabled={connecting || status === 'connecting' || status === 'qr_ready'}
-                className="flex items-center gap-2 px-3 py-2 bg-[#16A34A]/10 border border-[#16A34A]/30 text-[#16A34A] hover:bg-[#16A34A]/20 rounded-xl text-xs font-medium transition-colors disabled:opacity-50"
+                className="flex items-center gap-2 px-3 py-2 bg-[#FF096C]/10 border border-[#FF096C]/30 text-[#FF096C] hover:bg-[#FF096C]/20 rounded-xl text-xs font-medium transition-colors disabled:opacity-50"
               >
                 {connecting || status === 'connecting' ? <Spinner /> : <RefreshCw className="w-3.5 h-3.5" />}
                 {status === 'qr_ready' ? 'Escanea el QR' : 'Conectar'}
@@ -2746,7 +2746,7 @@ function QRTab({ bot }: { bot: Bot }) {
       {status === 'qr_ready' && qrBase64 && (
         <div className="dm-card p-6 rounded-2xl text-center space-y-4">
           <div className="flex items-center gap-2 justify-center text-sm font-bold text-[#111827]">
-            <QrCode className="w-4 h-4 text-[#16A34A]" />
+            <QrCode className="w-4 h-4 text-[#B735B8]" />
             Escanea con WhatsApp
           </div>
           <p className="text-xs text-[#6B7280]">
@@ -2766,7 +2766,7 @@ function QRTab({ bot }: { bot: Bot }) {
       {/* Conectado */}
       {status === 'connected' && (
         <div className="dm-card p-6 rounded-2xl border border-[#16A34A]/20 text-center space-y-2">
-          <div className="w-12 h-12 rounded-xl bg-[#16A34A]/10 border border-[#16A34A]/20 flex items-center justify-center mx-auto">
+          <div className="w-12 h-12 rounded-xl bg-[#B735B8]/12 border border-[#B735B8]/25 flex items-center justify-center mx-auto">
             <Wifi className="w-6 h-6 text-[#16A34A]" />
           </div>
           <div className="text-sm font-bold text-[#111827]">¡Agente conectado correctamente!</div>
@@ -3368,8 +3368,8 @@ function BotDetailView({
           <ArrowLeft className="w-5 h-5" />
         </button>
         <div className="flex-1 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-[#16A34A]/10 border border-[#16A34A]/20 flex items-center justify-center shrink-0">
-            <Bot className="w-5 h-5 text-[#16A34A]" />
+          <div className="w-10 h-10 rounded-xl bg-[#B735B8]/12 border border-[#B735B8]/25 flex items-center justify-center shrink-0">
+            <Bot className="w-5 h-5 text-[#B735B8]" />
           </div>
           {editingName ? (
             <div className="flex items-center gap-2 flex-1">
@@ -3378,7 +3378,7 @@ function BotDetailView({
                 onChange={e => setNewName(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && saveName()}
                 autoFocus
-                className="bg-[#F4F6FA]0 border border-[#E4E9F0] rounded-lg px-3 py-1.5 text-sm text-[#111827] focus:outline-none focus:border-[#16A34A]/40 flex-1 max-w-xs"
+                className="bg-[#F4F6FA] border border-[#E4E9F0] rounded-lg px-3 py-1.5 text-sm text-[#111827] focus:outline-none focus:border-[#16A34A]/40 flex-1 max-w-xs"
               />
               <button onClick={saveName} disabled={savingName} className="text-[#16A34A] hover:text-[#16A34A]/80">
                 {savingName ? <Spinner /> : <Check className="w-4 h-4" />}
@@ -3428,7 +3428,7 @@ function BotDetailView({
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 bg-[#F4F6FA]0 p-1 rounded-xl border border-[#E4E9F0] overflow-x-auto scrollbar-hide">
+      <div className="flex gap-1 bg-[#F4F6FA] p-1 rounded-xl border border-[#E4E9F0] overflow-x-auto scrollbar-hide">
         {tabs.map(t => (
           <button
             key={t.id}
