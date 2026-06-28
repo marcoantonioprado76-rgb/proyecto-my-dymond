@@ -746,11 +746,13 @@
 
 /* logo oficial único (diamante plata + MY DIAMOND) */
 .sidebar__logo-official {
-    width: 116px;
+    width: 150px;
     max-width: 100%;
     height: auto;
     display: block;
-    margin: 0 auto;
+    /* márgenes negativos: absorben el espacio transparente del PNG → el logo
+       se ve más grande sin agrandar el muro/header */
+    margin: -17px auto -15px;
     filter: drop-shadow(0 2px 8px rgba(0,0,0,0.30));
 }
 
