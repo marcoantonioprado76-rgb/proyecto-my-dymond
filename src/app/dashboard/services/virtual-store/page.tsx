@@ -695,8 +695,8 @@ export default function VirtualStorePage() {
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
                 <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
-                        style={{ background: 'rgba(34,183,255,0.14)', border: '1px solid rgba(34,183,255,0.32)', boxShadow: '0 0 18px -4px rgba(34,183,255,0.45)' }}>
-                        <Store className="w-5 h-5" style={{ color: '#7FBEF0' }} />
+                        style={{ background: 'linear-gradient(135deg, #FF2D95 0%, #B735B8 48%, #233B8F 100%)', boxShadow: '0 10px 22px -8px rgba(255,9,108,0.45)' }}>
+                        <Store className="w-5 h-5 text-white" />
                     </div>
                     <div className="min-w-0">
                         <h1 className="text-xl font-bold text-[#111827] leading-tight" style={{ letterSpacing: '-0.02em' }}>Mis Tiendas Virtuales</h1>
@@ -718,20 +718,20 @@ export default function VirtualStorePage() {
             </div>
 
             {loading ? (
-                <div className="py-20 flex justify-center"><Loader2 className="animate-spin" style={{ color: '#7FBEF0' }} /></div>
+                <div className="py-20 flex justify-center"><Loader2 className="animate-spin" style={{ color: '#7DD3FC' }} /></div>
             ) : stores.length === 0 ? (
                 <div className="rounded-3xl p-16 text-center max-w-2xl mx-auto"
                     style={{
-                        background: 'radial-gradient(120% 75% at 50% -10%, rgba(34,183,255,0.12), rgba(255,255,255,0) 60%), linear-gradient(180deg, rgba(255,255,255,0.82), rgba(255,255,255,0.8))',
+                        background: 'radial-gradient(120% 75% at 50% -10%, rgba(34,183,255,0.12), rgba(255,255,255,0) 60%), linear-gradient(180deg, #0B1B2B 0%, #081624 60%, #050B14 100%)',
                         border: '1px solid rgba(255,255,255,0.07)',
                         boxShadow: '0 22px 50px -22px rgba(15,23,42,0.10), inset 0 1px 0 rgba(255,255,255,0.04)',
                     }}>
                     <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-5"
                         style={{ background: 'rgba(34,183,255,0.12)', border: '1px solid rgba(34,183,255,0.32)', boxShadow: '0 0 28px -6px rgba(34,183,255,0.55)' }}>
-                        <ShoppingBag className="w-8 h-8" style={{ color: '#7FBEF0' }} />
+                        <ShoppingBag className="w-8 h-8" style={{ color: '#7DD3FC' }} />
                     </div>
-                    <h2 className="text-xl font-bold text-[#111827] mb-2" style={{ letterSpacing: '-0.02em' }}>Tu escaparate está vacío</h2>
-                    <p className="text-[#6B7280] text-sm mb-6 max-w-sm mx-auto leading-relaxed">Crea una tienda para empezar a vender tus productos en una vitrina digital premium.</p>
+                    <h2 className="text-xl font-bold text-white mb-2" style={{ letterSpacing: '-0.02em' }}>Tu escaparate está vacío</h2>
+                    <p className="text-white/55 text-sm mb-6 max-w-sm mx-auto leading-relaxed">Crea una tienda para empezar a vender tus productos en una vitrina digital premium.</p>
                     <button onClick={() => setShowStoreModal(true)}
                         className="inline-flex items-center gap-2 rounded-xl px-5 py-2.5 font-bold text-sm transition-all active:scale-[0.98]"
                         style={{
@@ -810,12 +810,12 @@ export default function VirtualStorePage() {
                                     <div className="absolute inset-x-0 top-5 bottom-0 px-3 pb-2 flex flex-col pointer-events-none">
                                         {/* top bar: marca + nav + carrito */}
                                         <div className="flex items-center gap-1 mb-1 opacity-90">
-                                            <span className="w-2.5 h-2.5 rounded-full" style={{ background: 'rgba(255,255,255,0.85)' }} />
-                                            <span className="text-[8px] font-bold text-[#111827] truncate max-w-[40%]" style={{ letterSpacing: '-0.01em' }}>{store.name}</span>
+                                            <span className="w-2.5 h-2.5 rounded-full" style={{ background: 'rgba(8,22,36,0.96)' }} />
+                                            <span className="text-[8px] font-bold text-white truncate max-w-[40%]" style={{ letterSpacing: '-0.01em' }}>{store.name}</span>
                                             <span className="ml-auto flex items-center gap-1.5">
-                                                <span className="text-[6.5px] font-medium uppercase tracking-[0.14em] text-[#111827]/50">Shop</span>
+                                                <span className="text-[6.5px] font-medium uppercase tracking-[0.14em] text-white/50">Shop</span>
                                                 <span className="relative">
-                                                    <ShoppingCart className="w-2.5 h-2.5 text-[#111827]/80" />
+                                                    <ShoppingCart className="w-2.5 h-2.5 text-white/80" />
                                                     {productCount > 0 && (
                                                         <span className="absolute -top-1 -right-1.5 min-w-[9px] h-[9px] px-1 rounded-full flex items-center justify-center text-[6px] font-bold text-black"
                                                             style={{ background: p.accent }}>
@@ -830,7 +830,7 @@ export default function VirtualStorePage() {
                                         <div className="flex-1 flex items-center gap-2 min-h-0">
                                             {/* hero izquierda */}
                                             <div className="flex-1 min-w-0 flex flex-col gap-0.5">
-                                                <div className="text-[11px] font-bold text-[#111827] leading-tight truncate" style={{ letterSpacing: '-0.02em', textShadow: '0 2px 12px rgba(15,23,42,0.10)' }}>
+                                                <div className="text-[11px] font-bold text-white leading-tight truncate" style={{ letterSpacing: '-0.02em', textShadow: '0 2px 12px rgba(15,23,42,0.10)' }}>
                                                     {store.name}
                                                 </div>
                                                 <div className="text-[7.5px] uppercase tracking-[0.18em] font-bold truncate" style={{ color: p.accent }}>
@@ -851,13 +851,13 @@ export default function VirtualStorePage() {
                                                             }}>
                                                             <div className="absolute inset-0 flex items-center justify-center">
                                                                 {shape === 0 && (
-                                                                    <div className="w-1 h-3 rounded-sm" style={{ background: `linear-gradient(180deg, rgba(255,255,255,0.82), rgba(255,255,255,0.42))` }} />
+                                                                    <div className="w-1 h-3 rounded-sm" style={{ background: `linear-gradient(180deg, rgba(8,22,36,0.96), rgba(255,255,255,0.42))` }} />
                                                                 )}
                                                                 {shape === 1 && (
-                                                                    <div className="w-2.5 h-2.5 rounded-full" style={{ background: `radial-gradient(circle at 35% 35%, rgba(255,255,255,0.82), rgba(255,255,255,0.32) 70%)` }} />
+                                                                    <div className="w-2.5 h-2.5 rounded-full" style={{ background: `radial-gradient(circle at 35% 35%, rgba(8,22,36,0.96), rgba(255,255,255,0.32) 70%)` }} />
                                                                 )}
                                                                 {shape === 2 && (
-                                                                    <div className="w-2.5 h-2 rounded-sm" style={{ background: `linear-gradient(150deg, rgba(255,255,255,0.78), rgba(255,255,255,0.32))` }} />
+                                                                    <div className="w-2.5 h-2 rounded-sm" style={{ background: `linear-gradient(150deg, rgba(8,22,36,0.96), rgba(255,255,255,0.32))` }} />
                                                                 )}
                                                             </div>
                                                         </div>
@@ -871,7 +871,7 @@ export default function VirtualStorePage() {
                                     <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-20">
                                         <div className="w-8 h-8 rounded-full flex items-center justify-center backdrop-blur-md"
                                             style={{ background: 'rgba(0,0,0,0.55)', border: '1px solid rgba(255,255,255,0.28)' }}>
-                                            <ExternalLink className="w-3.5 h-3.5 text-[#111827]" />
+                                            <ExternalLink className="w-3.5 h-3.5 text-white" />
                                         </div>
                                     </div>
                                 </a>
@@ -900,16 +900,16 @@ export default function VirtualStorePage() {
                                                     <LayoutIcon className="w-3 h-3" style={{ color: p.accent }} />}
                                         </div>
                                         <div className="flex-1 min-w-0">
-                                            <div className="text-[12.5px] font-bold text-[#111827] truncate leading-tight" style={{ letterSpacing: '-0.01em' }}>{store.name}</div>
+                                            <div className="text-[12.5px] font-bold text-white truncate leading-tight" style={{ letterSpacing: '-0.01em' }}>{store.name}</div>
                                             <div className="text-[9.5px] mt-0.5 truncate" style={{ color: 'rgba(255,255,255,0.46)' }}>
                                                 {storeTypeLabel(store.type)} · {productCount} {productCount === 1 ? 'producto' : 'productos'}
                                             </div>
                                         </div>
                                         <div className="flex items-center gap-0 shrink-0 -mr-1">
                                             <button onClick={() => setSharingStore(store)}
-                                                className="p-1 rounded-md transition-colors hover:bg-[#F4F6FA]"
+                                                className="p-1 rounded-md transition-colors hover:bg-white/5"
                                                 title="Compartir tienda">
-                                                <Share2 className="w-3 h-3 text-[#6B7280] hover:text-[#111827] transition-colors" />
+                                                <Share2 className="w-3 h-3 text-white/55 hover:text-white transition-colors" />
                                             </button>
                                             <button
                                                 onClick={() => {
@@ -926,14 +926,14 @@ export default function VirtualStorePage() {
                                                     setStoreThemePrimary(store.themeConfig?.theme?.primary || '');
                                                     setShowStoreModal(true);
                                                 }}
-                                                className="p-1 rounded-md transition-colors hover:bg-[#F4F6FA]"
+                                                className="p-1 rounded-md transition-colors hover:bg-white/5"
                                                 title="Editar">
-                                                <Edit3 className="w-3 h-3 text-[#6B7280] hover:text-[#111827] transition-colors" />
+                                                <Edit3 className="w-3 h-3 text-white/55 hover:text-white transition-colors" />
                                             </button>
                                             <button onClick={() => deleteStore(store.id)}
-                                                className="p-1 rounded-md transition-colors hover:bg-[#F4F6FA]"
+                                                className="p-1 rounded-md transition-colors hover:bg-white/5"
                                                 title="Eliminar">
-                                                <Trash2 className="w-3 h-3 text-[#9CA3AF] hover:text-red-400 transition-colors" />
+                                                <Trash2 className="w-3 h-3 text-white/40 hover:text-red-400 transition-colors" />
                                             </button>
                                         </div>
                                     </div>
@@ -958,9 +958,9 @@ export default function VirtualStorePage() {
                                             target="_blank"
                                             className="px-2.5 rounded-lg flex items-center justify-center transition-all active:scale-[0.98] hover:bg-white/8"
                                             style={{
-                                                background: '#F0F3F7',
-                                                border: '1px solid #E4E9F0',
-                                                color: '#374151',
+                                                background: 'rgba(255,255,255,0.05)',
+                                                border: '1px solid rgba(255,255,255,0.1)',
+                                                color: 'rgba(255,255,255,0.78)',
                                             }}
                                             title="Abrir tienda pública">
                                             <ExternalLink className="w-3 h-3" />
@@ -970,7 +970,7 @@ export default function VirtualStorePage() {
                                     {(store.type === 'NETWORK_MARKETING' || store.type === 'GENERAL_BUSINESS') && (
                                         <button
                                             onClick={() => convertStoreType(store)}
-                                            className="mt-2 w-full flex items-center justify-center gap-1.5 text-[9.5px] font-medium py-1.5 rounded-md transition-colors hover:text-[#111827]"
+                                            className="mt-2 w-full flex items-center justify-center gap-1.5 text-[9.5px] font-medium py-1.5 rounded-md transition-colors hover:text-white"
                                             style={{ color: 'rgba(255,255,255,0.34)' }}>
                                             Convertir a {store.type === 'NETWORK_MARKETING' ? 'Mi Negocio (General)' : 'Network Marketing (PV)'}
                                         </button>
@@ -988,21 +988,21 @@ export default function VirtualStorePage() {
 
             {showStoreModal && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
-                    <div className="bg-[#F4F6FA] border border-[#E4E9F0] rounded-3xl w-full max-w-md p-5 sm:p-6 max-h-[90vh] overflow-y-auto custom-scrollbar">
+                    <div className="bg-white/5 border border-white/10 rounded-3xl w-full max-w-md p-5 sm:p-6 max-h-[90vh] overflow-y-auto custom-scrollbar">
                         <div className="flex items-center justify-between mb-6">
                             <h2 className="text-xl font-bold">{editStore ? 'Configurar Tienda' : 'Crear Tienda'}</h2>
-                            <button onClick={() => setShowStoreModal(false)}><X size={24} className="text-[#6B7280]" /></button>
+                            <button onClick={() => setShowStoreModal(false)}><X size={24} className="text-white/55" /></button>
                         </div>
                         <form onSubmit={handleSaveStore} className="space-y-6">
                             <div>
-                                <label className="text-xs font-bold text-[#6B7280] uppercase tracking-widest block mb-4">Tipo de Tienda</label>
+                                <label className="text-xs font-bold text-white/55 uppercase tracking-widest block mb-4">Tipo de Tienda</label>
                                 <div className="grid grid-cols-3 gap-3">
                                     <button
                                         type="button"
                                         onClick={() => setStoreType('GENERAL_BUSINESS')}
                                         className={`p-3 rounded-2xl border-2 transition-all flex flex-col items-center gap-2 text-center ${storeType === 'GENERAL_BUSINESS'
                                             ? 'border-[#B735B8] bg-[#B735B8]/10 text-white shadow-[0_0_20px_rgba(var(--[#B735B8]-rgb),0.2)]'
-                                            : 'border-[#E4E9F0] bg-white text-[#9CA3AF] hover:border-purple-500/30'
+                                            : 'border-white/10 bg-white text-white/40 hover:border-purple-500/30'
                                             }`}
                                     >
                                         <Store className={storeType === 'GENERAL_BUSINESS' ? 'text-[#B735B8]' : ''} size={20} />
@@ -1016,7 +1016,7 @@ export default function VirtualStorePage() {
                                         onClick={() => setStoreType('NETWORK_MARKETING')}
                                         className={`p-3 rounded-2xl border-2 transition-all flex flex-col items-center gap-2 text-center ${storeType === 'NETWORK_MARKETING'
                                             ? 'border-[#233B8F] bg-[#233B8F]/10 text-white shadow-[0_0_20px_rgba(var(--[#233B8F]-rgb),0.2)]'
-                                            : 'border-[#E4E9F0] bg-white text-[#9CA3AF] hover:border-purple-500/30'
+                                            : 'border-white/10 bg-white text-white/40 hover:border-purple-500/30'
                                             }`}
                                     >
                                         <Globe className={storeType === 'NETWORK_MARKETING' ? 'text-[#233B8F]' : ''} size={20} />
@@ -1029,8 +1029,8 @@ export default function VirtualStorePage() {
                                         type="button"
                                         onClick={() => setStoreType('LANDING')}
                                         className={`p-3 rounded-2xl border-2 transition-all flex flex-col items-center gap-2 text-center ${storeType === 'LANDING'
-                                            ? 'border-[#16A34A] bg-[#16A34A]/10 text-[#111827] shadow-[0_0_20px_rgba(var(--[#16A34A]-rgb),0.2)]'
-                                            : 'border-[#E4E9F0] bg-white text-[#9CA3AF] hover:border-purple-500/30'
+                                            ? 'border-[#16A34A] bg-[#16A34A]/10 text-white shadow-[0_0_20px_rgba(var(--[#16A34A]-rgb),0.2)]'
+                                            : 'border-white/10 bg-white text-white/40 hover:border-purple-500/30'
                                             }`}
                                     >
                                         <LayoutIcon className={storeType === 'LANDING' ? 'text-[#16A34A]' : ''} size={20} />
@@ -1043,21 +1043,21 @@ export default function VirtualStorePage() {
                             </div>
 
                             <div>
-                                <label className="text-xs font-bold text-[#6B7280] uppercase tracking-widest block mb-2">Nombre</label>
-                                <input required value={storeName} onChange={e => setStoreName(e.target.value)} placeholder="Ej: Mi Boutique" className="w-full bg-white border border-purple-500/25 rounded-xl px-4 py-3 text-[#111827] placeholder-dark-500 focus:border-[#233B8F] outline-none transition-all" />
+                                <label className="text-xs font-bold text-white/55 uppercase tracking-widest block mb-2">Nombre</label>
+                                <input required value={storeName} onChange={e => setStoreName(e.target.value)} placeholder="Ej: Mi Boutique" className="w-full bg-white border border-purple-500/25 rounded-xl px-4 py-3 text-white placeholder-dark-500 focus:border-[#233B8F] outline-none transition-all" />
                             </div>
                             <div>
-                                <label className="text-xs font-bold text-[#6B7280] uppercase tracking-widest block mb-2">Slug (URL)</label>
-                                <input required value={storeSlug} onChange={e => setStoreSlug(e.target.value)} placeholder="mi-boutique" className="w-full bg-white border border-purple-500/25 rounded-xl px-4 py-3 text-[#111827] placeholder-dark-500 focus:border-[#233B8F] outline-none transition-all" />
+                                <label className="text-xs font-bold text-white/55 uppercase tracking-widest block mb-2">Slug (URL)</label>
+                                <input required value={storeSlug} onChange={e => setStoreSlug(e.target.value)} placeholder="mi-boutique" className="w-full bg-white border border-purple-500/25 rounded-xl px-4 py-3 text-white placeholder-dark-500 focus:border-[#233B8F] outline-none transition-all" />
                             </div>
                             <div>
-                                <label className="text-xs font-bold text-[#6B7280] uppercase tracking-widest block mb-2">WhatsApp de Pedidos</label>
-                                <input value={storeWhatsapp} onChange={e => setStoreWhatsapp(e.target.value)} placeholder="Ej: 51987654321 (con código de país)" className="w-full bg-white border border-purple-500/25 rounded-xl px-4 py-3 text-[#111827] placeholder-dark-500 focus:border-[#233B8F] outline-none transition-all" />
-                                <p className="text-[10px] text-[#9CA3AF] mt-2">Los pedidos de esta tienda llegarán directamente a este número.</p>
+                                <label className="text-xs font-bold text-white/55 uppercase tracking-widest block mb-2">WhatsApp de Pedidos</label>
+                                <input value={storeWhatsapp} onChange={e => setStoreWhatsapp(e.target.value)} placeholder="Ej: 51987654321 (con código de país)" className="w-full bg-white border border-purple-500/25 rounded-xl px-4 py-3 text-white placeholder-dark-500 focus:border-[#233B8F] outline-none transition-all" />
+                                <p className="text-[10px] text-white/40 mt-2">Los pedidos de esta tienda llegarán directamente a este número.</p>
                             </div>
 
                             <div>
-                                <label className="text-xs font-bold text-[#6B7280] uppercase tracking-widest block mb-2">QR de Pago (Transferencia)</label>
+                                <label className="text-xs font-bold text-white/55 uppercase tracking-widest block mb-2">QR de Pago (Transferencia)</label>
                                 <div className="flex items-center gap-4">
                                     {storeQr ? (
                                         <div className="relative w-20 h-20 rounded-xl overflow-hidden border border-purple-500/25 group">
@@ -1071,7 +1071,7 @@ export default function VirtualStorePage() {
                                             </button>
                                         </div>
                                     ) : (
-                                        <div className="relative w-20 h-20 rounded-xl border border-dashed border-[#E4E9F0] flex flex-col items-center justify-center text-[10px] font-bold text-[#6B7280] hover:border-[#233B8F] hover:text-[#233B8F] transition-all cursor-pointer">
+                                        <div className="relative w-20 h-20 rounded-xl border border-dashed border-white/10 flex flex-col items-center justify-center text-[10px] font-bold text-white/55 hover:border-[#233B8F] hover:text-[#233B8F] transition-all cursor-pointer">
                                             <input
                                                 type="file"
                                                 onChange={async (e) => {
@@ -1095,18 +1095,18 @@ export default function VirtualStorePage() {
                                         </div>
                                     )}
                                     <div className="flex-1">
-                                        <p className="text-[10px] text-[#9CA3AF] leading-relaxed">
+                                        <p className="text-[10px] text-white/40 leading-relaxed">
                                             Este QR se mostrará a los clientes que elijan pagar por transferencia en tu tienda.
                                         </p>
                                     </div>
                                 </div>
                             </div>
                             <div>
-                                <label className="text-xs font-bold text-[#6B7280] uppercase tracking-widest block mb-2">Fotos de Portada (Banner)</label>
-                                <p className="text-[10px] text-[#9CA3AF] mb-3">Sube hasta 2 fotos. Se mostrarán rotando en la parte superior de tu tienda.</p>
+                                <label className="text-xs font-bold text-white/55 uppercase tracking-widest block mb-2">Fotos de Portada (Banner)</label>
+                                <p className="text-[10px] text-white/40 mb-3">Sube hasta 2 fotos. Se mostrarán rotando en la parte superior de tu tienda.</p>
                                 <div className="flex gap-3">
                                     {/* Banner 1 */}
-                                    <div className="flex-1 relative h-24 rounded-xl overflow-hidden border border-dashed border-[#E4E9F0] hover:border-[#233B8F] transition-all cursor-pointer flex items-center justify-center">
+                                    <div className="flex-1 relative h-24 rounded-xl overflow-hidden border border-dashed border-white/10 hover:border-[#233B8F] transition-all cursor-pointer flex items-center justify-center">
                                         {storeBanner1 ? (
                                             <>
                                                 <img src={storeBanner1} className="absolute inset-0 w-full h-full object-cover opacity-70" />
@@ -1139,7 +1139,7 @@ export default function VirtualStorePage() {
                                                     className="absolute inset-0 opacity-0 cursor-pointer z-10"
                                                     accept="image/*"
                                                 />
-                                                <div className="text-center text-[#9CA3AF] pointer-events-none">
+                                                <div className="text-center text-white/40 pointer-events-none">
                                                     <Plus size={20} className="mx-auto mb-1" />
                                                     <span className="text-[10px] font-bold">Foto 1</span>
                                                 </div>
@@ -1147,7 +1147,7 @@ export default function VirtualStorePage() {
                                         )}
                                     </div>
                                     {/* Banner 2 */}
-                                    <div className="flex-1 relative h-24 rounded-xl overflow-hidden border border-dashed border-[#E4E9F0] hover:border-[#233B8F] transition-all cursor-pointer flex items-center justify-center">
+                                    <div className="flex-1 relative h-24 rounded-xl overflow-hidden border border-dashed border-white/10 hover:border-[#233B8F] transition-all cursor-pointer flex items-center justify-center">
                                         {storeBanner2 ? (
                                             <>
                                                 <img src={storeBanner2} className="absolute inset-0 w-full h-full object-cover opacity-70" />
@@ -1180,7 +1180,7 @@ export default function VirtualStorePage() {
                                                     className="absolute inset-0 opacity-0 cursor-pointer z-10"
                                                     accept="image/*"
                                                 />
-                                                <div className="text-center text-[#9CA3AF] pointer-events-none">
+                                                <div className="text-center text-white/40 pointer-events-none">
                                                     <Plus size={20} className="mx-auto mb-1" />
                                                     <span className="text-[10px] font-bold">Foto 2</span>
                                                 </div>
@@ -1191,14 +1191,14 @@ export default function VirtualStorePage() {
                             </div>
                             {/* ── APARIENCIA (tema de la tienda) ── */}
                             <div>
-                                <label className="text-xs font-bold text-[#6B7280] uppercase tracking-widest block mb-2">Apariencia de la tienda</label>
-                                <p className="text-[10px] text-[#9CA3AF] mb-3">Elige un tema: cambia los colores y la tipografía de tu vitrina.</p>
+                                <label className="text-xs font-bold text-white/55 uppercase tracking-widest block mb-2">Apariencia de la tienda</label>
+                                <p className="text-[10px] text-white/40 mb-3">Elige un tema: cambia los colores y la tipografía de tu vitrina.</p>
                                 <div className="grid grid-cols-3 gap-2">
                                     {Object.entries(STORE_THEMES).map(([id, t]) => {
                                         const sel = storeThemePreset === id
                                         return (
                                             <button key={id} type="button" onClick={() => setStoreThemePreset(id)}
-                                                className={`relative rounded-xl p-2 border text-left transition-all ${sel ? 'border-[#233B8F]' : 'border-[#E4E9F0] hover:border-white/25'}`}
+                                                className={`relative rounded-xl p-2 border text-left transition-all ${sel ? 'border-[#233B8F]' : 'border-white/10 hover:border-white/25'}`}
                                                 style={{ background: 'rgba(255,255,255,0.03)' }}>
                                                 <div className="h-9 rounded-lg mb-1.5 flex items-center gap-1 px-2" style={{ background: t.vars['--st-bg'] }}>
                                                     <span className="w-3.5 h-3.5 rounded-full" style={{ background: t.vars['--st-primary'] }} />
@@ -1212,24 +1212,24 @@ export default function VirtualStorePage() {
                                     })}
                                 </div>
 
-                                <label className="text-xs font-bold text-[#6B7280] uppercase tracking-widest block mb-2 mt-4">Tipografía</label>
+                                <label className="text-xs font-bold text-white/55 uppercase tracking-widest block mb-2 mt-4">Tipografía</label>
                                 <div className="flex flex-wrap gap-2">
                                     <button type="button" onClick={() => setStoreThemeFont('')}
-                                        className={`px-3 py-1.5 rounded-lg text-[11px] font-bold border transition-all ${storeThemeFont === '' ? 'border-[#233B8F] text-[#111827]' : 'border-[#E4E9F0] text-[#6B7280]'}`}>Auto</button>
+                                        className={`px-3 py-1.5 rounded-lg text-[11px] font-bold border transition-all ${storeThemeFont === '' ? 'border-[#233B8F] text-white' : 'border-white/10 text-white/55'}`}>Auto</button>
                                     {Object.entries(STORE_FONTS).map(([key, f]) => (
                                         <button key={key} type="button" onClick={() => setStoreThemeFont(key)}
-                                            className={`px-3 py-1.5 rounded-lg text-[11px] font-bold border transition-all ${storeThemeFont === key ? 'border-[#233B8F] text-[#111827]' : 'border-[#E4E9F0] text-[#6B7280]'}`}
+                                            className={`px-3 py-1.5 rounded-lg text-[11px] font-bold border transition-all ${storeThemeFont === key ? 'border-[#233B8F] text-white' : 'border-white/10 text-white/55'}`}
                                             style={{ fontFamily: f.family }}>{f.label}</button>
                                     ))}
                                 </div>
 
-                                <label className="text-xs font-bold text-[#6B7280] uppercase tracking-widest block mb-2 mt-4">Color principal (opcional)</label>
+                                <label className="text-xs font-bold text-white/55 uppercase tracking-widest block mb-2 mt-4">Color principal (opcional)</label>
                                 <div className="flex items-center gap-3">
                                     <input type="color" value={storeThemePrimary || '#D203DD'} onChange={e => setStoreThemePrimary(e.target.value)}
-                                        className="w-11 h-9 rounded-lg bg-transparent border border-[#E4E9F0] cursor-pointer p-0.5" />
+                                        className="w-11 h-9 rounded-lg bg-transparent border border-white/10 cursor-pointer p-0.5" />
                                     {storeThemePrimary
-                                        ? <button type="button" onClick={() => setStoreThemePrimary('')} className="text-[10px] text-[#6B7280] underline">usar el del tema</button>
-                                        : <span className="text-[10px] text-[#9CA3AF]">Sobrescribe el color del tema con el tuyo.</span>}
+                                        ? <button type="button" onClick={() => setStoreThemePrimary('')} className="text-[10px] text-white/55 underline">usar el del tema</button>
+                                        : <span className="text-[10px] text-white/40">Sobrescribe el color del tema con el tuyo.</span>}
                                 </div>
 
                                 {/* Vista previa en vivo del tema */}
@@ -1237,7 +1237,7 @@ export default function VirtualStorePage() {
                                     const pv = resolveStoreTheme({ theme: { preset: storeThemePreset, font: storeThemeFont || undefined, primary: storeThemePrimary || undefined } })
                                     return (
                                         <div className="mt-4">
-                                            <label className="text-xs font-bold text-[#6B7280] uppercase tracking-widest block mb-2">Vista previa</label>
+                                            <label className="text-xs font-bold text-white/55 uppercase tracking-widest block mb-2">Vista previa</label>
                                             <link rel="stylesheet" href={pv.fontHref} />
                                             <div style={{ ...(pv.vars as any), background: 'var(--st-bg)', fontFamily: 'var(--st-font)', borderRadius: 16, padding: 14, border: '1px solid var(--st-border)' }}>
                                                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
