@@ -257,7 +257,7 @@ export default function DashboardPage() {
                 <span style={{ position: 'absolute', right: 6, bottom: 6, width: 17, height: 17, borderRadius: '50%', background: '#16A34A', border: '3px solid #fff' }} title="En línea" />
               </label>
               <div style={{ minWidth: 0 }}>
-                <h1 style={{ margin: 0, fontSize: 'clamp(22px, 2.4vw, 32px)', fontWeight: 800, lineHeight: 1.05, color: '#fff', letterSpacing: '-0.02em', textShadow: '0 2px 18px rgba(0,0,0,0.6)' }}>{data.user.fullName}</h1>
+                <h1 style={{ margin: 0, fontSize: 'clamp(17px, 1.8vw, 24px)', fontWeight: 800, lineHeight: 1.1, color: '#fff', letterSpacing: '-0.01em', textShadow: '0 2px 18px rgba(0,0,0,0.6)' }}>{data.user.fullName}</h1>
                 <p style={{ margin: '7px 0 12px', fontSize: 14.5, fontWeight: 500, color: 'rgba(255,255,255,0.88)', textShadow: '0 1px 10px rgba(0,0,0,0.55)' }}>@{data.user.username} · MY DIAMOND</p>
                 <Link href="/dashboard/planes" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '7px 15px', borderRadius: 999, border: '1px solid rgba(255,255,255,0.38)', background: 'rgba(8,22,36,0.42)', backdropFilter: 'blur(4px)', WebkitBackdropFilter: 'blur(4px)', color: '#fff', fontSize: 12.5, fontWeight: 700, letterSpacing: '0.02em', textDecoration: 'none', width: 'fit-content' }}>
                   <span style={{ width: 7, height: 7, borderRadius: '50%', background: data.user.isActive ? '#16A34A' : '#9CA3AF', boxShadow: data.user.isActive ? '0 0 8px rgba(22,163,74,0.9)' : 'none', flexShrink: 0 }} />
