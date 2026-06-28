@@ -226,29 +226,6 @@ export default function DashboardPage() {
       <div className="hidden lg:flex w-full flex-1">
         <main className="d-main font-ui" style={{ background: 'radial-gradient(circle at top right, rgba(255,9,108,0.08), transparent 28%), radial-gradient(circle at bottom left, rgba(35,59,143,0.08), transparent 30%), linear-gradient(135deg, #EEF2F7 0%, #F5F7FA 45%, #E9EEF5 100%)', color: '#111827', minHeight: '100vh', gap: '24px' }}>
 
-          {/* ── TOPBAR ── */}
-          <header style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, flexWrap: 'wrap' }}>
-            <div style={{ position: 'relative', flex: 1, minWidth: 240, maxWidth: 460 }}>
-              <i className="fa-solid fa-magnifying-glass" style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', color: '#9CA3AF', fontSize: 13 }} />
-              <input placeholder="Buscar en la plataforma…" className="dm-input" style={{ paddingLeft: 40, height: 48, boxShadow: '0 8px 24px rgba(15,23,42,0.04)' }} />
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-              <NotificationBell />
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10, background: 'rgba(255,255,255,0.9)', border: '1px solid #E4E9F0', borderRadius: 16, padding: '7px 12px', boxShadow: '0 8px 24px rgba(15,23,42,0.04)' }}>
-                <label htmlFor="avatar-file-desktop" style={{ cursor: uploading ? 'not-allowed' : 'pointer', width: 38, height: 38, borderRadius: '50%', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--dm-grad)', color: '#fff', flexShrink: 0 }}>
-                  <input id="avatar-file-desktop" type="file" accept="image/*" disabled={uploading} style={{ display: 'none' }} onChange={uploadAvatar} />
-                  {data.user.avatarUrl
-                    ? <img src={data.user.avatarUrl} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                    : <i className="fa-solid fa-user" style={{ fontSize: 14 }} />}
-                </label>
-                <div style={{ lineHeight: 1.25 }}>
-                  <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: '#111827' }}>{data.user.fullName}</p>
-                  <p style={{ margin: 0, fontSize: 11, fontWeight: 600, color: '#FF096C' }}>{data.user.rank || 'Plan'} · {data.user.isActive ? 'Activo' : 'Inactivo'}</p>
-                </div>
-              </div>
-            </div>
-          </header>
-
           {/* ── COVER (carrusel) + PERFIL — layout referencia, colores diamante ── */}
           <div style={{ position: 'relative', borderRadius: 28, overflow: 'hidden', minHeight: 320, border: '1px solid #E4E9F0', boxShadow: '0 18px 45px rgba(15,23,42,0.10)' }}>
             {/* slides del carrusel */}
