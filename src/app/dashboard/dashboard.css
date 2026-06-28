@@ -484,7 +484,7 @@
 .profile__name {
     font-size: 1.3rem !important;
     font-weight: 800 !important;
-    color: #fff !important;
+    color: #111827 !important;
     display: flex !important;
     align-items: center !important;
     gap: var(--sp-2) !important;
@@ -494,7 +494,7 @@
 
 .profile__handle {
     font-size: 0.78rem !important;
-    color: var(--clr-dim) !important;
+    color: #6B7280 !important;
     margin: 0 !important;
 }
 

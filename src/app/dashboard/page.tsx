@@ -112,7 +112,7 @@ export default function DashboardPage() {
       {/* ═══════════════════════════════════════════════════════════
            MOBILE VIEW
       ═══════════════════════════════════════════════════════════ */}
-      <div className="lg:hidden flex flex-col min-h-screen w-full" style={{ position: 'relative' }}>
+      <div className="lg:hidden flex flex-col min-h-screen w-full font-ui" style={{ position: 'relative', background: 'radial-gradient(circle at top right, rgba(255,9,108,0.08), transparent 30%), radial-gradient(circle at bottom left, rgba(35,59,143,0.08), transparent 32%), linear-gradient(135deg, #EEF2F7 0%, #F5F7FA 45%, #E9EEF5 100%)', color: '#111827' }}>
 
         {/* Cover Photo */}
         <div className="cover" id="cover">
@@ -160,12 +160,13 @@ export default function DashboardPage() {
               width: '100%', padding: '12px 0', borderRadius: 12, textDecoration: 'none',
               fontWeight: 700, fontSize: 13, letterSpacing: '0.04em',
               background: data.user.rank && data.user.rank !== 'NONE'
-                ? 'linear-gradient(135deg, rgba(210,3,221,0.12) 0%, rgba(0,255,136,0.08) 100%)'
-                : 'linear-gradient(135deg, #D203DD 0%, #0D1E79 100%)',
+                ? 'rgba(255,9,108,0.08)'
+                : 'linear-gradient(135deg, #FF2D95 0%, #B735B8 48%, #233B8F 100%)',
               border: data.user.rank && data.user.rank !== 'NONE'
-                ? '1px solid rgba(210,3,221,0.25)'
+                ? '1px solid rgba(255,9,108,0.20)'
                 : 'none',
-              color: data.user.rank && data.user.rank !== 'NONE' ? '#D203DD' : '#fff',
+              boxShadow: data.user.rank && data.user.rank !== 'NONE' ? 'none' : '0 14px 30px rgba(255,9,108,0.26)',
+              color: data.user.rank && data.user.rank !== 'NONE' ? '#FF096C' : '#fff',
             }}
           >
             <i className={`fa-solid ${data.user.rank && data.user.rank !== 'NONE' ? 'fa-rotate' : 'fa-crown'}`}></i>
@@ -176,68 +177,41 @@ export default function DashboardPage() {
         {/* Services Grid — mobile */}
         <main className="feed" id="feed">
           <p className="section-label" style={{ marginBottom: 4 }}><i className="fa-solid fa-th-large"></i>Servicios</p>
-          <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.38)', margin: '0 0 30px', lineHeight: 1.5 }}>
+          <p style={{ fontSize: 11, color: '#6B7280', margin: '0 0 30px', lineHeight: 1.5 }}>
             Activa tu sistema de automatización.
           </p>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', columnGap: 14, rowGap: 32 }}>
-            {SERVICES.filter(s => !s.hidden).map((s, i) => (
+            {SERVICES.filter(s => !s.hidden).map((s) => (
               <Link key={s.href} href={s.href} style={{ textDecoration: 'none', display: 'block' }}>
                 <div
                   className="svc-card"
                   style={{
                     position: 'relative', borderRadius: 18,
-                    padding: '36px 14px 18px',
-                    background: `radial-gradient(122% 76% at 50% -4%, ${s.accent}24, rgba(255,255,255,0) 58%), linear-gradient(180deg, rgba(17,19,40,0.78) 0%, rgba(10,11,24,0.66) 52%, rgba(14,16,34,0.55) 100%)`,
-                    border: '1px solid rgba(255,255,255,0.10)',
-                    boxShadow: '0 18px 40px -20px rgba(0,0,0,0.78), 0 4px 14px -8px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05)',
+                    padding: '34px 14px 18px',
+                    background: '#FFFFFF',
+                    border: '1px solid #E4E9F0',
+                    boxShadow: '0 16px 36px -18px rgba(15,23,42,0.18), inset 0 1px 0 rgba(255,255,255,0.9)',
                     display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 5,
                   }}
                 >
-                  {/* figura gigante del servicio integrada en el fondo (recortada a la card) */}
-                  <div style={{ position: 'absolute', inset: 0, borderRadius: 18, overflow: 'hidden', pointerEvents: 'none' }}>
-                    <i className={s.icon} style={{
-                      position: 'absolute', right: -10, bottom: -16, fontSize: 92,
-                      color: s.accent, opacity: 0.07, filter: 'blur(1.2px)',
-                      transform: 'rotate(-8deg)',
-                    }} />
-                  </div>
-                  {/* reflejo glass diagonal tenue */}
-                  <div style={{ position: 'absolute', inset: 0, borderRadius: 18, background: 'linear-gradient(152deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0) 36%)', pointerEvents: 'none' }} />
-                  {/* línea de reflejo superior */}
-                  <div style={{ position: 'absolute', top: 0, left: 14, right: 14, height: 1, background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.13), transparent)', pointerEvents: 'none' }} />
-                  {/* halo ambiental cinematográfico detrás del icono */}
-                  <div className="svc-glow-pulse" style={{ position: 'absolute', top: -18, left: '50%', transform: 'translateX(-50%)', width: 110, height: 74, borderRadius: '50%', background: `radial-gradient(ellipse, ${s.accent}3a, transparent 72%)`, filter: 'blur(13px)', pointerEvents: 'none' }} />
-                  {/* icono sobresaliendo desde arriba */}
+                  {/* línea superior 3px con gradiente diamante */}
+                  <div style={{ position: 'absolute', top: 0, left: 16, right: 16, height: 3, borderRadius: 999, background: 'linear-gradient(90deg, #FF2D95, #B735B8, #233B8F)', pointerEvents: 'none' }} />
+                  {/* halo suave detrás del icono */}
+                  <div style={{ position: 'absolute', top: -10, left: '50%', transform: 'translateX(-50%)', width: 90, height: 60, borderRadius: '50%', background: 'radial-gradient(ellipse, rgba(255,9,108,0.18), transparent 72%)', filter: 'blur(12px)', pointerEvents: 'none' }} />
+                  {/* icono diamante sobresaliendo desde arriba */}
                   <div className="svc-float" style={{
                     position: 'absolute', top: -20, left: '50%', transform: 'translateX(-50%)',
                     width: 44, height: 44, borderRadius: 14,
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    background: `linear-gradient(155deg, rgba(255,255,255,0.13), rgba(255,255,255,0.02)), rgba(18,15,32,0.72)`,
-                    border: `1px solid ${s.accent}55`,
-                    boxShadow: `0 12px 26px -8px rgba(0,0,0,0.65), 0 0 14px -2px ${s.accent}3a, inset 0 1px 0 rgba(255,255,255,0.14)`,
-                    fontSize: 17, color: s.accent,
+                    background: 'linear-gradient(135deg, #FF2D95 0%, #B735B8 48%, #233B8F 100%)',
+                    boxShadow: '0 12px 26px -8px rgba(255,9,108,0.45), inset 0 1px 0 rgba(255,255,255,0.25)',
+                    fontSize: 17, color: '#fff',
                     WebkitFontSmoothing: 'antialiased',
                   }}>
-                    <i className={s.icon} style={{ filter: `drop-shadow(0 0 6px ${s.accent}55)` }} />
+                    <i className={s.icon} />
                   </div>
-                  <p style={{ fontSize: 13, fontWeight: 700, color: '#fff', margin: 0, lineHeight: 1.18, textAlign: 'center', letterSpacing: '-0.02em', textShadow: '0 1px 12px rgba(0,0,0,0.45)' }}>{s.label}</p>
-                  <p style={{ fontSize: 9.5, fontWeight: 400, color: 'rgba(255,255,255,0.5)', margin: 0, lineHeight: 1.3, textAlign: 'center', letterSpacing: '0.02em' }}>{s.desc}</p>
-                  {/* wave glow inferior — energía elegante difuminada */}
-                  <svg width="100%" height="26" viewBox="0 0 200 26" preserveAspectRatio="none" className="svc-wave"
-                    style={{ position: 'absolute', bottom: 0, left: 0, right: 0, pointerEvents: 'none' }}>
-                    <defs>
-                      <linearGradient id={`svcw-m-${i}`} x1="0" y1="0" x2="1" y2="0">
-                        <stop offset="0" stopColor={s.accent} stopOpacity="0" />
-                        <stop offset="0.5" stopColor={s.accent} stopOpacity="0.8" />
-                        <stop offset="1" stopColor={s.accent} stopOpacity="0" />
-                      </linearGradient>
-                      <filter id={`svcwb-m-${i}`} x="-20%" y="-60%" width="140%" height="240%">
-                        <feGaussianBlur stdDeviation="2" />
-                      </filter>
-                    </defs>
-                    <path d="M0 15 Q 100 3 200 17 L 200 21 Q 100 8 0 20 Z" fill={`url(#svcw-m-${i})`} opacity="0.55" filter={`url(#svcwb-m-${i})`} />
-                    <path d="M0 16 Q 100 5 200 18" stroke={`url(#svcw-m-${i})`} strokeWidth="1.3" fill="none" strokeLinecap="round" />
-                  </svg>
+                  <p style={{ fontSize: 13, fontWeight: 700, color: '#111827', margin: 0, lineHeight: 1.18, textAlign: 'center', letterSpacing: '-0.02em' }}>{s.label}</p>
+                  <p style={{ fontSize: 9.5, fontWeight: 400, color: '#9CA3AF', margin: 0, lineHeight: 1.3, textAlign: 'center', letterSpacing: '0.02em' }}>{s.desc}</p>
                 </div>
               </Link>
             ))}
