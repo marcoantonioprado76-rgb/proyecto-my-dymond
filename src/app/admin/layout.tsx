@@ -82,12 +82,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   }
 
   const Sidebar = () => (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full" style={{ background: 'radial-gradient(circle at top left, rgba(255,9,108,0.12), transparent 26%), linear-gradient(180deg, #071522 0%, #0B1B2B 55%, #050B14 100%)' }}>
       {/* Logo */}
       <div className="px-5 py-5 border-b border-white/5">
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-xl bg-purple-600/20 border border-purple-500/30 flex items-center justify-center">
-            <Shield size={15} className="text-purple-400" />
+          <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #FF2D95 0%, #B735B8 48%, #233B8F 100%)', boxShadow: '0 8px 18px rgba(255,9,108,0.30)' }}>
+            <Shield size={15} className="text-white" />
           </div>
           <div>
             <p className="text-[11px] font-black uppercase tracking-widest text-white/80">Admin</p>
@@ -107,13 +107,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               onClick={() => setMobileOpen(false)}
               className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all ${
                 active
-                  ? 'bg-purple-600/20 text-purple-300 border border-purple-500/25'
-                  : 'text-white/40 hover:text-white/70 hover:bg-white/5'
+                  ? 'text-white'
+                  : 'text-white/55 hover:text-white hover:bg-white/5'
               }`}
+              style={active ? { background: 'linear-gradient(135deg, #FF2D95 0%, #B735B8 48%, #233B8F 100%)', boxShadow: '0 12px 28px rgba(255,9,108,0.28)' } : undefined}
             >
-              <Icon size={15} className={active ? 'text-purple-400' : 'text-white/30'} />
+              <Icon size={15} className={active ? 'text-white' : 'text-white/40'} />
               {label}
-              {active && <ChevronRight size={12} className="ml-auto text-purple-400/50" />}
+              {active && <ChevronRight size={12} className="ml-auto text-white/70" />}
             </Link>
           )
         })}
@@ -133,7 +134,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   )
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f] text-white flex">
+    <div className="min-h-screen flex font-ui" style={{ background: 'radial-gradient(circle at top right, rgba(255,9,108,0.08), transparent 28%), radial-gradient(circle at bottom left, rgba(35,59,143,0.08), transparent 30%), linear-gradient(135deg, #EEF2F7 0%, #F5F7FA 45%, #E9EEF5 100%)', color: '#111827' }}>
       {/* Desktop sidebar */}
       <aside className="hidden lg:flex flex-col w-56 shrink-0 border-r border-white/5 fixed left-0 top-0 bottom-0">
         <Sidebar />
@@ -146,7 +147,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             className="absolute inset-0 bg-black/60 backdrop-blur-sm"
             onClick={() => setMobileOpen(false)}
           />
-          <aside className="relative w-56 bg-[#0d0d15] border-r border-white/5 flex flex-col z-10">
+          <aside className="relative w-56 border-r border-white/5 flex flex-col z-10" style={{ background: '#050B14' }}>
             <Sidebar />
           </aside>
         </div>
@@ -155,16 +156,16 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       {/* Main content */}
       <div className="flex-1 lg:pl-56 flex flex-col min-h-screen">
         {/* Mobile topbar */}
-        <div className="lg:hidden sticky top-0 z-30 bg-[#0a0a0f]/95 backdrop-blur border-b border-white/5 px-4 py-3 flex items-center gap-3">
+        <div className="lg:hidden sticky top-0 z-30 bg-white/95 backdrop-blur border-b border-[#E4E9F0] px-4 py-3 flex items-center gap-3">
           <button
             onClick={() => setMobileOpen(true)}
-            className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center"
+            className="w-8 h-8 rounded-lg bg-[#F0F3F7] border border-[#E4E9F0] flex items-center justify-center"
           >
-            <Menu size={15} className="text-white/60" />
+            <Menu size={15} className="text-[#6B7280]" />
           </button>
           <div className="flex items-center gap-2">
-            <Shield size={13} className="text-purple-400" />
-            <span className="text-xs font-bold text-white/60 uppercase tracking-widest">Admin Panel</span>
+            <Shield size={13} className="text-[#FF096C]" />
+            <span className="text-xs font-bold text-[#6B7280] uppercase tracking-widest">Admin Panel</span>
           </div>
         </div>
 
