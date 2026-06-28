@@ -2,7 +2,10 @@
 
 import Link from 'next/link'
 
-const CARD_BG = '#FFFFFF'
+const CARD_BG = 'linear-gradient(180deg, #0B1B2B 0%, #081624 60%, #050B14 100%)'
+const CARD_BG_SOLID = '#050B14'
+const CARD_BORDER = '1px solid rgba(255,255,255,0.08)'
+const CARD_SHADOW = '0 18px 40px -24px rgba(8,22,36,0.6), inset 0 1px 0 rgba(255,255,255,0.05)'
 
 const SECTIONS = [
   {
@@ -64,8 +67,9 @@ export default function AcademyPage() {
               className="academy-card__box"
               style={{
                 position: 'relative', display: 'flex', flexDirection: 'column', height: '100%',
-                borderRadius: 24, overflow: 'hidden', background: CARD_BG,
-                border: '1px solid #E4E9F0',
+                borderRadius: 24, overflow: 'hidden',
+                background: `radial-gradient(120% 70% at 50% -6%, ${s.accent}2e, rgba(255,255,255,0) 56%), ${CARD_BG}`,
+                border: CARD_BORDER, boxShadow: CARD_SHADOW,
               }}
             >
               {/* Imagen superior que se funde al fondo */}
@@ -78,7 +82,7 @@ export default function AcademyPage() {
                 />
                 <div style={{
                   position: 'absolute', inset: 0,
-                  background: `linear-gradient(180deg, rgba(14,10,28,0) 25%, rgba(14,10,28,0.55) 62%, ${CARD_BG} 100%)`,
+                  background: `linear-gradient(180deg, rgba(14,10,28,0) 25%, rgba(14,10,28,0.55) 62%, ${CARD_BG_SOLID} 100%)`,
                 }} />
                 {/* Badge "Más popular" */}
                 {s.badge && (
@@ -87,7 +91,7 @@ export default function AcademyPage() {
                     padding: '6px 13px', borderRadius: 999, fontSize: 11, fontWeight: 800, letterSpacing: '0.06em',
                     textTransform: 'uppercase', color: '#fff',
                     background: 'linear-gradient(90deg, #8b1fb0, #C026D3)',
-                    border: '1px solid #E4E9F0', boxShadow: '0 4px 16px rgba(192,38,211,0.4)',
+                    border: '1px solid rgba(255,255,255,0.08)', boxShadow: '0 4px 16px rgba(192,38,211,0.4)',
                   }}>
                     <i className="fa-solid fa-star" style={{ fontSize: 10 }} /> {s.badge}
                   </span>
@@ -106,19 +110,19 @@ export default function AcademyPage() {
                   }}>
                     <i className={`fa-solid ${s.icon}`} style={{ fontSize: 22, color: '#fff' }} />
                   </div>
-                  <h2 style={{ fontWeight: 900, fontSize: 26, color: '#111827', margin: 0, letterSpacing: '0.01em' }}>{s.label}</h2>
+                  <h2 style={{ fontWeight: 900, fontSize: 26, color: '#fff', margin: 0, letterSpacing: '0.01em' }}>{s.label}</h2>
                 </div>
 
                 {/* Descripción */}
-                <p style={{ fontSize: 13.5, color: '#6B7280', lineHeight: 1.55, margin: '0 0 16px' }}>{s.desc}</p>
+                <p style={{ fontSize: 13.5, color: 'rgba(255,255,255,0.55)', lineHeight: 1.55, margin: '0 0 16px' }}>{s.desc}</p>
 
                 {/* Features */}
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 20 }}>
                   {s.features.map(f => (
                     <span key={f.text} style={{
                       display: 'inline-flex', alignItems: 'center', gap: 7, padding: '7px 12px', borderRadius: 10,
-                      fontSize: 12, fontWeight: 600, color: '#374151',
-                      background: '#F4F6FA', border: '1px solid #E4E9F0',
+                      fontSize: 12, fontWeight: 600, color: 'rgba(255,255,255,0.78)',
+                      background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)',
                     }}>
                       <i className={`fa-solid ${f.icon}`} style={{ fontSize: 12, color: s.accent }} /> {f.text}
                     </span>
@@ -144,7 +148,7 @@ export default function AcademyPage() {
         .academy-card__img { transition: transform 0.5s ease; }
         .academy-card:hover .academy-card__img { transform: scale(1.06); }
         .academy-card__box { transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease; }
-        .academy-card:hover .academy-card__box { border-color: #E4E9F0; box-shadow: 0 14px 40px rgba(15,23,42,0.12); transform: translateY(-3px); }
+        .academy-card:hover .academy-card__box { border-color: rgba(255,255,255,0.18); box-shadow: 0 24px 50px -24px rgba(8,22,36,0.7), inset 0 1px 0 rgba(255,255,255,0.06); transform: translateY(-3px); }
         .academy-card__cta { transition: filter 0.2s ease, transform 0.2s ease; }
         .academy-card:hover .academy-card__cta { filter: brightness(1.1); }
       `}</style>

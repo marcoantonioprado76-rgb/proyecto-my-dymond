@@ -213,7 +213,7 @@ export default function SocialPage() {
                 <div className="flex items-center gap-2 self-start flex-shrink-0 flex-wrap">
                   <AIKeySelector compact />
                   <button onClick={() => { setScript(''); setScriptTopic(''); setScriptModal(true) }}
-                    className="flex items-center gap-2 px-3 py-2 sm:px-4 rounded-xl bg-blue-500/15 text-blue-300 border border-blue-500/30 hover:bg-blue-500/25 transition-all text-sm font-medium whitespace-nowrap">
+                    className="flex items-center gap-2 px-3 py-2 sm:px-4 rounded-xl bg-[#FF096C]/10 text-[#FF096C] border border-[#FF096C]/30 hover:bg-[#FF096C]/20 transition-all text-sm font-medium whitespace-nowrap">
                     <FileText size={14} /> Guión de video
                   </button>
                 </div>
@@ -226,12 +226,12 @@ export default function SocialPage() {
             {/* Usage limits bar */}
             {usageLimits && (
                 <div className="mb-5 grid grid-cols-2 gap-3">
-                    <div className="dm-card p-3 rounded-xl border border-[#E4E9F0]">
+                    <div className="dm-card-dark p-3 rounded-xl border border-white/10">
                         <div className="flex items-center justify-between mb-1.5">
-                            <span className="text-[#6B7280] text-xs">Publicaciones este mes</span>
-                            <span className="text-[#111827] text-xs font-semibold">{usageLimits.monthlyCount} / {usageLimits.limits.monthlyPosts}</span>
+                            <span className="text-white/55 text-xs">Publicaciones este mes</span>
+                            <span className="text-white text-xs font-semibold">{usageLimits.monthlyCount} / {usageLimits.limits.monthlyPosts}</span>
                         </div>
-                        <div className="w-full bg-[#EEF2F7] rounded-full h-1.5">
+                        <div className="w-full bg-white/10 rounded-full h-1.5">
                             <div className="h-1.5 rounded-full transition-all"
                                 style={{
                                     width: `${Math.min(100, (usageLimits.monthlyCount / usageLimits.limits.monthlyPosts) * 100)}%`,
@@ -239,12 +239,12 @@ export default function SocialPage() {
                                 }} />
                         </div>
                     </div>
-                    <div className="dm-card p-3 rounded-xl border border-[#E4E9F0]">
+                    <div className="dm-card-dark p-3 rounded-xl border border-white/10">
                         <div className="flex items-center justify-between mb-1.5">
-                            <span className="text-[#6B7280] text-xs">Programadas activas</span>
-                            <span className="text-[#111827] text-xs font-semibold">{usageLimits.scheduledCount} / {usageLimits.limits.scheduledSlots}</span>
+                            <span className="text-white/55 text-xs">Programadas activas</span>
+                            <span className="text-white text-xs font-semibold">{usageLimits.scheduledCount} / {usageLimits.limits.scheduledSlots}</span>
                         </div>
-                        <div className="w-full bg-[#EEF2F7] rounded-full h-1.5">
+                        <div className="w-full bg-white/10 rounded-full h-1.5">
                             <div className="h-1.5 rounded-full transition-all"
                                 style={{
                                     width: `${Math.min(100, (usageLimits.scheduledCount / usageLimits.limits.scheduledSlots) * 100)}%`,
@@ -265,7 +265,7 @@ export default function SocialPage() {
                     { id: 'connections', label: 'Cuentas', icon: Zap },
                 ].map(t => (
                     <button key={t.id} onClick={() => setTab(t.id as any)}
-                        className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium transition-all whitespace-nowrap ${tab === t.id ? 'bg-[#FF096C] text-black' : 'bg-[#F4F6FA] text-[#6B7280] hover:bg-[#EEF2F7]'}`}>
+                        className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium transition-all whitespace-nowrap ${tab === t.id ? 'bg-gradient-to-r from-[#FF2D95] via-[#B735B8] to-[#233B8F] text-white hover:opacity-90' : 'bg-[#F4F6FA] text-[#6B7280] hover:bg-[#EEF2F7]'}`}>
                         <t.icon size={14} /> {t.label}
                     </button>
                 ))}
@@ -276,39 +276,39 @@ export default function SocialPage() {
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                     {/* Left: editor */}
                     <div className="lg:col-span-2 space-y-4">
-                        <div className="dm-card p-4 rounded-2xl border border-[#E4E9F0]">
+                        <div className="dm-card-dark p-4 rounded-2xl border border-white/10">
                             <div className="flex items-center justify-between mb-2">
-                                <span className="text-[#111827] text-sm font-medium">Contenido</span>
+                                <span className="text-white text-sm font-medium">Contenido</span>
                                 <div className="flex gap-2">
-                                    <button onClick={insertBold} title="Negrita Unicode" className="px-2 py-1 rounded-lg bg-[#EEF2F7] text-[#111827] text-xs hover:bg-[#E4E9F0] font-bold">𝗕</button>
-                                    <button onClick={() => handleAI('improve')} disabled={aiLoading || !content} className="flex items-center gap-1 px-2 py-1 rounded-lg bg-purple-500/20 text-purple-300 text-xs hover:bg-purple-500/30 disabled:opacity-40">
+                                    <button onClick={insertBold} title="Negrita Unicode" className="px-2 py-1 rounded-lg bg-white/5 text-white text-xs hover:bg-white/10 font-bold">𝗕</button>
+                                    <button onClick={() => handleAI('improve')} disabled={aiLoading || !content} className="flex items-center gap-1 px-2 py-1 rounded-lg bg-[#FF096C]/10 text-[#FF096C] text-xs hover:bg-[#FF096C]/20 disabled:opacity-40">
                                         <Wand2 size={11} /> Mejorar
                                     </button>
                                 </div>
                             </div>
                             <textarea ref={textareaRef} value={content} onChange={e => setContent(e.target.value)}
                                 placeholder="Escribe tu post aquí o genera con IA..."
-                                className="w-full bg-transparent text-[#111827] placeholder-[#9CA3AF] text-sm resize-none focus:outline-none min-h-[160px]" />
-                            <div className="text-right text-[#9CA3AF] text-xs mt-1">{content.length} caracteres</div>
+                                className="w-full bg-transparent text-white placeholder-white/35 text-sm resize-none focus:outline-none min-h-[160px]" />
+                            <div className="text-right text-white/40 text-xs mt-1">{content.length} caracteres</div>
                         </div>
 
                         {/* AI Generate */}
-                        <div className="dm-card p-4 rounded-2xl border border-[#E4E9F0]">
-                            <p className="text-[#111827] text-sm font-medium mb-2 flex items-center gap-1"><Sparkles size={13} className="text-[#B735B8]" /> Generar con IA</p>
+                        <div className="dm-card-dark p-4 rounded-2xl border border-white/10">
+                            <p className="text-white text-sm font-medium mb-2 flex items-center gap-1"><Sparkles size={13} className="text-[#C9A7FF]" /> Generar con IA</p>
                             <div className="flex flex-col sm:flex-row gap-2">
                                 <input value={topic} onChange={e => setTopic(e.target.value)}
                                     placeholder="Tema del post (ej: promoción de verano)"
-                                    className="flex-1 min-w-0 bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-3 py-2 text-sm text-[#111827] placeholder-[#9CA3AF] focus:outline-none focus:border-[#FF096C]/50" />
+                                    className="flex-1 min-w-0 bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-sm text-white placeholder-white/35 focus:outline-none focus:border-[#FF096C]/50" />
                                 <button onClick={() => handleAI('generate')} disabled={aiLoading || !topic}
-                                    className="px-4 py-2 bg-[#FF096C] text-black font-bold rounded-xl text-sm disabled:opacity-40 whitespace-nowrap w-full sm:w-auto">
+                                    className="px-4 py-2 bg-gradient-to-r from-[#FF2D95] via-[#B735B8] to-[#233B8F] text-white font-bold rounded-xl text-sm disabled:opacity-40 whitespace-nowrap w-full sm:w-auto hover:opacity-90">
                                     {aiLoading ? <Loader2 size={14} className="animate-spin" /> : 'Generar'}
                                 </button>
                             </div>
                         </div>
 
                         {/* Media */}
-                        <div className="dm-card p-4 rounded-2xl border border-[#E4E9F0]">
-                            <p className="text-[#111827] text-sm font-medium mb-3">Media</p>
+                        <div className="dm-card-dark p-4 rounded-2xl border border-white/10">
+                            <p className="text-white text-sm font-medium mb-3">Media</p>
                             {mediaUrl ? (
                                 <div className="relative">
                                     {mediaType === 'video'
@@ -321,7 +321,7 @@ export default function SocialPage() {
                                 </div>
                             ) : (
                                 <button onClick={() => fileRef.current?.click()} disabled={uploadingMedia}
-                                    className="w-full border-2 border-dashed border-[#E4E9F0] rounded-xl p-6 text-[#6B7280] hover:border-[#FF096C]/40 hover:text-[#FF096C] transition-all flex flex-col items-center gap-2">
+                                    className="w-full border-2 border-dashed border-white/10 rounded-xl p-6 text-white/55 hover:border-[#FF096C]/40 hover:text-[#FF096C] transition-all flex flex-col items-center gap-2">
                                     {uploadingMedia ? <Loader2 size={20} className="animate-spin" /> : <><Image size={20} /><Video size={20} /></>}
                                     <span className="text-sm">{uploadingMedia ? 'Subiendo...' : 'Subir imagen o video'}</span>
                                 </button>
@@ -334,8 +334,8 @@ export default function SocialPage() {
                     {/* Right: settings */}
                     <div className="space-y-4">
                         {/* Networks */}
-                        <div className="dm-card p-4 rounded-2xl border border-[#E4E9F0]">
-                            <p className="text-[#111827] text-sm font-medium mb-3">Redes sociales</p>
+                        <div className="dm-card-dark p-4 rounded-2xl border border-white/10">
+                            <p className="text-white text-sm font-medium mb-3">Redes sociales</p>
                             <div className="space-y-2">
                                 {NETWORKS.map(n => {
                                     const isConnected = networkConnected(n.id)
@@ -348,12 +348,12 @@ export default function SocialPage() {
                                         <div key={n.id}>
                                             <button disabled={!isConnected}
                                                 onClick={() => toggleNetwork(n.id)}
-                                                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl border transition-all text-left ${isSelected ? 'border-[#FF096C]/50 bg-[#FF096C]/10' : 'border-[#E4E9F0] bg-[#F4F6FA]'} ${!isConnected ? 'opacity-40 cursor-not-allowed' : 'hover:border-purple-500/40'}`}>
+                                                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl border transition-all text-left ${isSelected ? 'border-[#FF096C]/50 bg-[#FF096C]/10' : 'border-white/10 bg-white/5'} ${!isConnected ? 'opacity-40 cursor-not-allowed' : 'hover:border-[#FF096C]/40'}`}>
                                                 <span className="text-lg">{n.icon}</span>
                                                 <div className="flex-1 min-w-0">
-                                                    <span className="text-[#111827] text-sm font-medium">{n.label}</span>
-                                                    {!isConnected && <p className="text-[#9CA3AF] text-xs">No conectado</p>}
-                                                    {isConnected && !isSelected && <p className="text-[#FF096C] text-xs">Conectado ✓</p>}
+                                                    <span className="text-white text-sm font-medium">{n.label}</span>
+                                                    {!isConnected && <p className="text-white/40 text-xs">No conectado</p>}
+                                                    {isConnected && !isSelected && <p className="text-[#16A34A] text-xs">Conectado ✓</p>}
                                                     {isConnected && isSelected && (isFB || isIG) && pageSelections[n.id] && (
                                                         <p className="text-[#FF096C] text-xs truncate">
                                                             {isFB ? pageSelections[n.id].pageName : `@${pageSelections[n.id].username}`}
@@ -367,11 +367,11 @@ export default function SocialPage() {
                                             {isSelected && isFB && isConnected && (
                                                 <div className="mt-1.5 ml-2">
                                                     {fbPagesLoading ? (
-                                                        <p className="text-[#6B7280] text-xs px-2 py-1">Cargando páginas...</p>
+                                                        <p className="text-white/55 text-xs px-2 py-1">Cargando páginas...</p>
                                                     ) : fbPagesError ? (
                                                         <p className="text-red-400 text-xs px-2 py-1">⚠ {fbPagesError}</p>
                                                     ) : fbPages.length === 0 ? (
-                                                        <p className="text-[#6B7280] text-xs px-2 py-1">No se encontraron páginas de Facebook. Asegúrate de ser admin de alguna Página.</p>
+                                                        <p className="text-white/55 text-xs px-2 py-1">No se encontraron páginas de Facebook. Asegúrate de ser admin de alguna Página.</p>
                                                     ) : (
                                                         <select
                                                             value={pageSelections.FACEBOOK?.pageId || ''}
@@ -379,7 +379,7 @@ export default function SocialPage() {
                                                                 const page = fbPages.find(p => p.pageId === e.target.value)
                                                                 if (page) setPageSelections(prev => ({ ...prev, FACEBOOK: { pageId: page.pageId, pageAccessToken: page.pageAccessToken, pageName: page.pageName } }))
                                                             }}
-                                                            className="w-full bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-3 py-2 text-xs text-[#111827] focus:outline-none focus:border-[#FF096C]/50 [&>option]:bg-[#F4F6FA]">
+                                                            className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-[#FF096C]/50 [&>option]:bg-[#081624]">
                                                             <option value="">— Selecciona una página —</option>
                                                             {fbPages.map(p => (
                                                                 <option key={p.pageId} value={p.pageId}>{p.pageName}</option>
@@ -393,11 +393,11 @@ export default function SocialPage() {
                                             {isSelected && isIG && isConnected && (
                                                 <div className="mt-1.5 ml-2">
                                                     {fbPagesLoading ? (
-                                                        <p className="text-[#6B7280] text-xs px-2 py-1">Cargando cuentas...</p>
+                                                        <p className="text-white/55 text-xs px-2 py-1">Cargando cuentas...</p>
                                                     ) : fbPagesError ? (
                                                         <p className="text-red-400 text-xs px-2 py-1">⚠ {fbPagesError}</p>
                                                     ) : igPages.length === 0 ? (
-                                                        <p className="text-[#B735B8] text-xs px-2 py-1">⚠ No hay cuentas de Instagram Business vinculadas a tus páginas de Facebook</p>
+                                                        <p className="text-amber-400 text-xs px-2 py-1">⚠ No hay cuentas de Instagram Business vinculadas a tus páginas de Facebook</p>
                                                     ) : (
                                                         <select
                                                             value={pageSelections.INSTAGRAM?.accountId || ''}
@@ -405,7 +405,7 @@ export default function SocialPage() {
                                                                 const page = igPages.find(p => p.instagram?.accountId === e.target.value)
                                                                 if (page) setPageSelections(prev => ({ ...prev, INSTAGRAM: { accountId: page.instagram.accountId, pageAccessToken: page.pageAccessToken, username: page.instagram.username } }))
                                                             }}
-                                                            className="w-full bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-3 py-2 text-xs text-[#111827] focus:outline-none focus:border-[#FF096C]/50 [&>option]:bg-[#F4F6FA]">
+                                                            className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-[#FF096C]/50 [&>option]:bg-[#081624]">
                                                             <option value="">— Selecciona una cuenta —</option>
                                                             {igPages.map(p => (
                                                                 <option key={p.instagram.accountId} value={p.instagram.accountId}>@{p.instagram.username} ({p.pageName})</option>
@@ -421,23 +421,23 @@ export default function SocialPage() {
                         </div>
 
                         {/* Post type */}
-                        <div className="dm-card p-4 rounded-2xl border border-[#E4E9F0]">
-                            <p className="text-[#111827] text-sm font-medium mb-3">Tipo de publicación</p>
+                        <div className="dm-card-dark p-4 rounded-2xl border border-white/10">
+                            <p className="text-white text-sm font-medium mb-3">Tipo de publicación</p>
                             <div className="grid grid-cols-2 gap-2">
                                 <button onClick={() => setPostType('feed')}
-                                    className={`py-2 rounded-xl text-sm font-medium border transition-all ${postType === 'feed' ? 'bg-[#FF096C] text-black border-[#FF096C]' : 'border-[#E4E9F0] text-[#6B7280] hover:border-purple-500/40'}`}>
+                                    className={`py-2 rounded-xl text-sm font-medium border transition-all ${postType === 'feed' ? 'bg-gradient-to-r from-[#FF2D95] via-[#B735B8] to-[#233B8F] text-white border-transparent hover:opacity-90' : 'border-white/10 text-white/55 hover:border-[#FF096C]/40'}`}>
                                     Feed
                                 </button>
                                 <button onClick={() => setPostType('story')}
-                                    className={`py-2 rounded-xl text-sm font-medium border transition-all ${postType === 'story' ? 'bg-[#FF096C] text-black border-[#FF096C]' : 'border-[#E4E9F0] text-[#6B7280] hover:border-purple-500/40'}`}>
+                                    className={`py-2 rounded-xl text-sm font-medium border transition-all ${postType === 'story' ? 'bg-gradient-to-r from-[#FF2D95] via-[#B735B8] to-[#233B8F] text-white border-transparent hover:opacity-90' : 'border-white/10 text-white/55 hover:border-[#FF096C]/40'}`}>
                                     Story
                                 </button>
                             </div>
                         </div>
 
                         {/* Schedule */}
-                        <div className="dm-card p-4 rounded-2xl border border-[#E4E9F0]">
-                            <p className="text-[#111827] text-sm font-medium mb-3 flex items-center gap-1"><Calendar size={13} /> Programar</p>
+                        <div className="dm-card-dark p-4 rounded-2xl border border-white/10">
+                            <p className="text-white text-sm font-medium mb-3 flex items-center gap-1"><Calendar size={13} /> Programar</p>
                             <input
                                 type="datetime-local"
                                 value={scheduledAt}
@@ -446,25 +446,25 @@ export default function SocialPage() {
                                     return d.toISOString().slice(0, 16)
                                 })()}
                                 onChange={e => setScheduledAt(e.target.value)}
-                                className="w-full bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-3 py-2 text-sm text-[#111827] focus:outline-none focus:border-[#FF096C]/50" />
-                            {scheduledAt && <p className="text-[#6B7280] text-xs mt-1">Se publicará automáticamente</p>}
+                                className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-[#FF096C]/50 [color-scheme:dark]" />
+                            {scheduledAt && <p className="text-white/55 text-xs mt-1">Se publicará automáticamente</p>}
                         </div>
 
                         {/* Publish button */}
                         <button onClick={handlePublish} disabled={loading || !content.trim() || !selectedNetworks.length}
-                            className="w-full py-3 bg-[#FF096C] text-black font-bold rounded-xl flex items-center justify-center gap-2 disabled:opacity-40 hover:brightness-110 transition-all">
+                            className="w-full py-3 bg-gradient-to-r from-[#FF2D95] via-[#B735B8] to-[#233B8F] text-white font-bold rounded-xl flex items-center justify-center gap-2 disabled:opacity-40 hover:opacity-90 transition-all">
                             {loading ? <><Loader2 size={16} className="animate-spin" /> Publicando...</>
                                 : scheduledAt ? <><Calendar size={16} /> Programar</> : <><Send size={16} /> Publicar ahora</>}
                         </button>
 
                         {/* Result */}
                         {publishResult && (
-                            <div className="dm-card p-4 rounded-2xl border border-[#FF096C]/30">
+                            <div className="dm-card-dark p-4 rounded-2xl border border-[#FF096C]/30">
                                 <p className="text-[#FF096C] text-sm font-medium mb-2">
                                     {publishResult.scheduled ? '✅ Programado' : '✅ Publicado'}
                                 </p>
                                 {publishResult.results?.map((r: any) => (
-                                    <div key={r.network} className="flex items-start gap-2 text-xs text-[#6B7280] mt-1 min-w-0">
+                                    <div key={r.network} className="flex items-start gap-2 text-xs text-white/55 mt-1 min-w-0">
                                         <span className="flex-shrink-0 mt-0.5">{r.success ? <CheckCircle size={11} className="text-[#FF096C]" /> : <XCircle size={11} className="text-red-400" />}</span>
                                         <span className="break-words min-w-0">{r.network}: {r.success ? 'OK' : r.error}</span>
                                     </div>
@@ -480,7 +480,7 @@ export default function SocialPage() {
                 <div className="space-y-3">
                     <p className="text-[#6B7280] text-sm">Posts programados pendientes</p>
                     {posts.length === 0 ? (
-                        <div className="dm-card p-8 rounded-2xl border border-[#E4E9F0] text-center text-[#6B7280]">
+                        <div className="dm-card-dark p-8 rounded-2xl border border-white/10 text-center text-white/55">
                             No hay posts programados
                         </div>
                     ) : posts.map(post => (
@@ -493,7 +493,7 @@ export default function SocialPage() {
             {tab === 'history' && (
                 <div className="space-y-3">
                     {posts.length === 0 ? (
-                        <div className="dm-card p-8 rounded-2xl border border-[#E4E9F0] text-center text-[#6B7280]">
+                        <div className="dm-card-dark p-8 rounded-2xl border border-white/10 text-center text-white/55">
                             No hay publicaciones todavía
                         </div>
                     ) : posts.map(post => (
@@ -515,13 +515,13 @@ export default function SocialPage() {
             {/* SCRIPT MODAL */}
             {scriptModal && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" onClick={e => { if (e.target === e.currentTarget) setScriptModal(false) }}>
-                    <div className="w-full max-w-lg bg-dark-900 border border-[#E4E9F0] rounded-2xl shadow-2xl overflow-hidden">
+                    <div className="w-full max-w-lg dm-card-dark border border-white/10 rounded-2xl shadow-2xl overflow-hidden">
                         {/* Modal header */}
-                        <div className="flex items-center justify-between px-5 py-4 border-b border-[#E4E9F0]">
-                            <h2 className="text-[#111827] font-semibold flex items-center gap-2">
-                                <FileText size={16} className="text-blue-400" /> Guión de video
+                        <div className="flex items-center justify-between px-5 py-4 border-b border-white/10">
+                            <h2 className="text-white font-semibold flex items-center gap-2">
+                                <FileText size={16} className="text-[#7DD3FC]" /> Guión de video
                             </h2>
-                            <button onClick={() => setScriptModal(false)} className="text-[#6B7280] hover:text-[#111827] transition-colors text-xl leading-none">&times;</button>
+                            <button onClick={() => setScriptModal(false)} className="text-white/55 hover:text-white transition-colors text-xl leading-none">&times;</button>
                         </div>
                         {/* Modal body */}
                         <div className="p-5 space-y-4">
@@ -531,26 +531,26 @@ export default function SocialPage() {
                                     onChange={e => setScriptTopic(e.target.value)}
                                     onKeyDown={e => e.key === 'Enter' && handleGenerateScript()}
                                     placeholder="Describe el tema de tu video..."
-                                    className="flex-1 min-w-0 bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-3 py-2.5 text-sm text-[#111827] placeholder-[#9CA3AF] focus:outline-none focus:border-blue-400/50"
+                                    className="flex-1 min-w-0 bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm text-white placeholder-white/35 focus:outline-none focus:border-[#FF096C]/50"
                                 />
                                 <button onClick={handleGenerateScript} disabled={scriptLoading || !scriptTopic.trim()}
-                                    className="px-4 py-2.5 bg-blue-500 text-white font-semibold rounded-xl text-sm disabled:opacity-40 hover:bg-blue-400 transition-colors whitespace-nowrap w-full sm:w-auto">
+                                    className="px-4 py-2.5 bg-gradient-to-r from-[#FF2D95] via-[#B735B8] to-[#233B8F] text-white font-semibold rounded-xl text-sm disabled:opacity-40 hover:opacity-90 transition-colors whitespace-nowrap w-full sm:w-auto">
                                     {scriptLoading ? <Loader2 size={14} className="animate-spin" /> : 'Generar'}
                                 </button>
                             </div>
                             {script ? (
                                 <>
-                                    <div className="bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl p-4 text-sm text-[#374151] whitespace-pre-wrap max-h-72 overflow-y-auto leading-relaxed">
+                                    <div className="bg-white/5 border border-white/10 rounded-xl p-4 text-sm text-white/75 whitespace-pre-wrap max-h-72 overflow-y-auto leading-relaxed">
                                         {script}
                                     </div>
                                     <button
                                         onClick={() => navigator.clipboard.writeText(script)}
-                                        className="w-full py-2 rounded-xl border border-[#E4E9F0] text-[#6B7280] hover:text-[#111827] hover:border-purple-500/40 text-sm transition-colors">
+                                        className="w-full py-2 rounded-xl border border-white/10 text-white/55 hover:text-white hover:border-[#FF096C]/40 text-sm transition-colors">
                                         Copiar guión
                                     </button>
                                 </>
                             ) : (
-                                <p className="text-[#9CA3AF] text-sm text-center py-6">El guión aparecerá aquí</p>
+                                <p className="text-white/40 text-sm text-center py-6">El guión aparecerá aquí</p>
                             )}
                         </div>
                     </div>
@@ -565,22 +565,22 @@ function PostCard({ post, onDelete }: { post: any; onDelete: (id: string) => voi
     const cfg = STATUS_CONFIG[post.status] || STATUS_CONFIG.DRAFT
     const Icon = cfg.icon
     return (
-        <div className="dm-card p-4 rounded-2xl border border-[#E4E9F0]">
+        <div className="dm-card-dark p-4 rounded-2xl border border-white/10">
             <div className="flex items-start justify-between gap-3">
                 <div className="flex-1 min-w-0">
-                    <p className="text-[#111827] text-sm line-clamp-2">{post.content}</p>
+                    <p className="text-white text-sm line-clamp-2">{post.content}</p>
                     <div className="flex items-center gap-3 mt-2 flex-wrap">
                         <span className="flex items-center gap-1 text-xs" style={{ color: cfg.color }}>
                             <Icon size={11} /> {cfg.label}
                         </span>
                         {post.scheduledAt && (
-                            <span className="text-[#6B7280] text-xs flex items-center gap-1">
+                            <span className="text-white/55 text-xs flex items-center gap-1">
                                 <Clock size={10} /> {new Date(post.scheduledAt).toLocaleString('es', { dateStyle: 'short', timeStyle: 'short' })}
                             </span>
                         )}
                         <div className="flex gap-1">
                             {post.networks?.map((n: any) => (
-                                <span key={n.id} className={`text-xs px-1.5 py-0.5 rounded-md ${n.status === 'PUBLISHED' ? 'bg-[#FF096C]/10 text-[#FF096C]' : n.status === 'FAILED' ? 'bg-red-500/10 text-red-400' : 'bg-[#F4F6FA] text-[#6B7280]'}`}>
+                                <span key={n.id} className={`text-xs px-1.5 py-0.5 rounded-md ${n.status === 'PUBLISHED' ? 'bg-[#FF096C]/10 text-[#FF096C]' : n.status === 'FAILED' ? 'bg-red-500/10 text-red-400' : 'bg-white/5 text-white/55'}`}>
                                     {n.network}
                                 </span>
                             ))}
@@ -588,7 +588,7 @@ function PostCard({ post, onDelete }: { post: any; onDelete: (id: string) => voi
                     </div>
                 </div>
                 {post.mediaUrl && (
-                    <div className="w-16 h-16 flex-shrink-0 rounded-xl overflow-hidden bg-[#F4F6FA]">
+                    <div className="w-16 h-16 flex-shrink-0 rounded-xl overflow-hidden bg-white/5">
                         {post.mediaType === 'video'
                             ? <video src={post.mediaUrl} className="w-full h-full object-cover" />
                             : <img src={post.mediaUrl} className="w-full h-full object-cover" alt="" />}
@@ -596,7 +596,7 @@ function PostCard({ post, onDelete }: { post: any; onDelete: (id: string) => voi
                 )}
             </div>
             <div className="mt-3 flex justify-end">
-                <button onClick={() => onDelete(post.id)} className="p-1.5 rounded-lg hover:bg-red-500/10 text-[#6B7280] hover:text-red-400 transition-all">
+                <button onClick={() => onDelete(post.id)} className="p-1.5 rounded-lg hover:bg-red-500/10 text-white/55 hover:text-red-400 transition-all">
                     <Trash2 size={13} />
                 </button>
             </div>
@@ -606,7 +606,7 @@ function PostCard({ post, onDelete }: { post: any; onDelete: (id: string) => voi
 
 function MetricsPanel({ metrics, onAiAnalyze, aiLoading }: { metrics: any; onAiAnalyze: () => void; aiLoading: boolean }) {
     if (!metrics) return (
-        <div className="dm-card p-8 rounded-2xl border border-[#E4E9F0] text-center text-[#6B7280]">
+        <div className="dm-card-dark p-8 rounded-2xl border border-white/10 text-center text-white/55">
             Cargando métricas...
         </div>
     )
@@ -624,25 +624,25 @@ function MetricsPanel({ metrics, onAiAnalyze, aiLoading }: { metrics: any; onAiA
                     { label: 'Fallidos', value: postStats.FAILED || 0, color: '#FF4444' },
                     { label: 'Total', value: Object.values(postStats).reduce((a, b) => a + b, 0), color: '#888' },
                 ].map(stat => (
-                    <div key={stat.label} className="dm-card p-4 rounded-2xl border border-[#E4E9F0] text-center">
+                    <div key={stat.label} className="dm-card-dark p-4 rounded-2xl border border-white/10 text-center">
                         <p className="text-2xl font-bold" style={{ color: stat.color }}>{stat.value}</p>
-                        <p className="text-[#6B7280] text-xs mt-1">{stat.label}</p>
+                        <p className="text-white/55 text-xs mt-1">{stat.label}</p>
                     </div>
                 ))}
             </div>
 
             {/* Platform metrics */}
             {metrics.metrics && Object.entries(metrics.metrics).map(([network, data]: [string, any]) => (
-                <div key={network} className="dm-card p-4 rounded-2xl border border-[#E4E9F0]">
-                    <h3 className="text-[#111827] font-medium mb-3">{network}</h3>
+                <div key={network} className="dm-card-dark p-4 rounded-2xl border border-white/10">
+                    <h3 className="text-white font-medium mb-3">{network}</h3>
                     {data.error ? (
                         <p className="text-red-400 text-sm">{data.error}</p>
                     ) : (
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                             {Object.entries(data).slice(0, 8).map(([k, v]: [string, any]) => (
-                                <div key={k} className="bg-[#F4F6FA] rounded-xl p-3">
-                                    <p className="text-[#111827] font-bold">{typeof v === 'number' ? v.toLocaleString() : String(v)}</p>
-                                    <p className="text-[#6B7280] text-xs mt-0.5">{k}</p>
+                                <div key={k} className="bg-white/5 rounded-xl p-3">
+                                    <p className="text-white font-bold">{typeof v === 'number' ? v.toLocaleString() : String(v)}</p>
+                                    <p className="text-white/55 text-xs mt-0.5">{k}</p>
                                 </div>
                             ))}
                         </div>
@@ -651,7 +651,7 @@ function MetricsPanel({ metrics, onAiAnalyze, aiLoading }: { metrics: any; onAiA
             ))}
 
             <button onClick={onAiAnalyze} disabled={aiLoading}
-                className="w-full py-3 border border-purple-500/30 rounded-xl text-purple-300 text-sm flex items-center justify-center gap-2 hover:bg-purple-500/10 disabled:opacity-40">
+                className="w-full py-3 border border-[#FF096C]/30 rounded-xl text-[#FF096C] text-sm flex items-center justify-center gap-2 hover:bg-[#FF096C]/10 disabled:opacity-40">
                 {aiLoading ? <Loader2 size={14} className="animate-spin" /> : <Sparkles size={14} />}
                 Analizar con IA y obtener recomendaciones
             </button>
@@ -711,18 +711,18 @@ function ConnectionsPanel({ connections, onRefresh }: { connections: any[]; onRe
     return (
         <div className="space-y-4">
             {/* OpenAI API Key */}
-            <div className="dm-card p-4 rounded-2xl border border-yellow-500/20 bg-[#B735B8]/5">
+            <div className="dm-card-dark p-4 rounded-2xl border border-white/10">
                 <div className="flex items-center gap-2 mb-3">
-                    <Sparkles size={15} className="text-[#B735B8]" />
-                    <p className="text-[#111827] font-medium text-sm">API Key de OpenAI (IA)</p>
-                    {oaiConfig?.isValid && <span className="text-xs text-[#FF096C] bg-[#FF096C]/10 px-2 py-0.5 rounded-full">Activa ✓</span>}
+                    <Sparkles size={15} className="text-[#C9A7FF]" />
+                    <p className="text-white font-medium text-sm">API Key de OpenAI (IA)</p>
+                    {oaiConfig?.isValid && <span className="text-xs text-[#16A34A] bg-[#16A34A]/10 px-2 py-0.5 rounded-full">Activa ✓</span>}
                 </div>
-                <p className="text-[#6B7280] text-xs mb-3">Necesaria para generar texto, mejorar posts y crear guiones de video con IA.</p>
+                <p className="text-white/55 text-xs mb-3">Necesaria para generar texto, mejorar posts y crear guiones de video con IA.</p>
                 {/* Model selector — shared between both states */}
                 <div className="mb-3">
-                    <label className="text-[#6B7280] text-xs mb-1.5 block">Modelo</label>
+                    <label className="text-white/55 text-xs mb-1.5 block">Modelo</label>
                     <select value={oaiModel} onChange={e => setOaiModel(e.target.value)}
-                        className="w-full bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-3 py-2 text-sm text-[#111827] focus:outline-none focus:border-yellow-400/50 [&>option]:bg-[#F4F6FA]">
+                        className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-[#FF096C]/50 [&>option]:bg-[#081624]">
                         <option value="gpt-5.2">GPT-5.2 ⚡ Última generación — ⚠ Mayor costo</option>
                         <option value="gpt-5.1">GPT-5.1 ⭐ Más inteligente — ⚠ Mayor costo</option>
                         <option value="gpt-4.1">GPT-4.1 — Alta calidad — ⚠ Mayor costo</option>
@@ -737,7 +737,7 @@ function ConnectionsPanel({ connections, onRefresh }: { connections: any[]; onRe
 
                 {oaiConfig ? (
                     <div className="flex items-center justify-between gap-2 min-w-0">
-                        <span className="text-[#374151] text-xs sm:text-sm font-mono truncate min-w-0">{oaiConfig.apiKeyMasked}</span>
+                        <span className="text-white/78 text-xs sm:text-sm font-mono truncate min-w-0">{oaiConfig.apiKeyMasked}</span>
                         <button onClick={removeOaiKey} className="flex-shrink-0 text-xs text-red-400 hover:text-red-300 px-3 py-1.5 rounded-lg border border-red-500/20 hover:bg-red-500/10">Eliminar</button>
                     </div>
                 ) : (
@@ -745,69 +745,69 @@ function ConnectionsPanel({ connections, onRefresh }: { connections: any[]; onRe
                         <input value={oaiKey} onChange={e => setOaiKey(e.target.value)}
                             placeholder="sk-proj-..."
                             type="password"
-                            className="flex-1 min-w-0 bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-3 py-2 text-sm text-[#111827] placeholder-[#9CA3AF] focus:outline-none focus:border-yellow-400/50" />
+                            className="flex-1 min-w-0 bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-sm text-white placeholder-white/35 focus:outline-none focus:border-[#FF096C]/50" />
                         <button onClick={saveOaiKey} disabled={oaiLoading || !oaiKey.trim()}
-                            className="px-3 py-2 bg-[#B735B8]/20 text-yellow-300 border border-yellow-500/30 rounded-xl text-sm disabled:opacity-40 hover:bg-[#B735B8]/30 whitespace-nowrap w-full sm:w-auto">
+                            className="px-3 py-2 bg-gradient-to-r from-[#FF2D95] via-[#B735B8] to-[#233B8F] text-white border border-transparent rounded-xl text-sm disabled:opacity-40 hover:opacity-90 whitespace-nowrap w-full sm:w-auto">
                             {oaiLoading ? <Loader2 size={13} className="animate-spin" /> : 'Guardar'}
                         </button>
                     </div>
                 )}
-                {oaiMsg && <p className={`text-xs mt-2 ${oaiMsg.startsWith('✓') ? 'text-[#FF096C]' : 'text-[#B735B8]'}`}>{oaiMsg}</p>}
+                {oaiMsg && <p className={`text-xs mt-2 ${oaiMsg.startsWith('✓') ? 'text-[#16A34A]' : 'text-amber-400'}`}>{oaiMsg}</p>}
             </div>
 
             <p className="text-[#6B7280] text-sm">Conecta tus cuentas para publicar desde aquí</p>
 
             {/* Facebook + Instagram (same OAuth) */}
-            <div className="dm-card p-4 rounded-2xl border border-[#E4E9F0]">
+            <div className="dm-card-dark p-4 rounded-2xl border border-white/10">
                 <div className="flex items-center justify-between gap-3">
                     <div className="flex items-center gap-3 min-w-0">
                         <span className="text-2xl flex-shrink-0">📘</span>
                         <div className="min-w-0">
-                            <p className="text-[#111827] font-medium">Facebook + Instagram</p>
+                            <p className="text-white font-medium">Facebook + Instagram</p>
                             {connectedMap.FACEBOOK
-                                ? <p className="text-[#FF096C] text-xs truncate">✓ {connectedMap.FACEBOOK.pageName || connectedMap.FACEBOOK.accountName}</p>
-                                : <p className="text-[#6B7280] text-xs">No conectado</p>}
+                                ? <p className="text-[#16A34A] text-xs truncate">✓ {connectedMap.FACEBOOK.pageName || connectedMap.FACEBOOK.accountName}</p>
+                                : <p className="text-white/55 text-xs">No conectado</p>}
                         </div>
                     </div>
                     {connectedMap.FACEBOOK
                         ? <button onClick={() => disconnect('FACEBOOK')} className="flex-shrink-0 text-xs text-red-400 hover:text-red-300 px-3 py-1.5 rounded-lg border border-red-500/20 hover:bg-red-500/10">Desconectar</button>
-                        : <a href="/api/social/oauth/facebook" className="flex-shrink-0 text-xs bg-blue-500/20 text-blue-300 border border-blue-500/30 px-3 py-1.5 rounded-lg hover:bg-blue-500/30 flex items-center gap-1"><ExternalLink size={11} /> Conectar</a>}
+                        : <a href="/api/social/oauth/facebook" className="flex-shrink-0 text-xs bg-[#FF096C]/10 text-[#FF096C] border border-[#FF096C]/30 px-3 py-1.5 rounded-lg hover:bg-[#FF096C]/20 flex items-center gap-1"><ExternalLink size={11} /> Conectar</a>}
                 </div>
             </div>
 
             {/* TikTok */}
-            <div className="dm-card p-4 rounded-2xl border border-[#E4E9F0]">
+            <div className="dm-card-dark p-4 rounded-2xl border border-white/10">
                 <div className="flex items-center justify-between gap-3">
                     <div className="flex items-center gap-3 min-w-0">
                         <span className="text-2xl flex-shrink-0">🎵</span>
                         <div className="min-w-0">
-                            <p className="text-[#111827] font-medium">TikTok</p>
+                            <p className="text-white font-medium">TikTok</p>
                             {connectedMap.TIKTOK
-                                ? <p className="text-[#FF096C] text-xs truncate">✓ {connectedMap.TIKTOK.accountName}</p>
-                                : <p className="text-[#6B7280] text-xs">No conectado</p>}
+                                ? <p className="text-[#16A34A] text-xs truncate">✓ {connectedMap.TIKTOK.accountName}</p>
+                                : <p className="text-white/55 text-xs">No conectado</p>}
                         </div>
                     </div>
                     {connectedMap.TIKTOK
                         ? <button onClick={() => disconnect('TIKTOK')} className="flex-shrink-0 text-xs text-red-400 hover:text-red-300 px-3 py-1.5 rounded-lg border border-red-500/20 hover:bg-red-500/10">Desconectar</button>
-                        : <a href="/api/social/oauth/tiktok" className="flex-shrink-0 text-xs bg-black/40 text-white border border-[#E4E9F0] px-3 py-1.5 rounded-lg hover:bg-[#EEF2F7] flex items-center gap-1"><ExternalLink size={11} /> Conectar</a>}
+                        : <a href="/api/social/oauth/tiktok" className="flex-shrink-0 text-xs bg-[#FF096C]/10 text-[#FF096C] border border-[#FF096C]/30 px-3 py-1.5 rounded-lg hover:bg-[#FF096C]/20 flex items-center gap-1"><ExternalLink size={11} /> Conectar</a>}
                 </div>
             </div>
 
             {/* YouTube */}
-            <div className="dm-card p-4 rounded-2xl border border-[#E4E9F0]">
+            <div className="dm-card-dark p-4 rounded-2xl border border-white/10">
                 <div className="flex items-center justify-between gap-3">
                     <div className="flex items-center gap-3 min-w-0">
                         <span className="text-2xl flex-shrink-0">▶️</span>
                         <div className="min-w-0">
-                            <p className="text-[#111827] font-medium">YouTube</p>
+                            <p className="text-white font-medium">YouTube</p>
                             {connectedMap.YOUTUBE
-                                ? <p className="text-[#FF096C] text-xs truncate">✓ {connectedMap.YOUTUBE.accountName}</p>
-                                : <p className="text-[#6B7280] text-xs">No conectado</p>}
+                                ? <p className="text-[#16A34A] text-xs truncate">✓ {connectedMap.YOUTUBE.accountName}</p>
+                                : <p className="text-white/55 text-xs">No conectado</p>}
                         </div>
                     </div>
                     {connectedMap.YOUTUBE
                         ? <button onClick={() => disconnect('YOUTUBE')} className="flex-shrink-0 text-xs text-red-400 hover:text-red-300 px-3 py-1.5 rounded-lg border border-red-500/20 hover:bg-red-500/10">Desconectar</button>
-                        : <a href="/api/social/oauth/youtube" className="flex-shrink-0 text-xs bg-red-500/20 text-red-300 border border-red-500/30 px-3 py-1.5 rounded-lg hover:bg-red-500/30 flex items-center gap-1"><ExternalLink size={11} /> Conectar</a>}
+                        : <a href="/api/social/oauth/youtube" className="flex-shrink-0 text-xs bg-[#FF096C]/10 text-[#FF096C] border border-[#FF096C]/30 px-3 py-1.5 rounded-lg hover:bg-[#FF096C]/20 flex items-center gap-1"><ExternalLink size={11} /> Conectar</a>}
                 </div>
             </div>
         </div>

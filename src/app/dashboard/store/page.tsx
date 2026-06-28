@@ -129,7 +129,7 @@ export default function StorePage() {
           <p className="text-xs text-[#6B7280] mt-2">Productos exclusivos de MY DIAMOND.</p>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <Link href="/dashboard/store/my-orders" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 12, fontWeight: 600, color: '#D203DD', background: 'rgba(210,3,221,0.07)', border: '1px solid #E4E9F0', borderRadius: 8, padding: '7px 14px', textDecoration: 'none' }}>
+          <Link href="/dashboard/store/my-orders" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 12, fontWeight: 600, color: '#FF096C', background: 'rgba(255,9,108,0.1)', border: '1px solid #E4E9F0', borderRadius: 8, padding: '7px 14px', textDecoration: 'none' }}>
             📦 Mis pedidos
           </Link>
           <Link href="/dashboard/store/cart" style={{ position: 'relative', display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 12, fontWeight: 600, color: '#111827', background: '#F0F3F7', border: '1px solid #E4E9F0', borderRadius: 8, padding: '7px 14px', textDecoration: 'none' }}>
@@ -175,7 +175,7 @@ export default function StorePage() {
             const img = Array.isArray(item.images) && item.images.length > 0 ? item.images[0] : null
             const outOfStock = item.stock === 0
             return (
-              <div key={item.id} style={{ borderRadius: 14, overflow: 'hidden', background: '#FFFFFF', border: '1px solid #E4E9F0', opacity: outOfStock ? 0.6 : 1, transition: 'border-color 0.2s', display: 'flex', flexDirection: 'column' }}>
+              <div key={item.id} style={{ borderRadius: 14, overflow: 'hidden', background: 'radial-gradient(120% 75% at 50% -10%, rgba(183,53,184,0.16), rgba(255,255,255,0) 60%), linear-gradient(180deg, #0B1B2B 0%, #081624 60%, #050B14 100%)', border: '1px solid rgba(255,255,255,0.08)', boxShadow: '0 18px 40px -24px rgba(8,22,36,0.6), inset 0 1px 0 rgba(255,255,255,0.05)', opacity: outOfStock ? 0.6 : 1, transition: 'border-color 0.2s', display: 'flex', flexDirection: 'column' }}>
                 {/* Image — click goes to detail */}
                 <Link href={`/dashboard/store/${item.id}`} style={{ textDecoration: 'none', display: 'block' }}>
                   <div style={{ aspectRatio: '1/1', background: 'rgba(210,3,221,0.04)', position: 'relative', overflow: 'hidden' }}>
@@ -188,10 +188,10 @@ export default function StorePage() {
                     )}
                     {outOfStock && (
                       <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.55)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        <span style={{ fontSize: 10, fontWeight: 800, color: '#374151', letterSpacing: '0.1em', textTransform: 'uppercase' }}>No disponible</span>
+                        <span style={{ fontSize: 10, fontWeight: 800, color: 'rgba(255,255,255,0.78)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>No disponible</span>
                       </div>
                     )}
-                    <span style={{ position: 'absolute', top: 8, left: 8, fontSize: 10, fontWeight: 600, color: '#6B7280', background: 'rgba(0,0,0,0.4)', borderRadius: 6, padding: '2px 7px' }}>
+                    <span style={{ position: 'absolute', top: 8, left: 8, fontSize: 10, fontWeight: 600, color: 'rgba(255,255,255,0.78)', background: 'rgba(0,0,0,0.4)', borderRadius: 6, padding: '2px 7px' }}>
                       {item.category}
                     </span>
                   </div>
@@ -207,13 +207,13 @@ export default function StorePage() {
                   {/* Action buttons */}
                   <div style={{ display: 'flex', gap: 5, marginTop: 'auto' }}>
                     <Link href={`/dashboard/store/${item.id}`}
-                      style={{ flex: 1, padding: '5px 0', borderRadius: 7, fontSize: 11, fontWeight: 600, textAlign: 'center', textDecoration: 'none', border: '1px solid #E4E9F0', color: '#6B7280', background: 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      style={{ flex: 1, padding: '5px 0', borderRadius: 7, fontSize: 11, fontWeight: 600, textAlign: 'center', textDecoration: 'none', border: '1px solid rgba(255,255,255,0.12)', color: 'rgba(255,255,255,0.55)', background: 'rgba(255,255,255,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                       Ver
                     </Link>
                     <button
                       onClick={e => handleQuickAdd(e, item)}
                       disabled={outOfStock}
-                      style={{ flex: 2, padding: '5px 0', borderRadius: 7, fontSize: 11, fontWeight: 700, cursor: outOfStock ? 'not-allowed' : 'pointer', border: 'none', background: outOfStock ? '#F0F3F7' : 'linear-gradient(135deg, #FF2D95 0%, #B735B8 48%, #233B8F 100%)', color: outOfStock ? '#9CA3AF' : '#000' }}>
+                      style={{ flex: 2, padding: '5px 0', borderRadius: 7, fontSize: 11, fontWeight: 700, cursor: outOfStock ? 'not-allowed' : 'pointer', border: 'none', background: outOfStock ? 'rgba(255,255,255,0.05)' : 'linear-gradient(135deg, #FF2D95 0%, #B735B8 48%, #233B8F 100%)', color: outOfStock ? 'rgba(255,255,255,0.42)' : '#fff' }}>
                       {outOfStock ? 'Agotado' : '🛒 Agregar'}
                     </button>
                   </div>
@@ -228,7 +228,7 @@ export default function StorePage() {
       {(eventsLoading || events.length > 0) && (
         <div style={{ marginTop: 32 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
-            <h2 style={{ fontSize: 14, fontWeight: 900, color: '#fff', margin: 0, textTransform: 'uppercase', letterSpacing: '0.12em' }}>🎟 Entradas</h2>
+            <h2 style={{ fontSize: 14, fontWeight: 900, color: '#111827', margin: 0, textTransform: 'uppercase', letterSpacing: '0.12em' }}>🎟 Entradas</h2>
             <div style={{ flex: 1, height: 1, background: 'linear-gradient(90deg, rgba(210,3,221,0.4), transparent)' }} />
           </div>
           {eventsLoading ? (
@@ -242,7 +242,7 @@ export default function StorePage() {
                 const formatDate = (d: string) => new Date(d).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' })
                 return (
                   <Link key={ev.id} href={`/entradas/${ev.id}`} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none' }}>
-                    <div style={{ borderRadius: 14, overflow: 'hidden', border: '1px solid rgba(210,3,221,0.2)', background: 'rgba(210,3,221,0.04)', transition: 'border-color 0.2s', opacity: allSoldOut ? 0.6 : 1, display: 'flex', flexDirection: 'column' }}>
+                    <div style={{ borderRadius: 14, overflow: 'hidden', border: '1px solid rgba(255,255,255,0.08)', background: 'radial-gradient(120% 75% at 50% -10%, rgba(183,53,184,0.16), rgba(255,255,255,0) 60%), linear-gradient(180deg, #0B1B2B 0%, #081624 60%, #050B14 100%)', boxShadow: '0 18px 40px -24px rgba(8,22,36,0.6), inset 0 1px 0 rgba(255,255,255,0.05)', transition: 'border-color 0.2s', opacity: allSoldOut ? 0.6 : 1, display: 'flex', flexDirection: 'column' }}>
                       {ev.image && (
                         <div style={{ aspectRatio: '16/7', overflow: 'hidden' }}>
                           <img src={ev.image} alt={ev.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
@@ -252,21 +252,21 @@ export default function StorePage() {
                         <div>
                           <p style={{ fontWeight: 800, color: '#fff', fontSize: 13, margin: '0 0 4px', lineHeight: 1.3 }}>{ev.title}</p>
                           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-                            {ev.date && <span style={{ fontSize: 10, color: '#6B7280' }}>📅 {formatDate(ev.date)}</span>}
-                            {ev.location && <span style={{ fontSize: 10, color: '#6B7280' }}>📍 {ev.location}</span>}
+                            {ev.date && <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.55)' }}>📅 {formatDate(ev.date)}</span>}
+                            {ev.location && <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.55)' }}>📍 {ev.location}</span>}
                           </div>
                         </div>
                         {/* Ticket types */}
                         <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                           {ev.ticketTypes.map(tt => (
                             <div key={tt.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '4px 0' }}>
-                              <span style={{ fontSize: 11, color: tt.soldOut ? '#9CA3AF' : '#6B7280', fontWeight: 600 }}>{tt.name}{tt.soldOut ? ' — Agotado' : ''}</span>
-                              <span style={{ fontSize: 11, fontWeight: 800, color: tt.soldOut ? '#9CA3AF' : '#F5A623' }}>${tt.price.toFixed(2)} USDT</span>
+                              <span style={{ fontSize: 11, color: tt.soldOut ? 'rgba(255,255,255,0.42)' : 'rgba(255,255,255,0.78)', fontWeight: 600 }}>{tt.name}{tt.soldOut ? ' — Agotado' : ''}</span>
+                              <span style={{ fontSize: 11, fontWeight: 800, color: tt.soldOut ? 'rgba(255,255,255,0.42)' : '#F5A623' }}>${tt.price.toFixed(2)} USDT</span>
                             </div>
                           ))}
                         </div>
                         <div style={{ marginTop: 'auto', paddingTop: 8 }}>
-                          <div style={{ padding: '8px 0', borderRadius: 9, textAlign: 'center', fontSize: 12, fontWeight: 700, background: allSoldOut ? '#F0F3F7' : 'linear-gradient(135deg, #FF2D95 0%, #B735B8 48%, #233B8F 100%)', color: allSoldOut ? '#6B7280' : '#fff' }}>
+                          <div style={{ padding: '8px 0', borderRadius: 9, textAlign: 'center', fontSize: 12, fontWeight: 700, background: allSoldOut ? 'rgba(255,255,255,0.05)' : 'linear-gradient(135deg, #FF2D95 0%, #B735B8 48%, #233B8F 100%)', color: allSoldOut ? 'rgba(255,255,255,0.42)' : '#fff' }}>
                             {allSoldOut ? 'Agotado' : '🎟 Comprar entrada'}
                           </div>
                         </div>
@@ -282,9 +282,9 @@ export default function StorePage() {
 
       {/* Quick-add variant modal */}
       {quickItem && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,0.10)', zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(5,11,20,0.55)', zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}
           onClick={() => setQuickItem(null)}>
-          <div style={{ background: '#FFFFFF', border: '1px solid #E4E9F0', borderRadius: 18, width: '100%', maxWidth: 360, padding: 24 }}
+          <div style={{ background: 'radial-gradient(120% 80% at 50% -10%, rgba(183,53,184,0.16), rgba(255,255,255,0) 58%), linear-gradient(180deg, #0B1B2B 0%, #081624 60%, #050B14 100%)', border: '1px solid rgba(255,255,255,0.1)', boxShadow: '0 30px 60px -24px rgba(8,22,36,0.7), inset 0 1px 0 rgba(255,255,255,0.05)', borderRadius: 18, width: '100%', maxWidth: 360, padding: 24 }}
             onClick={e => e.stopPropagation()}>
             <div style={{ display: 'flex', gap: 14, marginBottom: 18 }}>
               {quickItem.images[0] && (
@@ -300,13 +300,13 @@ export default function StorePage() {
 
             {quickItem.variants.map(v => (
               <div key={v.name} style={{ marginBottom: 14 }}>
-                <p style={{ fontSize: 11, fontWeight: 700, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>{v.name}</p>
+                <p style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.55)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>{v.name}</p>
                 <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                   {v.options.map(opt => (
                     <button key={opt} onClick={() => setSelectedVariants(p => ({ ...p, [v.name]: opt }))}
                       style={{ padding: '6px 14px', borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: 'pointer', border: '1px solid', background: 'transparent',
-                        borderColor: selectedVariants[v.name] === opt ? '#D203DD' : '#E4E9F0',
-                        color: selectedVariants[v.name] === opt ? '#D203DD' : '#6B7280' }}>
+                        borderColor: selectedVariants[v.name] === opt ? '#FF2DF7' : 'rgba(255,255,255,0.1)',
+                        color: selectedVariants[v.name] === opt ? '#FF2DF7' : 'rgba(255,255,255,0.55)' }}>
                       {opt}
                     </button>
                   ))}
@@ -316,11 +316,11 @@ export default function StorePage() {
 
             <div style={{ display: 'flex', gap: 8, marginTop: 18 }}>
               <button onClick={() => setQuickItem(null)}
-                style={{ flex: 1, padding: '10px 0', borderRadius: 9, border: '1px solid #E4E9F0', background: 'transparent', color: '#6B7280', cursor: 'pointer', fontWeight: 600, fontSize: 13 }}>
+                style={{ flex: 1, padding: '10px 0', borderRadius: 9, border: '1px solid rgba(255,255,255,0.1)', background: 'transparent', color: 'rgba(255,255,255,0.55)', cursor: 'pointer', fontWeight: 600, fontSize: 13 }}>
                 Cancelar
               </button>
               <button onClick={confirmQuickAdd}
-                style={{ flex: 2, padding: '10px 0', borderRadius: 9, border: 'none', background: 'linear-gradient(135deg, #FF2D95 0%, #B735B8 48%, #233B8F 100%)', color: '#000', cursor: 'pointer', fontWeight: 700, fontSize: 13 }}>
+                style={{ flex: 2, padding: '10px 0', borderRadius: 9, border: 'none', background: 'linear-gradient(135deg, #FF2D95 0%, #B735B8 48%, #233B8F 100%)', color: '#fff', cursor: 'pointer', fontWeight: 700, fontSize: 13 }}>
                 🛒 Agregar al carrito
               </button>
             </div>

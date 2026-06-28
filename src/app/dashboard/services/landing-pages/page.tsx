@@ -171,8 +171,8 @@ export default function LandingPagesPage() {
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
                 <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
-                        style={{ background: 'rgba(123,91,255,0.14)', border: '1px solid rgba(123,91,255,0.32)', boxShadow: '0 0 18px -4px rgba(123,91,255,0.45)' }}>
-                        <Layout className="w-5 h-5" style={{ color: '#A78BFA' }} />
+                        style={{ background: 'linear-gradient(135deg, #FF2D95 0%, #B735B8 48%, #233B8F 100%)', boxShadow: '0 0 18px -4px rgba(123,91,255,0.45)' }}>
+                        <Layout className="w-5 h-5 text-white" />
                     </div>
                     <div className="min-w-0">
                         <h1 className="text-xl font-bold text-[#111827] leading-tight" style={{ letterSpacing: '-0.02em' }}>
@@ -202,16 +202,16 @@ export default function LandingPagesPage() {
                 ) : pages.length === 0 ? (
                     <div className="col-span-full rounded-3xl p-16 text-center"
                         style={{
-                            background: 'radial-gradient(120% 75% at 50% -10%, rgba(123,91,255,0.12), rgba(255,255,255,0) 60%), linear-gradient(180deg, rgba(255,255,255,0.82), rgba(255,255,255,0.8))',
-                            border: '1px solid rgba(255,255,255,0.07)',
+                            background: 'radial-gradient(120% 75% at 50% -10%, rgba(123,91,255,0.12), rgba(255,255,255,0) 60%), linear-gradient(180deg, #0B1B2B 0%, #081624 60%, #050B14 100%)',
+                            border: '1px solid rgba(255,255,255,0.1)',
                             boxShadow: '0 22px 50px -22px rgba(15,23,42,0.10), inset 0 1px 0 rgba(255,255,255,0.04)',
                         }}>
                         <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-5"
-                            style={{ background: 'rgba(123,91,255,0.12)', border: '1px solid rgba(123,91,255,0.3)', boxShadow: '0 0 28px -6px rgba(123,91,255,0.55)' }}>
-                            <Layout className="w-8 h-8" style={{ color: '#A78BFA' }} />
+                            style={{ background: 'linear-gradient(135deg, #FF2D95 0%, #B735B8 48%, #233B8F 100%)', boxShadow: '0 0 28px -6px rgba(123,91,255,0.55)' }}>
+                            <Layout className="w-8 h-8 text-white" />
                         </div>
-                        <h2 className="text-xl font-bold text-[#111827] mb-2" style={{ letterSpacing: '-0.02em' }}>Aún no tienes Landing Pages</h2>
-                        <p className="text-[#6B7280] text-sm mb-6 max-w-sm mx-auto leading-relaxed">
+                        <h2 className="text-xl font-bold text-white mb-2" style={{ letterSpacing: '-0.02em' }}>Aún no tienes Landing Pages</h2>
+                        <p className="text-white/55 text-sm mb-6 max-w-sm mx-auto leading-relaxed">
                             Crea tu primera página de aterrizaje profesional para capturar nuevos clientes con IA.
                         </p>
                         <Link href="/dashboard/services/landing-pages/create"
@@ -232,7 +232,7 @@ export default function LandingPagesPage() {
                             <div key={page.id}
                                 className="relative rounded-2xl overflow-hidden group transition-all duration-300 hover:-translate-y-1"
                                 style={{
-                                    background: `radial-gradient(120% 80% at 50% -10%, ${p.accent}26, rgba(255,255,255,0) 58%), radial-gradient(80% 80% at 100% 100%, ${p.accent}16, rgba(255,255,255,0) 60%), radial-gradient(70% 70% at 0% 100%, ${p.accent}10, rgba(255,255,255,0) 60%), linear-gradient(180deg, rgba(255,255,255,0.92) 0%, rgba(255,255,255,0.9) 100%)`,
+                                    background: `radial-gradient(120% 80% at 50% -10%, ${p.accent}26, rgba(255,255,255,0) 58%), radial-gradient(80% 80% at 100% 100%, ${p.accent}16, rgba(255,255,255,0) 60%), radial-gradient(70% 70% at 0% 100%, ${p.accent}10, rgba(255,255,255,0) 60%), linear-gradient(180deg, #0B1B2B 0%, #081624 60%, #050B14 100%)`,
                                     border: '1px solid rgba(255,255,255,0.10)',
                                     boxShadow: `0 22px 48px -22px rgba(0,0,0,0.78), 0 0 0 1px rgba(255,255,255,0.02), inset 0 1px 0 rgba(255,255,255,0.06)`,
                                 }}
@@ -279,7 +279,7 @@ export default function LandingPagesPage() {
                                         <span className="inline-flex items-center gap-1 text-[9px] font-bold uppercase tracking-[0.14em] px-2 py-0.5 rounded-full backdrop-blur-md"
                                             style={page.active
                                                 ? { background: 'rgba(34,197,94,0.20)', color: '#86EFAC', border: '1px solid rgba(34,197,94,0.45)' }
-                                                : { background: 'rgba(255,255,255,0.10)', color: 'rgba(255,255,255,0.65)', border: '1px solid #E4E9F0' }}>
+                                                : { background: 'rgba(255,255,255,0.10)', color: 'rgba(255,255,255,0.65)', border: '1px solid rgba(255,255,255,0.1)' }}>
                                             {page.active && (
                                                 <span className="relative flex h-1 w-1">
                                                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
@@ -293,7 +293,7 @@ export default function LandingPagesPage() {
                                     <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-20">
                                         <div className="w-10 h-10 rounded-full flex items-center justify-center backdrop-blur-md"
                                             style={{ background: 'rgba(15,23,42,0.08)', border: '1px solid rgba(255,255,255,0.28)' }}>
-                                            <ExternalLink className="w-4 h-4 text-[#111827]" />
+                                            <ExternalLink className="w-4 h-4 text-white" />
                                         </div>
                                     </div>
                                 </a>
@@ -307,22 +307,22 @@ export default function LandingPagesPage() {
                                 {/* contenido inferior */}
                                 <div className="p-4 relative">
                                     <div className="flex items-start justify-between gap-2 mb-1">
-                                        <h2 className="text-base font-bold text-[#111827] truncate" style={{ letterSpacing: '-0.02em' }}>
+                                        <h2 className="text-base font-bold text-white truncate" style={{ letterSpacing: '-0.02em' }}>
                                             {page.name}
                                         </h2>
                                         <span className="text-[9px] font-medium uppercase tracking-[0.12em] mt-1 shrink-0 px-2 py-0.5 rounded-full"
-                                            style={{ color: '#6B7280', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)' }}>
+                                            style={{ color: 'rgba(255,255,255,0.55)', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)' }}>
                                             {templateLabel(page.templateId)}
                                         </span>
                                     </div>
-                                    <p className="text-[10.5px] font-mono truncate mb-3" style={{ color: '#6B7280' }}>/lp/{page.slug}</p>
+                                    <p className="text-[10.5px] font-mono truncate mb-3" style={{ color: 'rgba(255,255,255,0.55)' }}>/lp/{page.slug}</p>
 
                                     {/* métricas compactas */}
                                     <div className="flex items-center gap-3 mb-4">
                                         <div className="flex items-center gap-1.5 text-[11px]" style={{ color: 'rgba(255,255,255,0.65)' }}>
                                             <Users className="w-3.5 h-3.5" style={{ color: p.accent }} />
-                                            <span className="font-bold text-[#111827]">{page._count.leads}</span>
-                                            <span style={{ color: '#6B7280' }}>leads</span>
+                                            <span className="font-bold text-white">{page._count.leads}</span>
+                                            <span style={{ color: 'rgba(255,255,255,0.55)' }}>leads</span>
                                         </div>
                                     </div>
 

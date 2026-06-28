@@ -11,7 +11,7 @@ import {
 import { usePlanGuard } from '@/hooks/usePlanGuard'
 
 const STATUS_COLORS: Record<string, string> = {
-    DRAFT: 'text-[#6B7280] bg-[#F0F3F7]',
+    DRAFT: 'text-white/55 bg-white/5',
     SCHEDULED: 'text-purple-400 bg-purple-500/10',
     RUNNING: 'text-green-400 bg-green-400/10',
     COMPLETED: 'text-blue-400 bg-blue-400/10',
@@ -114,7 +114,7 @@ export default function CrmPage() {
                 <div className="flex items-center gap-2">
                     <Link
                         href="/dashboard/crm/new"
-                        className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-black uppercase tracking-wide text-[#111827] transition-all hover:opacity-90"
+                        className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-black uppercase tracking-wide text-white transition-all hover:opacity-90"
                         style={{ background: 'linear-gradient(135deg, #FF2D95 0%, #B735B8 48%, #233B8F 100%)' }}
                     >
                         <Plus size={15} /> Nueva campaña
@@ -143,11 +143,11 @@ export default function CrmPage() {
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                     {campaigns.map(c => (
-                        <div key={c.id} className="dm-card rounded-card p-5 flex flex-col gap-4">
+                        <div key={c.id} className="dm-card-dark rounded-card p-5 flex flex-col gap-4">
                             {/* Top */}
                             <div className="flex items-start justify-between gap-2">
                                 <div className="flex-1 min-w-0">
-                                    <p className="font-black text-[#111827] truncate">{c.name}</p>
+                                    <p className="font-black text-white truncate">{c.name}</p>
                                     {c.bot?.type === 'WHATSAPP_CLOUD' ? (
                                         <p className="flex items-center gap-1 text-[11px] text-green-400 mt-0.5 font-bold">
                                             <Wifi size={10} /> Cloud API · {c.bot.name}
@@ -157,7 +157,7 @@ export default function CrmPage() {
                                             <Smartphone size={10} /> QR · +{c.bot.baileysPhone}
                                         </p>
                                     ) : (
-                                        <p className="text-xs text-[#9CA3AF] mt-0.5">Sin WhatsApp conectado</p>
+                                        <p className="text-xs text-white/40 mt-0.5">Sin WhatsApp conectado</p>
                                     )}
                                 </div>
                                 <span className={`text-[10px] font-black uppercase px-2 py-1 rounded-lg shrink-0 ${STATUS_COLORS[c.status]}`}>
@@ -167,30 +167,30 @@ export default function CrmPage() {
 
                             {/* Stats */}
                             <div className="grid grid-cols-3 gap-2">
-                                <div className="bg-[#F0F3F7] rounded-xl p-2.5 text-center">
-                                    <p className="text-lg font-black text-[#111827]">{c._count?.contacts ?? c.totalContacts ?? 0}</p>
-                                    <p className="text-[10px] text-[#6B7280] uppercase">Contactos</p>
+                                <div className="bg-white/5 rounded-xl p-2.5 text-center">
+                                    <p className="text-lg font-black text-white">{c._count?.contacts ?? c.totalContacts ?? 0}</p>
+                                    <p className="text-[10px] text-white/50 uppercase">Contactos</p>
                                 </div>
-                                <div className="bg-[#F0F3F7] rounded-xl p-2.5 text-center">
+                                <div className="bg-white/5 rounded-xl p-2.5 text-center">
                                     <p className="text-lg font-black text-green-400">{c.sentCount}</p>
-                                    <p className="text-[10px] text-[#6B7280] uppercase">Enviados</p>
+                                    <p className="text-[10px] text-white/50 uppercase">Enviados</p>
                                 </div>
-                                <div className="bg-[#F0F3F7] rounded-xl p-2.5 text-center">
+                                <div className="bg-white/5 rounded-xl p-2.5 text-center">
                                     <p className="text-lg font-black text-red-400">{c.failedCount}</p>
-                                    <p className="text-[10px] text-[#6B7280] uppercase">Fallidos</p>
+                                    <p className="text-[10px] text-white/50 uppercase">Fallidos</p>
                                 </div>
                             </div>
 
                             {/* Progress bar */}
                             {c.totalContacts > 0 && (
                                 <div>
-                                    <div className="flex justify-between text-[10px] text-[#6B7280] mb-1">
+                                    <div className="flex justify-between text-[10px] text-white/50 mb-1">
                                         <span>Progreso</span>
                                         <span>{Math.round((c.sentCount / c.totalContacts) * 100)}%</span>
                                     </div>
-                                    <div className="h-1.5 bg-[#E9EDF2] rounded-full overflow-hidden">
+                                    <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
                                         <div
-                                            className="h-full bg-gradient-to-r from-[#D203DD] to-[#FF096C] rounded-full transition-all"
+                                            className="h-full bg-gradient-to-r from-[#FF2D95] via-[#B735B8] to-[#233B8F] rounded-full transition-all"
                                             style={{ width: `${Math.min(100, (c.sentCount / c.totalContacts) * 100)}%` }}
                                         />
                                     </div>
@@ -201,7 +201,7 @@ export default function CrmPage() {
                             {c.images?.length > 0 && (
                                 <div className="flex gap-1.5">
                                     {c.images.slice(0, 5).map((img: any, i: number) => (
-                                        <div key={i} className="w-9 h-9 rounded-lg overflow-hidden border border-[#E4E9F0] shrink-0">
+                                        <div key={i} className="w-9 h-9 rounded-lg overflow-hidden border border-white/10 shrink-0">
                                             <img src={img.url} alt="" className="w-full h-full object-cover" />
                                         </div>
                                     ))}
@@ -212,7 +212,7 @@ export default function CrmPage() {
                             <div className="flex gap-2 mt-auto">
                                 <Link
                                     href={`/dashboard/crm/${c.id}`}
-                                    className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl bg-[#F0F3F7] hover:bg-[#E9EDF2] text-xs font-bold transition-all"
+                                    className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-xs font-bold transition-all"
                                 >
                                     <Eye size={12} /> Ver
                                 </Link>
@@ -228,7 +228,7 @@ export default function CrmPage() {
                                     <button
                                         onClick={() => reenviarCampaign(c.id)}
                                         disabled={reenvying === c.id}
-                                        className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 text-xs font-bold transition-all disabled:opacity-50"
+                                        className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl bg-[#FF096C]/10 hover:bg-[#FF096C]/20 text-[#FF096C] text-xs font-bold transition-all disabled:opacity-50"
                                     >
                                         {reenvying === c.id ? <Loader2 size={12} className="animate-spin" /> : <RotateCcw size={12} />}
                                         Reenviar
@@ -236,7 +236,7 @@ export default function CrmPage() {
                                 ) : ['DRAFT', 'SCHEDULED', 'PAUSED', 'FAILED'].includes(c.status) ? (
                                     <button
                                         onClick={() => executeCampaign(c.id)}
-                                        className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-bold transition-all ${c.status === 'FAILED' ? 'bg-red-500/10 hover:bg-red-500/20 text-red-400' : 'bg-green-500/10 hover:bg-green-500/20 text-green-400'}`}
+                                        className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-bold transition-all ${c.status === 'FAILED' ? 'bg-red-500/10 hover:bg-red-500/20 text-red-400' : 'bg-[#FF096C]/10 hover:bg-[#FF096C]/20 text-[#FF096C]'}`}
                                     >
                                         <Play size={12} /> {c.status === 'PAUSED' ? 'Reanudar' : c.status === 'FAILED' ? 'Reintentar' : 'Enviar'}
                                     </button>
@@ -246,7 +246,7 @@ export default function CrmPage() {
                                     <button
                                         onClick={() => deleteCampaign(c.id)}
                                         disabled={deleting === c.id}
-                                        className="w-9 flex items-center justify-center rounded-xl bg-[#F0F3F7] hover:bg-red-500/10 text-[#6B7280] hover:text-red-400 transition-all"
+                                        className="w-9 flex items-center justify-center rounded-xl bg-white/5 hover:bg-red-500/10 text-white/50 hover:text-red-400 transition-all"
                                     >
                                         {deleting === c.id ? <Loader2 size={12} className="animate-spin" /> : <Trash2 size={12} />}
                                     </button>

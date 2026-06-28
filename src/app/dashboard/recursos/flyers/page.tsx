@@ -60,19 +60,24 @@ export default function RecursosGaleriaPage() {
     return (
       <button
         onClick={() => setSelected(value)}
-        className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl border text-left transition-all ${
-          active
-            ? 'bg-[#D203DD]/15 border-[#D203DD]/50 text-[#111827]'
-            : 'bg-white border-[#E4E9F0] text-[#111827]/70 hover:text-[#111827] hover:border-[#E4E9F0]'
+        className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left transition-all ${
+          active ? 'text-white' : 'text-white/70 hover:text-white'
         } ${empty ? 'opacity-45' : ''}`}
+        style={{
+          background: active
+            ? 'radial-gradient(120% 80% at 50% -10%, rgba(210,3,221,0.22), rgba(255,255,255,0) 58%), linear-gradient(180deg, #0B1B2B 0%, #081624 60%, #050B14 100%)'
+            : 'linear-gradient(180deg, #0B1B2B 0%, #081624 60%, #050B14 100%)',
+          border: active ? '1px solid rgba(210,3,221,0.5)' : '1px solid rgba(255,255,255,0.08)',
+          boxShadow: '0 14px 32px -22px rgba(8,22,36,0.6)',
+        }}
       >
         {/* indicador estilo radio */}
         <span className={`w-3.5 h-3.5 rounded-full border-2 shrink-0 flex items-center justify-center ${active ? 'border-[#D203DD]' : 'border-white/30'}`}>
           {active && <span className="w-1.5 h-1.5 rounded-full bg-[#D203DD]" />}
         </span>
         <span className="flex-1 text-sm font-bold truncate">{label}</span>
-        <span className={`text-[10px] font-black px-1.5 py-0.5 rounded-full ${active ? 'bg-[#D203DD]/30 text-[#111827]' : 'bg-[#EEF2F7] text-[#111827]/50'}`}>{n}</span>
-        <i className="fa-solid fa-chevron-right text-[10px] text-[#111827]/30 md:hidden"></i>
+        <span className={`text-[10px] font-black px-1.5 py-0.5 rounded-full ${active ? 'bg-[#D203DD]/30 text-white' : 'bg-white/10 text-white/55'}`}>{n}</span>
+        <i className="fa-solid fa-chevron-right text-[10px] text-white/30 md:hidden"></i>
       </button>
     )
   }
@@ -121,19 +126,20 @@ export default function RecursosGaleriaPage() {
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
           {gridItems.map(t => (
             <Link key={t.id} href={`/dashboard/recursos/flyers/${t.id}`}
-              className="group rounded-2xl overflow-hidden border border-[#E4E9F0] bg-white hover:border-[#D203DD]/40 transition-all active:scale-[0.98]">
+              className="group rounded-2xl overflow-hidden hover:border-[#D203DD]/40 transition-all active:scale-[0.98]"
+              style={{ background: 'radial-gradient(120% 80% at 50% -10%, rgba(183,53,184,0.18), rgba(255,255,255,0) 58%), linear-gradient(180deg, #0B1B2B 0%, #081624 55%, #050B14 100%)', border: '1px solid rgba(255,255,255,0.08)', boxShadow: '0 22px 50px -24px rgba(8,22,36,0.6), inset 0 1px 0 rgba(255,255,255,0.06)' }}>
               <div className="relative w-full bg-black/30" style={{ aspectRatio: `${t.ancho} / ${t.alto}` }}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={t.thumbUrl || t.fondoUrl} alt={t.nombre} className="w-full h-full object-cover" loading="lazy" />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center pb-3">
-                  <span className="text-xs font-black text-white px-3 py-1.5 rounded-full" style={{ background: 'linear-gradient(135deg,#0D1E79,#D203DD)' }}>
+                  <span className="text-xs font-black text-white px-3 py-1.5 rounded-full" style={{ background: 'linear-gradient(135deg, #FF2D95 0%, #B735B8 48%, #233B8F 100%)' }}>
                     <i className="fa-solid fa-pen-to-square mr-1"></i> Editar
                   </span>
                 </div>
               </div>
               <div className="p-2.5">
-                <p className="text-xs font-bold text-[#111827] truncate">{t.nombre}</p>
-                <p className="text-[10px] text-[#111827]/35">{t.categoria}</p>
+                <p className="text-xs font-bold text-white truncate">{t.nombre}</p>
+                <p className="text-[10px] text-white/55">{t.categoria}</p>
               </div>
             </Link>
           ))}

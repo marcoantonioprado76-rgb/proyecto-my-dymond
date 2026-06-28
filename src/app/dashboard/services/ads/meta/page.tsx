@@ -29,8 +29,8 @@ const PLATFORM = {
 }
 
 const STATUS_LABELS: Record<string, { label: string; color: string; dot: string; bg: string }> = {
-    DRAFT:      { label: 'Borrador',   color: 'text-[#6B7280]',   dot: 'bg-white/25',                 bg: 'bg-[#F4F6FA] border-[#E4E9F0]' },
-    READY:      { label: 'Listo',      color: 'text-[#233B8F]',   dot: 'bg-[#233B8F]',                 bg: 'bg-[#233B8F]/10 border-[#233B8F]/20' },
+    DRAFT:      { label: 'Borrador',   color: 'text-white/55',    dot: 'bg-white/25',                 bg: 'bg-white/5 border-white/10' },
+    READY:      { label: 'Listo',      color: 'text-[#7DD3FC]',   dot: 'bg-[#7DD3FC]',                 bg: 'bg-[#7DD3FC]/10 border-[#7DD3FC]/20' },
     PUBLISHING: { label: 'Publicando', color: 'text-[#B735B8]', dot: 'bg-[#B735B8] animate-pulse', bg: 'bg-[#B735B8]/10 border-yellow-500/20' },
     PUBLISHED:  { label: 'Publicado',  color: 'text-emerald-400',dot: 'bg-emerald-400',              bg: 'bg-emerald-500/10 border-emerald-500/20' },
     FAILED:     { label: 'Fallido',    color: 'text-red-400',    dot: 'bg-red-400',                  bg: 'bg-red-500/10 border-red-500/20' },
@@ -157,8 +157,8 @@ function MetaAdsDashboardInner() {
                 <div className="relative flex flex-col sm:flex-row sm:items-center justify-between gap-5">
                     <div className="flex items-center gap-4">
                         <div className="rounded-2xl flex items-center justify-center shrink-0"
-                            style={{ background: `linear-gradient(135deg, ${PLATFORM.accent}40, rgba(35,59,143,0.2))`, border: `1px solid ${PLATFORM.accentSoftBorder}`, width: 52, height: 52 }}>
-                            <Facebook className="text-blue-300" size={22} />
+                            style={{ background: `linear-gradient(135deg, #FF2D95 0%, #B735B8 48%, #233B8F 100%)`, border: `1px solid ${PLATFORM.accentSoftBorder}`, width: 52, height: 52 }}>
+                            <Facebook className="text-white" size={22} />
                         </div>
                         <div>
                             <div className="flex items-center gap-2 mb-0.5">
@@ -177,7 +177,7 @@ function MetaAdsDashboardInner() {
                     <div className="flex items-center gap-2 flex-wrap">
                         <AIKeySelector compact />
                         <Link href={`/dashboard/services/ads/wizard?platform=${PLATFORM_ID}`}
-                            className="flex items-center gap-2 text-[#111827] text-sm font-bold px-5 py-2.5 rounded-xl transition-all active:scale-[0.97] shadow-[0_0_30px_rgba(35,59,143,0.35)]"
+                            className="flex items-center gap-2 text-white text-sm font-bold px-5 py-2.5 rounded-xl transition-all active:scale-[0.97] shadow-[0_0_30px_rgba(35,59,143,0.35)]"
                             style={{ background: `linear-gradient(135deg, #FF2D95 0%, #B735B8 48%, #233B8F 100%)` }}>
                             <Plus size={15} />
                             Nueva Campaña
@@ -226,19 +226,19 @@ function MetaAdsDashboardInner() {
 
                     {/* ── SETUP ───────────────────────────── */}
                     {!allReady && (
-                        <div className="rounded-3xl p-5 md:p-6" style={{ background: `#FFFFFF`, border: '1px solid #E4E9F0' }}>
+                        <div className="rounded-3xl p-5 md:p-6" style={{ background: `linear-gradient(180deg, #0B1B2B 0%, #081624 60%, #050B14 100%)`, border: '1px solid rgba(255,255,255,0.1)' }}>
                             <div className="flex items-center justify-between mb-4">
                                 <div className="flex items-center gap-2.5">
-                                    <Rocket size={15} className="text-[#233B8F]" />
-                                    <span className="font-bold text-sm">Configura Meta Ads</span>
+                                    <Rocket size={15} className="text-[#7DD3FC]" />
+                                    <span className="font-bold text-sm text-white">Configura Meta Ads</span>
                                 </div>
                                 <div className="flex items-center gap-2">
                                     <div className="flex gap-1">
                                         {[0,1,2].map(i => (
-                                            <div key={i} className={`h-1 w-8 rounded-full transition-all duration-500 ${i < stepsCompleted ? 'bg-[#233B8F]' : 'bg-white/8'}`} />
+                                            <div key={i} className={`h-1 w-8 rounded-full transition-all duration-500 ${i < stepsCompleted ? 'bg-[#7DD3FC]' : 'bg-white/8'}`} />
                                         ))}
                                     </div>
-                                    <span className="text-[10px] text-[#6B7280] font-bold tabular-nums">{stepsCompleted}/3</span>
+                                    <span className="text-[10px] text-white/55 font-bold tabular-nums">{stepsCompleted}/3</span>
                                 </div>
                             </div>
                             <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
@@ -252,17 +252,17 @@ function MetaAdsDashboardInner() {
                                         <Link key={idx} href={step.href}
                                             className={`group flex items-center gap-3 p-3.5 rounded-2xl border transition-all active:scale-[0.98] ${step.done
                                                 ? 'bg-emerald-500/5 border-emerald-500/15'
-                                                : 'bg-white/2 border-white/6 hover:border-[#233B8F]/30 hover:bg-[#233B8F]/5'}`}>
-                                            <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${step.done ? 'bg-emerald-500/15' : 'bg-white/4 group-hover:bg-[#233B8F]/12'}`}>
+                                                : 'bg-white/5 border-white/10 hover:border-[#7DD3FC]/30 hover:bg-[#7DD3FC]/5'}`}>
+                                            <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${step.done ? 'bg-emerald-500/15' : 'bg-white/4 group-hover:bg-[#7DD3FC]/12'}`}>
                                                 {step.done
                                                     ? <CheckCircle2 size={15} className="text-emerald-400" />
-                                                    : <Icon size={15} className="text-[#6B7280] group-hover:text-[#233B8F] transition-colors" />}
+                                                    : <Icon size={15} className="text-white/55 group-hover:text-[#7DD3FC] transition-colors" />}
                                             </div>
                                             <div className="flex-1 min-w-0">
-                                                <p className="text-xs font-bold truncate">{step.label}</p>
-                                                <p className="text-[10px] text-[#9CA3AF] truncate">{step.done ? '✓ Completado' : step.desc}</p>
+                                                <p className="text-xs font-bold truncate text-white">{step.label}</p>
+                                                <p className="text-[10px] text-white/40 truncate">{step.done ? '✓ Completado' : step.desc}</p>
                                             </div>
-                                            {!step.done && <ChevronRight size={12} className="text-[#111827]/15 group-hover:text-[#233B8F] shrink-0 transition-colors" />}
+                                            {!step.done && <ChevronRight size={12} className="text-white/20 group-hover:text-[#7DD3FC] shrink-0 transition-colors" />}
                                         </Link>
                                     )
                                 })}
@@ -274,10 +274,10 @@ function MetaAdsDashboardInner() {
                     {metaCampaigns.length > 0 && (
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                             {[
-                                { label: 'Total', value: metaCampaigns.length, icon: Target, color: 'text-[#111827]', accent: 'rgba(35,59,143,0.12)', border: 'rgba(35,59,143,0.22)', iconColor: 'text-[#233B8F]' },
-                                { label: 'Publicadas', value: published, icon: Flame, color: 'text-emerald-400', accent: 'rgba(52,211,153,0.08)', border: 'rgba(52,211,153,0.18)', iconColor: 'text-emerald-400' },
-                                { label: 'Borradores', value: drafts, icon: Clock, color: 'text-[#233B8F]', accent: 'rgba(96,165,250,0.08)', border: 'rgba(96,165,250,0.18)', iconColor: 'text-[#233B8F]' },
-                                { label: 'Fallidas', value: failed, icon: XCircle, color: 'text-red-400', accent: 'rgba(248,113,113,0.08)', border: 'rgba(248,113,113,0.18)', iconColor: 'text-red-400' },
+                                { label: 'Total', value: metaCampaigns.length, icon: Target, color: 'text-white', accent: 'linear-gradient(180deg, #0B1B2B 0%, #081624 60%, #050B14 100%)', border: 'rgba(255,255,255,0.1)', iconColor: 'text-[#7DD3FC]' },
+                                { label: 'Publicadas', value: published, icon: Flame, color: 'text-emerald-400', accent: 'linear-gradient(180deg, #0B1B2B 0%, #081624 60%, #050B14 100%)', border: 'rgba(52,211,153,0.18)', iconColor: 'text-emerald-400' },
+                                { label: 'Borradores', value: drafts, icon: Clock, color: 'text-[#7DD3FC]', accent: 'linear-gradient(180deg, #0B1B2B 0%, #081624 60%, #050B14 100%)', border: 'rgba(125,211,252,0.18)', iconColor: 'text-[#7DD3FC]' },
+                                { label: 'Fallidas', value: failed, icon: XCircle, color: 'text-red-400', accent: 'linear-gradient(180deg, #0B1B2B 0%, #081624 60%, #050B14 100%)', border: 'rgba(248,113,113,0.18)', iconColor: 'text-red-400' },
                             ].map(stat => {
                                 const Icon = stat.icon
                                 return (
@@ -289,7 +289,7 @@ function MetaAdsDashboardInner() {
                                         </div>
                                         <div>
                                             <p className={`text-2xl font-black leading-none tabular-nums ${stat.color}`}>{stat.value}</p>
-                                            <p className="text-[10px] text-[#6B7280] font-medium mt-0.5">{stat.label}</p>
+                                            <p className="text-[10px] text-white/55 font-medium mt-0.5">{stat.label}</p>
                                         </div>
                                     </div>
                                 )
@@ -311,23 +311,23 @@ function MetaAdsDashboardInner() {
                             <div className="relative overflow-hidden rounded-2xl flex items-center gap-3 p-3.5"
                                 style={{
                                     background: isConnected
-                                        ? `#FFFFFF`
-                                        : `#F8FAFC`,
-                                    border: isConnected ? '1px solid #E4E9F0' : '1px dashed #E4E9F0',
+                                        ? `linear-gradient(180deg, #0B1B2B 0%, #081624 60%, #050B14 100%)`
+                                        : `linear-gradient(180deg, #0B1B2B 0%, #081624 60%, #050B14 100%)`,
+                                    border: isConnected ? '1px solid rgba(255,255,255,0.1)' : '1px dashed rgba(255,255,255,0.1)',
                                 }}>
                                 <div className="pointer-events-none absolute -top-6 -right-6 w-20 h-20 rounded-full blur-[40px]"
                                     style={{ background: isConnected ? PLATFORM.glow : 'transparent' }} />
 
                                 <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
-                                    style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid #E4E9F0' }}>
-                                    <span className={`font-black text-sm ${PLATFORM.textColor}`}>{PLATFORM.letter}</span>
+                                    style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)' }}>
+                                    <span className="font-black text-sm text-[#7DD3FC]">{PLATFORM.letter}</span>
                                 </div>
 
                                 <div className="flex-1 min-w-0">
-                                    <p className="font-bold text-xs leading-tight">{PLATFORM.label}</p>
+                                    <p className="font-bold text-xs leading-tight text-white">{PLATFORM.label}</p>
                                     {isConnected && metaIntegration?.connectedAccount
-                                        ? <p className="text-[10px] text-[#6B7280] truncate">↳ {metaIntegration.connectedAccount.displayName}</p>
-                                        : <p className="text-[10px] text-[#9CA3AF] truncate">{PLATFORM.sub}</p>
+                                        ? <p className="text-[10px] text-white/55 truncate">↳ {metaIntegration.connectedAccount.displayName}</p>
+                                        : <p className="text-[10px] text-white/40 truncate">{PLATFORM.sub}</p>
                                     }
                                 </div>
 
@@ -342,9 +342,9 @@ function MetaAdsDashboardInner() {
                                 <button onClick={handleConnect}
                                     className="text-[10px] font-bold py-1.5 px-3 rounded-xl shrink-0 transition-all active:scale-[0.97]"
                                     style={{
-                                        background: isConnected ? '#F0F3F7' : 'rgba(35,59,143,0.18)',
-                                        border: isConnected ? '1px solid #E4E9F0' : '1px solid rgba(35,59,143,0.32)',
-                                        color: isConnected ? '#6B7280' : '#93c5fd'
+                                        background: isConnected ? 'rgba(255,255,255,0.06)' : 'rgba(255,9,108,0.1)',
+                                        border: isConnected ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(255,9,108,0.25)',
+                                        color: isConnected ? 'rgba(255,255,255,0.55)' : '#FF096C'
                                     }}>
                                     {isConnected ? 'Reconf.' : '+ Conectar'}
                                 </button>
@@ -363,30 +363,29 @@ function MetaAdsDashboardInner() {
                             {allBriefs.length === 0 ? (
                                 <Link href="/dashboard/services/ads/brief"
                                     className="flex flex-col items-center justify-center rounded-2xl py-10 gap-3 group transition-all"
-                                    style={{ background: 'rgba(255,255,255,0.015)', border: '1px dashed rgba(255,255,255,0.07)' }}>
+                                    style={{ background: 'linear-gradient(180deg, #0B1B2B 0%, #081624 60%, #050B14 100%)', border: '1px dashed rgba(255,255,255,0.1)' }}>
                                     <div className="w-10 h-10 rounded-xl flex items-center justify-center"
-                                        style={{ background: 'rgba(35,59,143,0.10)', border: '1px solid rgba(35,59,143,0.20)' }}>
-                                        <FileText size={16} className="text-[#233B8F]" />
+                                        style={{ background: 'rgba(125,211,252,0.10)', border: '1px solid rgba(125,211,252,0.20)' }}>
+                                        <FileText size={16} className="text-[#7DD3FC]" />
                                     </div>
-                                    <p className="text-xs text-[#6B7280] font-medium">Crear perfil de negocio</p>
+                                    <p className="text-xs text-white/55 font-medium">Crear perfil de negocio</p>
                                 </Link>
                             ) : (
                                 <div className="space-y-2">
                                     {allBriefs.slice(0, 3).map((b: any) => (
                                         <div key={b.id}
                                             className="flex items-center gap-3 rounded-2xl px-3.5 py-3 group"
-                                            style={{ background: `#FFFFFF`, border: '1px solid #E4E9F0' }}>
+                                            style={{ background: `linear-gradient(180deg, #0B1B2B 0%, #081624 60%, #050B14 100%)`, border: '1px solid rgba(255,255,255,0.1)' }}>
                                             <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0"
-                                                style={{ background: 'rgba(35,59,143,0.12)', border: '1px solid rgba(35,59,143,0.20)' }}>
-                                                <FileText size={13} className="text-[#233B8F]" />
+                                                style={{ background: 'rgba(125,211,252,0.12)', border: '1px solid rgba(125,211,252,0.20)' }}>
+                                                <FileText size={13} className="text-[#7DD3FC]" />
                                             </div>
                                             <div className="flex-1 min-w-0">
-                                                <p className="text-xs font-bold truncate">{b.name}</p>
-                                                <p className="text-[10px] text-[#9CA3AF] truncate">{b.industry}</p>
+                                                <p className="text-xs font-bold truncate text-white">{b.name}</p>
+                                                <p className="text-[10px] text-white/40 truncate">{b.industry}</p>
                                             </div>
                                             <Link href={`/dashboard/services/ads/wizard?briefId=${b.id}&platform=${PLATFORM_ID}`}
-                                                className="flex items-center gap-1 text-[10px] font-bold px-3 py-1.5 rounded-xl shrink-0 transition-all active:scale-[0.97]"
-                                                style={{ background: 'rgba(35,59,143,0.7)', color: '#dbeafe', border: '1px solid rgba(35,59,143,0.45)' }}>
+                                                className="flex items-center gap-1 text-[10px] font-bold px-3 py-1.5 rounded-xl shrink-0 transition-all active:scale-[0.97] text-white bg-gradient-to-r from-[#FF2D95] via-[#B735B8] to-[#233B8F] hover:opacity-90">
                                                 Campaña <ArrowRight size={9} />
                                             </Link>
                                         </div>
@@ -415,17 +414,17 @@ function MetaAdsDashboardInner() {
 
                             {metaCampaigns.length === 0 ? (
                                 <div className="flex flex-col items-center justify-center py-20 gap-4 rounded-3xl text-center px-4"
-                                    style={{ background: 'rgba(255,255,255,0.015)', border: '1px dashed rgba(255,255,255,0.07)' }}>
+                                    style={{ background: 'linear-gradient(180deg, #0B1B2B 0%, #081624 60%, #050B14 100%)', border: '1px dashed rgba(255,255,255,0.1)' }}>
                                     <div className="w-14 h-14 rounded-full flex items-center justify-center"
-                                        style={{ background: 'rgba(35,59,143,0.10)', border: '1px solid rgba(35,59,143,0.20)' }}>
-                                        <Sparkles className="text-[#233B8F]" size={22} />
+                                        style={{ background: 'rgba(125,211,252,0.10)', border: '1px solid rgba(125,211,252,0.20)' }}>
+                                        <Sparkles className="text-[#7DD3FC]" size={22} />
                                     </div>
                                     <div>
-                                        <p className="text-[#6B7280] text-sm font-bold mb-1">Sin campañas todavía</p>
-                                        <p className="text-[#9CA3AF] text-xs">Crea tu primera campaña Meta impulsada por IA</p>
+                                        <p className="text-white text-sm font-bold mb-1">Sin campañas todavía</p>
+                                        <p className="text-white/55 text-xs">Crea tu primera campaña Meta impulsada por IA</p>
                                     </div>
                                     <Link href={`/dashboard/services/ads/wizard?platform=${PLATFORM_ID}`}
-                                        className="flex items-center gap-2 text-[#111827] text-sm font-bold px-5 py-2.5 rounded-xl transition-all"
+                                        className="flex items-center gap-2 text-white text-sm font-bold px-5 py-2.5 rounded-xl transition-all"
                                         style={{ background: `linear-gradient(135deg, #FF2D95 0%, #B735B8 48%, #233B8F 100%)` }}>
                                         <Plus size={14} /> Crear campaña
                                     </Link>
@@ -437,20 +436,20 @@ function MetaAdsDashboardInner() {
                                         return (
                                             <div key={campaign.id}
                                                 className="group rounded-2xl p-4 flex items-center gap-3 transition-all"
-                                                style={{ background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.07)' }}
-                                                onMouseEnter={e => (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)')}
-                                                onMouseLeave={e => (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.07)')}>
+                                                style={{ background: 'linear-gradient(180deg, #0B1B2B 0%, #081624 60%, #050B14 100%)', border: '1px solid rgba(255,255,255,0.1)' }}
+                                                onMouseEnter={e => (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.18)')}
+                                                onMouseLeave={e => (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)')}>
 
                                                 {/* platform icon */}
                                                 <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
-                                                    style={{ background: '#F0F3F7', border: '1px solid #E4E9F0' }}>
-                                                    <span className={`font-black text-sm ${PLATFORM.textColor}`}>{PLATFORM.letter}</span>
+                                                    style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)' }}>
+                                                    <span className="font-black text-sm text-[#7DD3FC]">{PLATFORM.letter}</span>
                                                 </div>
 
                                                 {/* info */}
                                                 <div className="flex-1 min-w-0">
-                                                    <p className="font-bold text-sm leading-tight truncate">{campaign.name}</p>
-                                                    <p className="text-[10px] text-[#9CA3AF] truncate mt-0.5">{campaign.strategy?.name || campaign.brief?.name}</p>
+                                                    <p className="font-bold text-sm leading-tight truncate text-white">{campaign.name}</p>
+                                                    <p className="text-[10px] text-white/40 truncate mt-0.5">{campaign.strategy?.name || campaign.brief?.name}</p>
                                                 </div>
 
                                                 {/* status + action */}
@@ -461,15 +460,14 @@ function MetaAdsDashboardInner() {
                                                     </span>
                                                     {campaign.status === 'READY' && (
                                                         <Link href={`/dashboard/services/ads/preview/${campaign.id}`}
-                                                            className="text-[10px] font-bold px-3 py-1.5 rounded-xl transition-all"
-                                                            style={{ background: 'rgba(35,59,143,0.7)', color: '#dbeafe', border: '1px solid rgba(35,59,143,0.45)' }}>
+                                                            className="text-[10px] font-bold px-3 py-1.5 rounded-xl transition-all text-white bg-gradient-to-r from-[#FF2D95] via-[#B735B8] to-[#233B8F] hover:opacity-90">
                                                             Publicar →
                                                         </Link>
                                                     )}
                                                     {campaign.status === 'DRAFT' && (
                                                         <Link href={`/dashboard/services/ads/campaign/${campaign.strategyId}?edit=${campaign.id}`}
                                                             className="text-[10px] font-bold px-3 py-1.5 rounded-xl transition-all"
-                                                            style={{ background: 'rgba(255,255,255,0.06)', color: '#6B7280', border: '1px solid #E4E9F0' }}>
+                                                            style={{ background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.55)', border: '1px solid rgba(255,255,255,0.1)' }}>
                                                             Continuar
                                                         </Link>
                                                     )}
@@ -506,8 +504,8 @@ function MetaAdsDashboardInner() {
                                     })}
 
                                     <Link href="/dashboard/services/ads/history"
-                                        className="flex items-center justify-center gap-2 py-3 rounded-2xl text-xs text-[#6B7280] font-bold hover:text-[#6B7280] transition-all"
-                                        style={{ background: `#FFFFFF`, border: '1px solid #E4E9F0' }}>
+                                        className="flex items-center justify-center gap-2 py-3 rounded-2xl text-xs text-white/55 font-bold hover:text-white/75 transition-all"
+                                        style={{ background: `linear-gradient(180deg, #0B1B2B 0%, #081624 60%, #050B14 100%)`, border: '1px solid rgba(255,255,255,0.1)' }}>
                                         Ver todas las campañas <ArrowRight size={11} />
                                     </Link>
                                 </div>
