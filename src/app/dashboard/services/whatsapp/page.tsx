@@ -173,10 +173,10 @@ function CreateBotForm({ onCreated }: { onCreated: (bot: Bot, webhookUrl: string
 
   return (
     <form onSubmit={handleSubmit} className="rounded-2xl p-4"
-      style={{ background: 'radial-gradient(120% 80% at 50% -10%, rgba(34,183,255,0.12), rgba(255,255,255,0) 58%), radial-gradient(90% 70% at 100% 110%, rgba(123,91,255,0.12), rgba(255,255,255,0) 60%), linear-gradient(180deg, rgba(255,255,255,0.85), rgba(255,255,255,0.82))', border: '1px solid rgba(255,255,255,0.08)', boxShadow: '0 16px 36px -22px rgba(15,23,42,0.10), inset 0 1px 0 rgba(255,255,255,0.04)' }}>
+      style={{ background: 'radial-gradient(120% 80% at 50% -10%, rgba(183,53,184,0.12), rgba(255,255,255,0) 58%), radial-gradient(90% 70% at 100% 110%, rgba(106,53,217,0.12), rgba(255,255,255,0) 60%), linear-gradient(180deg, rgba(255,255,255,0.85), rgba(255,255,255,0.82))', border: '1px solid rgba(255,255,255,0.08)', boxShadow: '0 16px 36px -22px rgba(15,23,42,0.10), inset 0 1px 0 rgba(255,255,255,0.04)' }}>
       <div className="flex items-center gap-2 mb-3">
-        <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: 'rgba(34,183,255,0.14)', border: '1px solid rgba(34,183,255,0.35)' }}>
-          <Plus className="w-3.5 h-3.5" style={{ color: '#22B7FF' }} />
+        <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: 'rgba(183,53,184,0.14)', border: '1px solid rgba(183,53,184,0.35)' }}>
+          <Plus className="w-3.5 h-3.5" style={{ color: '#B735B8' }} />
         </div>
         <h3 className="text-sm font-bold text-[#111827]" style={{ letterSpacing: '-0.01em' }}>Crear nuevo agente</h3>
       </div>
@@ -184,9 +184,9 @@ function CreateBotForm({ onCreated }: { onCreated: (bot: Bot, webhookUrl: string
       {/* Tipo de bot — selector compacto */}
       <div className="grid grid-cols-3 gap-2 mb-3">
         {([
-          { t: 'YCLOUD', icon: Webhook, label: 'YCloud', sub: 'WhatsApp API', c: '#38bdf8' },
-          { t: 'BAILEYS', icon: Smartphone, label: 'WA Web', sub: 'Escanear QR', c: '#22B7FF' },
-          { t: 'META', icon: MessageSquare, label: 'Messenger', sub: 'FB / IG', c: '#9B6BFF' },
+          { t: 'YCLOUD', icon: Webhook, label: 'YCloud', sub: 'WhatsApp API', c: '#233B8F' },
+          { t: 'BAILEYS', icon: Smartphone, label: 'WA Web', sub: 'Escanear QR', c: '#B735B8' },
+          { t: 'META', icon: MessageSquare, label: 'Messenger', sub: 'FB / IG', c: '#FF096C' },
         ] as const).map(o => {
           const sel = type === o.t
           return (
@@ -336,7 +336,7 @@ function GlobalBotChart({ bots }: { bots: Bot[] }) {
   const yVals = [0, Math.round(maxVal / 2), maxVal]
 
   return (
-    <div className="rounded-2xl" style={{ padding: '14px 16px 10px', background: 'radial-gradient(120% 80% at 50% -10%, rgba(123,91,255,0.12), rgba(255,255,255,0) 58%), linear-gradient(180deg, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.8) 55%, rgba(255,255,255,0.74) 100%)', border: '1px solid rgba(255,255,255,0.08)', boxShadow: '0 18px 40px -22px rgba(15,23,42,0.10), inset 0 1px 0 rgba(255,255,255,0.04)' }}>
+    <div className="rounded-2xl" style={{ padding: '14px 16px 10px', background: 'radial-gradient(120% 80% at 50% -10%, rgba(106,53,217,0.12), rgba(255,255,255,0) 58%), linear-gradient(180deg, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.8) 55%, rgba(255,255,255,0.74) 100%)', border: '1px solid rgba(255,255,255,0.08)', boxShadow: '0 18px 40px -22px rgba(15,23,42,0.10), inset 0 1px 0 rgba(255,255,255,0.04)' }}>
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 8, flexWrap: 'wrap', gap: 8 }}>
         <div>
@@ -347,7 +347,7 @@ function GlobalBotChart({ bots }: { bots: Bot[] }) {
           </p>
           <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.28)', margin: '4px 0 0' }}>
             <span style={{ color: '#D203DD', fontWeight: 700 }}>{visibleDays.reduce((s, d) => s + d.conversations, 0)}</span> personas ·{' '}
-            <span style={{ color: '#7B5BFF', fontWeight: 700 }}>{visibleDays.reduce((s, d) => s + d.sales, 0)}</span> ventas
+            <span style={{ color: '#6A35D9', fontWeight: 700 }}>{visibleDays.reduce((s, d) => s + d.sales, 0)}</span> ventas
           </p>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
@@ -356,7 +356,7 @@ function GlobalBotChart({ bots }: { bots: Bot[] }) {
             ● Personas
           </span>
           <span style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 11, color: 'rgba(255,255,255,0.45)' }}>
-            <span style={{ display: 'inline-block', width: 10, height: 3, borderRadius: 99, background: '#7B5BFF' }} />
+            <span style={{ display: 'inline-block', width: 10, height: 3, borderRadius: 99, background: '#6A35D9' }} />
             ✦ Ventas
           </span>
         </div>
@@ -422,12 +422,12 @@ function GlobalBotChart({ bots }: { bots: Bot[] }) {
             </linearGradient>
             {/* Sales — purple */}
             <linearGradient id="gc-sales-area" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%"   stopColor="#7B5BFF" stopOpacity="0.20" />
-              <stop offset="100%" stopColor="#7B5BFF" stopOpacity="0" />
+              <stop offset="0%"   stopColor="#6A35D9" stopOpacity="0.20" />
+              <stop offset="100%" stopColor="#6A35D9" stopOpacity="0" />
             </linearGradient>
             <linearGradient id="gc-sales-line" x1="0" y1="0" x2="1" y2="0">
               <stop offset="0%"   stopColor="#A78BFA" />
-              <stop offset="100%" stopColor="#7B5BFF" />
+              <stop offset="100%" stopColor="#6A35D9" />
             </linearGradient>
             <filter id="gc-glow-conv" x="-30%" y="-30%" width="160%" height="160%">
               <feGaussianBlur stdDeviation="2" result="blur"/>
@@ -473,11 +473,11 @@ function GlobalBotChart({ bots }: { bots: Bot[] }) {
             if (p.val === 0) return null
             return (
               <g key={i} filter="url(#gc-dot-glow)">
-                <circle cx={p.x} cy={p.y} r="10" fill="#7B5BFF" opacity="0.07" />
-                <rect x={p.x - 11} y={p.y - 30} width="22" height="15" rx="5" fill="#7B5BFF" opacity="0.92" />
+                <circle cx={p.x} cy={p.y} r="10" fill="#6A35D9" opacity="0.07" />
+                <rect x={p.x - 11} y={p.y - 30} width="22" height="15" rx="5" fill="#6A35D9" opacity="0.92" />
                 <text x={p.x} y={p.y - 19} textAnchor="middle" fontSize="8" fontWeight="800" fill="#fff">{p.val}</text>
-                <line x1={p.x} y1={p.y - 15} x2={p.x} y2={p.y - 5} stroke="#7B5BFF" strokeWidth="1" opacity="0.4" />
-                <circle cx={p.x} cy={p.y} r="4" fill="#7B5BFF" stroke="rgba(15,23,42,0.10)" strokeWidth="1.5" />
+                <line x1={p.x} y1={p.y - 15} x2={p.x} y2={p.y - 5} stroke="#6A35D9" strokeWidth="1" opacity="0.4" />
+                <circle cx={p.x} cy={p.y} r="4" fill="#6A35D9" stroke="rgba(15,23,42,0.10)" strokeWidth="1.5" />
                 <circle cx={p.x} cy={p.y} r="2" fill="#fff" opacity="0.5" />
               </g>
             )
@@ -581,7 +581,7 @@ function GlobalBotChart({ bots }: { bots: Bot[] }) {
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 {recentSales.map((s, i) => (
                   <div key={i} style={{
-                    background: 'rgba(123,91,255,0.04)', border: '1px solid rgba(123,91,255,0.10)',
+                    background: 'rgba(106,53,217,0.04)', border: '1px solid rgba(106,53,217,0.10)',
                     borderRadius: 12, padding: '10px 12px',
                   }}>
                     {/* Nombre + fecha */}
@@ -609,7 +609,7 @@ function GlobalBotChart({ bots }: { bots: Bot[] }) {
                         fontSize: 11, color: '#6B7280',
                         background: 'rgba(0,0,0,0.25)', borderRadius: 8,
                         padding: '7px 10px', lineHeight: 1.6,
-                        borderLeft: '2px solid rgba(123,91,255,0.3)',
+                        borderLeft: '2px solid rgba(106,53,217,0.3)',
                         whiteSpace: 'pre-wrap', wordBreak: 'break-word',
                       }}>
                         {s.reporte}
@@ -631,7 +631,7 @@ function GlobalBotChart({ bots }: { bots: Bot[] }) {
 
 function BotCard({ bot, onSelect }: { bot: Bot; onSelect: (bot: Bot) => void }) {
   const isActive = bot.status === 'ACTIVE'
-  const accent = isActive ? '#22B7FF' : '#7C82A8'
+  const accent = isActive ? '#B735B8' : '#7C82A8'
   const channel = bot.type === 'YCLOUD' ? 'YCloud' : bot.type === 'BAILEYS' ? 'WhatsApp Web' : 'Messenger'
   const stats = [
     { icon: ShoppingBag, label: 'Productos', value: bot._count?.assignedProducts ?? 0 },
@@ -646,7 +646,7 @@ function BotCard({ bot, onSelect }: { bot: Bot; onSelect: (bot: Bot) => void }) 
         marginTop: 30,
         borderRadius: 18,
         background: isActive
-          ? `radial-gradient(120% 80% at 50% -6%, ${accent}1f, rgba(255,255,255,0) 56%), radial-gradient(95% 75% at 100% 108%, rgba(123,91,255,0.16), rgba(255,255,255,0) 60%), linear-gradient(180deg, rgba(255,255,255,0.92) 0%, rgba(10,11,26,0.88) 100%)`
+          ? `radial-gradient(120% 80% at 50% -6%, ${accent}1f, rgba(255,255,255,0) 56%), radial-gradient(95% 75% at 100% 108%, rgba(106,53,217,0.16), rgba(255,255,255,0) 60%), linear-gradient(180deg, rgba(255,255,255,0.92) 0%, rgba(10,11,26,0.88) 100%)`
           : 'linear-gradient(180deg, rgba(20,20,32,0.85), rgba(14,14,24,0.85))',
         border: `1px solid ${isActive ? 'rgba(255,255,255,0.09)' : '#F0F3F7'}`,
         boxShadow: isActive ? '0 18px 38px -22px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.045)' : 'none',
@@ -3557,13 +3557,13 @@ export default function WhatsAppPage() {
           <ArrowLeft className="w-4.5 h-4.5 text-[#6B7280] group-hover:text-[#111827] transition-colors" />
         </Link>
         <div className="flex items-center gap-3 flex-1 min-w-0">
-          <div className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style={{ background: 'rgba(34,183,255,0.12)', border: '1px solid rgba(34,183,255,0.28)', boxShadow: '0 0 14px -4px rgba(34,183,255,0.4)' }}>
-            <MessageCircle className="w-4.5 h-4.5" style={{ color: '#22B7FF' }} />
+          <div className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style={{ background: 'rgba(183,53,184,0.12)', border: '1px solid rgba(183,53,184,0.28)', boxShadow: '0 0 14px -4px rgba(183,53,184,0.4)' }}>
+            <MessageCircle className="w-4.5 h-4.5" style={{ color: '#B735B8' }} />
           </div>
           <div className="min-w-0">
             <h1 className="text-lg font-bold text-[#111827] flex items-center gap-2 leading-tight" style={{ letterSpacing: '-0.02em' }}>
               <span className="truncate">WhatsApp Bots</span>
-              <span className="text-[9px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded-md shrink-0" style={{ background: 'rgba(34,183,255,0.12)', color: '#22B7FF', border: '1px solid rgba(34,183,255,0.28)' }}>
+              <span className="text-[9px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded-md shrink-0" style={{ background: 'rgba(183,53,184,0.12)', color: '#B735B8', border: '1px solid rgba(183,53,184,0.28)' }}>
                 Multi-Tenant
               </span>
             </h1>
@@ -3593,12 +3593,12 @@ export default function WhatsAppPage() {
                 <div className="text-[10px] text-[#6B7280] mt-0.5 truncate">Total agentes</div>
               </div>
             </div>
-            <div className="dm-card px-3 py-2.5 rounded-xl flex items-center gap-2.5" style={{ border: '1px solid rgba(34,183,255,0.14)' }}>
-              <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ background: 'rgba(34,183,255,0.12)', border: '1px solid rgba(34,183,255,0.28)' }}>
-                <Zap className="w-4 h-4" style={{ color: '#22B7FF' }} />
+            <div className="dm-card px-3 py-2.5 rounded-xl flex items-center gap-2.5" style={{ border: '1px solid rgba(183,53,184,0.14)' }}>
+              <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ background: 'rgba(183,53,184,0.12)', border: '1px solid rgba(183,53,184,0.28)' }}>
+                <Zap className="w-4 h-4" style={{ color: '#B735B8' }} />
               </div>
               <div className="min-w-0">
-                <div className="text-lg font-bold leading-none" style={{ color: '#22B7FF' }}>{activeBots}</div>
+                <div className="text-lg font-bold leading-none" style={{ color: '#B735B8' }}>{activeBots}</div>
                 <div className="text-[10px] text-[#6B7280] mt-0.5 truncate">Activos ahora</div>
               </div>
             </div>
@@ -3647,18 +3647,18 @@ export default function WhatsAppPage() {
           {/* How it works — compact onboarding strip */}
           <div className="rounded-2xl px-4 py-3.5"
             style={{
-              background: 'radial-gradient(120% 80% at 50% -10%, rgba(34,183,255,0.10), rgba(255,255,255,0) 58%), linear-gradient(180deg, rgba(255,255,255,0.78), rgba(255,255,255,0.76))',
+              background: 'radial-gradient(120% 80% at 50% -10%, rgba(183,53,184,0.10), rgba(255,255,255,0) 58%), linear-gradient(180deg, rgba(255,255,255,0.78), rgba(255,255,255,0.76))',
               border: '1px solid rgba(255,255,255,0.07)',
               boxShadow: '0 14px 32px -22px rgba(15,23,42,0.10), inset 0 1px 0 rgba(255,255,255,0.04)',
             }}>
             <h3 className="text-[11px] font-bold uppercase tracking-[0.18em] mb-3 flex items-center gap-2" style={{ color: 'rgba(255,255,255,0.55)' }}>
-              <Zap className="w-3 h-3" style={{ color: '#22B7FF' }} />
+              <Zap className="w-3 h-3" style={{ color: '#B735B8' }} />
               ¿Cómo funciona?
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
               {([
-                { Icon: Plus,        title: 'Crea el agente',         desc: 'Nombre + URL webhook.',  c: '#22B7FF' },
-                { Icon: Key,         title: 'Configura credenciales', desc: 'API keys YCloud / OpenAI.', c: '#7B5BFF' },
+                { Icon: Plus,        title: 'Crea el agente',         desc: 'Nombre + URL webhook.',  c: '#B735B8' },
+                { Icon: Key,         title: 'Configura credenciales', desc: 'API keys YCloud / OpenAI.', c: '#6A35D9' },
                 { Icon: ShoppingBag, title: 'Agrega productos',       desc: 'Base de conocimiento.',  c: '#22D3EE' },
                 { Icon: Webhook,     title: 'Conecta YCloud',         desc: 'Apunta el webhook.',     c: '#A78BFA' },
               ] as const).map((step, i) => (
