@@ -249,7 +249,7 @@ export default function DashboardPage() {
            DESKTOP VIEW — Premium light (MY DIAMOND)
       ═══════════════════════════════════════════════════════════ */}
       <div className="hidden lg:flex w-full flex-1">
-        <main className="d-main font-ui" style={{ background: 'linear-gradient(135deg, #F8FAFC 0%, #F5F7FA 45%, #EEF2F7 100%)', color: '#111827', minHeight: '100vh', gap: '24px' }}>
+        <main className="d-main font-ui" style={{ background: 'radial-gradient(circle at top right, rgba(255,9,108,0.08), transparent 28%), radial-gradient(circle at bottom left, rgba(35,59,143,0.08), transparent 30%), linear-gradient(135deg, #EEF2F7 0%, #F5F7FA 45%, #E9EEF5 100%)', color: '#111827', minHeight: '100vh', gap: '24px' }}>
 
           {/* ── TOPBAR ── */}
           <header style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, flexWrap: 'wrap' }}>

@@ -3546,7 +3546,7 @@ export default function WhatsAppPage() {
   const activeBots = bots.filter(b => b.status === 'ACTIVE').length
 
   return (
-    <div className="font-ui" style={{ background: 'linear-gradient(135deg, #F8FAFC 0%, #F5F7FA 45%, #EEF2F7 100%)', minHeight: '100vh', color: '#111827' }}>
+    <div className="dm-page font-ui">
     <div className="px-4 sm:px-6 lg:px-8 pt-8 max-w-screen-2xl mx-auto pb-20 fade-in">
       {/* Page Header */}
       <div className="flex items-center gap-3 mb-5">

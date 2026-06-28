@@ -143,7 +143,7 @@ function MetaAdsDashboardInner() {
     const failed = metaCampaigns.filter((c: any) => c.status === 'FAILED').length
 
     return (
-        <div className="font-ui" style={{ background: 'linear-gradient(135deg, #F8FAFC 0%, #F5F7FA 45%, #EEF2F7 100%)', minHeight: '100vh', color: '#111827' }}>
+        <div className="dm-page font-ui">
         <div className="px-4 md:px-6 xl:px-10 pt-6 pb-28 max-w-screen-2xl mx-auto text-[#111827]">
 
             {/* ── HEADER ─────────────────────────────── */}

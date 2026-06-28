@@ -112,7 +112,7 @@ export default function StorePage() {
   }
 
   return (
-    <div className="font-ui" style={{ background: 'linear-gradient(135deg, #F8FAFC 0%, #F5F7FA 45%, #EEF2F7 100%)', minHeight: '100vh', color: '#111827' }}>
+    <div className="dm-page font-ui">
     <div className="px-4 sm:px-6 lg:px-8 pt-8 pb-10 max-w-screen-xl mx-auto">
       {/* Toast */}
       {toast && (

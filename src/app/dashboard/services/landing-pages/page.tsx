@@ -165,7 +165,7 @@ export default function LandingPagesPage() {
     }
 
     return (
-        <div className="font-ui" style={{ background: 'linear-gradient(135deg, #F8FAFC 0%, #F5F7FA 45%, #EEF2F7 100%)', minHeight: '100vh', color: '#111827' }}>
+        <div className="dm-page font-ui">
         <div className="px-4 sm:px-6 lg:px-8 pt-8 max-w-screen-xl mx-auto pb-20 font-inter">
             {/* Page Header — premium compacto */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">

@@ -42,7 +42,7 @@ export default function LoginPage() {
 
   return (
     <div className="font-ui min-h-screen flex items-center justify-center px-4 relative overflow-hidden"
-      style={{ background: 'linear-gradient(135deg, #F8FAFC 0%, #F5F7FA 45%, #EEF2F7 100%)' }}>
+      style={{ background: 'radial-gradient(circle at top right, rgba(255,9,108,0.08), transparent 28%), radial-gradient(circle at bottom left, rgba(35,59,143,0.08), transparent 30%), linear-gradient(135deg, #EEF2F7 0%, #F5F7FA 45%, #E9EEF5 100%)' }}>
 
       {/* Glows suaves */}
       <div className="pointer-events-none fixed inset-0 overflow-hidden">

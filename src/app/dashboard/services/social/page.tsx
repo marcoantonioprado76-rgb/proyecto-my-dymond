@@ -200,7 +200,7 @@ export default function SocialPage() {
     const networkConnected = (id: string) => connectedNetworks.includes(id)
 
     return (
-        <div className="font-ui" style={{ background: 'linear-gradient(135deg, #F8FAFC 0%, #F5F7FA 45%, #EEF2F7 100%)', minHeight: '100vh', color: '#111827' }}>
+        <div className="dm-page font-ui">
         <div className="p-4 md:p-6 lg:px-8 max-w-5xl mx-auto">
             {/* Header */}
             <div className="mb-6 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">

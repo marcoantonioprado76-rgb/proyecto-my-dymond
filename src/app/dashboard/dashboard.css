@@ -1412,7 +1412,7 @@
 :root {
     --dm-grad: linear-gradient(135deg, #FF2D95 0%, #B735B8 48%, #233B8F 100%);
     --dm-silver: linear-gradient(135deg, #FFFFFF 0%, #E8EDF5 22%, #B8C0CC 45%, #F8FAFC 62%, #8F98A8 100%);
-    --dm-bg: linear-gradient(135deg, #F8FAFC 0%, #F5F7FA 45%, #EEF2F7 100%);
+    --dm-bg: radial-gradient(circle at top right, rgba(255,9,108,0.08), transparent 28%), radial-gradient(circle at bottom left, rgba(35,59,143,0.08), transparent 30%), linear-gradient(135deg, #EEF2F7 0%, #F5F7FA 45%, #E9EEF5 100%);
     --dm-hero: radial-gradient(circle at 80% 40%, rgba(255,9,108,0.26), transparent 30%), linear-gradient(135deg, #081624 0%, #111A2E 52%, #070D17 100%);
     --dm-sidebar: radial-gradient(circle at top left, rgba(255,9,108,0.12), transparent 26%), linear-gradient(180deg, #071522 0%, #0B1B2B 55%, #050B14 100%);
 }
@@ -1443,14 +1443,35 @@
 }
 
 /* Card clara premium */
+/* Fondo de página premium — Nivel 1 (perla con profundidad de orbes rosa/azul) */
+.dm-page {
+    background:
+        radial-gradient(circle at top right, rgba(255, 9, 108, 0.08), transparent 28%),
+        radial-gradient(circle at bottom left, rgba(35, 59, 143, 0.08), transparent 30%),
+        linear-gradient(135deg, #EEF2F7 0%, #F5F7FA 45%, #E9EEF5 100%);
+    min-height: 100vh;
+    color: #111827;
+}
+
 .dm-card {
     background: #FFFFFF;
     border: 1px solid #E4E9F0;
     border-radius: 22px;
-    box-shadow: 0 18px 40px rgba(15,23,42,0.07);
+    box-shadow: 0 18px 45px rgba(15,23,42,0.08), inset 0 1px 0 rgba(255,255,255,0.9);
     transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
 }
 .dm-card--hover:hover { transform: translateY(-2px); box-shadow: 0 24px 54px rgba(15,23,42,0.11); }
+
+/* Card destacada — línea superior 3px con gradiente diamante */
+.dm-card--feature { position: relative; overflow: hidden; }
+.dm-card--feature::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 24px; right: 24px;
+    height: 3px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #FF2D95, #B735B8, #233B8F);
+}
 
 /* Card oscura premium */
 .dm-card-dark {
