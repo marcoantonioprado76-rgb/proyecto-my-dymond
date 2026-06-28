@@ -51,31 +51,32 @@ export default function PodcastsPage() {
   }
 
   return (
+  <div className="dm-page font-ui">
     <div className="px-4 sm:px-6 pt-6 pb-24 max-w-6xl mx-auto">
 
       {/* Volver a Academy */}
       <Link href="/dashboard/academy" className="academy-back" style={{ display: 'inline-flex', alignItems: 'center', gap: 10, marginBottom: 16, textDecoration: 'none' }}>
         <span style={{
           display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 30, height: 30, borderRadius: 9,
-          background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.12)', color: 'rgba(255,255,255,0.7)',
+          background: '#F0F3F7', border: '1px solid rgba(255,255,255,0.12)', color: '#374151',
         }}>
           <i className="fa-solid fa-arrow-left" style={{ fontSize: 12 }} />
         </span>
-        <span style={{ fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.6)' }}>Volver a Academy</span>
+        <span style={{ fontSize: 13, fontWeight: 600, color: '#6B7280' }}>Volver a Academy</span>
       </Link>
 
       {/* Header */}
       <div className="mb-6 flex items-start justify-between gap-3 flex-wrap">
         <div className="min-w-0">
-          <h1 className="text-xl font-bold text-white uppercase tracking-widest">MY DIAMOND Podcasts</h1>
+          <h1 className="text-xl font-bold text-[#111827] uppercase tracking-widest">MY DIAMOND Podcasts</h1>
           <div className="h-px w-20 mt-2 rounded-full" style={{ background: 'linear-gradient(90deg, transparent, #D203DD, #FF2DF7, transparent)' }} />
-          <p className="text-xs text-white/30 mt-2">Episodios exclusivos de MY DIAMOND.</p>
+          <p className="text-xs text-[#111827]/30 mt-2">Episodios exclusivos de MY DIAMOND.</p>
         </div>
       </div>
 
       {/* Search */}
       <div className="relative mb-6">
-        <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/25 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#111827]/25 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
           <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
         </svg>
         <input
@@ -86,29 +87,29 @@ export default function PodcastsPage() {
           style={{
             width: '100%', paddingLeft: 36, paddingRight: 16, paddingTop: 10, paddingBottom: 10,
             borderRadius: 12, fontSize: 13, color: '#fff', outline: 'none',
-            background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)',
+            background: 'rgba(255,255,255,0.04)', border: '1px solid #E4E9F0',
             boxSizing: 'border-box',
           }}
-          onFocus={e => (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.15)')}
-          onBlur={e => (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)')}
+          onFocus={e => (e.currentTarget.style.borderColor = '#E4E9F0')}
+          onBlur={e => (e.currentTarget.style.borderColor = '#E4E9F0')}
         />
         {search && (
           <button onClick={() => setSearch('')}
-            style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.3)', fontSize: 16, lineHeight: 1 }}>✕</button>
+            style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: '#6B7280', fontSize: 16, lineHeight: 1 }}>✕</button>
         )}
       </div>
 
       {podcasts.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-24 text-center">
           <div className="w-14 h-14 rounded-2xl flex items-center justify-center mb-4"
-            style={{ background: 'rgba(210,3,221,0.06)', border: '1px solid rgba(255,255,255,0.15)' }}>
+            style={{ background: 'rgba(210,3,221,0.06)', border: '1px solid #E4E9F0' }}>
             <i className="fa-solid fa-microphone" style={{ fontSize: 24, color: '#D203DD', opacity: 0.5 }} />
           </div>
-          <p className="text-sm text-white/40">No hay episodios disponibles aún.</p>
+          <p className="text-sm text-[#111827]/40">No hay episodios disponibles aún.</p>
         </div>
       ) : filtered.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20 text-center">
-          <p className="text-sm text-white/30">Sin resultados para <span className="text-white/60">"{search}"</span></p>
+          <p className="text-sm text-[#111827]/30">Sin resultados para <span className="text-[#111827]/60">"{search}"</span></p>
           <button onClick={() => setSearch('')} className="mt-3 text-xs text-cyan-400 hover:underline">Limpiar búsqueda</button>
         </div>
       ) : (
@@ -119,7 +120,7 @@ export default function PodcastsPage() {
               <div style={{
                 borderRadius: 16, overflow: 'hidden',
                 background: 'linear-gradient(135deg, rgba(154,203,255,0.12) 0%, rgba(255,125,224,0.12) 50%, rgba(162,102,255,0.12) 100%)',
-                border: '1px solid rgba(255,255,255,0.15)',
+                border: '1px solid #E4E9F0',
                 cursor: 'pointer', display: 'flex', flexDirection: 'column', height: '100%',
               }}>
                 {/* Cover */}
@@ -144,13 +145,13 @@ export default function PodcastsPage() {
                     {podcast.title}
                   </p>
                   <p style={{
-                    color: 'rgba(255,255,255,0.3)', fontSize: 11, lineHeight: 1.5, marginBottom: 12, flex: 1,
+                    color: '#6B7280', fontSize: 11, lineHeight: 1.5, marginBottom: 12, flex: 1,
                     display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden',
                   }}>
                     {podcast.description ?? 'Episodio exclusivo de MY DIAMOND.'}
                   </p>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', marginTop: 'auto' }}>
-                    <span style={{ color: 'rgba(255,255,255,0.2)', fontSize: 11 }}>
+                    <span style={{ color: '#9CA3AF', fontSize: 11 }}>
                       <i className="fa-solid fa-microphone" style={{ marginRight: 4 }} />Podcast
                     </span>
                   </div>
@@ -161,5 +162,6 @@ export default function PodcastsPage() {
         </div>
       )}
     </div>
+  </div>
   )
 }

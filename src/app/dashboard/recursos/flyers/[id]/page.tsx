@@ -6,7 +6,7 @@ import dynamic from 'next/dynamic'
 const UserEditor = dynamic(() => import('./UserEditor'), {
   ssr: false,
   loading: () => (
-    <div className="flex items-center justify-center py-32 text-white/40">
+    <div className="flex items-center justify-center py-32 text-[#111827]/40">
       <i className="fa-solid fa-spinner fa-spin text-2xl"></i>
     </div>
   ),

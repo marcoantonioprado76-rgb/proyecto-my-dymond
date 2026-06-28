@@ -125,7 +125,7 @@ function LineChart({ days }: { days: DayData[] }) {
               stroke="rgba(255,255,255,0.06)" strokeWidth="1"
               strokeDasharray={i === 0 ? 'none' : '4 6'} />
             <text x={padL - 6} y={y + 4} textAnchor="end" fontSize="8"
-              fill="rgba(255,255,255,0.2)" fontFamily="monospace">{v}</text>
+              fill="#9CA3AF" fontFamily="monospace">{v}</text>
           </g>
         )
       })}
@@ -136,7 +136,7 @@ function LineChart({ days }: { days: DayData[] }) {
       {convArea  && <path d={convArea}  fill="url(#lc-conv-area)" />}
       {convLine  && <path d={convLine}  fill="none" stroke="url(#lc-conv-line)"  strokeWidth="1.5" strokeLinejoin="round" strokeLinecap="round" filter="url(#lc-glow-conv)" />}
       {convPts.map((p, i) => p.val === 0 ? null : (
-        <circle key={i} cx={p.x} cy={p.y} r="2.5" fill="#0D1E79" stroke="rgba(0,0,0,0.6)" strokeWidth="1.5" />
+        <circle key={i} cx={p.x} cy={p.y} r="2.5" fill="#0D1E79" stroke="rgba(15,23,42,0.10)" strokeWidth="1.5" />
       ))}
 
       {/* ── Ventas (green) — área + línea + puntos con badges ── */}
@@ -150,7 +150,7 @@ function LineChart({ days }: { days: DayData[] }) {
             <rect x={p.x - 10} y={p.y - 30} width="20" height="14" rx="4" fill="#00FF88" opacity="0.9" />
             <text x={p.x} y={p.y - 20} textAnchor="middle" fontSize="8" fontWeight="800" fill="#000">{p.val}</text>
             <line x1={p.x} y1={p.y - 16} x2={p.x} y2={p.y - 6} stroke="#00FF88" strokeWidth="1" opacity="0.5" />
-            <circle cx={p.x} cy={p.y} r="4" fill="#00FF88" stroke="rgba(0,0,0,0.6)" strokeWidth="1.5" />
+            <circle cx={p.x} cy={p.y} r="4" fill="#00FF88" stroke="rgba(15,23,42,0.10)" strokeWidth="1.5" />
             <circle cx={p.x} cy={p.y} r="2" fill="#fff" opacity="0.6" />
           </g>
         )
@@ -199,7 +199,7 @@ export default function BotReportsPage() {
   if (error || !data) {
     return (
       <div className="px-4 sm:px-6 pt-6 max-w-screen-2xl mx-auto">
-        <Link href="/dashboard/services/whatsapp" style={{ fontSize: 13, color: 'rgba(255,255,255,0.4)', textDecoration: 'none' }}>← Volver</Link>
+        <Link href="/dashboard/services/whatsapp" style={{ fontSize: 13, color: '#6B7280', textDecoration: 'none' }}>← Volver</Link>
         <p className="text-red-400 text-sm mt-4">{error || 'Error al cargar'}</p>
       </div>
     )
@@ -208,9 +208,10 @@ export default function BotReportsPage() {
   const { stats, days, recentSales, botName } = data
 
   return (
+  <div className="dm-page font-ui">
     <div className="px-4 sm:px-6 pt-6 pb-12 max-w-7xl mx-auto">
       {/* Back */}
-      <Link href="/dashboard/services/whatsapp" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 13, color: 'rgba(255,255,255,0.4)', textDecoration: 'none', marginBottom: 20 }}>
+      <Link href="/dashboard/services/whatsapp" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 13, color: '#6B7280', textDecoration: 'none', marginBottom: 20 }}>
         ← Volver a bots
       </Link>
 
@@ -219,7 +220,7 @@ export default function BotReportsPage() {
         <h1 style={{ fontSize: 20, fontWeight: 800, color: '#fff', letterSpacing: '0.05em', textTransform: 'uppercase' }}>
           📊 Reportes
         </h1>
-        <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.35)', marginTop: 4 }}>{botName}</p>
+        <p style={{ fontSize: 13, color: '#6B7280', marginTop: 4 }}>{botName}</p>
         <div style={{ height: 2, width: 60, marginTop: 10, borderRadius: 99, background: 'linear-gradient(90deg, #D203DD, #00FF88)' }} />
       </div>
 
@@ -231,15 +232,15 @@ export default function BotReportsPage() {
           { label: 'Ventas hoy', value: stats.salesToday, color: '#F5A623' },
           { label: 'Conversión', value: `${stats.conversionRate}%`, color: '#FF2DF7' },
         ].map(s => (
-          <div key={s.label} style={{ borderRadius: 14, padding: '14px 16px', background: 'linear-gradient(135deg, rgba(154,203,255,0.12) 0%, rgba(255,125,224,0.12) 50%, rgba(162,102,255,0.12) 100%)', border: '1px solid rgba(255,255,255,0.15)' }}>
-            <p style={{ fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 6 }}>{s.label}</p>
+          <div key={s.label} style={{ borderRadius: 14, padding: '14px 16px', background: 'linear-gradient(135deg, rgba(154,203,255,0.12) 0%, rgba(255,125,224,0.12) 50%, rgba(162,102,255,0.12) 100%)', border: '1px solid #E4E9F0' }}>
+            <p style={{ fontSize: 11, fontWeight: 600, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 6 }}>{s.label}</p>
             <p style={{ fontSize: 26, fontWeight: 900, color: s.color, lineHeight: 1 }}>{s.value}</p>
           </div>
         ))}
       </div>
 
       {/* Chart section */}
-      <div style={{ borderRadius: 16, padding: '20px', background: 'linear-gradient(135deg, rgba(154,203,255,0.12) 0%, rgba(255,125,224,0.12) 50%, rgba(162,102,255,0.12) 100%)', border: '1px solid rgba(255,255,255,0.15)', marginBottom: 24 }}>
+      <div style={{ borderRadius: 16, padding: '20px', background: 'linear-gradient(135deg, rgba(154,203,255,0.12) 0%, rgba(255,125,224,0.12) 50%, rgba(162,102,255,0.12) 100%)', border: '1px solid #E4E9F0', marginBottom: 24 }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16, flexWrap: 'wrap', gap: 8 }}>
           <p style={{ fontSize: 13, fontWeight: 700, color: '#fff' }}>Últimos 30 días</p>
           <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
@@ -254,7 +255,7 @@ export default function BotReportsPage() {
           </div>
         </div>
         <LineChart days={days} />
-        <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.2)', textAlign: 'center', marginTop: 8 }}>
+        <p style={{ fontSize: 10, color: '#9CA3AF', textAlign: 'center', marginTop: 8 }}>
           Conversaciones iniciadas y ventas confirmadas por día
         </p>
       </div>
@@ -264,13 +265,13 @@ export default function BotReportsPage() {
         <div style={{ padding: '14px 18px', background: 'rgba(0,255,136,0.04)', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
           <p style={{ fontSize: 13, fontWeight: 700, color: '#fff', margin: 0 }}>
             Ventas recientes
-            <span style={{ marginLeft: 8, fontSize: 11, color: 'rgba(255,255,255,0.3)', fontWeight: 500 }}>últimas {recentSales.length}</span>
+            <span style={{ marginLeft: 8, fontSize: 11, color: '#6B7280', fontWeight: 500 }}>últimas {recentSales.length}</span>
           </p>
         </div>
 
         {recentSales.length === 0 ? (
           <div style={{ padding: '32px 18px', textAlign: 'center' }}>
-            <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.25)' }}>Aún no hay ventas registradas.</p>
+            <p style={{ fontSize: 13, color: '#9CA3AF' }}>Aún no hay ventas registradas.</p>
           </div>
         ) : (
           <div style={{ padding: '8px 12px', display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -286,7 +287,7 @@ export default function BotReportsPage() {
                       <p style={{ fontSize: 13, fontWeight: 700, color: '#fff', margin: 0, wordBreak: 'break-word' }}>
                         {sale.userName || 'Sin nombre'}
                       </p>
-                      <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.25)', margin: 0, flexShrink: 0 }}>{fmtDate(sale.soldAt)}</p>
+                      <p style={{ fontSize: 10, color: '#9CA3AF', margin: 0, flexShrink: 0 }}>{fmtDate(sale.soldAt)}</p>
                     </div>
                     <span style={{ display: 'inline-block', marginTop: 4, fontSize: 11, color: '#0D1E79', background: 'rgba(13,30,121,0.08)', border: '1px solid rgba(13,30,121,0.18)', borderRadius: 5, padding: '2px 8px', fontWeight: 600, wordBreak: 'break-all' }}>
                       📞 {sale.userPhone}
@@ -305,5 +306,6 @@ export default function BotReportsPage() {
         )}
       </div>
     </div>
+  </div>
   )
 }

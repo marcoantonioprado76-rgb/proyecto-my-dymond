@@ -78,7 +78,7 @@ export default function StoreItemPage({ params }: { params: { itemId: string } }
   if (!item) {
     return (
       <div className="px-4 sm:px-6 pt-6 max-w-screen-2xl mx-auto">
-        <p className="text-white/40 text-sm">Producto no encontrado.</p>
+        <p className="text-[#111827]/40 text-sm">Producto no encontrado.</p>
         <Link href="/dashboard/store" style={{ color: '#D203DD', fontSize: 13, textDecoration: 'none' }}>← Volver a la tienda</Link>
       </div>
     )
@@ -88,6 +88,7 @@ export default function StoreItemPage({ params }: { params: { itemId: string } }
   const outOfStock = item.stock === 0
 
   return (
+  <div className="dm-page font-ui">
     <div className="px-4 sm:px-6 pt-6 pb-12 max-w-7xl mx-auto">
       {/* Toast */}
       {toast && (
@@ -97,14 +98,14 @@ export default function StoreItemPage({ params }: { params: { itemId: string } }
       )}
 
       {/* Back */}
-      <Link href="/dashboard/store" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 13, color: 'rgba(255,255,255,0.4)', textDecoration: 'none', marginBottom: 24 }}>
+      <Link href="/dashboard/store" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 13, color: '#6B7280', textDecoration: 'none', marginBottom: 24 }}>
         ← Volver a la tienda
       </Link>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 28 }} className="sm:grid-cols-2">
         {/* Images */}
         <div>
-          <div style={{ aspectRatio: '1/1', borderRadius: 16, overflow: 'hidden', background: 'linear-gradient(135deg, rgba(154,203,255,0.12) 0%, rgba(255,125,224,0.12) 50%, rgba(162,102,255,0.12) 100%)', border: '1px solid rgba(255,255,255,0.15)', position: 'relative' }}>
+          <div style={{ aspectRatio: '1/1', borderRadius: 16, overflow: 'hidden', background: 'linear-gradient(135deg, rgba(154,203,255,0.12) 0%, rgba(255,125,224,0.12) 50%, rgba(162,102,255,0.12) 100%)', border: '1px solid #E4E9F0', position: 'relative' }}>
             {images.length > 0 ? (
               <img src={images[activeImg]} alt={item.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
             ) : (
@@ -114,7 +115,7 @@ export default function StoreItemPage({ params }: { params: { itemId: string } }
             )}
             {outOfStock && (
               <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.55)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <span style={{ fontSize: 16, fontWeight: 800, color: 'rgba(255,255,255,0.7)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>No disponible</span>
+                <span style={{ fontSize: 16, fontWeight: 800, color: '#374151', letterSpacing: '0.1em', textTransform: 'uppercase' }}>No disponible</span>
               </div>
             )}
           </div>
@@ -122,7 +123,7 @@ export default function StoreItemPage({ params }: { params: { itemId: string } }
             <div style={{ display: 'flex', gap: 8, marginTop: 10, flexWrap: 'wrap' }}>
               {images.map((src, i) => (
                 <button key={i} onClick={() => setActiveImg(i)}
-                  style={{ width: 56, height: 56, borderRadius: 8, overflow: 'hidden', border: `2px solid ${activeImg === i ? '#D203DD' : 'rgba(255,255,255,0.1)'}`, background: 'none', cursor: 'pointer', padding: 0 }}>
+                  style={{ width: 56, height: 56, borderRadius: 8, overflow: 'hidden', border: `2px solid ${activeImg === i ? '#D203DD' : '#E4E9F0'}`, background: 'none', cursor: 'pointer', padding: 0 }}>
                   <img src={src} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 </button>
               ))}
@@ -135,7 +136,7 @@ export default function StoreItemPage({ params }: { params: { itemId: string } }
           <div>
             <span style={{ fontSize: 11, fontWeight: 600, color: '#D203DD', textTransform: 'uppercase', letterSpacing: '0.08em' }}>{item.category}</span>
             <h1 style={{ fontSize: 'clamp(18px, 5vw, 24px)', fontWeight: 800, color: '#fff', margin: '6px 0 8px', lineHeight: 1.2 }}>{item.title}</h1>
-            <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.5)', lineHeight: 1.6 }}>{item.description}</p>
+            <p style={{ fontSize: 14, color: '#6B7280', lineHeight: 1.6 }}>{item.description}</p>
           </div>
 
           {/* Price */}
@@ -144,20 +145,20 @@ export default function StoreItemPage({ params }: { params: { itemId: string } }
           </div>
 
           {/* Stock */}
-          <p style={{ fontSize: 12, color: outOfStock ? '#ef4444' : 'rgba(255,255,255,0.3)' }}>
+          <p style={{ fontSize: 12, color: outOfStock ? '#ef4444' : '#6B7280' }}>
             {outOfStock ? 'Producto no disponible' : `${item.stock} disponibles`}
           </p>
 
           {/* Variants */}
           {item.variants.map(v => (
             <div key={v.name}>
-              <p style={{ fontSize: 12, fontWeight: 600, color: 'rgba(255,255,255,0.5)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{v.name}</p>
+              <p style={{ fontSize: 12, fontWeight: 600, color: '#6B7280', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{v.name}</p>
               <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                 {v.options.map(opt => (
                   <button key={opt} onClick={() => setSelectedVariants(p => ({ ...p, [v.name]: opt }))}
                     style={{ padding: '6px 14px', borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: 'pointer', border: '1px solid', background: 'transparent',
-                      borderColor: selectedVariants[v.name] === opt ? '#D203DD' : 'rgba(255,255,255,0.15)',
-                      color: selectedVariants[v.name] === opt ? '#D203DD' : 'rgba(255,255,255,0.5)' }}>
+                      borderColor: selectedVariants[v.name] === opt ? '#D203DD' : '#E4E9F0',
+                      color: selectedVariants[v.name] === opt ? '#D203DD' : '#6B7280' }}>
                     {opt}
                   </button>
                 ))}
@@ -168,13 +169,13 @@ export default function StoreItemPage({ params }: { params: { itemId: string } }
           {/* Quantity */}
           {!outOfStock && (
             <div>
-              <p style={{ fontSize: 12, fontWeight: 600, color: 'rgba(255,255,255,0.5)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Cantidad</p>
+              <p style={{ fontSize: 12, fontWeight: 600, color: '#6B7280', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Cantidad</p>
               <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                 <button onClick={() => setQuantity(q => Math.max(1, q - 1))}
-                  style={{ width: 32, height: 32, borderRadius: 8, border: '1px solid rgba(255,255,255,0.15)', background: 'rgba(255,255,255,0.05)', color: '#fff', fontSize: 18, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>−</button>
+                  style={{ width: 32, height: 32, borderRadius: 8, border: '1px solid #E4E9F0', background: '#F0F3F7', color: '#fff', fontSize: 18, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>−</button>
                 <span style={{ fontSize: 16, fontWeight: 700, color: '#fff', minWidth: 24, textAlign: 'center' }}>{quantity}</span>
                 <button onClick={() => setQuantity(q => Math.min(item.stock, q + 1))}
-                  style={{ width: 32, height: 32, borderRadius: 8, border: '1px solid rgba(255,255,255,0.15)', background: 'rgba(255,255,255,0.05)', color: '#fff', fontSize: 18, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>+</button>
+                  style={{ width: 32, height: 32, borderRadius: 8, border: '1px solid #E4E9F0', background: '#F0F3F7', color: '#fff', fontSize: 18, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>+</button>
               </div>
             </div>
           )}
@@ -184,16 +185,17 @@ export default function StoreItemPage({ params }: { params: { itemId: string } }
             <button onClick={addToCart} disabled={outOfStock}
               style={{ flex: 1, minWidth: 140, padding: '12px 20px', borderRadius: 10, fontWeight: 700, fontSize: 14, cursor: outOfStock ? 'not-allowed' : 'pointer', border: 'none',
                 background: outOfStock ? 'rgba(255,255,255,0.06)' : 'linear-gradient(135deg, #D203DD 0%, #00FF88 100%)',
-                color: outOfStock ? 'rgba(255,255,255,0.3)' : '#000' }}>
+                color: outOfStock ? '#6B7280' : '#000' }}>
               {outOfStock ? 'No disponible' : '🛒 Agregar al carrito'}
             </button>
             <Link href="/dashboard/store/cart"
-              style={{ flex: 1, minWidth: 120, padding: '12px 20px', borderRadius: 10, fontWeight: 700, fontSize: 14, textAlign: 'center', textDecoration: 'none', border: '1px solid rgba(255,255,255,0.15)', color: '#D203DD', background: 'rgba(210,3,221,0.06)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
+              style={{ flex: 1, minWidth: 120, padding: '12px 20px', borderRadius: 10, fontWeight: 700, fontSize: 14, textAlign: 'center', textDecoration: 'none', border: '1px solid #E4E9F0', color: '#D203DD', background: 'rgba(210,3,221,0.06)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
               Ver carrito
             </Link>
           </div>
         </div>
       </div>
     </div>
+  </div>
   )
 }

@@ -49,7 +49,7 @@ const TRUST_BADGES = [
 
 const COLOR_PALETTES = [
     {
-        id: 'neon-green',
+        id: '[#16A34A]',
         label: 'Neón Verde',
         desc: 'Tecnológico y moderno',
         primary: '#00FF88',
@@ -115,21 +115,21 @@ function slug(str: string) {
 
 const Input = ({ label, icon: Icon, ...props }: any) => (
     <div className="space-y-1.5">
-        {label && <label className="text-xs font-bold uppercase tracking-widest text-white/50 flex items-center gap-1.5">{Icon && <Icon size={12} />}{label}</label>}
+        {label && <label className="text-xs font-bold uppercase tracking-widest text-[#111827]/50 flex items-center gap-1.5">{Icon && <Icon size={12} />}{label}</label>}
         <input
             {...props}
-            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/25 focus:outline-none focus:border-[#00FF88]/50 transition-colors text-sm"
+            className="w-full bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-4 py-3 text-[#111827] placeholder-white/25 focus:outline-none focus:border-[#00FF88]/50 transition-colors text-sm"
         />
     </div>
 )
 
 const TextArea = ({ label, icon: Icon, rows = 3, ...props }: any) => (
     <div className="space-y-1.5">
-        {label && <label className="text-xs font-bold uppercase tracking-widest text-white/50 flex items-center gap-1.5">{Icon && <Icon size={12} />}{label}</label>}
+        {label && <label className="text-xs font-bold uppercase tracking-widest text-[#111827]/50 flex items-center gap-1.5">{Icon && <Icon size={12} />}{label}</label>}
         <textarea
             rows={rows}
             {...props}
-            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/25 focus:outline-none focus:border-[#00FF88]/50 transition-colors text-sm resize-none"
+            className="w-full bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-4 py-3 text-[#111827] placeholder-white/25 focus:outline-none focus:border-[#00FF88]/50 transition-colors text-sm resize-none"
         />
     </div>
 )
@@ -138,7 +138,7 @@ const Chip = ({ label, active, onClick, color = '#00FF88' }: any) => (
     <button
         type="button"
         onClick={onClick}
-        className={`px-3 py-1.5 rounded-xl text-xs font-bold border transition-all ${active ? 'text-black border-transparent' : 'bg-white/5 border-white/10 text-white/60 hover:text-white hover:border-white/30'}`}
+        className={`px-3 py-1.5 rounded-xl text-xs font-bold border transition-all ${active ? 'text-black border-transparent' : 'bg-[#F4F6FA] border-[#E4E9F0] text-[#111827]/60 hover:text-[#111827] hover:border-white/30'}`}
         style={active ? { background: color, borderColor: color } : {}}
     >
         {label}
@@ -150,7 +150,7 @@ const SectionTitle = ({ icon: Icon, title, color = '#00FF88' }: any) => (
         <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: `${color}20`, color }}>
             <Icon size={16} />
         </div>
-        <h3 className="text-base font-black uppercase tracking-tight text-white">{title}</h3>
+        <h3 className="text-base font-black uppercase tracking-tight text-[#111827]">{title}</h3>
     </div>
 )
 
@@ -197,7 +197,7 @@ export default function CreateLandingPage() {
         additionalImages: [''] as string[],
         mainVideoUrl: '',
         additionalVideos: [''] as string[],
-        colorPalette: 'neon-green',
+        colorPalette: '[#16A34A]',
         primaryColor: '#00FF88',
         secondaryColor: '#D203DD',
         visualStyle: '',
@@ -322,35 +322,35 @@ export default function CreateLandingPage() {
         <div className="min-h-screen bg-[#1C192C] flex flex-col items-center justify-center px-4">
             <div className="w-20 h-20 rounded-full border-4 border-[#00FF88]/20 border-t-[#00FF88] animate-spin mb-8" />
             <p className="text-[#00FF88] font-black text-lg tracking-widest uppercase text-center">{LOADING_MSGS[loadingIdx]}</p>
-            <p className="text-white/30 text-sm mt-3">Esto puede tardar 30-60 segundos</p>
+            <p className="text-[#111827]/30 text-sm mt-3">Esto puede tardar 30-60 segundos</p>
         </div>
     )
 
     // ─── Mode selector ────────────────────────────────────────────────────────
     if (mode === 'select') return (
-        <div className="min-h-screen bg-[#1C192C] text-white flex flex-col">
-            <nav className="h-16 border-b border-white/5 flex items-center px-4 sm:px-8 bg-[#1C192C]/90 backdrop-blur-xl fixed top-0 left-0 w-full z-50 lg:left-[240px] lg:w-[calc(100%-240px)]">
-                <Link href="/dashboard/services/landing-pages" className="w-9 h-9 rounded-full border border-white/10 flex items-center justify-center hover:bg-white/10 transition-all">
+        <div className="min-h-screen bg-[#1C192C] text-[#111827] flex flex-col">
+            <nav className="h-16 border-b border-[#E4E9F0] flex items-center px-4 sm:px-8 bg-[#1C192C]/90 backdrop-blur-xl fixed top-0 left-0 w-full z-50 lg:left-[240px] lg:w-[calc(100%-240px)]">
+                <Link href="/dashboard/services/landing-pages" className="w-9 h-9 rounded-full border border-[#E4E9F0] flex items-center justify-center hover:bg-[#EEF2F7] transition-all">
                     <ArrowLeft size={16} />
                 </Link>
                 <span className="ml-3 font-black text-sm uppercase tracking-widest">Nueva Landing Page</span>
             </nav>
             <main className="pt-24 pb-20 px-4 sm:px-8 max-w-2xl mx-auto w-full flex flex-col items-center">
                 <div className="text-center mb-10">
-                    <h1 className="text-2xl sm:text-3xl font-black uppercase tracking-tight text-white mb-2">¿Cómo quieres crear tu landing?</h1>
-                    <p className="text-white/40 text-sm">Elige el método que mejor se adapte a tu caso</p>
+                    <h1 className="text-2xl sm:text-3xl font-black uppercase tracking-tight text-[#111827] mb-2">¿Cómo quieres crear tu landing?</h1>
+                    <p className="text-[#111827]/40 text-sm">Elige el método que mejor se adapte a tu caso</p>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 w-full">
                     {/* Opción 1: Pegar HTML */}
                     <button
                         onClick={() => setMode('html')}
-                        className="group bg-white/[0.03] border border-white/10 hover:border-white/30 rounded-3xl p-8 text-left transition-all hover:bg-white/5 hover:shadow-[0_0_20px_rgba(255,255,255,0.05)]"
+                        className="group bg-white border border-[#E4E9F0] hover:border-white/30 rounded-3xl p-8 text-left transition-all hover:bg-[#F4F6FA] hover:shadow-[0_0_20px_#F0F3F7]"
                     >
                         <div className="w-12 h-12 rounded-2xl bg-[#D203DD]/10 border border-[#D203DD]/20 flex items-center justify-center mb-5 group-hover:bg-[#D203DD]/20 transition-colors">
                             <Code size={22} className="text-[#D203DD]" />
                         </div>
-                        <h2 className="text-lg font-black text-white mb-2">Pegar mi HTML</h2>
-                        <p className="text-white/40 text-sm leading-relaxed">Tienes tu propio código HTML listo. Pégalo aquí y publícalo al instante.</p>
+                        <h2 className="text-lg font-black text-[#111827] mb-2">Pegar mi HTML</h2>
+                        <p className="text-[#111827]/40 text-sm leading-relaxed">Tienes tu propio código HTML listo. Pégalo aquí y publícalo al instante.</p>
                         <div className="mt-5 text-xs font-bold uppercase tracking-widest text-[#D203DD]/70 flex items-center gap-1.5">
                             Usar → <ArrowRight size={12} />
                         </div>
@@ -358,13 +358,13 @@ export default function CreateLandingPage() {
                     {/* Opción 2: Builder con IA */}
                     <button
                         onClick={() => setMode('ai')}
-                        className="group bg-white/[0.03] border border-white/10 hover:border-[#00FF88]/50 rounded-3xl p-8 text-left transition-all hover:bg-[#00FF88]/5 hover:shadow-[0_0_40px_rgba(0,255,136,0.08)]"
+                        className="group bg-white border border-[#E4E9F0] hover:border-[#00FF88]/50 rounded-3xl p-8 text-left transition-all hover:bg-[#00FF88]/5 hover:shadow-[0_0_40px_rgba(0,255,136,0.08)]"
                     >
                         <div className="w-12 h-12 rounded-2xl bg-[#00FF88]/10 border border-[#00FF88]/20 flex items-center justify-center mb-5 group-hover:bg-[#00FF88]/20 transition-colors">
                             <Sparkles size={22} className="text-[#00FF88]" />
                         </div>
-                        <h2 className="text-lg font-black text-white mb-2">Crear con IA</h2>
-                        <p className="text-white/40 text-sm leading-relaxed">Dinos de tu negocio y la IA genera una landing de alta conversión lista para publicar.</p>
+                        <h2 className="text-lg font-black text-[#111827] mb-2">Crear con IA</h2>
+                        <p className="text-[#111827]/40 text-sm leading-relaxed">Dinos de tu negocio y la IA genera una landing de alta conversión lista para publicar.</p>
                         <div className="mt-5 text-xs font-bold uppercase tracking-widest text-[#00FF88]/70 flex items-center gap-1.5">
                             Empezar → <ArrowRight size={12} />
                         </div>
@@ -377,23 +377,23 @@ export default function CreateLandingPage() {
     if (mode === 'html') return (
         <div className="min-h-screen bg-[#1C192C] flex flex-col">
             {/* Top bar — title + back only (no save button, avoids clash with dashboard Navbar) */}
-            <div className="h-12 border-b border-white/5 flex items-center gap-3 px-4 sm:px-8 bg-[#1C192C]/90 backdrop-blur-xl sticky top-0 z-40">
-                <button onClick={() => setMode('select')} className="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center hover:bg-white/10 transition-all">
+            <div className="h-12 border-b border-[#E4E9F0] flex items-center gap-3 px-4 sm:px-8 bg-[#1C192C]/90 backdrop-blur-xl sticky top-0 z-40">
+                <button onClick={() => setMode('select')} className="w-8 h-8 rounded-full border border-[#E4E9F0] flex items-center justify-center hover:bg-[#EEF2F7] transition-all">
                     <ArrowLeft size={15} />
                 </button>
                 <span className="font-black text-sm uppercase tracking-widest">Pegar HTML</span>
             </div>
 
             {/* Name + slug bar */}
-            <div className="px-4 sm:px-8 py-3 border-b border-white/5 bg-[#1C192C] flex items-center gap-3">
+            <div className="px-4 sm:px-8 py-3 border-b border-[#E4E9F0] bg-[#1C192C] flex items-center gap-3">
                 <input
                     type="text"
                     value={form.name}
                     onChange={e => { set('name', e.target.value); set('slug', slug(e.target.value)) }}
                     placeholder="Nombre de tu landing page"
-                    className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-white/25 focus:outline-none focus:border-[#00FF88]/50 transition-colors"
+                    className="flex-1 bg-[#F4F6FA] border border-[#E4E9F0] rounded-lg px-3 py-2 text-sm text-[#111827] placeholder-white/25 focus:outline-none focus:border-[#00FF88]/50 transition-colors"
                 />
-                <span className="text-white/20 text-xs hidden sm:block">{form.slug || 'slug-auto'}</span>
+                <span className="text-[#111827]/20 text-xs hidden sm:block">{form.slug || 'slug-auto'}</span>
             </div>
 
             {error && <p className="text-red-400 text-xs text-center py-2 bg-red-500/10">{error}</p>}
@@ -409,10 +409,10 @@ export default function CreateLandingPage() {
             />
 
             {/* Bottom save bar — always visible */}
-            <div className="fixed bottom-[65px] left-0 w-full bg-[#1C192C]/95 backdrop-blur-xl border-t border-white/10 px-4 sm:px-8 py-4 flex items-center justify-between z-50 lg:bottom-0 lg:left-[240px] lg:w-[calc(100%-240px)]">
+            <div className="fixed bottom-[65px] left-0 w-full bg-[#1C192C]/95 backdrop-blur-xl border-t border-[#E4E9F0] px-4 sm:px-8 py-4 flex items-center justify-between z-50 lg:bottom-0 lg:left-[240px] lg:w-[calc(100%-240px)]">
                 <div>
-                    <p className="text-xs font-bold text-white/50">Pegar HTML</p>
-                    <p className="text-[10px] text-white/25">{form.name || 'Sin nombre aún'}</p>
+                    <p className="text-xs font-bold text-[#111827]/50">Pegar HTML</p>
+                    <p className="text-[10px] text-[#111827]/25">{form.name || 'Sin nombre aún'}</p>
                 </div>
                 <button
                     onClick={handleSaveHtml}
@@ -436,20 +436,20 @@ export default function CreateLandingPage() {
                 <div className="space-y-8">
                     <SectionTitle icon={KeyRound} title="API Key de OpenAI" color="#00FF88" />
                     <div className="space-y-1.5">
-                        <label className="text-xs font-bold uppercase tracking-widest text-white/50 flex items-center gap-1.5"><KeyRound size={12} />OpenAI API Key</label>
+                        <label className="text-xs font-bold uppercase tracking-widest text-[#111827]/50 flex items-center gap-1.5"><KeyRound size={12} />OpenAI API Key</label>
                         <div className="relative">
                             <input
                                 type={showKey ? 'text' : 'password'}
                                 value={form.openaiKey}
                                 onChange={e => set('openaiKey', e.target.value)}
                                 placeholder="sk-..."
-                                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 pr-12 text-white placeholder-white/25 focus:outline-none focus:border-[#00FF88]/50 transition-colors text-sm font-mono"
+                                className="w-full bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-4 py-3 pr-12 text-[#111827] placeholder-white/25 focus:outline-none focus:border-[#00FF88]/50 transition-colors text-sm font-mono"
                             />
-                            <button type="button" onClick={() => setShowKey(v => !v)} className="absolute right-3 top-1/2 -translate-y-1/2 text-white/30 hover:text-white transition-colors">
+                            <button type="button" onClick={() => setShowKey(v => !v)} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#111827]/30 hover:text-[#111827] transition-colors">
                                 {showKey ? <EyeOff size={16} /> : <Eye size={16} />}
                             </button>
                         </div>
-                        <p className="text-white/25 text-xs mt-1">Necesaria para generar con AI. La encontrarás en platform.openai.com</p>
+                        <p className="text-[#111827]/25 text-xs mt-1">Necesaria para generar con AI. La encontrarás en platform.openai.com</p>
                     </div>
 
                     <SectionTitle icon={Globe2} title="Datos del Proyecto" color="#D203DD" />
@@ -459,7 +459,7 @@ export default function CreateLandingPage() {
                     </div>
 
                     <div className="space-y-1.5">
-                        <label className="text-xs font-bold uppercase tracking-widest text-white/50">Idioma de la Landing</label>
+                        <label className="text-xs font-bold uppercase tracking-widest text-[#111827]/50">Idioma de la Landing</label>
                         <div className="flex gap-3 flex-wrap">
                             {LANGUAGES.map(lang => (
                                 <Chip key={lang} label={lang} active={form.language === lang} onClick={() => set('language', lang)} color="#D203DD" />
@@ -476,10 +476,10 @@ export default function CreateLandingPage() {
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                         {BUSINESS_TYPES.map(b => (
                             <button key={b.id} type="button" onClick={() => set('businessType', b.id)}
-                                className={`p-4 rounded-xl border text-left transition-all ${form.businessType === b.id ? 'border-[#00FF88] bg-[#00FF88]/10' : 'border-white/10 bg-white/5 hover:border-white/30'}`}>
+                                className={`p-4 rounded-xl border text-left transition-all ${form.businessType === b.id ? 'border-[#00FF88] bg-[#00FF88]/10' : 'border-[#E4E9F0] bg-[#F4F6FA] hover:border-white/30'}`}>
                                 <div className="text-xl mb-1">{b.label.split(' ')[0]}</div>
-                                <div className="text-xs font-bold text-white">{b.label.split(' ').slice(1).join(' ')}</div>
-                                <div className="text-[10px] text-white/40 mt-1 leading-tight">{b.desc}</div>
+                                <div className="text-xs font-bold text-[#111827]">{b.label.split(' ').slice(1).join(' ')}</div>
+                                <div className="text-[10px] text-[#111827]/40 mt-1 leading-tight">{b.desc}</div>
                             </button>
                         ))}
                     </div>
@@ -493,7 +493,7 @@ export default function CreateLandingPage() {
                     <TextArea label="¿Qué problema resuelves a tu cliente?" rows={2} placeholder="Ej: Mis clientes no saben cómo conseguir ventas por internet y pierden dinero en publicidad sin resultados..." value={form.painPoint} onChange={(e: any) => set('painPoint', e.target.value)} />
 
                     <div className="space-y-2">
-                        <label className="text-xs font-bold uppercase tracking-widest text-white/50">Público Objetivo (selecciona todos los que apliquen)</label>
+                        <label className="text-xs font-bold uppercase tracking-widest text-[#111827]/50">Público Objetivo (selecciona todos los que apliquen)</label>
                         <div className="flex flex-wrap gap-2">
                             {AUDIENCES.map(a => <Chip key={a} label={a} active={form.audience.includes(a)} onClick={() => toggleArr('audience', a)} />)}
                         </div>
@@ -528,10 +528,10 @@ export default function CreateLandingPage() {
                             <div key={i} className="flex gap-3 items-start">
                                 <div className="w-6 h-6 rounded-full bg-[#00FF88]/20 text-[#00FF88] text-xs font-black flex items-center justify-center flex-shrink-0 mt-3">{i + 1}</div>
                                 <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-2">
-                                    <input value={b.title} onChange={e => { const arr = [...form.benefits]; arr[i].title = e.target.value; set('benefits', arr) }} placeholder={`Beneficio ${i + 1} (ej: Resultados en 7 días)`} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white placeholder-white/25 focus:outline-none focus:border-[#00FF88]/50 text-sm" />
-                                    <input value={b.desc} onChange={e => { const arr = [...form.benefits]; arr[i].desc = e.target.value; set('benefits', arr) }} placeholder="Descripción (opcional)" className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white placeholder-white/25 focus:outline-none focus:border-[#00FF88]/50 text-sm" />
+                                    <input value={b.title} onChange={e => { const arr = [...form.benefits]; arr[i].title = e.target.value; set('benefits', arr) }} placeholder={`Beneficio ${i + 1} (ej: Resultados en 7 días)`} className="w-full bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-4 py-2.5 text-[#111827] placeholder-white/25 focus:outline-none focus:border-[#00FF88]/50 text-sm" />
+                                    <input value={b.desc} onChange={e => { const arr = [...form.benefits]; arr[i].desc = e.target.value; set('benefits', arr) }} placeholder="Descripción (opcional)" className="w-full bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-4 py-2.5 text-[#111827] placeholder-white/25 focus:outline-none focus:border-[#00FF88]/50 text-sm" />
                                 </div>
-                                {form.benefits.length > 1 && <button type="button" onClick={() => set('benefits', form.benefits.filter((_, j) => j !== i))} className="text-white/20 hover:text-red-400 transition-colors mt-2.5"><Trash2 size={16} /></button>}
+                                {form.benefits.length > 1 && <button type="button" onClick={() => set('benefits', form.benefits.filter((_, j) => j !== i))} className="text-[#111827]/20 hover:text-red-400 transition-colors mt-2.5"><Trash2 size={16} /></button>}
                             </div>
                         ))}
                         {form.benefits.length < 6 && <button type="button" onClick={() => set('benefits', [...form.benefits, { title: '', desc: '' }])} className="flex items-center gap-2 text-[#00FF88] text-xs font-bold hover:opacity-80 transition-opacity"><Plus size={14} />Agregar beneficio</button>}
@@ -543,10 +543,10 @@ export default function CreateLandingPage() {
                             <div key={i} className="flex gap-3 items-start">
                                 <div className="w-6 h-6 rounded-full bg-[#D203DD]/20 text-[#D203DD] text-xs font-black flex items-center justify-center flex-shrink-0 mt-3">{i + 1}</div>
                                 <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-2">
-                                    <input value={t.name} onChange={e => { const arr = [...form.testimonials]; arr[i].name = e.target.value; set('testimonials', arr) }} placeholder="Nombre del cliente" className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white placeholder-white/25 focus:outline-none focus:border-[#D203DD]/50 text-sm" />
-                                    <input value={t.text} onChange={e => { const arr = [...form.testimonials]; arr[i].text = e.target.value; set('testimonials', arr) }} placeholder="Resultado / testimonio..." className="md:col-span-2 w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white placeholder-white/25 focus:outline-none focus:border-[#D203DD]/50 text-sm" />
+                                    <input value={t.name} onChange={e => { const arr = [...form.testimonials]; arr[i].name = e.target.value; set('testimonials', arr) }} placeholder="Nombre del cliente" className="w-full bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-4 py-2.5 text-[#111827] placeholder-white/25 focus:outline-none focus:border-[#D203DD]/50 text-sm" />
+                                    <input value={t.text} onChange={e => { const arr = [...form.testimonials]; arr[i].text = e.target.value; set('testimonials', arr) }} placeholder="Resultado / testimonio..." className="md:col-span-2 w-full bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-4 py-2.5 text-[#111827] placeholder-white/25 focus:outline-none focus:border-[#D203DD]/50 text-sm" />
                                 </div>
-                                {form.testimonials.length > 1 && <button type="button" onClick={() => set('testimonials', form.testimonials.filter((_, j) => j !== i))} className="text-white/20 hover:text-red-400 transition-colors mt-2.5"><Trash2 size={16} /></button>}
+                                {form.testimonials.length > 1 && <button type="button" onClick={() => set('testimonials', form.testimonials.filter((_, j) => j !== i))} className="text-[#111827]/20 hover:text-red-400 transition-colors mt-2.5"><Trash2 size={16} /></button>}
                             </div>
                         ))}
                         {form.testimonials.length < 5 && <button type="button" onClick={() => set('testimonials', [...form.testimonials, { name: '', text: '' }])} className="flex items-center gap-2 text-[#D203DD] text-xs font-bold hover:opacity-80 transition-opacity"><Plus size={14} />Agregar testimonio</button>}
@@ -558,17 +558,17 @@ export default function CreateLandingPage() {
                             <div key={i} className="flex gap-3 items-start">
                                 <div className="w-6 h-6 rounded-full bg-[#FF006E]/20 text-[#FF006E] text-xs font-black flex items-center justify-center flex-shrink-0 mt-3">{i + 1}</div>
                                 <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-2">
-                                    <input value={f.q} onChange={e => { const arr = [...form.faqs]; arr[i].q = e.target.value; set('faqs', arr) }} placeholder="Pregunta frecuente..." className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white placeholder-white/25 focus:outline-none focus:border-[#FF006E]/50 text-sm" />
-                                    <input value={f.a} onChange={e => { const arr = [...form.faqs]; arr[i].a = e.target.value; set('faqs', arr) }} placeholder="Respuesta..." className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white placeholder-white/25 focus:outline-none focus:border-[#FF006E]/50 text-sm" />
+                                    <input value={f.q} onChange={e => { const arr = [...form.faqs]; arr[i].q = e.target.value; set('faqs', arr) }} placeholder="Pregunta frecuente..." className="w-full bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-4 py-2.5 text-[#111827] placeholder-white/25 focus:outline-none focus:border-[#FF006E]/50 text-sm" />
+                                    <input value={f.a} onChange={e => { const arr = [...form.faqs]; arr[i].a = e.target.value; set('faqs', arr) }} placeholder="Respuesta..." className="w-full bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-4 py-2.5 text-[#111827] placeholder-white/25 focus:outline-none focus:border-[#FF006E]/50 text-sm" />
                                 </div>
-                                {form.faqs.length > 1 && <button type="button" onClick={() => set('faqs', form.faqs.filter((_, j) => j !== i))} className="text-white/20 hover:text-red-400 transition-colors mt-2.5"><Trash2 size={16} /></button>}
+                                {form.faqs.length > 1 && <button type="button" onClick={() => set('faqs', form.faqs.filter((_, j) => j !== i))} className="text-[#111827]/20 hover:text-red-400 transition-colors mt-2.5"><Trash2 size={16} /></button>}
                             </div>
                         ))}
                         {form.faqs.length < 6 && <button type="button" onClick={() => set('faqs', [...form.faqs, { q: '', a: '' }])} className="flex items-center gap-2 text-[#FF006E] text-xs font-bold hover:opacity-80 transition-opacity"><Plus size={14} />Agregar pregunta</button>}
                     </div>
 
                     <div className="space-y-2">
-                        <label className="text-xs font-bold uppercase tracking-widest text-white/50">Badges de Confianza</label>
+                        <label className="text-xs font-bold uppercase tracking-widest text-[#111827]/50">Badges de Confianza</label>
                         <div className="flex flex-wrap gap-2">
                             {TRUST_BADGES.map(b => <Chip key={b} label={b} active={form.trustBadges.includes(b)} onClick={() => toggleArr('trustBadges', b)} color="#FFD700" />)}
                         </div>
@@ -584,12 +584,12 @@ export default function CreateLandingPage() {
                     <Input icon={ImageIcon} label="Imagen Principal (Hero)" placeholder="https://tu-sitio.com/imagen-hero.jpg" value={form.mainImageUrl} onChange={(e: any) => set('mainImageUrl', e.target.value)} />
 
                     <div className="space-y-2">
-                        <label className="text-xs font-bold uppercase tracking-widest text-white/50 flex items-center gap-1.5"><ImageIcon size={12} />Imágenes Adicionales (hasta 5)</label>
+                        <label className="text-xs font-bold uppercase tracking-widest text-[#111827]/50 flex items-center gap-1.5"><ImageIcon size={12} />Imágenes Adicionales (hasta 5)</label>
                         <div className="space-y-2">
                             {form.additionalImages.map((img, i) => (
                                 <div key={i} className="flex gap-2">
-                                    <input value={img} onChange={e => { const arr = [...form.additionalImages]; arr[i] = e.target.value; set('additionalImages', arr) }} placeholder={`Imagen ${i + 2} URL`} className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white placeholder-white/25 focus:outline-none focus:border-[#00FF88]/50 text-sm" />
-                                    {form.additionalImages.length > 1 && <button type="button" onClick={() => set('additionalImages', form.additionalImages.filter((_, j) => j !== i))} className="text-white/20 hover:text-red-400 transition-colors"><Trash2 size={16} /></button>}
+                                    <input value={img} onChange={e => { const arr = [...form.additionalImages]; arr[i] = e.target.value; set('additionalImages', arr) }} placeholder={`Imagen ${i + 2} URL`} className="flex-1 bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-4 py-2.5 text-[#111827] placeholder-white/25 focus:outline-none focus:border-[#00FF88]/50 text-sm" />
+                                    {form.additionalImages.length > 1 && <button type="button" onClick={() => set('additionalImages', form.additionalImages.filter((_, j) => j !== i))} className="text-[#111827]/20 hover:text-red-400 transition-colors"><Trash2 size={16} /></button>}
                                 </div>
                             ))}
                             {form.additionalImages.length < 5 && <button type="button" onClick={() => set('additionalImages', [...form.additionalImages, ''])} className="flex items-center gap-2 text-[#00FF88] text-xs font-bold hover:opacity-80 transition-opacity"><Plus size={14} />Agregar imagen</button>}
@@ -600,12 +600,12 @@ export default function CreateLandingPage() {
                     <Input icon={Tv2} label="Video Principal (YouTube URL)" placeholder="https://youtube.com/watch?v=..." value={form.mainVideoUrl} onChange={(e: any) => set('mainVideoUrl', e.target.value)} />
 
                     <div className="space-y-2">
-                        <label className="text-xs font-bold uppercase tracking-widest text-white/50 flex items-center gap-1.5"><Video size={12} />Videos Adicionales (hasta 2)</label>
+                        <label className="text-xs font-bold uppercase tracking-widest text-[#111827]/50 flex items-center gap-1.5"><Video size={12} />Videos Adicionales (hasta 2)</label>
                         <div className="space-y-2">
                             {form.additionalVideos.map((v, i) => (
                                 <div key={i} className="flex gap-2">
-                                    <input value={v} onChange={e => { const arr = [...form.additionalVideos]; arr[i] = e.target.value; set('additionalVideos', arr) }} placeholder={`Video ${i + 2} URL`} className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white placeholder-white/25 focus:outline-none focus:border-[#D203DD]/50 text-sm" />
-                                    {form.additionalVideos.length > 1 && <button type="button" onClick={() => set('additionalVideos', form.additionalVideos.filter((_, j) => j !== i))} className="text-white/20 hover:text-red-400 transition-colors"><Trash2 size={16} /></button>}
+                                    <input value={v} onChange={e => { const arr = [...form.additionalVideos]; arr[i] = e.target.value; set('additionalVideos', arr) }} placeholder={`Video ${i + 2} URL`} className="flex-1 bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-4 py-2.5 text-[#111827] placeholder-white/25 focus:outline-none focus:border-[#D203DD]/50 text-sm" />
+                                    {form.additionalVideos.length > 1 && <button type="button" onClick={() => set('additionalVideos', form.additionalVideos.filter((_, j) => j !== i))} className="text-[#111827]/20 hover:text-red-400 transition-colors"><Trash2 size={16} /></button>}
                                 </div>
                             ))}
                             {form.additionalVideos.length < 2 && <button type="button" onClick={() => set('additionalVideos', [...form.additionalVideos, ''])} className="flex items-center gap-2 text-[#D203DD] text-xs font-bold hover:opacity-80 transition-opacity"><Plus size={14} />Agregar video</button>}
@@ -621,13 +621,13 @@ export default function CreateLandingPage() {
                     <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                         {COLOR_PALETTES.map(p => (
                             <button key={p.id} type="button" onClick={() => { set('colorPalette', p.id); set('primaryColor', p.primary); set('secondaryColor', p.secondary) }}
-                                className={`p-5 rounded-2xl border text-left transition-all ${form.colorPalette === p.id ? 'border-white/40 scale-105 shadow-lg' : 'border-white/10 bg-white/5 hover:border-white/20'}`}
+                                className={`p-5 rounded-2xl border text-left transition-all ${form.colorPalette === p.id ? 'border-white/40 scale-105 shadow-lg' : 'border-[#E4E9F0] bg-[#F4F6FA] hover:border-[#E4E9F0]'}`}
                                 style={form.colorPalette === p.id ? { background: `${p.primary}15`, borderColor: p.primary } : {}}>
                                 <div className="flex gap-2 mb-3">
-                                    {p.preview.map((c, i) => <div key={i} className="w-6 h-6 rounded-full border border-white/10" style={{ background: c }} />)}
+                                    {p.preview.map((c, i) => <div key={i} className="w-6 h-6 rounded-full border border-[#E4E9F0]" style={{ background: c }} />)}
                                 </div>
-                                <div className="text-sm font-black text-white">{p.label}</div>
-                                <div className="text-[10px] text-white/40 mt-1">{p.desc}</div>
+                                <div className="text-sm font-black text-[#111827]">{p.label}</div>
+                                <div className="text-[10px] text-[#111827]/40 mt-1">{p.desc}</div>
                                 {form.colorPalette === p.id && <div className="mt-2 text-[10px] font-black uppercase tracking-widest" style={{ color: p.primary }}>✓ Seleccionado</div>}
                             </button>
                         ))}
@@ -664,8 +664,8 @@ export default function CreateLandingPage() {
                     />
 
                     {/* Summary */}
-                    <div className="bg-white/5 border border-white/10 rounded-2xl p-6 space-y-3">
-                        <h4 className="text-xs font-black uppercase tracking-widest text-white/50 mb-4">Resumen de tu Landing</h4>
+                    <div className="bg-[#F4F6FA] border border-[#E4E9F0] rounded-2xl p-6 space-y-3">
+                        <h4 className="text-xs font-black uppercase tracking-widest text-[#111827]/50 mb-4">Resumen de tu Landing</h4>
                         {[
                             { label: 'Proyecto', value: form.name || '—' },
                             { label: 'Negocio', value: form.businessType || '—' },
@@ -677,8 +677,8 @@ export default function CreateLandingPage() {
                             { label: 'Testimonios', value: `${form.testimonials.filter(t => t.name).length} definidos` },
                         ].map(({ label, value }) => (
                             <div key={label} className="flex justify-between text-sm">
-                                <span className="text-white/40 font-bold">{label}</span>
-                                <span className="text-white text-right max-w-[60%]">{value}</span>
+                                <span className="text-[#111827]/40 font-bold">{label}</span>
+                                <span className="text-[#111827] text-right max-w-[60%]">{value}</span>
                             </div>
                         ))}
                     </div>
@@ -699,13 +699,13 @@ export default function CreateLandingPage() {
                         <button
                             type="button"
                             onClick={() => setMode('html')}
-                            className="w-full py-4 rounded-2xl font-black text-sm uppercase tracking-widest flex items-center justify-center gap-3 bg-white/5 border border-white/20 text-white hover:bg-white/10 transition-all"
+                            className="w-full py-4 rounded-2xl font-black text-sm uppercase tracking-widest flex items-center justify-center gap-3 bg-[#F4F6FA] border border-[#E4E9F0] text-[#111827] hover:bg-[#EEF2F7] transition-all"
                         >
                             <Code size={18} />
                             Usar mi HTML
                         </button>
                     </div>
-                    {(!form.name || !form.description) && <p className="text-white/30 text-xs text-center">Completa al menos el nombre y la descripción del negocio para generar</p>}
+                    {(!form.name || !form.description) && <p className="text-[#111827]/30 text-xs text-center">Completa al menos el nombre y la descripción del negocio para generar</p>}
                 </div>
             )
 
@@ -715,11 +715,12 @@ export default function CreateLandingPage() {
 
     // ─── Layout ───────────────────────────────────────────────────────────────
     return (
-        <div className="min-h-screen bg-[#1C192C] text-white">
+    <div className="dm-page font-ui">
+        <div className="min-h-screen bg-[#1C192C] text-[#111827]">
             {/* Top Nav */}
-            <nav className="h-16 border-b border-white/5 flex items-center justify-between px-4 sm:px-8 bg-[#1C192C]/90 backdrop-blur-xl fixed top-0 left-0 w-full z-50 lg:left-[240px] lg:w-[calc(100%-240px)]">
+            <nav className="h-16 border-b border-[#E4E9F0] flex items-center justify-between px-4 sm:px-8 bg-[#1C192C]/90 backdrop-blur-xl fixed top-0 left-0 w-full z-50 lg:left-[240px] lg:w-[calc(100%-240px)]">
                 <div className="flex items-center gap-3">
-                    <button onClick={() => setMode('select')} className="w-9 h-9 rounded-full border border-white/10 flex items-center justify-center hover:bg-white/10 transition-all">
+                    <button onClick={() => setMode('select')} className="w-9 h-9 rounded-full border border-[#E4E9F0] flex items-center justify-center hover:bg-[#EEF2F7] transition-all">
                         <ArrowLeft size={16} />
                     </button>
                     <div>
@@ -731,44 +732,44 @@ export default function CreateLandingPage() {
                 {/* Step dots — mobile */}
                 <div className="flex items-center gap-1.5 sm:hidden">
                     {STEPS.map(s => (
-                        <div key={s.id} className={`h-1.5 rounded-full transition-all ${s.id === step ? 'w-6 bg-[#00FF88]' : s.id < step ? 'w-1.5 bg-[#00FF88]/40' : 'w-1.5 bg-white/10'}`} />
+                        <div key={s.id} className={`h-1.5 rounded-full transition-all ${s.id === step ? 'w-6 bg-[#00FF88]' : s.id < step ? 'w-1.5 bg-[#00FF88]/40' : 'w-1.5 bg-[#EEF2F7]'}`} />
                     ))}
                 </div>
             </nav>
 
             {/* Step indicator — desktop */}
-            <div className="fixed top-16 left-0 w-full z-40 bg-[#1C192C]/90 backdrop-blur-xl border-b border-white/5 hidden sm:flex items-center justify-center py-4 px-8 gap-2 lg:left-[240px] lg:w-[calc(100%-240px)]">
+            <div className="fixed top-16 left-0 w-full z-40 bg-[#1C192C]/90 backdrop-blur-xl border-b border-[#E4E9F0] hidden sm:flex items-center justify-center py-4 px-8 gap-2 lg:left-[240px] lg:w-[calc(100%-240px)]">
                 {STEPS.map((s, i) => (
                     <div key={s.id} className="flex items-center gap-2">
-                        <button type="button" onClick={() => s.id < step && setStep(s.id)} className={`flex items-center gap-2 transition-all ${s.id === step ? 'text-white' : s.id < step ? 'text-[#00FF88]/70 hover:text-[#00FF88]' : 'text-white/20'}`}>
-                            <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-black border transition-all ${s.id === step ? 'border-[#00FF88] bg-[#00FF88] text-black' : s.id < step ? 'border-[#00FF88]/40 bg-[#00FF88]/10 text-[#00FF88]' : 'border-white/10'}`}>
+                        <button type="button" onClick={() => s.id < step && setStep(s.id)} className={`flex items-center gap-2 transition-all ${s.id === step ? 'text-[#111827]' : s.id < step ? 'text-[#00FF88]/70 hover:text-[#00FF88]' : 'text-[#111827]/20'}`}>
+                            <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-black border transition-all ${s.id === step ? 'border-[#00FF88] bg-[#00FF88] text-black' : s.id < step ? 'border-[#00FF88]/40 bg-[#00FF88]/10 text-[#00FF88]' : 'border-[#E4E9F0]'}`}>
                                 {s.id < step ? <Check size={12} /> : s.id}
                             </div>
                             <span className="text-xs font-bold uppercase tracking-widest">{s.label}</span>
                         </button>
-                        {i < STEPS.length - 1 && <div className={`w-8 h-px ${s.id < step ? 'bg-[#00FF88]/30' : 'bg-white/10'}`} />}
+                        {i < STEPS.length - 1 && <div className={`w-8 h-px ${s.id < step ? 'bg-[#00FF88]/30' : 'bg-[#EEF2F7]'}`} />}
                     </div>
                 ))}
             </div>
 
             {/* Content */}
             <main className="pt-28 sm:pt-36 pb-32 px-4 sm:px-8 max-w-4xl mx-auto">
-                <div className="bg-white/[0.03] border border-white/10 rounded-3xl p-6 sm:p-10">
+                <div className="bg-white border border-[#E4E9F0] rounded-3xl p-6 sm:p-10">
                     {renderStep()}
                 </div>
             </main>
 
             {/* Bottom Nav */}
-            <div className="fixed bottom-[65px] left-0 w-full bg-[#1C192C]/90 backdrop-blur-xl border-t border-white/5 px-4 sm:px-8 py-4 flex items-center justify-between z-50 lg:bottom-0 lg:left-[240px] lg:w-[calc(100%-240px)]">
+            <div className="fixed bottom-[65px] left-0 w-full bg-[#1C192C]/90 backdrop-blur-xl border-t border-[#E4E9F0] px-4 sm:px-8 py-4 flex items-center justify-between z-50 lg:bottom-0 lg:left-[240px] lg:w-[calc(100%-240px)]">
                 <button
                     type="button"
                     onClick={() => setStep(s => s - 1)}
                     disabled={step === 1}
-                    className="flex items-center gap-2 text-white/50 hover:text-white transition-colors disabled:opacity-20 font-bold text-sm"
+                    className="flex items-center gap-2 text-[#111827]/50 hover:text-[#111827] transition-colors disabled:opacity-20 font-bold text-sm"
                 >
                     <ArrowLeft size={16} /> Anterior
                 </button>
-                <span className="text-white/20 text-xs font-bold">{step} / {STEPS.length}</span>
+                <span className="text-[#111827]/20 text-xs font-bold">{step} / {STEPS.length}</span>
                 {step < STEPS.length ? (
                     <button
                         type="button"
@@ -781,5 +782,6 @@ export default function CreateLandingPage() {
                 ) : null}
             </div>
         </div>
+    </div>
     )
 }

@@ -62,8 +62,8 @@ export default function RecursosGaleriaPage() {
         onClick={() => setSelected(value)}
         className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl border text-left transition-all ${
           active
-            ? 'bg-[#D203DD]/15 border-[#D203DD]/50 text-white'
-            : 'bg-white/[0.03] border-white/10 text-white/70 hover:text-white hover:border-white/20'
+            ? 'bg-[#D203DD]/15 border-[#D203DD]/50 text-[#111827]'
+            : 'bg-white border-[#E4E9F0] text-[#111827]/70 hover:text-[#111827] hover:border-[#E4E9F0]'
         } ${empty ? 'opacity-45' : ''}`}
       >
         {/* indicador estilo radio */}
@@ -71,17 +71,18 @@ export default function RecursosGaleriaPage() {
           {active && <span className="w-1.5 h-1.5 rounded-full bg-[#D203DD]" />}
         </span>
         <span className="flex-1 text-sm font-bold truncate">{label}</span>
-        <span className={`text-[10px] font-black px-1.5 py-0.5 rounded-full ${active ? 'bg-[#D203DD]/30 text-white' : 'bg-white/10 text-white/50'}`}>{n}</span>
-        <i className="fa-solid fa-chevron-right text-[10px] text-white/30 md:hidden"></i>
+        <span className={`text-[10px] font-black px-1.5 py-0.5 rounded-full ${active ? 'bg-[#D203DD]/30 text-[#111827]' : 'bg-[#EEF2F7] text-[#111827]/50'}`}>{n}</span>
+        <i className="fa-solid fa-chevron-right text-[10px] text-[#111827]/30 md:hidden"></i>
       </button>
     )
   }
 
   return (
+  <div className="dm-page font-ui">
     <div className="md:flex md:gap-6">
       {/* ── MENÚ VERTICAL DE ÁREAS ── */}
       <aside className={`${selected ? 'hidden md:block' : 'block'} md:w-60 md:shrink-0`}>
-        <h2 className="text-sm font-black text-white/80 mb-3 px-1">Filtrar flyers</h2>
+        <h2 className="text-sm font-black text-[#111827]/80 mb-3 px-1">Filtrar flyers</h2>
         <div className="space-y-1.5">
           <Row value="todas" label="Todas" n={templates.length} />
           {areas.map(a => <Row key={a} value={a} label={a} n={counts[a] || 0} />)}
@@ -92,25 +93,25 @@ export default function RecursosGaleriaPage() {
       <section className={`${selected ? 'block' : 'hidden md:block'} flex-1 min-w-0`}>
         {selected && (
           <button onClick={() => setSelected(null)}
-            className="md:hidden flex items-center gap-2 mb-4 text-sm font-bold text-white/60 hover:text-white transition-all">
+            className="md:hidden flex items-center gap-2 mb-4 text-sm font-bold text-[#111827]/60 hover:text-[#111827] transition-all">
             <i className="fa-solid fa-arrow-left"></i> Áreas
           </button>
         )}
 
         <div className="flex items-center justify-between gap-3 mb-4">
-          <h3 className="text-lg font-black text-white truncate">{titulo}</h3>
-          {!loading && <span className="text-xs text-white/40 shrink-0">{gridItems.length} flyer(s)</span>}
+          <h3 className="text-lg font-black text-[#111827] truncate">{titulo}</h3>
+          {!loading && <span className="text-xs text-[#111827]/40 shrink-0">{gridItems.length} flyer(s)</span>}
         </div>
 
         {loading && (
-          <div className="flex items-center justify-center py-24 text-white/40">
+          <div className="flex items-center justify-center py-24 text-[#111827]/40">
             <i className="fa-solid fa-spinner fa-spin text-2xl"></i>
           </div>
         )}
         {error && <p className="text-red-400 text-sm py-10 text-center">{error}</p>}
 
         {!loading && !error && gridItems.length === 0 && (
-          <div className="text-center py-24 text-white/40">
+          <div className="text-center py-24 text-[#111827]/40">
             <i className="fa-regular fa-image text-4xl mb-3 block opacity-50"></i>
             <p className="text-sm">Todavía no hay flyers{selected && selected !== 'todas' ? ' en esta área' : ''}.</p>
             {isAdmin && <p className="text-xs mt-2">Subí el primero desde <Link href="/admin/recursos" className="underline text-[#D203DD]">Admin → Recursos</Link>.</p>}
@@ -120,7 +121,7 @@ export default function RecursosGaleriaPage() {
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
           {gridItems.map(t => (
             <Link key={t.id} href={`/dashboard/recursos/flyers/${t.id}`}
-              className="group rounded-2xl overflow-hidden border border-white/10 bg-white/[0.03] hover:border-[#D203DD]/40 transition-all active:scale-[0.98]">
+              className="group rounded-2xl overflow-hidden border border-[#E4E9F0] bg-white hover:border-[#D203DD]/40 transition-all active:scale-[0.98]">
               <div className="relative w-full bg-black/30" style={{ aspectRatio: `${t.ancho} / ${t.alto}` }}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={t.thumbUrl || t.fondoUrl} alt={t.nombre} className="w-full h-full object-cover" loading="lazy" />
@@ -131,13 +132,14 @@ export default function RecursosGaleriaPage() {
                 </div>
               </div>
               <div className="p-2.5">
-                <p className="text-xs font-bold text-white truncate">{t.nombre}</p>
-                <p className="text-[10px] text-white/35">{t.categoria}</p>
+                <p className="text-xs font-bold text-[#111827] truncate">{t.nombre}</p>
+                <p className="text-[10px] text-[#111827]/35">{t.categoria}</p>
               </div>
             </Link>
           ))}
         </div>
       </section>
     </div>
+  </div>
   )
 }

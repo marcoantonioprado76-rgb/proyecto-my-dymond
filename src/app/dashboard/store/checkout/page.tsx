@@ -200,7 +200,7 @@ function CheckoutContent() {
     return (
       <div className="flex flex-col items-center justify-center min-h-[50vh] gap-4">
         <AlertCircle className="text-red-400" size={28} />
-        <p className="text-white/50 text-sm">Plan no válido.</p>
+        <p className="text-[#111827]/50 text-sm">Plan no válido.</p>
         <button onClick={() => router.push('/dashboard/store')} className="text-xs text-purple-400 hover:text-purple-300">
           ← Volver a la tienda
         </button>
@@ -216,10 +216,10 @@ function CheckoutContent() {
           <CheckCircle2 size={32} className={isInstant ? 'text-yellow-400' : 'text-green-400'} />
         </div>
         <div>
-          <h2 className="text-xl font-black text-white">
+          <h2 className="text-xl font-black text-[#111827]">
             {isInstant ? (isRenewal ? '¡Plan renovado!' : '¡Plan activado!') : '¡Solicitud enviada!'}
           </h2>
-          <p className="text-sm text-white/40 mt-2 max-w-xs mx-auto">
+          <p className="text-sm text-[#111827]/40 mt-2 max-w-xs mx-auto">
             {isInstant
               ? isRenewal
                 ? 'Tu plan fue renovado por 30 días más. El pago fue verificado en la blockchain.'
@@ -231,7 +231,7 @@ function CheckoutContent() {
                   : `Recibimos tu comprobante. El equipo revisará tu pago y activará tu ${packInfo.name} en menos de 24 horas.`}
           </p>
         </div>
-        <div className="flex items-center gap-2 text-xs text-white/30 bg-white/5 border border-white/8 rounded-xl px-4 py-3">
+        <div className="flex items-center gap-2 text-xs text-[#111827]/30 bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-4 py-3">
           <ShieldCheck size={13} className={isInstant ? 'text-yellow-400' : 'text-green-400'} />
           {isInstant ? 'Plan activo · Verificado on-chain' : 'Tu solicitud está en revisión · Estado: Pendiente'}
         </div>
@@ -248,12 +248,12 @@ function CheckoutContent() {
   const Icon = packInfo.icon
 
   return (
-    <div className="px-4 md:px-6 pt-6 max-w-3xl mx-auto pb-24 text-white space-y-6">
+    <div className="px-4 md:px-6 pt-6 max-w-3xl mx-auto pb-24 text-[#111827] space-y-6">
 
       {/* Back */}
       <button
         onClick={() => router.push('/dashboard/planes')}
-        className="flex items-center gap-2 text-xs text-white/30 hover:text-white/60 transition-colors"
+        className="flex items-center gap-2 text-xs text-[#111827]/30 hover:text-[#111827]/60 transition-colors"
       >
         <ArrowLeft size={13} /> Volver a planes
       </button>
@@ -261,12 +261,12 @@ function CheckoutContent() {
       {/* Header */}
       <div>
         <h1 className="text-xl font-black uppercase tracking-tighter">Checkout</h1>
-        <p className="text-xs text-white/30 mt-0.5">Realiza tu pago y sube el comprobante</p>
+        <p className="text-xs text-[#111827]/30 mt-0.5">Realiza tu pago y sube el comprobante</p>
       </div>
 
       {/* Order summary */}
       <div className={`rounded-2xl border ${packInfo.border} ${packInfo.bg} p-5`}>
-        <p className="text-[10px] font-black uppercase tracking-widest text-white/30 mb-3">Resumen del pedido</p>
+        <p className="text-[10px] font-black uppercase tracking-widest text-[#111827]/30 mb-3">Resumen del pedido</p>
         <div className="flex items-start gap-3 mb-4">
           <div className={`w-10 h-10 rounded-xl border ${packInfo.border} ${packInfo.bg} flex items-center justify-center shrink-0`}>
             <Icon size={18} className={packInfo.color} />
@@ -280,23 +280,23 @@ function CheckoutContent() {
                 </span>
               )}
             </div>
-            <p className="text-xs text-white/30">{isRenewal ? 'Extender 30 días más tu plan actual' : packInfo.tagline}</p>
+            <p className="text-xs text-[#111827]/30">{isRenewal ? 'Extender 30 días más tu plan actual' : packInfo.tagline}</p>
           </div>
         </div>
         <ul className="space-y-1.5 mb-4">
           {packInfo.features.map((f, i) => (
             <li key={i} className="flex items-start gap-2">
               <Check size={11} className={`${packInfo.color} shrink-0 mt-0.5`} />
-              <span className="text-[11px] text-white/50">{f}</span>
+              <span className="text-[11px] text-[#111827]/50">{f}</span>
             </li>
           ))}
         </ul>
         <div className={`pt-3 border-t ${packInfo.border} flex items-center justify-between`}>
-          <span className="text-xs text-white/40 font-bold">Total a pagar</span>
+          <span className="text-xs text-[#111827]/40 font-bold">Total a pagar</span>
           {loadingSettings ? (
-            <Loader2 size={16} className="animate-spin text-white/30" />
+            <Loader2 size={16} className="animate-spin text-[#111827]/30" />
           ) : (
-            <span className="text-2xl font-black text-white">${price?.toFixed(2)} <span className="text-sm text-white/30">USD</span></span>
+            <span className="text-2xl font-black text-[#111827]">${price?.toFixed(2)} <span className="text-sm text-[#111827]/30">USD</span></span>
           )}
         </div>
       </div>
@@ -304,7 +304,7 @@ function CheckoutContent() {
       {/* Tabs: método de pago — solo muestra los habilitados por el admin */}
       {loadingSettings ? (
         <div className="flex items-center justify-center py-4">
-          <Loader2 size={18} className="animate-spin text-white/20" />
+          <Loader2 size={18} className="animate-spin text-[#111827]/20" />
         </div>
       ) : faseGlobalOnly ? null : !cryptoEnabled && !manualEnabled && !faseGlobalEnabled ? (
         <div className="flex items-center gap-3 py-4 px-4 bg-orange-500/8 border border-orange-500/20 rounded-2xl">
@@ -312,11 +312,11 @@ function CheckoutContent() {
           <p className="text-xs text-orange-400 font-bold">Los métodos de pago están temporalmente deshabilitados. Contacta al equipo.</p>
         </div>
       ) : (
-        <div className="flex gap-2 bg-white/[0.025] border border-white/8 rounded-2xl p-1.5 flex-wrap">
+        <div className="flex gap-2 bg-white/[0.025] border border-[#E4E9F0] rounded-2xl p-1.5 flex-wrap">
           {cryptoEnabled && (
             <button
               onClick={() => { setPaymentMethod('CRYPTO'); setProofUrl(''); setError('') }}
-              className={`flex-1 py-2.5 rounded-xl text-xs font-black transition-all whitespace-nowrap ${paymentMethod === 'CRYPTO' ? 'bg-yellow-500 text-black' : 'text-white/40 hover:text-white/60'}`}
+              className={`flex-1 py-2.5 rounded-xl text-xs font-black transition-all whitespace-nowrap ${paymentMethod === 'CRYPTO' ? 'bg-yellow-500 text-black' : 'text-[#111827]/40 hover:text-[#111827]/60'}`}
             >
               ₮ Pagar con USDT
             </button>
@@ -324,7 +324,7 @@ function CheckoutContent() {
           {manualEnabled && (
             <button
               onClick={() => { setPaymentMethod('MANUAL'); setProofUrl(''); setError('') }}
-              className={`flex-1 py-2.5 rounded-xl text-xs font-black transition-all whitespace-nowrap ${paymentMethod === 'MANUAL' ? 'bg-white/10 text-white' : 'text-white/40 hover:text-white/60'}`}
+              className={`flex-1 py-2.5 rounded-xl text-xs font-black transition-all whitespace-nowrap ${paymentMethod === 'MANUAL' ? 'bg-[#EEF2F7] text-[#111827]' : 'text-[#111827]/40 hover:text-[#111827]/60'}`}
             >
               🏦 Transferencia
             </button>
@@ -332,7 +332,7 @@ function CheckoutContent() {
           {faseGlobalEnabled && (
             <button
               onClick={() => { setPaymentMethod('FASE_GLOBAL'); setProofUrl(''); setError('') }}
-              className={`flex-1 py-2.5 rounded-xl text-xs font-black transition-all whitespace-nowrap ${paymentMethod === 'FASE_GLOBAL' ? 'bg-green-600 text-white' : 'text-white/40 hover:text-white/60'}`}
+              className={`flex-1 py-2.5 rounded-xl text-xs font-black transition-all whitespace-nowrap ${paymentMethod === 'FASE_GLOBAL' ? 'bg-green-600 text-[#111827]' : 'text-[#111827]/40 hover:text-[#111827]/60'}`}
             >
               🌐 Fase Global
             </button>
@@ -342,7 +342,7 @@ function CheckoutContent() {
 
       {/* Pago CRYPTO */}
       {paymentMethod === 'CRYPTO' && cryptoEnabled && price !== null && (
-        <div className="bg-white/[0.025] border border-white/8 rounded-2xl p-5">
+        <div className="bg-white/[0.025] border border-[#E4E9F0] rounded-2xl p-5">
           <PaymentGateway
             plan={plan}
             price={price}
@@ -367,7 +367,7 @@ function CheckoutContent() {
       </div>
 
       {/* Step 1: QR de pago */}
-      <div className="bg-white/[0.025] border border-white/8 rounded-2xl p-5 space-y-4">
+      <div className="bg-white/[0.025] border border-[#E4E9F0] rounded-2xl p-5 space-y-4">
         <div className="flex items-center gap-2 mb-1">
           <div className="w-5 h-5 rounded-full bg-purple-600 flex items-center justify-center text-[10px] font-black">1</div>
           <p className="text-sm font-black">Escanea el QR y realiza tu pago</p>
@@ -375,15 +375,15 @@ function CheckoutContent() {
 
         {loadingSettings ? (
           <div className="flex items-center justify-center py-8">
-            <Loader2 className="animate-spin text-white/30" size={20} />
+            <Loader2 className="animate-spin text-[#111827]/30" size={20} />
           </div>
         ) : paymentQrUrl ? (
           <div className="flex flex-col sm:flex-row items-center gap-5">
-            <div className="w-40 h-40 rounded-2xl bg-white flex items-center justify-center border border-white/20 shrink-0 overflow-hidden">
+            <div className="w-40 h-40 rounded-2xl bg-white flex items-center justify-center border border-[#E4E9F0] shrink-0 overflow-hidden">
               <img src={paymentQrUrl} alt="QR de pago" className="w-full h-full object-contain p-2" />
             </div>
             <div className="text-center sm:text-left space-y-2">
-              <p className="text-xs text-white/50 leading-relaxed">
+              <p className="text-xs text-[#111827]/50 leading-relaxed">
                 Escanea el QR con tu app de billetera (Binance, Trust Wallet, MetaMask, etc.) y realiza el pago por exactamente:
               </p>
               <p className="text-2xl font-black text-yellow-400">${price?.toFixed(2)} USD</p>
@@ -409,12 +409,12 @@ function CheckoutContent() {
       </div>
 
       {/* Step 2: Upload proof */}
-      <div className="bg-white/[0.025] border border-white/8 rounded-2xl p-5 space-y-4">
+      <div className="bg-white/[0.025] border border-[#E4E9F0] rounded-2xl p-5 space-y-4">
         <div className="flex items-center gap-2">
           <div className="w-5 h-5 rounded-full bg-purple-600 flex items-center justify-center text-[10px] font-black">2</div>
           <p className="text-sm font-black">Sube tu comprobante de pago</p>
         </div>
-        <p className="text-xs text-white/40">
+        <p className="text-xs text-[#111827]/40">
           Después de realizar el pago, toma una captura de pantalla o foto del comprobante y súbela aquí.
         </p>
 
@@ -441,7 +441,7 @@ function CheckoutContent() {
               </div>
               <button
                 onClick={() => { setProofUrl(''); if (proofInputRef.current) proofInputRef.current.value = '' }}
-                className="text-xs text-white/30 hover:text-red-400 transition-colors"
+                className="text-xs text-[#111827]/30 hover:text-red-400 transition-colors"
               >
                 Cambiar
               </button>
@@ -451,7 +451,7 @@ function CheckoutContent() {
           <button
             onClick={() => proofInputRef.current?.click()}
             disabled={uploading}
-            className="w-full flex flex-col items-center justify-center gap-2 py-8 border-2 border-dashed border-white/10 rounded-xl text-white/30 hover:border-purple-500/40 hover:text-purple-400 transition-colors"
+            className="w-full flex flex-col items-center justify-center gap-2 py-8 border-2 border-dashed border-[#E4E9F0] rounded-xl text-[#111827]/30 hover:border-purple-500/40 hover:text-purple-400 transition-colors"
           >
             {uploading ? (
               <>
@@ -462,7 +462,7 @@ function CheckoutContent() {
               <>
                 <Upload size={20} />
                 <span className="text-xs font-bold">Subir comprobante de pago</span>
-                <span className="text-[10px] text-white/20">PNG, JPG, PDF</span>
+                <span className="text-[10px] text-[#111827]/20">PNG, JPG, PDF</span>
               </>
             )}
           </button>
@@ -481,7 +481,7 @@ function CheckoutContent() {
       <button
         onClick={submit}
         disabled={submitting || !proofUrl || uploading}
-        className="w-full flex items-center justify-center gap-2 py-3.5 rounded-2xl bg-purple-600 hover:bg-purple-500 text-white font-black text-sm transition-all active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed"
+        className="w-full flex items-center justify-center gap-2 py-3.5 rounded-2xl bg-purple-600 hover:bg-purple-500 text-[#111827] font-black text-sm transition-all active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed"
       >
         {submitting ? (
           <><Loader2 size={15} className="animate-spin" /> Enviando solicitud...</>
@@ -490,7 +490,7 @@ function CheckoutContent() {
         )}
       </button>
 
-      <p className="text-center text-[11px] text-white/20">
+      <p className="text-center text-[11px] text-[#111827]/20">
         El equipo revisará tu comprobante y activará tu plan en menos de 24 horas.
       </p>
         </>
@@ -523,12 +523,12 @@ function CheckoutContent() {
           </div>
 
           {/* Step 1: Comprobante */}
-          <div className="bg-white/[0.025] border border-white/8 rounded-2xl p-5 space-y-4">
+          <div className="bg-white/[0.025] border border-[#E4E9F0] rounded-2xl p-5 space-y-4">
             <div className="flex items-center gap-2">
               <div className="w-5 h-5 rounded-full bg-green-600 flex items-center justify-center text-[10px] font-black">1</div>
               <p className="text-sm font-black">Sube tu comprobante de recompra</p>
             </div>
-            <p className="text-xs text-white/40">
+            <p className="text-xs text-[#111827]/40">
               Toma una foto o captura de pantalla de tu comprobante de recompra en Fase Global y súbela aquí.
             </p>
 
@@ -555,7 +555,7 @@ function CheckoutContent() {
                   </div>
                   <button
                     onClick={() => { setProofUrl(''); if (faseProofInputRef.current) faseProofInputRef.current.value = '' }}
-                    className="text-xs text-white/30 hover:text-red-400 transition-colors"
+                    className="text-xs text-[#111827]/30 hover:text-red-400 transition-colors"
                   >
                     Cambiar
                   </button>
@@ -565,46 +565,46 @@ function CheckoutContent() {
               <button
                 onClick={() => faseProofInputRef.current?.click()}
                 disabled={uploading}
-                className="w-full flex flex-col items-center justify-center gap-2 py-8 border-2 border-dashed border-white/10 rounded-xl text-white/30 hover:border-green-500/40 hover:text-green-400 transition-colors"
+                className="w-full flex flex-col items-center justify-center gap-2 py-8 border-2 border-dashed border-[#E4E9F0] rounded-xl text-[#111827]/30 hover:border-green-500/40 hover:text-green-400 transition-colors"
               >
                 {uploading ? (
                   <><Loader2 size={20} className="animate-spin" /><span className="text-xs">Subiendo...</span></>
                 ) : (
-                  <><Upload size={20} /><span className="text-xs font-bold">Subir comprobante</span><span className="text-[10px] text-white/20">PNG, JPG</span></>
+                  <><Upload size={20} /><span className="text-xs font-bold">Subir comprobante</span><span className="text-[10px] text-[#111827]/20">PNG, JPG</span></>
                 )}
               </button>
             )}
           </div>
 
           {/* Step 2: Código de Fase Global */}
-          <div className="bg-white/[0.025] border border-white/8 rounded-2xl p-5 space-y-3">
+          <div className="bg-white/[0.025] border border-[#E4E9F0] rounded-2xl p-5 space-y-3">
             <div className="flex items-center gap-2">
               <div className="w-5 h-5 rounded-full bg-green-600 flex items-center justify-center text-[10px] font-black">2</div>
               <p className="text-sm font-black">Código de Fase Global <span className="text-red-400">*</span></p>
             </div>
-            <p className="text-xs text-white/40">Ingresa tu código de miembro o usuario de Fase Global.</p>
+            <p className="text-xs text-[#111827]/40">Ingresa tu código de miembro o usuario de Fase Global.</p>
             <input
               type="text"
               value={faseGlobalCode}
               onChange={e => setFaseGlobalCode(e.target.value)}
               placeholder="Ej: FG-123456"
-              className="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-white/20 focus:outline-none focus:border-green-500/50 transition-colors"
+              className="w-full bg-black/30 border border-[#E4E9F0] rounded-xl px-4 py-3 text-sm text-white placeholder-white/20 focus:outline-none focus:border-green-500/50 transition-colors"
             />
           </div>
 
           {/* Step 3: Mensaje */}
-          <div className="bg-white/[0.025] border border-white/8 rounded-2xl p-5 space-y-3">
+          <div className="bg-white/[0.025] border border-[#E4E9F0] rounded-2xl p-5 space-y-3">
             <div className="flex items-center gap-2">
               <div className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center text-[10px] font-black">3</div>
-              <p className="text-sm font-black">Mensaje / Nota <span className="text-white/30 text-xs font-normal">(opcional)</span></p>
+              <p className="text-sm font-black">Mensaje / Nota <span className="text-[#111827]/30 text-xs font-normal">(opcional)</span></p>
             </div>
-            <p className="text-xs text-white/40">¿Tienes algún mensaje o información adicional para el equipo?</p>
+            <p className="text-xs text-[#111827]/40">¿Tienes algún mensaje o información adicional para el equipo?</p>
             <textarea
               value={faseGlobalNote}
               onChange={e => setFaseGlobalNote(e.target.value)}
               placeholder="Escribe tu mensaje aquí..."
               rows={3}
-              className="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-white/20 focus:outline-none focus:border-green-500/50 transition-colors resize-none"
+              className="w-full bg-black/30 border border-[#E4E9F0] rounded-xl px-4 py-3 text-sm text-white placeholder-white/20 focus:outline-none focus:border-green-500/50 transition-colors resize-none"
             />
           </div>
 
@@ -629,7 +629,7 @@ function CheckoutContent() {
             )}
           </button>
 
-          <p className="text-center text-[11px] text-white/20">
+          <p className="text-center text-[11px] text-[#111827]/20">
             El equipo verificará tu recompra y activará tu Pack Básico en menos de 24 horas.
           </p>
         </>
@@ -640,6 +640,7 @@ function CheckoutContent() {
 
 export default function CheckoutPage() {
   return (
+  <div className="dm-page font-ui">
     <Suspense fallback={
       <div className="flex items-center justify-center min-h-[50vh]">
         <Loader2 className="animate-spin text-purple-400" size={28} />
@@ -647,5 +648,6 @@ export default function CheckoutPage() {
     }>
       <CheckoutContent />
     </Suspense>
+  </div>
   )
 }

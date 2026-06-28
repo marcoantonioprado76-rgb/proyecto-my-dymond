@@ -45,15 +45,16 @@ export default function MyOrdersPage() {
   }, [])
 
   return (
+  <div className="dm-page font-ui">
     <div className="px-4 sm:px-6 pt-6 pb-12 max-w-3xl mx-auto">
-      <Link href="/dashboard/store" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 13, color: 'rgba(255,255,255,0.4)', textDecoration: 'none', marginBottom: 24 }}>
+      <Link href="/dashboard/store" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 13, color: '#6B7280', textDecoration: 'none', marginBottom: 24 }}>
         ← Volver a la tienda
       </Link>
 
       <div className="mb-6">
-        <h1 className="text-xl font-bold text-white uppercase tracking-widest">Mis Pedidos</h1>
+        <h1 className="text-xl font-bold text-[#111827] uppercase tracking-widest">Mis Pedidos</h1>
         <div className="h-px w-20 mt-2 rounded-full" style={{ background: 'linear-gradient(90deg, transparent, #D203DD, #FF2DF7, transparent)' }} />
-        <p className="text-xs mt-2" style={{ color: 'rgba(255,255,255,0.3)' }}>Historial de compras en la tienda MY DIAMOND.</p>
+        <p className="text-xs mt-2" style={{ color: '#6B7280' }}>Historial de compras en la tienda MY DIAMOND.</p>
       </div>
 
       {loading && (
@@ -65,8 +66,8 @@ export default function MyOrdersPage() {
       {!loading && orders.length === 0 && (
         <div className="flex flex-col items-center justify-center py-20 text-center">
           <div style={{ fontSize: 40, marginBottom: 12 }}>📦</div>
-          <p className="text-sm" style={{ color: 'rgba(255,255,255,0.35)', marginBottom: 16 }}>No tienes pedidos aún.</p>
-          <Link href="/dashboard/store" style={{ color: '#D203DD', fontSize: 13, textDecoration: 'none', border: '1px solid rgba(255,255,255,0.15)', borderRadius: 8, padding: '7px 16px' }}>
+          <p className="text-sm" style={{ color: '#6B7280', marginBottom: 16 }}>No tienes pedidos aún.</p>
+          <Link href="/dashboard/store" style={{ color: '#D203DD', fontSize: 13, textDecoration: 'none', border: '1px solid #E4E9F0', borderRadius: 8, padding: '7px 16px' }}>
             Ir a la tienda
           </Link>
         </div>
@@ -77,12 +78,12 @@ export default function MyOrdersPage() {
           {orders.map(order => {
             const st = STATUS[order.status] ?? STATUS['PENDING']
             return (
-              <div key={order.id} style={{ background: 'linear-gradient(135deg, rgba(154,203,255,0.12) 0%, rgba(255,125,224,0.12) 50%, rgba(162,102,255,0.12) 100%)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: 16, overflow: 'hidden' }}>
+              <div key={order.id} style={{ background: 'linear-gradient(135deg, rgba(154,203,255,0.12) 0%, rgba(255,125,224,0.12) 50%, rgba(162,102,255,0.12) 100%)', border: '1px solid #E4E9F0', borderRadius: 16, overflow: 'hidden' }}>
                 {/* Header */}
-                <div style={{ padding: '14px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8, borderBottom: '1px solid rgba(255,255,255,0.15)' }}>
+                <div style={{ padding: '14px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8, borderBottom: '1px solid #E4E9F0' }}>
                   <div>
                     <p style={{ fontSize: 12, fontWeight: 700, color: '#fff', letterSpacing: '0.05em' }}>#{order.id.slice(0, 8).toUpperCase()}</p>
-                    <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.25)', marginTop: 2 }}>
+                    <p style={{ fontSize: 11, color: '#9CA3AF', marginTop: 2 }}>
                       {new Date(order.createdAt).toLocaleString('es-BO', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', timeZone: 'America/La_Paz' })}
                       {' · '}{order.city}, {order.country}
                     </p>
@@ -103,7 +104,7 @@ export default function MyOrdersPage() {
                         </div>
                         <div style={{ flex: 1, minWidth: 0 }}>
                           <p style={{ fontSize: 13, fontWeight: 600, color: '#fff', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{oi.item.title}</p>
-                          <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.3)' }}>
+                          <p style={{ fontSize: 11, color: '#6B7280' }}>
                             {Object.entries(oi.selectedVariants).map(([k, v]) => `${k}: ${v}`).join(' · ')}
                             {Object.keys(oi.selectedVariants).length > 0 && ' · '}
                             x{oi.quantity} · {(oi.priceSnapshot * oi.quantity).toFixed(2)} USDT
@@ -115,7 +116,7 @@ export default function MyOrdersPage() {
                 </div>
 
                 {/* Footer */}
-                <div style={{ padding: '10px 16px', borderTop: '1px solid rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8 }}>
+                <div style={{ padding: '10px 16px', borderTop: '1px solid #F0F3F7', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8 }}>
                   <div>
                     <span style={{ fontSize: 13, fontWeight: 800, color: '#F5A623' }}>{order.totalPrice.toFixed(2)} USDT</span>
                   </div>
@@ -135,5 +136,6 @@ export default function MyOrdersPage() {
         </div>
       )}
     </div>
+  </div>
   )
 }

@@ -56,7 +56,7 @@ function DetailModal({ node, onClose }: { node: TreeNode; onClose: () => void })
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4" onClick={onClose}>
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
       <div
-        className="relative w-full max-w-sm rounded-2xl overflow-hidden z-10 bg-[#111] border border-white/10"
+        className="relative w-full max-w-sm rounded-2xl overflow-hidden z-10 bg-[#111] border border-[#E4E9F0]"
         onClick={e => e.stopPropagation()}
       >
         <div className="px-5 pt-5 pb-4 flex items-center gap-4">
@@ -64,15 +64,15 @@ function DetailModal({ node, onClose }: { node: TreeNode; onClose: () => void })
             {node.fullName.charAt(0).toUpperCase()}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-semibold text-white truncate">{node.fullName}</p>
-            <p className="text-xs text-white/35 mt-0.5">@{node.username}</p>
+            <p className="text-sm font-semibold text-[#111827] truncate">{node.fullName}</p>
+            <p className="text-xs text-[#111827]/35 mt-0.5">@{node.username}</p>
             <span className={`inline-block text-[10px] px-2 py-0.5 rounded-full mt-1.5 border ${active ? 'bg-emerald-400/8 border-emerald-400/20 text-emerald-400' : 'bg-red-400/8 border-red-400/20 text-red-400'}`}>
               {active ? 'Activo' : 'Inactivo'}
             </span>
           </div>
           <button
             onClick={onClose}
-            className="shrink-0 w-8 h-8 rounded-xl flex items-center justify-center bg-white/5 border border-white/8 text-white/30 hover:text-white/60 transition-colors"
+            className="shrink-0 w-8 h-8 rounded-xl flex items-center justify-center bg-[#F4F6FA] border border-[#E4E9F0] text-[#111827]/30 hover:text-[#111827]/60 transition-colors"
           >
             <X size={14} />
           </button>
@@ -81,21 +81,21 @@ function DetailModal({ node, onClose }: { node: TreeNode; onClose: () => void })
         <div className="mx-5 h-px bg-white/6" />
 
         <div className="grid grid-cols-2 gap-2.5 p-5">
-          <div className="col-span-2 bg-white/[0.03] border border-white/8 rounded-xl p-3.5 flex items-center gap-3">
-            <Crown size={14} className="text-white/30 shrink-0" />
+          <div className="col-span-2 bg-white border border-[#E4E9F0] rounded-xl p-3.5 flex items-center gap-3">
+            <Crown size={14} className="text-[#111827]/30 shrink-0" />
             <div>
-              <p className="text-[9px] text-white/25 uppercase tracking-widest">Plan adquirido</p>
-              <p className="text-sm font-medium text-white/70 mt-0.5">{plan}</p>
+              <p className="text-[9px] text-[#111827]/25 uppercase tracking-widest">Plan adquirido</p>
+              <p className="text-sm font-medium text-[#111827]/70 mt-0.5">{plan}</p>
             </div>
           </div>
-          <div className="bg-white/[0.03] border border-white/8 rounded-xl p-3.5">
-            <Network size={13} className="text-white/30 mb-2" />
-            <p className="text-2xl font-semibold text-white/80">{node.directCount}</p>
-            <p className="text-[9px] text-white/25 uppercase tracking-widest mt-0.5">Directos</p>
+          <div className="bg-white border border-[#E4E9F0] rounded-xl p-3.5">
+            <Network size={13} className="text-[#111827]/30 mb-2" />
+            <p className="text-2xl font-semibold text-[#111827]/80">{node.directCount}</p>
+            <p className="text-[9px] text-[#111827]/25 uppercase tracking-widest mt-0.5">Directos</p>
           </div>
-          <div className="bg-white/[0.03] border border-white/8 rounded-xl p-3.5">
-            <p className="text-[9px] text-white/25 uppercase tracking-widest mb-2">Nivel</p>
-            <p className="text-2xl font-semibold text-white/80">{node.level}</p>
+          <div className="bg-white border border-[#E4E9F0] rounded-xl p-3.5">
+            <p className="text-[9px] text-[#111827]/25 uppercase tracking-widest mb-2">Nivel</p>
+            <p className="text-2xl font-semibold text-[#111827]/80">{node.level}</p>
           </div>
         </div>
       </div>
@@ -110,15 +110,15 @@ function RecursiveNode({ node, onDetail }: { node: TreeNode; onDetail: (n: TreeN
     <li className="mlm-child">
       <div className="flex flex-col items-center gap-1.5 select-none" style={{ width: 80 }}>
         <div
-          className={`relative w-14 h-14 rounded-2xl flex items-center justify-center text-base font-semibold cursor-pointer transition-all active:scale-90 border ${active ? 'bg-emerald-400/8 border-emerald-400/20 text-emerald-400' : 'bg-white/[0.03] border-white/10 text-white/30'}`}
+          className={`relative w-14 h-14 rounded-2xl flex items-center justify-center text-base font-semibold cursor-pointer transition-all active:scale-90 border ${active ? 'bg-emerald-400/8 border-emerald-400/20 text-emerald-400' : 'bg-white border-[#E4E9F0] text-white/30'}`}
           onClick={() => onDetail(node)}
         >
           {node.fullName.charAt(0).toUpperCase()}
-          <span className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-white/10 border border-white/15 flex items-center justify-center text-[8px] font-bold text-white/50">
+          <span className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-[#EEF2F7] border border-[#E4E9F0] flex items-center justify-center text-[8px] font-bold text-[#111827]/50">
             {node.level}
           </span>
         </div>
-        <p className="text-[10px] font-medium text-white/60 text-center leading-tight w-full truncate px-1">
+        <p className="text-[10px] font-medium text-[#111827]/60 text-center leading-tight w-full truncate px-1">
           {node.fullName.split(' ')[0]}
         </p>
       </div>
@@ -137,12 +137,12 @@ function RecursiveNode({ node, onDetail }: { node: TreeNode; onDetail: (n: TreeN
 function RootCard({ name, username, isActive }: { name: string; username: string; isActive: boolean }) {
   return (
     <div className="flex flex-col items-center gap-1.5">
-      <div className="relative w-20 h-20 rounded-2xl flex items-center justify-center text-2xl font-semibold border-2 bg-white/5 border-white/20 text-white/70">
+      <div className="relative w-20 h-20 rounded-2xl flex items-center justify-center text-2xl font-semibold border-2 bg-[#F4F6FA] border-[#E4E9F0] text-[#111827]/70">
         <UserCircle2 size={32} />
         <span className={`absolute -bottom-1 -right-1 w-3.5 h-3.5 rounded-full border-2 border-black ${isActive ? 'bg-emerald-400' : 'bg-red-400/70'}`} />
       </div>
-      <p className="text-sm font-medium text-white/70 mt-0.5">{name}</p>
-      <p className="text-[10px] text-white/25">@{username} · Tú</p>
+      <p className="text-sm font-medium text-[#111827]/70 mt-0.5">{name}</p>
+      <p className="text-[10px] text-[#111827]/25">@{username} · Tú</p>
     </div>
   )
 }
@@ -246,13 +246,13 @@ function PanZoomCanvas({ children, color = '#D203DD' }: { children: React.ReactN
       <div className="absolute top-0 left-0 right-0 h-px z-10" style={{ background: `linear-gradient(90deg, transparent, ${color}70, transparent)` }} />
       {/* Controls */}
       <div className="absolute top-3 right-3 z-10 flex flex-col gap-1.5">
-        <button onClick={() => setScale(s => clampScale(s * 1.2))} className="w-8 h-8 flex items-center justify-center rounded-xl bg-black/50 border border-white/10 text-white/40 hover:text-white/70 transition-colors backdrop-blur-sm">
+        <button onClick={() => setScale(s => clampScale(s * 1.2))} className="w-8 h-8 flex items-center justify-center rounded-xl bg-black/50 border border-[#E4E9F0] text-white/40 hover:text-white/70 transition-colors backdrop-blur-sm">
           <ZoomIn size={14} />
         </button>
-        <button onClick={() => setScale(s => clampScale(s * 0.8))} className="w-8 h-8 flex items-center justify-center rounded-xl bg-black/50 border border-white/10 text-white/40 hover:text-white/70 transition-colors backdrop-blur-sm">
+        <button onClick={() => setScale(s => clampScale(s * 0.8))} className="w-8 h-8 flex items-center justify-center rounded-xl bg-black/50 border border-[#E4E9F0] text-white/40 hover:text-white/70 transition-colors backdrop-blur-sm">
           <ZoomOut size={14} />
         </button>
-        <button onClick={reset} className="w-8 h-8 flex items-center justify-center rounded-xl bg-black/50 border border-white/10 text-white/40 hover:text-white/70 transition-colors backdrop-blur-sm">
+        <button onClick={reset} className="w-8 h-8 flex items-center justify-center rounded-xl bg-black/50 border border-[#E4E9F0] text-white/40 hover:text-white/70 transition-colors backdrop-blur-sm">
           <Maximize2 size={13} />
         </button>
       </div>
@@ -306,7 +306,7 @@ export default function NetworkPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="w-8 h-8 border-2 border-white/10 border-t-white/50 rounded-full animate-spin" />
+        <div className="w-8 h-8 border-2 border-[#E4E9F0] border-t-white/50 rounded-full animate-spin" />
       </div>
     )
   }
@@ -314,7 +314,7 @@ export default function NetworkPage() {
   if (!data) {
     return (
       <div className="flex items-center justify-center min-h-[50vh]">
-        <p className="text-sm text-white/25">Error al cargar la red</p>
+        <p className="text-sm text-[#111827]/25">Error al cargar la red</p>
       </div>
     )
   }
@@ -322,17 +322,18 @@ export default function NetworkPage() {
   const { stats, tree, user } = data
 
   return (
-    <div className="px-4 md:px-6 pt-6 max-w-screen-2xl mx-auto pb-24 text-white space-y-4">
+  <div className="dm-page font-ui">
+    <div className="px-4 md:px-6 pt-6 max-w-screen-2xl mx-auto pb-24 text-[#111827] space-y-4">
       <style>{TREE_CSS}</style>
 
       {detail && <DetailModal node={detail} onClose={() => setDetail(null)} />}
 
       {/* ── HEADER ── */}
       <div>
-        <h1 className="text-xl font-semibold text-white flex items-center gap-2">
-          <Users size={18} className="text-white/40" /> Mi Red
+        <h1 className="text-xl font-semibold text-[#111827] flex items-center gap-2">
+          <Users size={18} className="text-[#111827]/40" /> Mi Red
         </h1>
-        <p className="text-sm text-white/30 mt-0.5">
+        <p className="text-sm text-[#111827]/30 mt-0.5">
           {stats.totalNetwork} miembros · {stats.totalActive} activos
         </p>
       </div>
@@ -349,9 +350,9 @@ export default function NetworkPage() {
 
             {tree.length === 0 ? (
               <div className="mt-8 text-center px-6 py-8 rounded-2xl bg-white/[0.015] border border-dashed border-white/6" style={{ minWidth: 260 }}>
-                <Users size={18} className="text-white/10 mx-auto mb-3" />
-                <p className="text-white/25 text-sm">Aún no tienes referidos</p>
-                <p className="text-white/15 text-xs mt-1">Comparte tu link y empieza a construir tu red</p>
+                <Users size={18} className="text-[#111827]/10 mx-auto mb-3" />
+                <p className="text-[#111827]/25 text-sm">Aún no tienes referidos</p>
+                <p className="text-[#111827]/15 text-xs mt-1">Comparte tu link y empieza a construir tu red</p>
               </div>
             ) : (
               <ul className="mlm-children">
@@ -365,11 +366,12 @@ export default function NetworkPage() {
       </PanZoomCanvas>
 
       {/* ── HINT ── */}
-      <p className="text-[10px] text-white/20 text-center">
+      <p className="text-[10px] text-[#111827]/20 text-center">
         Arrastra para mover · Pellizca o usa los botones para zoom · Toca un avatar para ver detalles
       </p>
 
 
     </div>
+  </div>
   )
 }

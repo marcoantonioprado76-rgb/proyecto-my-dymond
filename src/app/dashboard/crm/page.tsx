@@ -114,7 +114,7 @@ export default function CrmPage() {
                 <div className="flex items-center gap-2">
                     <Link
                         href="/dashboard/crm/new"
-                        className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-black uppercase tracking-wide text-white transition-all hover:opacity-90"
+                        className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-black uppercase tracking-wide text-[#111827] transition-all hover:opacity-90"
                         style={{ background: 'linear-gradient(135deg, #FF2D95 0%, #B735B8 48%, #233B8F 100%)' }}
                     >
                         <Plus size={15} /> Nueva campaña

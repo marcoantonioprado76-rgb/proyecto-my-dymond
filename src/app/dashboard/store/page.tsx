@@ -282,7 +282,7 @@ export default function StorePage() {
 
       {/* Quick-add variant modal */}
       {quickItem && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,0.10)', zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}
           onClick={() => setQuickItem(null)}>
           <div style={{ background: '#FFFFFF', border: '1px solid #E4E9F0', borderRadius: 18, width: '100%', maxWidth: 360, padding: 24 }}
             onClick={e => e.stopPropagation()}>

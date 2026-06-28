@@ -51,19 +51,20 @@ export default function PodcastDetailPage() {
 
   if (error || !podcast) return (
     <div className="px-4 sm:px-6 pt-6 max-w-screen-xl mx-auto">
-      <Link href="/dashboard/podcasts" style={{ fontSize: 13, color: 'rgba(255,255,255,0.4)', textDecoration: 'none' }}>← Volver a Podcasts</Link>
+      <Link href="/dashboard/podcasts" style={{ fontSize: 13, color: '#6B7280', textDecoration: 'none' }}>← Volver a Podcasts</Link>
       <p className="text-red-400 text-sm mt-4">{error ?? 'Episodio no encontrado'}</p>
     </div>
   )
 
   return (
+  <div className="dm-page font-ui">
     <div className="px-4 sm:px-6 pt-6 pb-12 max-w-4xl mx-auto">
-      <Link href="/dashboard/podcasts" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 13, color: 'rgba(255,255,255,0.4)', textDecoration: 'none', marginBottom: 20 }}>
+      <Link href="/dashboard/podcasts" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 13, color: '#6B7280', textDecoration: 'none', marginBottom: 20 }}>
         ← Volver a Podcasts
       </Link>
 
       {/* Player */}
-      <div style={{ borderRadius: 14, overflow: 'hidden', border: '1px solid rgba(255,255,255,0.15)', marginBottom: 20 }}>
+      <div style={{ borderRadius: 14, overflow: 'hidden', border: '1px solid #E4E9F0', marginBottom: 20 }}>
         <div style={{ background: 'rgba(210,3,221,0.08)', padding: '12px 16px', display: 'flex', alignItems: 'center', gap: 10 }}>
           <i className="fa-solid fa-microphone" style={{ fontSize: 14, color: '#D203DD' }} />
           <p style={{ fontSize: 14, fontWeight: 700, color: '#fff', margin: 0 }}>{podcast.title}</p>
@@ -71,7 +72,7 @@ export default function PodcastDetailPage() {
         {isDirectAudio(podcast.embedUrl) ? (
           <div style={{ background: 'linear-gradient(135deg, rgba(210,3,221,0.08), rgba(13,11,26,1))', padding: '28px 20px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
             {podcast.coverUrl && (
-              <img src={podcast.coverUrl} alt={podcast.title} style={{ width: 100, height: 100, borderRadius: 12, objectFit: 'cover', border: '1px solid rgba(255,255,255,0.1)' }} />
+              <img src={podcast.coverUrl} alt={podcast.title} style={{ width: 100, height: 100, borderRadius: 12, objectFit: 'cover', border: '1px solid #E4E9F0' }} />
             )}
             <audio
               controls
@@ -96,10 +97,11 @@ export default function PodcastDetailPage() {
 
       {/* Info */}
       {podcast.description && (
-        <div style={{ padding: '16px', borderRadius: 12, background: 'linear-gradient(135deg, rgba(154,203,255,0.12) 0%, rgba(255,125,224,0.12) 50%, rgba(162,102,255,0.12) 100%)', border: '1px solid rgba(255,255,255,0.15)' }}>
-          <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)', lineHeight: 1.7, margin: 0 }}>{podcast.description}</p>
+        <div style={{ padding: '16px', borderRadius: 12, background: 'linear-gradient(135deg, rgba(154,203,255,0.12) 0%, rgba(255,125,224,0.12) 50%, rgba(162,102,255,0.12) 100%)', border: '1px solid #E4E9F0' }}>
+          <p style={{ fontSize: 13, color: '#6B7280', lineHeight: 1.7, margin: 0 }}>{podcast.description}</p>
         </div>
       )}
     </div>
+  </div>
   )
 }
