@@ -85,12 +85,12 @@ function LineChart({ days }: { days: DayData[] }) {
       <defs>
         {/* Conversations — cyan */}
         <linearGradient id="lc-conv-area" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%"   stopColor="#0D1E79" stopOpacity="0.18" />
-          <stop offset="100%" stopColor="#0D1E79" stopOpacity="0" />
+          <stop offset="0%"   stopColor="#7DD3FC" stopOpacity="0.18" />
+          <stop offset="100%" stopColor="#7DD3FC" stopOpacity="0" />
         </linearGradient>
         <linearGradient id="lc-conv-line" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0%"   stopColor="#7DD3FC" />
-          <stop offset="100%" stopColor="#0D1E79" />
+          <stop offset="0%"   stopColor="#BAE6FD" />
+          <stop offset="100%" stopColor="#38BDF8" />
         </linearGradient>
         {/* Sales — green */}
         <linearGradient id="lc-sales-area" x1="0" y1="0" x2="0" y2="1">
@@ -136,7 +136,7 @@ function LineChart({ days }: { days: DayData[] }) {
       {convArea  && <path d={convArea}  fill="url(#lc-conv-area)" />}
       {convLine  && <path d={convLine}  fill="none" stroke="url(#lc-conv-line)"  strokeWidth="1.5" strokeLinejoin="round" strokeLinecap="round" filter="url(#lc-glow-conv)" />}
       {convPts.map((p, i) => p.val === 0 ? null : (
-        <circle key={i} cx={p.x} cy={p.y} r="2.5" fill="#0D1E79" stroke="rgba(15,23,42,0.10)" strokeWidth="1.5" />
+        <circle key={i} cx={p.x} cy={p.y} r="2.5" fill="#38BDF8" stroke="rgba(15,23,42,0.10)" strokeWidth="1.5" />
       ))}
 
       {/* ── Ventas (green) — área + línea + puntos con badges ── */}
@@ -217,7 +217,7 @@ export default function BotReportsPage() {
 
       {/* Header */}
       <div style={{ marginBottom: 24 }}>
-        <h1 style={{ fontSize: 20, fontWeight: 800, color: '#fff', letterSpacing: '0.05em', textTransform: 'uppercase' }}>
+        <h1 style={{ fontSize: 20, fontWeight: 800, color: '#111827', letterSpacing: '0.05em', textTransform: 'uppercase' }}>
           📊 Reportes
         </h1>
         <p style={{ fontSize: 13, color: '#6B7280', marginTop: 4 }}>{botName}</p>
@@ -232,20 +232,20 @@ export default function BotReportsPage() {
           { label: 'Ventas hoy', value: stats.salesToday, color: '#F5A623' },
           { label: 'Conversión', value: `${stats.conversionRate}%`, color: '#FF2DF7' },
         ].map(s => (
-          <div key={s.label} style={{ borderRadius: 14, padding: '14px 16px', background: 'linear-gradient(135deg, rgba(154,203,255,0.12) 0%, rgba(255,125,224,0.12) 50%, rgba(162,102,255,0.12) 100%)', border: '1px solid #E4E9F0' }}>
-            <p style={{ fontSize: 11, fontWeight: 600, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 6 }}>{s.label}</p>
+          <div key={s.label} style={{ borderRadius: 14, padding: '14px 16px', background: 'linear-gradient(180deg, #0B1B2B 0%, #081624 60%, #050B14 100%)', border: '1px solid rgba(255,255,255,0.1)' }}>
+            <p style={{ fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,0.55)', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 6 }}>{s.label}</p>
             <p style={{ fontSize: 26, fontWeight: 900, color: s.color, lineHeight: 1 }}>{s.value}</p>
           </div>
         ))}
       </div>
 
       {/* Chart section */}
-      <div style={{ borderRadius: 16, padding: '20px', background: 'linear-gradient(135deg, rgba(154,203,255,0.12) 0%, rgba(255,125,224,0.12) 50%, rgba(162,102,255,0.12) 100%)', border: '1px solid #E4E9F0', marginBottom: 24 }}>
+      <div style={{ borderRadius: 16, padding: '20px', background: 'linear-gradient(180deg, #0B1B2B 0%, #081624 60%, #050B14 100%)', border: '1px solid rgba(255,255,255,0.1)', marginBottom: 24 }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16, flexWrap: 'wrap', gap: 8 }}>
           <p style={{ fontSize: 13, fontWeight: 700, color: '#fff' }}>Últimos 30 días</p>
           <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
             <span style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 11, color: 'rgba(255,255,255,0.45)' }}>
-              <span style={{ display: 'inline-block', width: 10, height: 3, borderRadius: 99, background: '#0D1E79' }} />
+              <span style={{ display: 'inline-block', width: 10, height: 3, borderRadius: 99, background: '#38BDF8' }} />
               Personas
             </span>
             <span style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 11, color: 'rgba(255,255,255,0.45)' }}>
@@ -261,11 +261,11 @@ export default function BotReportsPage() {
       </div>
 
       {/* Recent sales */}
-      <div style={{ borderRadius: 16, overflow: 'hidden', border: '1px solid rgba(255,255,255,0.07)' }}>
+      <div style={{ borderRadius: 16, overflow: 'hidden', border: '1px solid rgba(255,255,255,0.1)', background: 'linear-gradient(180deg, #0B1B2B 0%, #081624 60%, #050B14 100%)' }}>
         <div style={{ padding: '14px 18px', background: 'rgba(0,255,136,0.04)', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
           <p style={{ fontSize: 13, fontWeight: 700, color: '#fff', margin: 0 }}>
             Ventas recientes
-            <span style={{ marginLeft: 8, fontSize: 11, color: '#6B7280', fontWeight: 500 }}>últimas {recentSales.length}</span>
+            <span style={{ marginLeft: 8, fontSize: 11, color: 'rgba(255,255,255,0.55)', fontWeight: 500 }}>últimas {recentSales.length}</span>
           </p>
         </div>
 
@@ -289,7 +289,7 @@ export default function BotReportsPage() {
                       </p>
                       <p style={{ fontSize: 10, color: '#9CA3AF', margin: 0, flexShrink: 0 }}>{fmtDate(sale.soldAt)}</p>
                     </div>
-                    <span style={{ display: 'inline-block', marginTop: 4, fontSize: 11, color: '#0D1E79', background: 'rgba(13,30,121,0.08)', border: '1px solid rgba(13,30,121,0.18)', borderRadius: 5, padding: '2px 8px', fontWeight: 600, wordBreak: 'break-all' }}>
+                    <span style={{ display: 'inline-block', marginTop: 4, fontSize: 11, color: '#7DD3FC', background: 'rgba(125,211,252,0.08)', border: '1px solid rgba(125,211,252,0.18)', borderRadius: 5, padding: '2px 8px', fontWeight: 600, wordBreak: 'break-all' }}>
                       📞 {sale.userPhone}
                     </span>
                   </div>

@@ -241,8 +241,8 @@ function ClippingPageInner() {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <div className="w-11 h-11 rounded-xl flex items-center justify-center"
-            style={{ background: 'rgba(255,45,85,0.08)', border: '1px solid rgba(255,45,85,0.2)' }}>
-            <Play className="w-5 h-5" style={{ color: '#FF2D55' }} />
+            style={{ background: 'linear-gradient(135deg, #FF2D95 0%, #B735B8 50%, #233B8F 100%)' }}>
+            <Play className="w-5 h-5 text-white" />
           </div>
           <div>
             <h1 className="text-xl font-medium text-[#111827] uppercase tracking-widest">Clipping</h1>
@@ -266,18 +266,18 @@ function ClippingPageInner() {
           { label: 'Total vistas', value: totalViews.toLocaleString(), Icon: Eye, color: '#D203DD' },
         ].map(({ label, value, Icon, color }) => (
           <div key={label} className="rounded-xl p-4"
-            style={{ background: `${color}08`, border: `1px solid ${color}18` }}>
+            style={{ background: 'linear-gradient(180deg, #0B1B2B 0%, #081624 60%, #050B14 100%)', border: '1px solid rgba(255,255,255,0.10)' }}>
             <Icon className="w-4 h-4 mb-2" style={{ color }} />
-            <p className="text-lg font-semibold text-[#111827]">{value}</p>
-            <p className="text-[11px]" style={{ color: '#6B7280' }}>{label}</p>
+            <p className="text-lg font-semibold text-white">{value}</p>
+            <p className="text-[11px] text-white/55">{label}</p>
           </div>
         ))}
       </div>
 
       {/* Connect Accounts */}
       <div className="rounded-2xl p-6 space-y-4"
-        style={{ background: 'linear-gradient(135deg, rgba(154,203,255,0.12) 0%, rgba(255,125,224,0.12) 50%, rgba(162,102,255,0.12) 100%)', border: '1px solid #E4E9F0' }}>
-        <h2 className="text-sm font-semibold text-[#111827] uppercase tracking-widest">Cuentas conectadas</h2>
+        style={{ background: 'linear-gradient(180deg, #0B1B2B 0%, #081624 60%, #050B14 100%)', border: '1px solid rgba(255,255,255,0.10)' }}>
+        <h2 className="text-sm font-semibold text-white uppercase tracking-widest">Cuentas conectadas</h2>
 
         {(['YOUTUBE', 'TIKTOK', 'FACEBOOK'] as Platform[]).map(platform => {
           const account = getAccount(platform)
@@ -292,24 +292,24 @@ function ClippingPageInner() {
 
           return (
             <div key={platform} className="flex items-center justify-between p-4 rounded-xl"
-              style={{ background: `${color}06`, border: `1px solid ${color}15` }}>
+              style={{ background: 'rgba(255,255,255,0.04)', border: `1px solid ${color}30` }}>
               <div className="flex items-center gap-3">
                 <div className="w-8 h-8 rounded-lg flex items-center justify-center"
-                  style={{ background: `${color}15`, color }}>
+                  style={{ background: `${color}22`, color }}>
                   <PlatformIcon />
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-[#111827]">{PLATFORM_LABEL[platform]}</p>
+                  <p className="text-sm font-medium text-white">{PLATFORM_LABEL[platform]}</p>
                   {isYoutube ? (
                     <p className="text-[11px]" style={{ color: '#00FF88' }}>
                       No requiere conexión — usa URL pública
                     </p>
                   ) : account ? (
-                    <p className="text-[11px]" style={{ color: '#6B7280' }}>
+                    <p className="text-[11px] text-white/55">
                       {account.displayName}
                     </p>
                   ) : (
-                    <p className="text-[11px]" style={{ color: '#9CA3AF' }}>
+                    <p className="text-[11px] text-white/40">
                       No conectado
                     </p>
                   )}
@@ -323,8 +323,8 @@ function ClippingPageInner() {
                 </span>
               ) : account ? (
                 <button onClick={() => disconnectAccount(platform)}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-colors hover:bg-[#EEF2F7]"
-                  style={{ color: '#6B7280', border: '1px solid rgba(255,255,255,0.08)' }}>
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-colors text-white/55 hover:bg-white/5 hover:text-white/80"
+                  style={{ border: '1px solid rgba(255,255,255,0.12)' }}>
                   <Unlink className="w-3 h-3" />
                   Desconectar
                 </button>
@@ -343,11 +343,11 @@ function ClippingPageInner() {
 
       {/* Campaigns + Submit */}
       <div className="rounded-2xl p-6 space-y-4"
-        style={{ background: 'linear-gradient(135deg, rgba(154,203,255,0.12) 0%, rgba(255,125,224,0.12) 50%, rgba(162,102,255,0.12) 100%)', border: '1px solid #E4E9F0' }}>
-        <h2 className="text-sm font-semibold text-[#111827] uppercase tracking-widest">Campañas activas</h2>
+        style={{ background: 'linear-gradient(180deg, #0B1B2B 0%, #081624 60%, #050B14 100%)', border: '1px solid rgba(255,255,255,0.10)' }}>
+        <h2 className="text-sm font-semibold text-white uppercase tracking-widest">Campañas activas</h2>
 
         {campaigns.length === 0 ? (
-          <p className="text-sm py-6 text-center" style={{ color: '#9CA3AF' }}>
+          <p className="text-sm py-6 text-center text-white/40">
             No hay campañas activas en este momento
           </p>
         ) : (
@@ -364,13 +364,13 @@ function ClippingPageInner() {
                     onClick={() => setSelectedCampaign(isSelected ? null : c)}
                     className="w-full text-left p-4 rounded-xl transition-all"
                     style={{
-                      background: isSelected ? `${color}10` : `${color}05`,
-                      border: `1px solid ${isSelected ? `${color}35` : `${color}15`}`,
+                      background: isSelected ? 'rgba(255,255,255,0.06)' : 'rgba(255,255,255,0.03)',
+                      border: `1px solid ${isSelected ? `${color}45` : 'rgba(255,255,255,0.10)'}`,
                     }}>
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-3">
                         <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0"
-                          style={{ background: `${color}15`, color }}>
+                          style={{ background: `${color}22`, color }}>
                           {c.platform === 'YOUTUBE'
                             ? <Youtube className="w-3.5 h-3.5" />
                             : c.platform === 'TIKTOK'
@@ -379,8 +379,8 @@ function ClippingPageInner() {
                           }
                         </div>
                         <div>
-                          <p className="text-sm font-medium text-[#111827]">{c.title}</p>
-                          <p className="text-[11px] mt-0.5" style={{ color: '#6B7280' }}>
+                          <p className="text-sm font-medium text-white">{c.title}</p>
+                          <p className="text-[11px] mt-0.5 text-white/55">
                             ${Number(c.cpmUSD).toFixed(2)} por 1,000 vistas · Hold: {c.holdHours}h
                             {c.minViews > 0 && ` · Mín. ${c.minViews.toLocaleString()} vistas`}
                           </p>
@@ -394,13 +394,13 @@ function ClippingPageInner() {
                           </span>
                         )}
                         {isSelected
-                          ? <ChevronUp className="w-4 h-4" style={{ color: '#6B7280' }} />
-                          : <ChevronDown className="w-4 h-4" style={{ color: '#6B7280' }} />
+                          ? <ChevronUp className="w-4 h-4 text-white/55" />
+                          : <ChevronDown className="w-4 h-4 text-white/55" />
                         }
                       </div>
                     </div>
                     {c.description && (
-                      <p className="text-xs mt-2 ml-10" style={{ color: '#6B7280' }}>
+                      <p className="text-xs mt-2 ml-10 text-white/55">
                         {c.description}
                       </p>
                     )}
@@ -409,15 +409,15 @@ function ClippingPageInner() {
                   {/* Submit form for this campaign */}
                   {isSelected && (
                     <div className="mt-2 rounded-xl space-y-0 overflow-hidden"
-                      style={{ border: '1px solid rgba(255,255,255,0.08)' }}>
+                      style={{ border: '1px solid rgba(255,255,255,0.10)' }}>
 
                       {/* Campaign images */}
                       {c.imageUrls && c.imageUrls.length > 0 && (
                         <div className="p-4 space-y-2"
-                          style={{ background: 'linear-gradient(135deg, rgba(154,203,255,0.12) 0%, rgba(255,125,224,0.12) 50%, rgba(162,102,255,0.12) 100%)', borderBottom: '1px solid #E4E9F0' }}>
+                          style={{ background: 'rgba(255,255,255,0.03)', borderBottom: '1px solid rgba(255,255,255,0.10)' }}>
                           <div className="flex items-center gap-2 mb-2">
-                            <Images className="w-3.5 h-3.5" style={{ color: '#D203DD' }} />
-                            <p className="text-[11px] font-semibold uppercase tracking-widest" style={{ color: '#6B7280' }}>
+                            <Images className="w-3.5 h-3.5" style={{ color: '#C9A7FF' }} />
+                            <p className="text-[11px] font-semibold uppercase tracking-widest text-white/55">
                               Material de la campaña
                             </p>
                           </div>
@@ -425,11 +425,11 @@ function ClippingPageInner() {
                             {c.imageUrls.map((url, idx) => (
                               <button key={idx} type="button" onClick={() => setImageModal(url)}
                                 className="relative aspect-square rounded-lg overflow-hidden transition-transform hover:scale-[1.03] active:scale-[0.98] focus:outline-none"
-                                style={{ border: '1px solid #E4E9F0' }}>
+                                style={{ border: '1px solid rgba(255,255,255,0.10)' }}>
                                 <img src={url} alt={`img-${idx + 1}`} className="w-full h-full object-cover" />
                                 <div className="absolute inset-0 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center"
                                   style={{ background: 'rgba(0,0,0,0.45)' }}>
-                                  <Eye className="w-4 h-4 text-[#111827]" />
+                                  <Eye className="w-4 h-4 text-white" />
                                 </div>
                               </button>
                             ))}
@@ -438,7 +438,7 @@ function ClippingPageInner() {
                       )}
 
                     <form onSubmit={handleSubmit} className="p-4 space-y-3"
-                      style={{ background: 'linear-gradient(135deg, rgba(154,203,255,0.12) 0%, rgba(255,125,224,0.12) 50%, rgba(162,102,255,0.12) 100%)' }}>
+                      style={{ background: 'rgba(255,255,255,0.03)' }}>
                       {!hasAccount && (
                         <div className="flex items-center gap-2 text-xs p-3 rounded-lg"
                           style={{ background: 'rgba(255,136,0,0.08)', border: '1px solid rgba(255,136,0,0.2)', color: '#FF8800' }}>
@@ -447,7 +447,7 @@ function ClippingPageInner() {
                         </div>
                       )}
                       <div>
-                        <label className="text-xs font-medium block mb-1.5" style={{ color: '#6B7280' }}>
+                        <label className="text-xs font-medium block mb-1.5 text-white/55">
                           URL del video
                         </label>
                         <input
@@ -461,13 +461,13 @@ function ClippingPageInner() {
                               ? 'https://www.tiktok.com/@usuario/video/...'
                               : 'https://www.facebook.com/video/...'
                           }
-                          className="w-full px-3 py-2.5 rounded-lg text-sm text-[#111827] outline-none transition-colors"
+                          className="w-full px-3 py-2.5 rounded-lg text-sm text-white outline-none transition-colors placeholder:text-white/35"
                           style={{
-                            background: '#F0F3F7',
-                            border: '1px solid #E4E9F0',
+                            background: 'rgba(255,255,255,0.05)',
+                            border: '1px solid rgba(255,255,255,0.10)',
                           }}
                           onFocus={e => { e.target.style.borderColor = `${color}50` }}
-                          onBlur={e => { e.target.style.borderColor = '#E4E9F0' }}
+                          onBlur={e => { e.target.style.borderColor = 'rgba(255,255,255,0.10)' }}
                         />
                       </div>
                       {submitError && (
@@ -492,8 +492,8 @@ function ClippingPageInner() {
       {/* My Submissions */}
       {submissions.length > 0 && (
         <div className="rounded-2xl p-6 space-y-4"
-          style={{ background: 'linear-gradient(135deg, rgba(154,203,255,0.12) 0%, rgba(255,125,224,0.12) 50%, rgba(162,102,255,0.12) 100%)', border: '1px solid #E4E9F0' }}>
-          <h2 className="text-sm font-semibold text-[#111827] uppercase tracking-widest">Mis videos enviados</h2>
+          style={{ background: 'linear-gradient(180deg, #0B1B2B 0%, #081624 60%, #050B14 100%)', border: '1px solid rgba(255,255,255,0.10)' }}>
+          <h2 className="text-sm font-semibold text-white uppercase tracking-widest">Mis videos enviados</h2>
 
           <div className="space-y-3">
             {submissions.map(sub => {
@@ -504,26 +504,26 @@ function ClippingPageInner() {
 
               return (
                 <div key={sub.id} className="p-4 rounded-xl"
-                  style={{ background: 'linear-gradient(135deg, rgba(154,203,255,0.12) 0%, rgba(255,125,224,0.12) 50%, rgba(162,102,255,0.12) 100%)', border: '1px solid #E4E9F0' }}>
+                  style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.10)' }}>
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
                         <span className="text-[10px] px-1.5 py-0.5 rounded-full font-medium"
-                          style={{ background: `${platformColor}15`, color: platformColor, border: `1px solid ${platformColor}25` }}>
+                          style={{ background: `${platformColor}22`, color: platformColor, border: `1px solid ${platformColor}35` }}>
                           {PLATFORM_LABEL[sub.platform]}
                         </span>
-                        <span className="text-xs text-[#111827]/50 truncate">{sub.campaign.title}</span>
+                        <span className="text-xs text-white/40 truncate">{sub.campaign.title}</span>
                       </div>
                       <a href={sub.videoUrl} target="_blank" rel="noopener noreferrer"
-                        className="text-sm font-medium text-[#111827]/80 hover:text-[#111827] truncate block transition-colors">
+                        className="text-sm font-medium text-white/75 hover:text-white truncate block transition-colors">
                         {sub.videoTitle || sub.videoId}
                       </a>
                       <div className="flex items-center gap-4 mt-2">
-                        <span className="text-xs flex items-center gap-1" style={{ color: '#6B7280' }}>
+                        <span className="text-xs flex items-center gap-1 text-white/55">
                           <Eye className="w-3 h-3" />
                           {sub.deltaViews.toLocaleString()} nuevas
                         </span>
-                        <span className="text-xs flex items-center gap-1" style={{ color: '#6B7280' }}>
+                        <span className="text-xs flex items-center gap-1 text-white/55">
                           <TrendingUp className="w-3 h-3" />
                           {sub.currentViews.toLocaleString()} totales
                         </span>
@@ -564,7 +564,7 @@ function ClippingPageInner() {
       {imageModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
           onClick={() => setImageModal(null)}>
-          <button className="absolute top-4 right-4 p-2 rounded-full text-[#111827]/60 hover:text-[#111827] hover:bg-[#EEF2F7] transition-colors"
+          <button className="absolute top-4 right-4 p-2 rounded-full text-white/60 hover:text-white hover:bg-white/10 transition-colors"
             onClick={() => setImageModal(null)}>
             <X className="w-5 h-5" />
           </button>
@@ -572,7 +572,7 @@ function ClippingPageInner() {
             src={imageModal}
             alt="Imagen de campaña"
             className="max-w-full max-h-[85vh] rounded-xl object-contain shadow-2xl"
-            style={{ border: '1px solid #E4E9F0' }}
+            style={{ border: '1px solid rgba(255,255,255,0.10)' }}
             onClick={e => e.stopPropagation()}
           />
         </div>
