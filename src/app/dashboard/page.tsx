@@ -18,9 +18,10 @@ interface DashboardData {
 }
 
 const IMAGES = [
-  'https://i.ibb.co/ksmGqK0R/estrategia-metaverso-de-meta-2025-detalle2-1024x573.jpg',
-  'https://i.ibb.co/Z1vWB05C/estrategia-metaverso-de-meta-2025-detalle1-1024x573.jpg',
-  'https://i.ibb.co/cK5Wv5yG/estrategia-metaverso-de-meta-2025.jpg',
+  '/cover/cover1.jpg',
+  '/cover/cover2.jpg',
+  '/cover/cover3.jpg',
+  '/cover/cover4.jpg',
 ]
 
 // Clipping queda en la lista con hidden:true — oculto visualmente del Inicio
@@ -248,19 +249,43 @@ export default function DashboardPage() {
             </div>
           </header>
 
-          {/* ── HERO premium ── */}
-          <div className="dm-hero" style={{ display: 'flex', alignItems: 'stretch', minHeight: 240 }}>
-            <div style={{ position: 'relative', zIndex: 2, flex: 1, padding: '38px 42px', display: 'flex', flexDirection: 'column', justifyContent: 'center', minWidth: 0 }}>
-              <p style={{ margin: 0, fontSize: 12, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: '#FF6FA8' }}>Bienvenido de nuevo</p>
-              <h1 className="font-display text-silver-gradient" style={{ margin: '4px 0 0', fontSize: 'clamp(34px, 4vw, 52px)', fontWeight: 600, lineHeight: 1, letterSpacing: '-0.01em' }}>{data.user.fullName}</h1>
-              <p style={{ margin: '12px 0 16px', fontSize: 13.5, color: 'rgba(255,255,255,0.5)' }}>@{data.user.username} · MY DIAMOND</p>
-              <Link href="/dashboard/planes" className="dm-badge" style={{ width: 'fit-content', textDecoration: 'none' }}>
-                <i className="fa-solid fa-crown" style={{ fontSize: 11 }} /> {data.user.rank || 'Plan'} · {data.user.isActive ? 'Activo' : 'Inactivo'}
-              </Link>
+          {/* ── COVER (carrusel) + PERFIL — layout referencia, colores diamante ── */}
+          <div style={{ position: 'relative', borderRadius: 28, overflow: 'hidden', minHeight: 320, border: '1px solid #E4E9F0', boxShadow: '0 18px 45px rgba(15,23,42,0.10)' }}>
+            {/* slides del carrusel */}
+            {IMAGES.map((img, i) => (
+              <div key={i} style={{ position: 'absolute', inset: 0, backgroundImage: `url('${img}')`, backgroundSize: 'cover', backgroundPosition: 'center', opacity: imgIdx === i ? 1 : 0, transition: 'opacity 1s ease' }} />
+            ))}
+            {/* overlay para legibilidad + tinte diamante */}
+            <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(8,22,36,0.10) 0%, rgba(8,22,36,0.40) 52%, rgba(8,22,36,0.84) 100%)' }} />
+            <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(circle at 88% 10%, rgba(255,9,108,0.24), transparent 40%)' }} />
+
+            {/* dots del carrusel */}
+            <div style={{ position: 'absolute', top: 16, right: 18, display: 'flex', gap: 7, zIndex: 3 }}>
+              {IMAGES.map((_, i) => (
+                <button key={i} onClick={() => setImgIdx(i)} aria-label={`Slide ${i + 1}`} style={{ width: imgIdx === i ? 24 : 8, height: 8, borderRadius: 999, border: 'none', cursor: 'pointer', padding: 0, background: imgIdx === i ? 'linear-gradient(90deg,#FF2D95,#B735B8,#233B8F)' : 'rgba(255,255,255,0.55)', transition: 'all .3s ease' }} />
+              ))}
             </div>
-            <div className="hidden xl:flex" style={{ position: 'relative', width: 340, alignItems: 'center', justifyContent: 'center', padding: '0 36px 0 0' }}>
-              <div style={{ position: 'absolute', right: 60, top: '50%', transform: 'translateY(-50%)', width: 220, height: 220, borderRadius: '50%', background: 'radial-gradient(circle, rgba(255,9,108,0.28), transparent 60%)', filter: 'blur(8px)' }} />
-              <i className="fa-solid fa-gem" style={{ position: 'relative', fontSize: 96, background: 'var(--dm-silver)', WebkitBackgroundClip: 'text', backgroundClip: 'text', color: 'transparent', filter: 'drop-shadow(0 18px 40px rgba(255,9,108,0.35))' }} />
+
+            {/* perfil sobre el banner (abajo-izquierda) */}
+            <div style={{ position: 'absolute', left: 32, right: 32, bottom: 26, zIndex: 3, display: 'flex', alignItems: 'flex-end', gap: 20 }}>
+              <label htmlFor="avatar-file-cover" style={{ cursor: uploading ? 'not-allowed' : 'pointer', position: 'relative', flexShrink: 0 }} title="Cambiar foto">
+                <input id="avatar-file-cover" type="file" accept="image/*" disabled={uploading} style={{ display: 'none' }} onChange={uploadAvatar} />
+                <div style={{ width: 108, height: 108, borderRadius: '50%', padding: 3, background: 'linear-gradient(135deg,#FF2D95,#B735B8,#233B8F)', boxShadow: '0 14px 34px rgba(255,9,108,0.42)' }}>
+                  <div style={{ width: '100%', height: '100%', borderRadius: '50%', overflow: 'hidden', background: '#0B1B2B', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '3px solid #fff' }}>
+                    {data.user.avatarUrl
+                      ? <img src={data.user.avatarUrl} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      : <i className="fa-solid fa-user" style={{ fontSize: 40, color: 'rgba(255,255,255,0.6)' }} />}
+                  </div>
+                </div>
+                <span style={{ position: 'absolute', right: 7, bottom: 7, width: 18, height: 18, borderRadius: '50%', background: '#16A34A', border: '3px solid #fff' }} title="En línea" />
+              </label>
+              <div style={{ minWidth: 0, paddingBottom: 6 }}>
+                <h1 className="font-display" style={{ margin: 0, fontSize: 'clamp(28px, 3.4vw, 44px)', fontWeight: 600, lineHeight: 1.05, color: '#fff', letterSpacing: '-0.01em', textShadow: '0 2px 18px rgba(0,0,0,0.55)' }}>{data.user.fullName}</h1>
+                <p style={{ margin: '6px 0 11px', fontSize: 14, color: 'rgba(255,255,255,0.85)', textShadow: '0 1px 10px rgba(0,0,0,0.5)' }}>@{data.user.username} · MY DIAMOND</p>
+                <Link href="/dashboard/planes" className="dm-badge" style={{ width: 'fit-content', textDecoration: 'none' }}>
+                  <i className="fa-solid fa-crown" style={{ fontSize: 11 }} /> {data.user.rank || 'Plan'} · {data.user.isActive ? 'Activo' : 'Inactivo'}
+                </Link>
+              </div>
             </div>
           </div>
 
