@@ -19,18 +19,18 @@ const PLATFORM = {
     id: 'META',
     label: 'Meta Ads',
     sub: 'Facebook & Instagram',
-    color: '#0081FB',
-    accent: '#0081FB',
-    accentSoft: 'rgba(0,129,251,0.15)',
-    accentSoftBorder: 'rgba(0,129,251,0.30)',
-    glow: 'rgba(0,129,251,0.18)',
+    color: '#233B8F',
+    accent: '#233B8F',
+    accentSoft: 'rgba(35,59,143,0.15)',
+    accentSoftBorder: 'rgba(35,59,143,0.30)',
+    glow: 'rgba(35,59,143,0.18)',
     letter: 'f',
-    textColor: 'text-blue-400',
+    textColor: 'text-[#233B8F]',
 }
 
 const STATUS_LABELS: Record<string, { label: string; color: string; dot: string; bg: string }> = {
     DRAFT:      { label: 'Borrador',   color: 'text-[#6B7280]',   dot: 'bg-white/25',                 bg: 'bg-[#F4F6FA] border-[#E4E9F0]' },
-    READY:      { label: 'Listo',      color: 'text-blue-400',   dot: 'bg-blue-400',                 bg: 'bg-blue-500/10 border-blue-500/20' },
+    READY:      { label: 'Listo',      color: 'text-[#233B8F]',   dot: 'bg-[#233B8F]',                 bg: 'bg-[#233B8F]/10 border-[#233B8F]/20' },
     PUBLISHING: { label: 'Publicando', color: 'text-[#B735B8]', dot: 'bg-[#B735B8] animate-pulse', bg: 'bg-[#B735B8]/10 border-yellow-500/20' },
     PUBLISHED:  { label: 'Publicado',  color: 'text-emerald-400',dot: 'bg-emerald-400',              bg: 'bg-emerald-500/10 border-emerald-500/20' },
     FAILED:     { label: 'Fallido',    color: 'text-red-400',    dot: 'bg-red-400',                  bg: 'bg-red-500/10 border-red-500/20' },
@@ -42,7 +42,7 @@ export default function MetaAdsDashboard() {
     return (
         <Suspense fallback={
             <div className="flex items-center justify-center min-h-screen">
-                <div className="w-8 h-8 border-2 border-blue-400/30 border-t-blue-400 rounded-full animate-spin" />
+                <div className="w-8 h-8 border-2 border-[#233B8F]/30 border-t-blue-400 rounded-full animate-spin" />
             </div>
         }>
             <MetaAdsDashboardInner />
@@ -148,16 +148,16 @@ function MetaAdsDashboardInner() {
 
             {/* ── HEADER ─────────────────────────────── */}
             <div className="relative rounded-3xl overflow-hidden mb-7 p-6 md:p-8"
-                style={{ background: `linear-gradient(135deg, ${PLATFORM.glow} 0%, rgba(59,130,246,0.06) 50%, rgba(0,0,0,0) 100%)`, border: `1px solid ${PLATFORM.accentSoftBorder}` }}>
+                style={{ background: `linear-gradient(135deg, ${PLATFORM.glow} 0%, rgba(35,59,143,0.06) 50%, rgba(0,0,0,0) 100%)`, border: `1px solid ${PLATFORM.accentSoftBorder}` }}>
 
                 {/* glow orbs */}
-                <div className="pointer-events-none absolute -top-10 -left-10 w-56 h-56 rounded-full blur-[80px]" style={{ background: 'rgba(0,129,251,0.22)' }} />
-                <div className="pointer-events-none absolute -bottom-10 right-20 w-40 h-40 rounded-full blur-[70px]" style={{ background: 'rgba(59,130,246,0.14)' }} />
+                <div className="pointer-events-none absolute -top-10 -left-10 w-56 h-56 rounded-full blur-[80px]" style={{ background: 'rgba(35,59,143,0.22)' }} />
+                <div className="pointer-events-none absolute -bottom-10 right-20 w-40 h-40 rounded-full blur-[70px]" style={{ background: 'rgba(35,59,143,0.14)' }} />
 
                 <div className="relative flex flex-col sm:flex-row sm:items-center justify-between gap-5">
                     <div className="flex items-center gap-4">
                         <div className="rounded-2xl flex items-center justify-center shrink-0"
-                            style={{ background: `linear-gradient(135deg, ${PLATFORM.accent}40, rgba(59,130,246,0.2))`, border: `1px solid ${PLATFORM.accentSoftBorder}`, width: 52, height: 52 }}>
+                            style={{ background: `linear-gradient(135deg, ${PLATFORM.accent}40, rgba(35,59,143,0.2))`, border: `1px solid ${PLATFORM.accentSoftBorder}`, width: 52, height: 52 }}>
                             <Facebook className="text-blue-300" size={22} />
                         </div>
                         <div>
@@ -166,7 +166,7 @@ function MetaAdsDashboardInner() {
                                     Meta Ads
                                 </h1>
                                 <span className="text-2xl md:text-3xl font-black tracking-tight leading-none text-transparent bg-clip-text"
-                                    style={{ backgroundImage: 'linear-gradient(90deg, #60a5fa, #38bdf8)' }}>
+                                    style={{ backgroundImage: 'linear-gradient(90deg, #60a5fa, #B735B8)' }}>
                                     AI
                                 </span>
                             </div>
@@ -177,8 +177,8 @@ function MetaAdsDashboardInner() {
                     <div className="flex items-center gap-2 flex-wrap">
                         <AIKeySelector compact />
                         <Link href={`/dashboard/services/ads/wizard?platform=${PLATFORM_ID}`}
-                            className="flex items-center gap-2 text-[#111827] text-sm font-bold px-5 py-2.5 rounded-xl transition-all active:scale-[0.97] shadow-[0_0_30px_rgba(0,129,251,0.35)]"
-                            style={{ background: `linear-gradient(135deg, ${PLATFORM.accent}, #3b82f6)` }}>
+                            className="flex items-center gap-2 text-[#111827] text-sm font-bold px-5 py-2.5 rounded-xl transition-all active:scale-[0.97] shadow-[0_0_30px_rgba(35,59,143,0.35)]"
+                            style={{ background: `linear-gradient(135deg, #FF2D95 0%, #B735B8 48%, #233B8F 100%)` }}>
                             <Plus size={15} />
                             Nueva Campaña
                         </Link>
@@ -216,8 +216,8 @@ function MetaAdsDashboardInner() {
             {loading ? (
                 <div className="flex flex-col items-center justify-center py-36 gap-4">
                     <div className="relative">
-                        <div className="w-12 h-12 rounded-full border-2 border-blue-500/20 border-t-blue-400 animate-spin" />
-                        <div className="absolute inset-0 rounded-full blur-md" style={{ background: 'rgba(0,129,251,0.14)' }} />
+                        <div className="w-12 h-12 rounded-full border-2 border-[#233B8F]/20 border-t-blue-400 animate-spin" />
+                        <div className="absolute inset-0 rounded-full blur-md" style={{ background: 'rgba(35,59,143,0.14)' }} />
                     </div>
                     <p className="text-[#9CA3AF] text-xs font-medium tracking-widest uppercase">Cargando</p>
                 </div>
@@ -229,13 +229,13 @@ function MetaAdsDashboardInner() {
                         <div className="rounded-3xl p-5 md:p-6" style={{ background: `#FFFFFF`, border: '1px solid #E4E9F0' }}>
                             <div className="flex items-center justify-between mb-4">
                                 <div className="flex items-center gap-2.5">
-                                    <Rocket size={15} className="text-blue-400" />
+                                    <Rocket size={15} className="text-[#233B8F]" />
                                     <span className="font-bold text-sm">Configura Meta Ads</span>
                                 </div>
                                 <div className="flex items-center gap-2">
                                     <div className="flex gap-1">
                                         {[0,1,2].map(i => (
-                                            <div key={i} className={`h-1 w-8 rounded-full transition-all duration-500 ${i < stepsCompleted ? 'bg-blue-400' : 'bg-white/8'}`} />
+                                            <div key={i} className={`h-1 w-8 rounded-full transition-all duration-500 ${i < stepsCompleted ? 'bg-[#233B8F]' : 'bg-white/8'}`} />
                                         ))}
                                     </div>
                                     <span className="text-[10px] text-[#6B7280] font-bold tabular-nums">{stepsCompleted}/3</span>
@@ -252,17 +252,17 @@ function MetaAdsDashboardInner() {
                                         <Link key={idx} href={step.href}
                                             className={`group flex items-center gap-3 p-3.5 rounded-2xl border transition-all active:scale-[0.98] ${step.done
                                                 ? 'bg-emerald-500/5 border-emerald-500/15'
-                                                : 'bg-white/2 border-white/6 hover:border-blue-500/30 hover:bg-blue-500/5'}`}>
-                                            <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${step.done ? 'bg-emerald-500/15' : 'bg-white/4 group-hover:bg-blue-500/12'}`}>
+                                                : 'bg-white/2 border-white/6 hover:border-[#233B8F]/30 hover:bg-[#233B8F]/5'}`}>
+                                            <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${step.done ? 'bg-emerald-500/15' : 'bg-white/4 group-hover:bg-[#233B8F]/12'}`}>
                                                 {step.done
                                                     ? <CheckCircle2 size={15} className="text-emerald-400" />
-                                                    : <Icon size={15} className="text-[#6B7280] group-hover:text-blue-400 transition-colors" />}
+                                                    : <Icon size={15} className="text-[#6B7280] group-hover:text-[#233B8F] transition-colors" />}
                                             </div>
                                             <div className="flex-1 min-w-0">
                                                 <p className="text-xs font-bold truncate">{step.label}</p>
                                                 <p className="text-[10px] text-[#9CA3AF] truncate">{step.done ? '✓ Completado' : step.desc}</p>
                                             </div>
-                                            {!step.done && <ChevronRight size={12} className="text-[#111827]/15 group-hover:text-blue-400 shrink-0 transition-colors" />}
+                                            {!step.done && <ChevronRight size={12} className="text-[#111827]/15 group-hover:text-[#233B8F] shrink-0 transition-colors" />}
                                         </Link>
                                     )
                                 })}
@@ -274,9 +274,9 @@ function MetaAdsDashboardInner() {
                     {metaCampaigns.length > 0 && (
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                             {[
-                                { label: 'Total', value: metaCampaigns.length, icon: Target, color: 'text-[#111827]', accent: 'rgba(0,129,251,0.12)', border: 'rgba(0,129,251,0.22)', iconColor: 'text-blue-400' },
+                                { label: 'Total', value: metaCampaigns.length, icon: Target, color: 'text-[#111827]', accent: 'rgba(35,59,143,0.12)', border: 'rgba(35,59,143,0.22)', iconColor: 'text-[#233B8F]' },
                                 { label: 'Publicadas', value: published, icon: Flame, color: 'text-emerald-400', accent: 'rgba(52,211,153,0.08)', border: 'rgba(52,211,153,0.18)', iconColor: 'text-emerald-400' },
-                                { label: 'Borradores', value: drafts, icon: Clock, color: 'text-blue-400', accent: 'rgba(96,165,250,0.08)', border: 'rgba(96,165,250,0.18)', iconColor: 'text-blue-400' },
+                                { label: 'Borradores', value: drafts, icon: Clock, color: 'text-[#233B8F]', accent: 'rgba(96,165,250,0.08)', border: 'rgba(96,165,250,0.18)', iconColor: 'text-[#233B8F]' },
                                 { label: 'Fallidas', value: failed, icon: XCircle, color: 'text-red-400', accent: 'rgba(248,113,113,0.08)', border: 'rgba(248,113,113,0.18)', iconColor: 'text-red-400' },
                             ].map(stat => {
                                 const Icon = stat.icon
@@ -304,7 +304,7 @@ function MetaAdsDashboardInner() {
                         <div>
                             <div className="flex items-center justify-between mb-3">
                                 <span className="text-[10px] font-bold uppercase tracking-widest text-[#9CA3AF]">Conexión</span>
-                                <Link href="/dashboard/services/ads/setup" className="flex items-center gap-1 text-[10px] text-blue-400 hover:underline">
+                                <Link href="/dashboard/services/ads/setup" className="flex items-center gap-1 text-[10px] text-[#233B8F] hover:underline">
                                     <Settings2 size={10} /> Configurar
                                 </Link>
                             </div>
@@ -342,8 +342,8 @@ function MetaAdsDashboardInner() {
                                 <button onClick={handleConnect}
                                     className="text-[10px] font-bold py-1.5 px-3 rounded-xl shrink-0 transition-all active:scale-[0.97]"
                                     style={{
-                                        background: isConnected ? '#F0F3F7' : 'rgba(0,129,251,0.18)',
-                                        border: isConnected ? '1px solid #E4E9F0' : '1px solid rgba(0,129,251,0.32)',
+                                        background: isConnected ? '#F0F3F7' : 'rgba(35,59,143,0.18)',
+                                        border: isConnected ? '1px solid #E4E9F0' : '1px solid rgba(35,59,143,0.32)',
                                         color: isConnected ? '#6B7280' : '#93c5fd'
                                     }}>
                                     {isConnected ? 'Reconf.' : '+ Conectar'}
@@ -355,7 +355,7 @@ function MetaAdsDashboardInner() {
                         <div>
                             <div className="flex items-center justify-between mb-3">
                                 <span className="text-[10px] font-bold uppercase tracking-widest text-[#9CA3AF]">Mis Negocios</span>
-                                <Link href="/dashboard/services/ads/brief" className="flex items-center gap-1 text-[10px] text-blue-400 hover:underline">
+                                <Link href="/dashboard/services/ads/brief" className="flex items-center gap-1 text-[10px] text-[#233B8F] hover:underline">
                                     Gestionar <ArrowRight size={10} />
                                 </Link>
                             </div>
@@ -365,8 +365,8 @@ function MetaAdsDashboardInner() {
                                     className="flex flex-col items-center justify-center rounded-2xl py-10 gap-3 group transition-all"
                                     style={{ background: 'rgba(255,255,255,0.015)', border: '1px dashed rgba(255,255,255,0.07)' }}>
                                     <div className="w-10 h-10 rounded-xl flex items-center justify-center"
-                                        style={{ background: 'rgba(0,129,251,0.10)', border: '1px solid rgba(0,129,251,0.20)' }}>
-                                        <FileText size={16} className="text-blue-400" />
+                                        style={{ background: 'rgba(35,59,143,0.10)', border: '1px solid rgba(35,59,143,0.20)' }}>
+                                        <FileText size={16} className="text-[#233B8F]" />
                                     </div>
                                     <p className="text-xs text-[#6B7280] font-medium">Crear perfil de negocio</p>
                                 </Link>
@@ -377,8 +377,8 @@ function MetaAdsDashboardInner() {
                                             className="flex items-center gap-3 rounded-2xl px-3.5 py-3 group"
                                             style={{ background: `#FFFFFF`, border: '1px solid #E4E9F0' }}>
                                             <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0"
-                                                style={{ background: 'rgba(0,129,251,0.12)', border: '1px solid rgba(0,129,251,0.20)' }}>
-                                                <FileText size={13} className="text-blue-400" />
+                                                style={{ background: 'rgba(35,59,143,0.12)', border: '1px solid rgba(35,59,143,0.20)' }}>
+                                                <FileText size={13} className="text-[#233B8F]" />
                                             </div>
                                             <div className="flex-1 min-w-0">
                                                 <p className="text-xs font-bold truncate">{b.name}</p>
@@ -386,7 +386,7 @@ function MetaAdsDashboardInner() {
                                             </div>
                                             <Link href={`/dashboard/services/ads/wizard?briefId=${b.id}&platform=${PLATFORM_ID}`}
                                                 className="flex items-center gap-1 text-[10px] font-bold px-3 py-1.5 rounded-xl shrink-0 transition-all active:scale-[0.97]"
-                                                style={{ background: 'rgba(0,129,251,0.7)', color: '#dbeafe', border: '1px solid rgba(0,129,251,0.45)' }}>
+                                                style={{ background: 'rgba(35,59,143,0.7)', color: '#dbeafe', border: '1px solid rgba(35,59,143,0.45)' }}>
                                                 Campaña <ArrowRight size={9} />
                                             </Link>
                                         </div>
@@ -409,7 +409,7 @@ function MetaAdsDashboardInner() {
                                     <span className="text-[10px] font-bold uppercase tracking-widest text-[#9CA3AF]">Campañas Meta</span>
                                 </div>
                                 {metaCampaigns.length > 0 && (
-                                    <Link href="/dashboard/services/ads/history" className="text-[10px] text-blue-400 hover:underline">Ver todas →</Link>
+                                    <Link href="/dashboard/services/ads/history" className="text-[10px] text-[#233B8F] hover:underline">Ver todas →</Link>
                                 )}
                             </div>
 
@@ -417,8 +417,8 @@ function MetaAdsDashboardInner() {
                                 <div className="flex flex-col items-center justify-center py-20 gap-4 rounded-3xl text-center px-4"
                                     style={{ background: 'rgba(255,255,255,0.015)', border: '1px dashed rgba(255,255,255,0.07)' }}>
                                     <div className="w-14 h-14 rounded-full flex items-center justify-center"
-                                        style={{ background: 'rgba(0,129,251,0.10)', border: '1px solid rgba(0,129,251,0.20)' }}>
-                                        <Sparkles className="text-blue-400" size={22} />
+                                        style={{ background: 'rgba(35,59,143,0.10)', border: '1px solid rgba(35,59,143,0.20)' }}>
+                                        <Sparkles className="text-[#233B8F]" size={22} />
                                     </div>
                                     <div>
                                         <p className="text-[#6B7280] text-sm font-bold mb-1">Sin campañas todavía</p>
@@ -426,7 +426,7 @@ function MetaAdsDashboardInner() {
                                     </div>
                                     <Link href={`/dashboard/services/ads/wizard?platform=${PLATFORM_ID}`}
                                         className="flex items-center gap-2 text-[#111827] text-sm font-bold px-5 py-2.5 rounded-xl transition-all"
-                                        style={{ background: `linear-gradient(135deg, ${PLATFORM.accent}, #3b82f6)` }}>
+                                        style={{ background: `linear-gradient(135deg, #FF2D95 0%, #B735B8 48%, #233B8F 100%)` }}>
                                         <Plus size={14} /> Crear campaña
                                     </Link>
                                 </div>
@@ -462,7 +462,7 @@ function MetaAdsDashboardInner() {
                                                     {campaign.status === 'READY' && (
                                                         <Link href={`/dashboard/services/ads/preview/${campaign.id}`}
                                                             className="text-[10px] font-bold px-3 py-1.5 rounded-xl transition-all"
-                                                            style={{ background: 'rgba(0,129,251,0.7)', color: '#dbeafe', border: '1px solid rgba(0,129,251,0.45)' }}>
+                                                            style={{ background: 'rgba(35,59,143,0.7)', color: '#dbeafe', border: '1px solid rgba(35,59,143,0.45)' }}>
                                                             Publicar →
                                                         </Link>
                                                     )}

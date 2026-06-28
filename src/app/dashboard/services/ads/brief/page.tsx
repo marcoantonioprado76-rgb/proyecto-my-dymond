@@ -168,7 +168,7 @@ export default function BriefPage() {
                             <div className="flex items-center gap-2 mt-4 pt-4 border-t border-white/5">
                                 <Link
                                     href={`/dashboard/services/ads/wizard?briefId=${brief.id}`}
-                                    className="flex-1 flex items-center justify-center gap-1.5 text-xs font-bold py-2 rounded-xl bg-gradient-to-r from-purple-600 to-blue-600 text-white hover:opacity-90 transition-all"
+                                    className="flex-1 flex items-center justify-center gap-1.5 text-xs font-bold py-2 rounded-xl bg-gradient-to-r from-[#FF2D95] via-[#B735B8] to-[#233B8F] text-white hover:opacity-90 transition-all"
                                 >
                                     <Sparkles size={12} /> Crear campaña
                                 </Link>
@@ -315,7 +315,7 @@ function CreateBriefView({ onSaved, onCancel }: { onSaved: (b: Brief) => void; o
                                 className="w-full bg-[#1c1d2e] border border-white/20 rounded-2xl px-4 py-3 text-sm text-white resize-none focus:outline-none focus:border-purple-500/50 placeholder:text-white/30 leading-relaxed" />
                             <p className="text-xs text-white/20 text-right">{text.length} chars · mínimo 20</p>
                             <button onClick={generateBrief} disabled={generating || text.trim().length < 20}
-                                className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-bold py-4 rounded-2xl hover:opacity-90 disabled:opacity-40 transition-all shadow-[0_0_30px_rgba(139,92,246,0.3)]">
+                                className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-[#FF2D95] via-[#B735B8] to-[#233B8F] text-white font-bold py-4 rounded-2xl hover:opacity-90 disabled:opacity-40 transition-all shadow-[0_0_30px_rgba(139,92,246,0.3)]">
                                 {generating ? <><Loader2 size={18} className="animate-spin" /> Analizando...</> : <><Sparkles size={18} /> Generar Brief con IA</>}
                             </button>
                         </div>
@@ -369,7 +369,7 @@ function CreateBriefView({ onSaved, onCancel }: { onSaved: (b: Brief) => void; o
                         <button onClick={onCancel} className="flex-1 py-3 rounded-2xl bg-white/5 border border-purple-500/25 text-sm font-bold hover:bg-white/10 transition-all">
                             Cancelar
                         </button>
-                        <button onClick={saveBrief} disabled={saving} className="flex-1 py-3 rounded-2xl bg-gradient-to-r from-purple-600 to-blue-600 text-white text-sm font-bold hover:opacity-90 disabled:opacity-50 transition-all flex items-center justify-center gap-2">
+                        <button onClick={saveBrief} disabled={saving} className="flex-1 py-3 rounded-2xl bg-gradient-to-r from-[#FF2D95] via-[#B735B8] to-[#233B8F] text-white text-sm font-bold hover:opacity-90 disabled:opacity-50 transition-all flex items-center justify-center gap-2">
                             {saving ? <><Loader2 size={16} className="animate-spin" /> Guardando...</> : <><Save size={16} /> Guardar Negocio</>}
                         </button>
                     </div>
@@ -416,7 +416,7 @@ function EditBriefView({ brief, onSaved, onCancel }: { brief: Brief; onSaved: (b
             <EditBriefForm brief={form} onChange={setForm} />
             <div className="flex gap-3 mt-6">
                 <button onClick={onCancel} className="flex-1 py-3 rounded-2xl bg-white/5 border border-purple-500/25 text-sm font-bold hover:bg-white/10 transition-all">Cancelar</button>
-                <button onClick={save} disabled={saving} className="flex-1 py-3 rounded-2xl bg-gradient-to-r from-purple-600 to-blue-600 text-white text-sm font-bold hover:opacity-90 disabled:opacity-50 transition-all flex items-center justify-center gap-2">
+                <button onClick={save} disabled={saving} className="flex-1 py-3 rounded-2xl bg-gradient-to-r from-[#FF2D95] via-[#B735B8] to-[#233B8F] text-white text-sm font-bold hover:opacity-90 disabled:opacity-50 transition-all flex items-center justify-center gap-2">
                     {saving ? <><Loader2 size={16} className="animate-spin" /> Guardando...</> : <><Save size={16} /> Guardar Cambios</>}
                 </button>
             </div>

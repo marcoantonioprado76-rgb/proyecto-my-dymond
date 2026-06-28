@@ -140,7 +140,7 @@ function GoogleAdsDashboardInner() {
                     <div className="rounded-3xl p-5 md:p-6" style={{ background: `linear-gradient(135deg, rgba(66,133,244,0.10) 0%, rgba(251,188,4,0.10) 50%, rgba(66,133,244,0.10) 100%)`, border: '1px solid rgba(255,255,255,0.10)' }}>
                         <div className="flex items-center justify-between mb-4">
                             <div className="flex items-center gap-2.5">
-                                <Rocket size={15} className="text-blue-400" />
+                                <Rocket size={15} className="text-[#233B8F]" />
                                 <span className="font-bold text-sm">Configura Google Ads</span>
                             </div>
                             <div className="flex items-center gap-2">
@@ -181,7 +181,7 @@ function GoogleAdsDashboardInner() {
                         style={{ background: 'rgba(255,255,255,0.015)', border: '1px dashed rgba(255,255,255,0.07)' }}>
                         <div className="w-14 h-14 rounded-full flex items-center justify-center"
                             style={{ background: `${PLATFORM.accent}15`, border: `1px solid ${PLATFORM.accent}30` }}>
-                            <Sparkles className="text-blue-400" size={22} />
+                            <Sparkles className="text-[#233B8F]" size={22} />
                         </div>
                         <div>
                             <p className="text-[#111827]/40 text-sm font-bold mb-1">Sin campañas todavía</p>
@@ -195,7 +195,7 @@ function GoogleAdsDashboardInner() {
                     <Link href="/dashboard/services/ads/meta"
                         className="flex items-center gap-2 text-[11px] text-[#111827]/40 hover:text-[#111827]/70 transition-colors font-medium">
                         <span>Mientras tanto, podés usar</span>
-                        <span className="font-bold text-blue-400">Meta Ads</span>
+                        <span className="font-bold text-[#233B8F]">Meta Ads</span>
                         <ChevronRight size={11} />
                     </Link>
                 </div>

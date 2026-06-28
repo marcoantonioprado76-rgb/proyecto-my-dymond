@@ -20,7 +20,7 @@ interface Strategy {
 }
 
 const PLATFORM_LABELS: Record<string, { label: string; letter: string; color: string; bg: string }> = {
-    META: { label: 'Meta Ads', letter: 'f', color: 'text-blue-400', bg: 'bg-blue-500/15 border-blue-500/25' },
+    META: { label: 'Meta Ads', letter: 'f', color: 'text-[#233B8F]', bg: 'bg-[#233B8F]/15 border-[#233B8F]/25' },
     TIKTOK: { label: 'TikTok Ads', letter: 'T', color: 'text-pink-400', bg: 'bg-pink-500/15 border-pink-500/25' },
     GOOGLE_ADS: { label: 'Google Ads', letter: 'G', color: 'text-yellow-400', bg: 'bg-yellow-500/15 border-yellow-500/25' },
 }
@@ -45,8 +45,8 @@ const OBJECTIVE_LABELS: Record<string, string> = {
 
 const OBJECTIVE_COLORS: Record<string, string> = {
     conversions: 'text-green-400',
-    leads: 'text-blue-400',
-    traffic: 'text-cyan-400',
+    leads: 'text-[#233B8F]',
+    traffic: 'text-[#B735B8]',
     awareness: 'text-purple-400',
     engagement: 'text-pink-400',
     app_promotion: 'text-orange-400',
@@ -462,14 +462,14 @@ function WizardContent() {
                             {/* Solo Meta es seleccionable hoy: una sola acción clara, sin botones falsos */}
                             <div className="grid grid-cols-1 gap-3">
                                 <button onClick={() => pickPlatform('META')}
-                                    className="w-full flex items-center gap-4 p-5 rounded-2xl border text-left transition-all active:scale-[0.98] group border-blue-500/25 hover:border-blue-500/50 bg-blue-500/5 hover:bg-blue-500/10">
-                                    <div className="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 border bg-blue-500/15 border-blue-500/25">
-                                        <span className="font-black text-xl text-blue-400">f</span>
+                                    className="w-full flex items-center gap-4 p-5 rounded-2xl border text-left transition-all active:scale-[0.98] group border-[#233B8F]/25 hover:border-[#233B8F]/50 bg-[#233B8F]/5 hover:bg-[#233B8F]/10">
+                                    <div className="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 border bg-[#233B8F]/15 border-[#233B8F]/25">
+                                        <span className="font-black text-xl text-[#233B8F]">f</span>
                                     </div>
                                     <div className="flex-1 min-w-0">
                                         <div className="flex items-center gap-2 mb-0.5">
                                             <p className="font-black text-sm text-white">Meta Ads</p>
-                                            <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-white/5 border border-white/10 text-blue-400">Facebook & Instagram</span>
+                                            <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-white/5 border border-white/10 text-[#233B8F]">Facebook & Instagram</span>
                                             <span className="text-[9px] font-black px-2 py-0.5 rounded-full"
                                                 style={{ background: 'rgba(34,197,94,0.12)', border: '1px solid rgba(34,197,94,0.25)', color: '#4ade80' }}>
                                                 DISPONIBLE
@@ -477,7 +477,7 @@ function WizardContent() {
                                         </div>
                                         <p className="text-xs text-white/35 leading-relaxed">Ideal para ventas directas por WhatsApp, leads, branding y audiencias amplias.</p>
                                     </div>
-                                    <ArrowRight size={16} className="text-blue-400 opacity-40 group-hover:opacity-100 shrink-0 transition-all" />
+                                    <ArrowRight size={16} className="text-[#233B8F] opacity-40 group-hover:opacity-100 shrink-0 transition-all" />
                                 </button>
                             </div>
                         </div>
@@ -494,8 +494,8 @@ function WizardContent() {
                                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                                     {[
                                         { id: 'conversions', label: 'Ventas', desc: 'Compras directas', icon: ShoppingCart, color: 'text-green-400', bg: 'bg-green-500/10 border-green-500/25' },
-                                        { id: 'leads', label: 'Clientes potenciales', desc: 'Captación de contactos', icon: MessageCircle, color: 'text-blue-400', bg: 'bg-blue-500/10 border-blue-500/25' },
-                                        { id: 'traffic', label: 'Tráfico', desc: 'Visitas a tu sitio', icon: Globe, color: 'text-cyan-400', bg: 'bg-cyan-500/10 border-cyan-500/25' },
+                                        { id: 'leads', label: 'Clientes potenciales', desc: 'Captación de contactos', icon: MessageCircle, color: 'text-[#233B8F]', bg: 'bg-[#233B8F]/10 border-[#233B8F]/25' },
+                                        { id: 'traffic', label: 'Tráfico', desc: 'Visitas a tu sitio', icon: Globe, color: 'text-[#B735B8]', bg: 'bg-[#B735B8]/10 border-[#B735B8]/25' },
                                         { id: 'awareness', label: 'Reconocimiento', desc: 'Dar a conocer tu marca', icon: Eye, color: 'text-purple-400', bg: 'bg-purple-500/10 border-purple-500/25' },
                                         { id: 'engagement', label: 'Interacción', desc: 'Likes, mensajes, chat', icon: Heart, color: 'text-pink-400', bg: 'bg-pink-500/10 border-pink-500/25' },
                                     ].map(obj => (
@@ -516,7 +516,7 @@ function WizardContent() {
                                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                                         {[
                                             { id: 'whatsapp', label: 'WhatsApp', icon: '💬', color: 'text-green-400', bg: 'bg-green-500/10 border-green-500/25', hidden: selectedObjective === 'traffic' || selectedObjective === 'awareness' },
-                                            { id: 'website', label: 'Sitio Web', icon: '🌐', color: 'text-blue-400', bg: 'bg-blue-500/10 border-blue-500/25', hidden: selectedObjective === 'engagement' },
+                                            { id: 'website', label: 'Sitio Web', icon: '🌐', color: 'text-[#233B8F]', bg: 'bg-[#233B8F]/10 border-[#233B8F]/25', hidden: selectedObjective === 'engagement' },
                                             { id: 'instagram', label: 'Instagram', icon: '📷', color: 'text-pink-400', bg: 'bg-pink-500/10 border-pink-500/25', hidden: false },
                                             { id: 'messenger', label: 'Messenger', icon: '💬', color: 'text-purple-400', bg: 'bg-purple-500/10 border-purple-500/25', hidden: selectedObjective === 'traffic' || selectedObjective === 'awareness' },
                                         ].filter(d => !d.hidden).map(dest => (
@@ -562,7 +562,7 @@ function WizardContent() {
 
                             <button onClick={confirmAdType}
                                 className="w-full flex items-center justify-center gap-2 py-4 rounded-2xl font-bold text-sm transition-all"
-                                style={{ background: 'linear-gradient(135deg,#D203DD,#2563eb)', boxShadow: '0 0 24px rgba(255,255,255,0.15)' }}>
+                                style={{ background: 'linear-gradient(135deg, #FF2D95 0%, #B735B8 48%, #233B8F 100%)', boxShadow: '0 0 24px rgba(255,255,255,0.15)' }}>
                                 <Brain size={16} /> Generar estrategias con IA
                             </button>
                             <p className="text-center text-[10px] text-white/20">Las selecciones son opcionales — puedes continuar sin elegir nada y la IA sugerirá lo mejor para tu negocio</p>
@@ -575,7 +575,7 @@ function WizardContent() {
                             {/* ⭐ Método Andromeda — recomendado (un toque) */}
                             {selectedBrief && (
                                 <div className="mb-5 rounded-2xl p-4 sm:p-5 relative overflow-hidden"
-                                    style={{ background: 'linear-gradient(135deg, rgba(0,129,251,0.16), rgba(139,92,246,0.14))', border: '1px solid rgba(0,129,251,0.35)' }}>
+                                    style={{ background: 'linear-gradient(135deg, rgba(35,59,143,0.16), rgba(139,92,246,0.14))', border: '1px solid rgba(35,59,143,0.35)' }}>
                                     <span className="inline-block text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full mb-2.5"
                                         style={{ background: 'rgba(250,204,21,0.15)', color: '#facc15', border: '1px solid rgba(250,204,21,0.3)' }}>
                                         ⭐ Recomendado · Lo más fácil
@@ -594,7 +594,7 @@ function WizardContent() {
                                     </div>
                                     <button onClick={useAndromeda} disabled={creatingAndromeda}
                                         className="mt-3 w-full flex items-center justify-center gap-2 py-3 rounded-xl font-black text-sm text-white transition-all active:scale-[0.98] disabled:opacity-60"
-                                        style={{ background: 'linear-gradient(135deg, #0081FB, #3b82f6)' }}>
+                                        style={{ background: 'linear-gradient(135deg, #FF2D95 0%, #B735B8 48%, #233B8F 100%)' }}>
                                         {creatingAndromeda
                                             ? <><Loader2 size={16} className="animate-spin" /> Preparando tu campaña…</>
                                             : <><Sparkles size={16} /> Usar este método →</>}
@@ -853,7 +853,7 @@ function WizardContent() {
 
                                     {/* Create button */}
                                     <button onClick={createCampaign} disabled={!selectedStrategy || creating}
-                                        className="w-full flex items-center justify-center gap-2 py-4 rounded-2xl bg-gradient-to-r from-purple-600 to-blue-600 text-white font-bold hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-[0_0_30px_rgba(139,92,246,0.2)]">
+                                        className="w-full flex items-center justify-center gap-2 py-4 rounded-2xl bg-gradient-to-r from-[#FF2D95] via-[#B735B8] to-[#233B8F] text-white font-bold hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-[0_0_30px_rgba(139,92,246,0.2)]">
                                         {creating
                                             ? <><Loader2 size={18} className="animate-spin" /> Creando campaña...</>
                                             : <><Sparkles size={18} /> {selectedStrategy ? 'Crear campaña y continuar' : 'Selecciona una estrategia'}</>

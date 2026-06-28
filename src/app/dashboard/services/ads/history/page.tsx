@@ -10,7 +10,7 @@ import Link from 'next/link'
 
 const STATUS_LABELS: Record<string, { label: string; color: string; dot: string }> = {
     DRAFT: { label: 'Borrador', color: 'text-[#111827]/50 bg-[#F4F6FA] border-[#E4E9F0]', dot: 'bg-white/30' },
-    READY: { label: 'Listo', color: 'text-blue-400 bg-blue-500/10 border-blue-500/20', dot: 'bg-blue-400' },
+    READY: { label: 'Listo', color: 'text-[#233B8F] bg-[#233B8F]/10 border-[#233B8F]/20', dot: 'bg-[#233B8F]' },
     PUBLISHING: { label: 'Publicando', color: 'text-yellow-400 bg-yellow-500/10 border-yellow-500/20', dot: 'bg-yellow-400 animate-pulse' },
     PUBLISHED: { label: 'Publicado', color: 'text-green-400 bg-green-500/10 border-green-500/20', dot: 'bg-green-400' },
     FAILED: { label: 'Error', color: 'text-red-400 bg-red-500/10 border-red-500/20', dot: 'bg-red-400' },
@@ -18,7 +18,7 @@ const STATUS_LABELS: Record<string, { label: string; color: string; dot: string 
 }
 
 const PLATFORM_MAP: Record<string, { letter: string; color: string }> = {
-    META: { letter: 'f', color: 'text-blue-400' },
+    META: { letter: 'f', color: 'text-[#233B8F]' },
     TIKTOK: { letter: 'T', color: 'text-red-400' },
     GOOGLE_ADS: { letter: 'G', color: 'text-yellow-400' },
 }
@@ -135,7 +135,7 @@ export default function HistoryPage() {
                     <p className="text-[10px] text-[#111827]/25 font-bold uppercase tracking-widest mb-2">Últimos 30 días</p>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
                     {[
-                        { icon: <Eye size={14} />, label: 'Impresiones', value: fmt(totalImpressions), color: 'text-blue-400' },
+                        { icon: <Eye size={14} />, label: 'Impresiones', value: fmt(totalImpressions), color: 'text-[#233B8F]' },
                         { icon: <MousePointerClick size={14} />, label: 'Clics', value: fmt(totalClicks), color: 'text-purple-400' },
                         { icon: <DollarSign size={14} />, label: 'Gasto', value: `$${totalSpend.toFixed(2)}`, color: 'text-green-400' },
                         { icon: <Users size={14} />, label: 'Alcance', value: fmt(totalReach), color: 'text-orange-400' },
@@ -248,7 +248,7 @@ export default function HistoryPage() {
                                             <div className="mt-3">
                                                 <div className="grid grid-cols-4 gap-2">
                                                     {[
-                                                        { label: 'Impresiones', value: fmt(campaignMetrics!.impressions), color: 'text-blue-400' },
+                                                        { label: 'Impresiones', value: fmt(campaignMetrics!.impressions), color: 'text-[#233B8F]' },
                                                         { label: 'Clics', value: fmt(campaignMetrics!.clicks), color: 'text-purple-400' },
                                                         { label: 'Gasto', value: `$${campaignMetrics!.spend.toFixed(2)}`, color: 'text-green-400' },
                                                         { label: 'Alcance', value: fmt(campaignMetrics!.reach), color: 'text-orange-400' },
@@ -327,7 +327,7 @@ export default function HistoryPage() {
                                     )}
                                     {campaign.status === 'PUBLISHED' && campaign.providerCampaignId && (
                                         <a href="https://business.facebook.com/adsmanager" target="_blank" rel="noopener noreferrer"
-                                            className="flex items-center gap-1.5 text-xs font-bold px-4 py-2 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400 hover:bg-blue-500/20 transition-all">
+                                            className="flex items-center gap-1.5 text-xs font-bold px-4 py-2 rounded-xl bg-[#233B8F]/10 border border-[#233B8F]/20 text-[#233B8F] hover:bg-[#233B8F]/20 transition-all">
                                             <ExternalLink size={12} /> Ads Manager
                                         </a>
                                     )}

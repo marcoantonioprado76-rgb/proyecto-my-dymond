@@ -29,13 +29,13 @@ const MEDIA_FILTERS = [
 ]
 
 const PLATFORM_COLORS: Record<string, string> = {
-    META: '#0081FB',
+    META: '#233B8F',
     TIKTOK: '#EE1D52',
     GOOGLE_ADS: '#4285F4'
 }
 
 const ADVANTAGE_LABELS: Record<string, { label: string; color: string }> = {
-    advantage: { label: 'Advantage+', color: 'text-blue-400 bg-blue-500/10 border-blue-500/20' },
+    advantage: { label: 'Advantage+', color: 'text-[#233B8F] bg-[#233B8F]/10 border-[#233B8F]/20' },
     smart_segmentation: { label: 'Segmentación Smart', color: 'text-purple-400 bg-purple-500/10 border-purple-500/20' },
     custom: { label: 'Personalizado', color: 'text-orange-400 bg-orange-500/10 border-orange-500/20' }
 }
@@ -182,7 +182,7 @@ export default function StrategiesPage() {
                             key={f.id}
                             onClick={() => setMediaType(f.id)}
                             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all border ${mediaType === f.id
-                                ? 'bg-blue-600 text-[#111827] border-blue-600'
+                                ? 'bg-[#233B8F] text-[#111827] border-[#233B8F]'
                                 : 'bg-white/3 border-purple-500/20 text-[#111827]/40 hover:border-purple-500/40'
                                 }`}
                         >
@@ -255,7 +255,7 @@ export default function StrategiesPage() {
                                 <div className="flex items-center gap-3 mb-5">
                                     <div className="flex items-center gap-1.5 text-xs text-[#111827]/40">
                                         {strategy.mediaType === 'video'
-                                            ? <Video size={12} className="text-blue-400" />
+                                            ? <Video size={12} className="text-[#233B8F]" />
                                             : <ImageIcon size={12} className="text-purple-400" />
                                         }
                                         <span className="font-bold">{strategy.mediaCount}</span>

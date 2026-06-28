@@ -728,7 +728,7 @@ function CampaignPageInner() {
 
             {/* ── Header ── */}
             <div className="flex items-center gap-3 mb-6"
-                style={{ background: 'linear-gradient(135deg,rgba(139,92,246,0.1) 0%,rgba(59,130,246,0.05) 100%)', border: '1px solid rgba(139,92,246,0.18)', borderRadius: '1.5rem', padding: '1rem 1.25rem' }}>
+                style={{ background: 'linear-gradient(135deg,rgba(139,92,246,0.1) 0%,rgba(35,59,143,0.05) 100%)', border: '1px solid rgba(139,92,246,0.18)', borderRadius: '1.5rem', padding: '1rem 1.25rem' }}>
                 <Link href="/dashboard/services/ads/strategies"
                     className="w-9 h-9 shrink-0 rounded-xl bg-white/5 border border-purple-500/25 flex items-center justify-center hover:bg-white/10 transition-all">
                     <ArrowLeft size={15} />
@@ -754,7 +754,7 @@ function CampaignPageInner() {
 
             {/* Platform badges */}
             <div className="flex flex-wrap items-center gap-2 mb-5 px-3 py-2.5 bg-white/2 border border-purple-500/15 border-l-2 border-l-blue-500/40 rounded-2xl">
-                <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400">{strategy.platform}</span>
+                <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-[#233B8F]/10 border border-[#233B8F]/20 text-[#233B8F]">{strategy.platform}</span>
                 <span className="text-[11px] text-white/30 flex items-center gap-1">
                     {strategy.mediaType === 'video' ? <Video size={10} /> : <ImageIcon size={10} />}
                     {strategy.mediaCount} {strategy.mediaType === 'video' ? 'videos' : 'imágenes'}
@@ -1119,7 +1119,7 @@ function CampaignPageInner() {
                                 </div>
                                 <button
                                     onClick={() => setAdvantageCreative(v => !v)}
-                                    className={`shrink-0 w-11 h-6 rounded-full border transition-all relative ${advantageCreative ? 'bg-blue-500 border-blue-400' : 'bg-white/8 border-white/15'}`}
+                                    className={`shrink-0 w-11 h-6 rounded-full border transition-all relative ${advantageCreative ? 'bg-[#233B8F] border-[#233B8F]' : 'bg-white/8 border-white/15'}`}
                                 >
                                     <span className={`absolute top-0.5 w-5 h-5 rounded-full bg-white transition-all shadow-sm ${advantageCreative ? 'left-5' : 'left-0.5'}`} />
                                 </button>
@@ -1172,7 +1172,7 @@ function CampaignPageInner() {
                     {/* Save button */}
                     <button onClick={saveConfig} disabled={savingConfig || !form.providerAccountId || !form.name.trim()}
                         className="w-full flex items-center justify-center gap-2 font-bold py-3.5 rounded-2xl disabled:opacity-40 disabled:cursor-not-allowed transition-all"
-                        style={{ background: 'linear-gradient(135deg,#D203DD,#2563eb)', boxShadow: '0 0 24px rgba(255,255,255,0.15)' }}>
+                        style={{ background: 'linear-gradient(135deg, #FF2D95 0%, #B735B8 48%, #233B8F 100%)', boxShadow: '0 0 24px rgba(255,255,255,0.15)' }}>
                         {savingConfig
                             ? <><Loader2 size={15} className="animate-spin" /> Guardando...</>
                             : configSaved
@@ -1267,7 +1267,7 @@ function CampaignPageInner() {
                                                 <div className="space-y-1.5">
                                                     {([
                                                         { key: 'fast', label: 'Rápida', icon: Gauge, color: 'text-green-400', border: 'border-green-500/30', bg: 'bg-green-500/10' },
-                                                        { key: 'standard', label: 'Estándar', icon: Star, color: 'text-blue-400', border: 'border-blue-500/30', bg: 'bg-blue-500/10' },
+                                                        { key: 'standard', label: 'Estándar', icon: Star, color: 'text-[#233B8F]', border: 'border-[#233B8F]/30', bg: 'bg-[#233B8F]/10' },
                                                         { key: 'premium', label: 'Premium HD', icon: Trophy, color: 'text-yellow-400', border: 'border-yellow-500/30', bg: 'bg-yellow-500/10' },
                                                     ] as const).map(q => (
                                                         <button key={q.key} onClick={() => setBulkQuality(q.key)}
@@ -1312,7 +1312,7 @@ function CampaignPageInner() {
 
                                         <button onClick={generateAllImages} disabled={bulkGenerating}
                                             className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl font-bold text-sm disabled:opacity-40 disabled:cursor-not-allowed transition-all"
-                                            style={{ background: 'linear-gradient(135deg,#D203DD,#2563eb)', boxShadow: '0 0 20px rgba(255,255,255,0.15)' }}>
+                                            style={{ background: 'linear-gradient(135deg, #FF2D95 0%, #B735B8 48%, #233B8F 100%)', boxShadow: '0 0 20px rgba(255,255,255,0.15)' }}>
                                             {bulkGenerating
                                                 ? <><Loader2 size={15} className="animate-spin" /> Generando...</>
                                                 : <><Sparkles size={15} /> Generar {strategy.mediaCount} imágenes</>
@@ -1332,7 +1332,7 @@ function CampaignPageInner() {
                                         <span className="text-[10px] font-black text-white/30 uppercase">Anuncio #{i + 1}</span>
                                         {creative.aiGenerated && <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-400">IA</span>}
                                         {creative.mediaUrl && <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-green-500/10 border border-green-500/20 text-green-400 flex items-center gap-1"><CheckCircle2 size={8} /> Imagen</span>}
-                                        {creative.primaryText && <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 flex items-center gap-1"><FileText size={8} /> Texto</span>}
+                                        {creative.primaryText && <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-[#233B8F]/10 border border-[#233B8F]/20 text-[#233B8F] flex items-center gap-1"><FileText size={8} /> Texto</span>}
                                     </div>
 
                                     <div className="flex flex-col md:flex-row">
@@ -1629,7 +1629,7 @@ function CampaignPageInner() {
                                             </div>
                                             <button onClick={() => generateImage(i)}
                                                 className="w-full flex items-center justify-center gap-1.5 py-2.5 rounded-xl font-bold text-xs transition-all"
-                                                style={{ background: 'linear-gradient(135deg,#D203DD,#2563eb)' }}>
+                                                style={{ background: 'linear-gradient(135deg, #FF2D95 0%, #B735B8 48%, #233B8F 100%)' }}>
                                                 <Sparkles size={12} />
                                                 {(refImageUrls[i] || creatives.find(c => c.slotIndex === i)?.mediaUrl?.startsWith('http')) ? 'Editar con gpt-image-1' : 'Generar con DALL-E 3'}
                                             </button>
@@ -1643,7 +1643,7 @@ function CampaignPageInner() {
                         {configSaved && (
                             <button onClick={generateCopies} disabled={generatingCopies}
                                 className="w-full flex items-center justify-center gap-2 font-bold py-3.5 rounded-2xl disabled:opacity-40 disabled:cursor-not-allowed transition-all"
-                                style={{ background: copiesGenerated ? 'rgba(139,92,246,0.12)' : 'linear-gradient(135deg,#D203DD,#2563eb)', border: copiesGenerated ? '1px solid rgba(139,92,246,0.25)' : 'none', color: copiesGenerated ? '#c4b5fd' : '#fff', boxShadow: copiesGenerated ? 'none' : '0 0 24px rgba(255,255,255,0.15)' }}>
+                                style={{ background: copiesGenerated ? 'rgba(139,92,246,0.12)' : 'linear-gradient(135deg, #FF2D95 0%, #B735B8 48%, #233B8F 100%)', border: copiesGenerated ? '1px solid rgba(139,92,246,0.25)' : 'none', color: copiesGenerated ? '#c4b5fd' : '#fff', boxShadow: copiesGenerated ? 'none' : '0 0 24px rgba(255,255,255,0.15)' }}>
                                 {generatingCopies
                                     ? <><Loader2 size={15} className="animate-spin" /> Generando textos con IA...</>
                                     : copiesGenerated
@@ -1695,7 +1695,7 @@ function CampaignPageInner() {
                                 <div className="bg-white rounded-2xl overflow-hidden shadow-2xl">
                                     <div className="flex items-center gap-2.5 px-3 pt-3 pb-2">
                                         <div className="w-9 h-9 rounded-full flex items-center justify-center text-white text-xs font-black shrink-0"
-                                            style={{ background: 'linear-gradient(135deg,#3b82f6,#D203DD)' }}>
+                                            style={{ background: 'linear-gradient(135deg,#233B8F,#B735B8)' }}>
                                             {pageName.charAt(0).toUpperCase()}
                                         </div>
                                         <div className="flex-1 min-w-0">
@@ -1741,7 +1741,7 @@ function CampaignPageInner() {
                                         </span>
                                     )}
                                     {advantageCreative && (
-                                        <span className="flex items-center gap-1 text-[10px] font-bold px-2.5 py-1 rounded-full bg-blue-500/15 border border-blue-500/25 text-blue-400">
+                                        <span className="flex items-center gap-1 text-[10px] font-bold px-2.5 py-1 rounded-full bg-[#233B8F]/15 border border-[#233B8F]/25 text-[#233B8F]">
                                             <Sparkles size={9} /> Advantage+ Creative
                                         </span>
                                     )}

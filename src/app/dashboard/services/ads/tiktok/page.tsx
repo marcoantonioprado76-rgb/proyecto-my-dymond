@@ -195,7 +195,7 @@ function TikTokAdsDashboardInner() {
                     <Link href="/dashboard/services/ads/meta"
                         className="flex items-center gap-2 text-[11px] text-[#111827]/40 hover:text-[#111827]/70 transition-colors font-medium">
                         <span>Mientras tanto, podés usar</span>
-                        <span className="font-bold text-blue-400">Meta Ads</span>
+                        <span className="font-bold text-[#233B8F]">Meta Ads</span>
                         <ChevronRight size={11} />
                     </Link>
                 </div>

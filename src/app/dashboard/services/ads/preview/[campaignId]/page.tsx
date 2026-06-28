@@ -11,7 +11,7 @@ import { useRouter, useParams } from 'next/navigation'
 
 const STATUS_INFO: Record<string, { label: string; color: string; desc: string }> = {
     DRAFT: { label: 'Borrador', color: 'text-white/50', desc: 'Completa la configuración' },
-    READY: { label: 'Listo para publicar', color: 'text-blue-400', desc: 'Todo configurado correctamente' },
+    READY: { label: 'Listo para publicar', color: 'text-[#233B8F]', desc: 'Todo configurado correctamente' },
     PUBLISHING: { label: 'Publicando...', color: 'text-yellow-400', desc: 'Enviando a Meta Ads Manager' },
     PUBLISHED: { label: 'Publicado', color: 'text-green-400', desc: 'Activo en Meta Ads (estado inicial: pausado)' },
     FAILED: { label: 'Error al publicar', color: 'text-red-400', desc: 'Revisa los detalles del error' },
@@ -123,7 +123,7 @@ export default function PreviewPage() {
                     <button
                         onClick={publish}
                         disabled={publishing || campaign.status === 'PUBLISHING'}
-                        className="flex items-center gap-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-bold px-5 py-2.5 rounded-xl hover:opacity-90 disabled:opacity-50 transition-all text-sm shadow-[0_0_30px_rgba(139,92,246,0.3)]"
+                        className="flex items-center gap-2 bg-gradient-to-r from-[#FF2D95] via-[#B735B8] to-[#233B8F] text-white font-bold px-5 py-2.5 rounded-xl hover:opacity-90 disabled:opacity-50 transition-all text-sm shadow-[0_0_30px_rgba(139,92,246,0.3)]"
                     >
                         {publishing ? <><Loader2 size={15} className="animate-spin" /> Publicando...</> : <><Rocket size={15} /> Publicar Campaña</>}
                     </button>
@@ -156,7 +156,7 @@ export default function PreviewPage() {
                             href="https://business.facebook.com/adsmanager"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="flex items-center gap-2 text-xs font-bold px-4 py-2 rounded-xl bg-blue-600 text-white hover:bg-blue-500 transition-all"
+                            className="flex items-center gap-2 text-xs font-bold px-4 py-2 rounded-xl bg-[#233B8F] text-white hover:bg-[#233B8F] transition-all"
                         >
                             Abrir Ads Manager <ExternalLink size={12} />
                         </a>
@@ -203,7 +203,7 @@ export default function PreviewPage() {
                         <div className="bg-white/5 rounded-2xl overflow-hidden border border-white/15 backdrop-blur-md">
                             {/* Post header */}
                             <div className="flex items-center gap-3 p-3 border-b border-white/5">
-                                <div className="w-9 h-9 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-xs font-black">
+                                <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#FF2D95] via-[#B735B8] to-[#233B8F] flex items-center justify-center text-xs font-black">
                                     {campaign.brief?.name?.[0] || 'N'}
                                 </div>
                                 <div className="flex-1">
@@ -246,7 +246,7 @@ export default function PreviewPage() {
                                     <p className="text-[10px] text-white/40 mt-0.5">{currentCreative.description}</p>
                                 )}
                                 <div className="mt-2">
-                                    <div className="w-full py-2 rounded-lg bg-blue-600 text-center text-xs font-bold text-white">
+                                    <div className="w-full py-2 rounded-lg bg-[#233B8F] text-center text-xs font-bold text-white">
                                         {campaign.brief?.mainCTA || 'Más información'}
                                     </div>
                                 </div>
@@ -342,7 +342,7 @@ export default function PreviewPage() {
                             <button
                                 onClick={publish}
                                 disabled={publishing || campaign.status === 'PUBLISHING'}
-                                className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-bold py-4 rounded-2xl hover:opacity-90 disabled:opacity-50 transition-all mt-4 shadow-[0_0_30px_rgba(139,92,246,0.3)]"
+                                className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-[#FF2D95] via-[#B735B8] to-[#233B8F] text-white font-bold py-4 rounded-2xl hover:opacity-90 disabled:opacity-50 transition-all mt-4 shadow-[0_0_30px_rgba(139,92,246,0.3)]"
                             >
                                 {publishing
                                     ? <><Loader2 size={18} className="animate-spin" /> Publicando en Meta Ads...</>

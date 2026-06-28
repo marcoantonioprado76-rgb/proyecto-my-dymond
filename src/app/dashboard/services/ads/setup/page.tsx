@@ -5,7 +5,7 @@ import { Brain, Zap, CheckCircle2, AlertCircle, Loader2, Eye, EyeOff, ArrowLeft,
 import Link from 'next/link'
 
 const PLATFORMS = [
-    { id: 'META', label: 'Meta Ads', sub: 'Facebook & Instagram', color: '#0081FB', letter: 'f', textColor: 'text-blue-400' },
+    { id: 'META', label: 'Meta Ads', sub: 'Facebook & Instagram', color: '#233B8F', letter: 'f', textColor: 'text-[#233B8F]' },
     { id: 'TIKTOK', label: 'TikTok Ads', sub: 'TikTok for Business', color: '#EE1D52', letter: 'T', textColor: 'text-red-400' },
     { id: 'GOOGLE_ADS', label: 'Google Ads', sub: 'Search, Display & YouTube', color: '#4285F4', letter: 'G', textColor: 'text-yellow-400' },
 ]
@@ -157,10 +157,10 @@ export default function SetupPage() {
                     )}
 
                     {/* Info */}
-                    <div className="bg-blue-500/5 border border-blue-500/15 rounded-2xl p-4">
+                    <div className="bg-[#233B8F]/5 border border-[#233B8F]/15 rounded-2xl p-4">
                         <div className="flex items-center gap-2 mb-2">
-                            <Sparkles size={13} className="text-blue-400" />
-                            <p className="text-xs font-bold text-blue-400 uppercase tracking-widest">¿Por qué tu propia API Key?</p>
+                            <Sparkles size={13} className="text-[#233B8F]" />
+                            <p className="text-xs font-bold text-[#233B8F] uppercase tracking-widest">¿Por qué tu propia API Key?</p>
                         </div>
                         <ul className="text-xs text-[#111827]/45 space-y-1">
                             <li>• Control total de costos — pagas directamente a OpenAI</li>
@@ -169,7 +169,7 @@ export default function SetupPage() {
                             <li>• Tu clave se guarda cifrada con AES-256-GCM</li>
                         </ul>
                         <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1 mt-3 text-xs text-blue-400 font-bold hover:underline">
+                            className="inline-flex items-center gap-1 mt-3 text-xs text-[#233B8F] font-bold hover:underline">
                             Obtener API Key en OpenAI →
                         </a>
                     </div>
