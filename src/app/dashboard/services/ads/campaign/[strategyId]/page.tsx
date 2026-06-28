@@ -1783,6 +1783,7 @@ function CampaignPageInner() {
 
 export default function CampaignPage() {
     return (
+    <div className="dm-page font-ui">
         <Suspense fallback={
             <div className="flex items-center justify-center min-h-[60vh]">
                 <Loader2 className="animate-spin text-purple-400" size={32} />
@@ -1790,5 +1791,6 @@ export default function CampaignPage() {
         }>
             <CampaignPageInner />
         </Suspense>
+    </div>
     )
 }

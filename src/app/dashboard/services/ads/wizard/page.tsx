@@ -871,6 +871,7 @@ function WizardContent() {
 
 export default function WizardPage() {
     return (
+    <div className="dm-page font-ui">
         <Suspense fallback={
             <div className="flex items-center justify-center min-h-screen">
                 <Loader2 className="animate-spin text-purple-400" size={28} />
@@ -878,5 +879,6 @@ export default function WizardPage() {
         }>
             <WizardContent />
         </Suspense>
+    </div>
     )
 }

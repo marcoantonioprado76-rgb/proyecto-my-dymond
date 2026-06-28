@@ -518,9 +518,11 @@ function InputField({ label, value, onChange, placeholder }: { label: string; va
 
 function TextareaField({ label, value, onChange }: { label: string; value: string; onChange: any }) {
     return (
+    <div className="dm-page font-ui">
         <div>
             <label className="text-xs font-bold text-white/40 uppercase tracking-widest block mb-2">{label}</label>
             <textarea value={value} onChange={onChange} rows={3} className="w-full bg-[#1c1d2e] border border-white/20 rounded-xl px-3 py-2.5 text-sm text-white resize-none focus:outline-none focus:border-purple-500/50 leading-relaxed" />
         </div>
+    </div>
     )
 }

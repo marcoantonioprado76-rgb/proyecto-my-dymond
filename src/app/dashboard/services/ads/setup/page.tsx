@@ -84,17 +84,18 @@ export default function SetupPage() {
     }
 
     return (
-        <div className="px-4 md:px-6 pt-6 max-w-3xl mx-auto pb-24 text-white">
+    <div className="dm-page font-ui">
+        <div className="px-4 md:px-6 pt-6 max-w-3xl mx-auto pb-24 text-[#111827]">
 
             {/* Header */}
             <div className="flex items-center gap-3 mb-7">
                 <Link href="/dashboard/services/ads"
-                    className="w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-all shrink-0">
+                    className="w-9 h-9 rounded-xl bg-[#F4F6FA] border border-[#E4E9F0] flex items-center justify-center hover:bg-[#EEF2F7] transition-all shrink-0">
                     <ArrowLeft size={15} />
                 </Link>
                 <div>
                     <h1 className="text-lg md:text-xl font-black uppercase tracking-tighter">Configuración</h1>
-                    <p className="text-[11px] text-white/30">API Key de OpenAI y plataformas</p>
+                    <p className="text-[11px] text-[#111827]/30">API Key de OpenAI y plataformas</p>
                 </div>
             </div>
 
@@ -115,7 +116,7 @@ export default function SetupPage() {
             )}
 
             {/* Tab switcher */}
-            <div className="flex gap-1.5 mb-7 bg-white/4 p-1.5 rounded-2xl border border-white/8">
+            <div className="flex gap-1.5 mb-7 bg-white/4 p-1.5 rounded-2xl border border-[#E4E9F0]">
                 {[
                     { id: 'openai' as const, label: 'OpenAI', icon: Brain },
                     { id: 'platforms' as const, label: 'Plataformas', icon: Zap }
@@ -123,7 +124,7 @@ export default function SetupPage() {
                     <button key={t.id} onClick={() => setTab(t.id)}
                         className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-bold transition-all ${tab === t.id
                             ? 'bg-white text-black shadow-sm'
-                            : 'text-white/40 hover:text-white/70'
+                            : 'text-[#111827]/40 hover:text-[#111827]/70'
                         }`}>
                         <t.icon size={14} />
                         {t.label}
@@ -149,7 +150,7 @@ export default function SetupPage() {
                             </div>
                             <div className="flex-1 min-w-0">
                                 <p className="font-bold text-sm">{config.isValid ? 'API Key activa' : 'API Key no validada'}</p>
-                                <p className="text-[11px] text-white/40 font-mono truncate">{config.apiKeyMasked} · {config.model}</p>
+                                <p className="text-[11px] text-[#111827]/40 font-mono truncate">{config.apiKeyMasked} · {config.model}</p>
                             </div>
                             <button onClick={handleDeleteOpenAI} className="text-xs text-red-400 hover:text-red-300 font-bold shrink-0">Eliminar</button>
                         </div>
@@ -161,7 +162,7 @@ export default function SetupPage() {
                             <Sparkles size={13} className="text-blue-400" />
                             <p className="text-xs font-bold text-blue-400 uppercase tracking-widest">¿Por qué tu propia API Key?</p>
                         </div>
-                        <ul className="text-xs text-white/45 space-y-1">
+                        <ul className="text-xs text-[#111827]/45 space-y-1">
                             <li>• Control total de costos — pagas directamente a OpenAI</li>
                             <li>• Sin intermediarios — mayor seguridad y privacidad</li>
                             <li>• Usa el modelo que prefieras (GPT-5.1, GPT-4.1, etc.)</li>
@@ -174,14 +175,14 @@ export default function SetupPage() {
                     </div>
 
                     {/* Form */}
-                    <form onSubmit={handleSaveOpenAI} className="bg-white/3 border border-white/8 rounded-2xl p-5 space-y-4">
+                    <form onSubmit={handleSaveOpenAI} className="bg-white/3 border border-[#E4E9F0] rounded-2xl p-5 space-y-4">
                         <div className="flex items-center gap-2 mb-1">
-                            <Key size={14} className="text-white/40" />
+                            <Key size={14} className="text-[#111827]/40" />
                             <h3 className="font-bold text-sm">{config ? 'Actualizar API Key' : 'Configurar API Key'}</h3>
                         </div>
 
                         <div>
-                            <label className="text-[11px] font-bold text-white/40 uppercase tracking-widest block mb-2">
+                            <label className="text-[11px] font-bold text-[#111827]/40 uppercase tracking-widest block mb-2">
                                 OpenAI API Key
                             </label>
                             <div className="relative">
@@ -190,19 +191,19 @@ export default function SetupPage() {
                                     value={apiKey}
                                     onChange={e => setApiKey(e.target.value)}
                                     placeholder="sk-proj-..."
-                                    className="w-full bg-[#1c1d2e] border border-white/20 rounded-xl px-4 py-3 text-sm font-mono text-white pr-12 focus:outline-none focus:border-purple-500/50 placeholder:text-white/30 transition-colors"
+                                    className="w-full bg-[#1c1d2e] border border-[#E4E9F0] rounded-xl px-4 py-3 text-sm font-mono text-[#111827] pr-12 focus:outline-none focus:border-purple-500/50 placeholder:text-[#111827]/30 transition-colors"
                                 />
                                 <button type="button" onClick={() => setShowKey(!showKey)}
-                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/60 transition-colors">
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[#111827]/30 hover:text-[#111827]/60 transition-colors">
                                     {showKey ? <EyeOff size={15} /> : <Eye size={15} />}
                                 </button>
                             </div>
                         </div>
 
                         <div>
-                            <label className="text-[11px] font-bold text-white/40 uppercase tracking-widest block mb-2">Modelo de IA</label>
+                            <label className="text-[11px] font-bold text-[#111827]/40 uppercase tracking-widest block mb-2">Modelo de IA</label>
                             <select value={model} onChange={e => setModel(e.target.value)}
-                                className="w-full bg-[#1c1d2e] border border-white/20 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-purple-500/50 transition-colors [&>option]:bg-[#1c1d2e]">
+                                className="w-full bg-[#1c1d2e] border border-[#E4E9F0] rounded-xl px-4 py-3 text-sm text-[#111827] focus:outline-none focus:border-purple-500/50 transition-colors [&>option]:bg-[#1c1d2e]">
                                 <option value="gpt-5.2">GPT-5.2 ⚡ Última generación — ⚠ Mayor costo</option>
                                 <option value="gpt-5.1">GPT-5.1 ⚡ Más inteligente — ⚠ Mayor costo</option>
                                 <option value="gpt-4.1">GPT-4.1 — Alta calidad</option>
@@ -213,7 +214,7 @@ export default function SetupPage() {
                         </div>
 
                         <button type="submit" disabled={saving || !apiKey.trim()}
-                            className="w-full bg-purple-600 hover:bg-purple-500 disabled:opacity-40 disabled:cursor-not-allowed text-white font-bold py-3 rounded-xl transition-all flex items-center justify-center gap-2 active:scale-[0.98]">
+                            className="w-full bg-purple-600 hover:bg-purple-500 disabled:opacity-40 disabled:cursor-not-allowed text-[#111827] font-bold py-3 rounded-xl transition-all flex items-center justify-center gap-2 active:scale-[0.98]">
                             {saving ? <><Loader2 size={15} className="animate-spin" /> Validando...</> : 'Guardar y validar API Key'}
                         </button>
                     </form>
@@ -223,15 +224,15 @@ export default function SetupPage() {
             {/* Platforms Tab */}
             {tab === 'platforms' && (
                 <div className="space-y-3">
-                    <p className="text-xs text-white/30 mb-4">Conecta las plataformas donde quieres publicar tus anuncios.</p>
+                    <p className="text-xs text-[#111827]/30 mb-4">Conecta las plataformas donde quieres publicar tus anuncios.</p>
                     {PLATFORMS.map(platform => {
                         const integration = integrations.find(i => i.platform === platform.id)
                         const isConnected = integration?.status === 'CONNECTED'
                         return (
-                            <div key={platform.id} className="bg-white/3 border border-white/8 rounded-2xl p-4 md:p-5 hover:border-white/12 transition-all">
+                            <div key={platform.id} className="bg-white/3 border border-[#E4E9F0] rounded-2xl p-4 md:p-5 hover:border-white/12 transition-all">
                                 <div className="flex items-center gap-3">
                                     <div className="relative">
-                                        <div className="w-11 h-11 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center shrink-0">
+                                        <div className="w-11 h-11 rounded-2xl bg-[#F4F6FA] border border-[#E4E9F0] flex items-center justify-center shrink-0">
                                             <span className={`font-black text-xl ${platform.textColor}`}>{platform.letter}</span>
                                         </div>
                                         {isConnected && (
@@ -240,14 +241,14 @@ export default function SetupPage() {
                                     </div>
                                     <div className="flex-1 min-w-0">
                                         <h3 className="font-bold text-sm">{platform.label}</h3>
-                                        <p className="text-[11px] text-white/30">{platform.sub}</p>
+                                        <p className="text-[11px] text-[#111827]/30">{platform.sub}</p>
                                         {isConnected && integration?.connectedAccount && (
                                             <p className="text-[11px] text-green-400 mt-0.5 truncate">✓ {integration.connectedAccount.displayName}</p>
                                         )}
                                     </div>
                                     <button
                                         onClick={() => handleConnectPlatform(platform.id)}
-                                        className="shrink-0 flex items-center gap-1.5 text-xs font-bold px-4 py-2 rounded-xl bg-white/5 border border-white/10 hover:bg-white hover:text-black transition-all active:scale-[0.97]">
+                                        className="shrink-0 flex items-center gap-1.5 text-xs font-bold px-4 py-2 rounded-xl bg-[#F4F6FA] border border-[#E4E9F0] hover:bg-white hover:text-black transition-all active:scale-[0.97]">
                                         {isConnected ? <><Settings2 size={12} /> Reconfigurar</> : <><Link2 size={12} /> Conectar</>}
                                     </button>
                                 </div>
@@ -257,5 +258,6 @@ export default function SetupPage() {
                 </div>
             )}
         </div>
+    </div>
     )
 }

@@ -105,6 +105,7 @@ export default function PreviewPage() {
     const isPublished = campaign.status === 'PUBLISHED'
 
     return (
+    <div className="dm-page font-ui">
         <div className="px-4 md:px-6 pt-6 max-w-screen-xl mx-auto pb-24 text-white">
             {/* Header */}
             <div className="flex items-center gap-4 mb-6">
@@ -357,5 +358,6 @@ export default function PreviewPage() {
                 </div>
             )}
         </div>
+    </div>
     )
 }
