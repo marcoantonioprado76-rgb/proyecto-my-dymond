@@ -3368,8 +3368,8 @@ function BotDetailView({
           <ArrowLeft className="w-5 h-5" />
         </button>
         <div className="flex-1 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-[#B735B8]/12 border border-[#B735B8]/25 flex items-center justify-center shrink-0">
-            <Bot className="w-5 h-5 text-[#B735B8]" />
+          <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style={{ background: 'linear-gradient(135deg, #FF2D95 0%, #B735B8 48%, #233B8F 100%)', boxShadow: '0 10px 22px -8px rgba(255,9,108,0.45)' }}>
+            <Bot className="w-5 h-5 text-white" />
           </div>
           {editingName ? (
             <div className="flex items-center gap-2 flex-1">
@@ -3558,8 +3558,8 @@ export default function WhatsAppPage() {
           <ArrowLeft className="w-4.5 h-4.5 text-[#6B7280] group-hover:text-[#111827] transition-colors" />
         </Link>
         <div className="flex items-center gap-3 flex-1 min-w-0">
-          <div className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style={{ background: 'rgba(183,53,184,0.12)', border: '1px solid rgba(183,53,184,0.28)', boxShadow: '0 0 14px -4px rgba(183,53,184,0.4)' }}>
-            <MessageCircle className="w-4.5 h-4.5" style={{ color: '#B735B8' }} />
+          <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0" style={{ background: 'linear-gradient(135deg, #FF2D95 0%, #B735B8 48%, #233B8F 100%)', boxShadow: '0 10px 22px -8px rgba(255,9,108,0.45)' }}>
+            <MessageCircle className="w-4.5 h-4.5 text-white" />
           </div>
           <div className="min-w-0">
             <h1 className="text-lg font-bold text-[#111827] flex items-center gap-2 leading-tight" style={{ letterSpacing: '-0.02em' }}>
