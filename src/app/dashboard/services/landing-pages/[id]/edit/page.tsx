@@ -161,7 +161,7 @@ export default function LandingEditor({ params }: { params: { id: string } }) {
     }
 
     if (loading) return (
-        <div className="h-screen w-full flex flex-col items-center justify-center bg-[#050505] text-[#111827]">
+        <div className="h-screen w-full flex flex-col items-center justify-center bg-[#EEF2F7] text-[#111827]">
             <Loader2 className="w-12 h-12 text-[#00FF88] animate-spin mb-4" />
             <span className="font-black tracking-widest text-[#00FF88] uppercase text-xs">Cargando Software Pro...</span>
         </div>
@@ -169,7 +169,7 @@ export default function LandingEditor({ params }: { params: { id: string } }) {
 
     return (
     <div className="dm-page font-ui">
-        <div className="h-screen w-full flex flex-col bg-[#050505] overflow-hidden text-[#111827] font-inter">
+        <div className="h-screen w-full flex flex-col bg-[#EEF2F7] overflow-hidden text-[#111827] font-inter">
             {/* Top Bar - Clean & Pro */}
             <nav className="h-16 sm:h-20 border-b border-[#E4E9F0] flex items-center justify-between px-3 sm:px-8 bg-black/50 backdrop-blur-2xl z-[100] fixed top-0 w-full gap-2">
                 <div className="flex items-center gap-2 sm:gap-6 min-w-0">
@@ -223,7 +223,7 @@ export default function LandingEditor({ params }: { params: { id: string } }) {
             </nav>
 
             {/* Main Canvas Area */}
-            <main className="flex-1 mt-16 sm:mt-20 overflow-y-auto bg-[#050505] flex justify-center p-4 sm:p-8 scrollbar-hide">
+            <main className="flex-1 mt-16 sm:mt-20 overflow-y-auto bg-[#EEF2F7] flex justify-center p-4 sm:p-8 scrollbar-hide">
                 <div className={`transition-all duration-700 relative ${previewMode === 'desktop' ? 'w-full max-w-[1440px]' : 'w-[375px] h-[812px] rounded-[3rem] border-[12px] border-[#E4E9F0] shadow-[0_0_100px_rgba(0,0,0,0.8)] overflow-hidden scale-90 mt-[-5%]'
                     }`}>
                     <div className={`h-full ${previewMode === 'mobile' ? 'overflow-y-auto scrollbar-hide' : ''}`}>
