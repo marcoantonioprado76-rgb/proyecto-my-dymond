@@ -267,28 +267,6 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          {/* ── STAT CARDS (datos reales) ── */}
-          <div className="d-grid d-grid-4">
-            {[
-              { icon: 'fa-crown',        label: 'Tu Plan',         value: data.user.rank || '—',                          href: '/dashboard/planes', cta: 'Ver planes' },
-              { icon: 'fa-clock',        label: 'Días restantes',  value: countdown ? String(countdown.d) : '—',          href: '/dashboard/planes', cta: 'Renovar' },
-              { icon: 'fa-layer-group',  label: 'Servicios',       value: String(SERVICES.filter(s => !s.hidden).length), href: '/dashboard/services', cta: 'Explorar' },
-              { icon: 'fa-circle-check', label: 'Estado',          value: data.user.isActive ? 'Activo' : 'Inactivo',     href: '/dashboard/profile', cta: 'Mi perfil' },
-            ].map((st, i) => (
-              <div key={i} className="dm-card dm-card--hover" style={{ padding: 22, display: 'flex', flexDirection: 'column', gap: 14 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-                  <div style={{ width: 50, height: 50, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--dm-grad)', color: '#fff', boxShadow: '0 12px 28px rgba(255,9,108,0.24)', flexShrink: 0 }}>
-                    <i className={`fa-solid ${st.icon}`} style={{ fontSize: 18 }} />
-                  </div>
-                  <div style={{ minWidth: 0 }}>
-                    <p style={{ margin: 0, fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#6B7280' }}>{st.label}</p>
-                    <p className="font-display" style={{ margin: '2px 0 0', fontSize: 28, fontWeight: 600, color: '#111827', lineHeight: 1.05 }}>{st.value}</p>
-                  </div>
-                </div>
-                <Link href={st.href} style={{ fontSize: 12.5, fontWeight: 700, color: '#FF096C', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 6 }}>{st.cta} <i className="fa-solid fa-arrow-right" style={{ fontSize: 10 }} /></Link>
-              </div>
-            ))}
-          </div>
 
           {/* ── CTA Plan (countdown o comprar) ── */}
           {data.user.rank && data.user.rank !== 'NONE' && data.user.planExpiresAt ? (
