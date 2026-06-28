@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import NotificationBell from './NotificationBell'
@@ -33,6 +34,8 @@ async function logout() {
 export default function Navbar() {
   const pathname = usePathname()
   const isInAcademy  = pathname.startsWith('/dashboard/courses') || pathname.startsWith('/dashboard/podcasts') || pathname === '/dashboard/academy'
+  const isInServices = pathname === '/dashboard/services' || serviceItems.some(s => pathname === s.href || pathname.startsWith(s.href))
+  const [servicesOpen, setServicesOpen] = useState(isInServices)
 
   return (
     <>
@@ -54,25 +57,36 @@ export default function Navbar() {
             <span className="nav-item__label">Inicio</span>
             <span className="nav-item__dot"></span>
           </Link>
-          <Link href="/dashboard/services" className={`nav-item ${pathname === '/dashboard/services' ? 'nav-item--active' : ''}`}>
+          {/* Servicios — desplegable */}
+          <button
+            type="button"
+            onClick={() => setServicesOpen(o => !o)}
+            aria-expanded={servicesOpen}
+            className={`nav-item ${pathname === '/dashboard/services' ? 'nav-item--active' : ''}`}
+            style={{ width: '100%', background: pathname === '/dashboard/services' ? undefined : 'none', border: 'none', cursor: 'pointer', font: 'inherit', textAlign: 'left' }}
+          >
             <span className="nav-item__icon"><i className="fa-solid fa-th-large"></i></span>
             <span className="nav-item__label">Servicios</span>
-            <span className="nav-item__dot"></span>
-          </Link>
+            <i className="fa-solid fa-chevron-down" style={{ marginLeft: 'auto', fontSize: 11, opacity: 0.55, transition: 'transform .2s ease', transform: servicesOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}></i>
+          </button>
 
-          {serviceItems.map(item => {
-            const isActive = pathname === item.href || pathname.startsWith(item.href)
-            return (
-              <Link key={item.href} href={item.href} className={`nav-item ${isActive ? 'nav-item--active' : ''}`}>
-                <span className="nav-item__icon" style={{
-                  color: '#fff', background: item.grad,
-                  boxShadow: 'inset 0 1.5px 0 rgba(255,255,255,0.4), inset 0 -2px 4px rgba(0,0,0,0.22), 0 3px 8px rgba(0,0,0,0.4)',
-                }}><i className={item.iconClass}></i></span>
-                <span className="nav-item__label">{item.label}</span>
-                <span className="nav-item__dot"></span>
-              </Link>
-            )
-          })}
+          {servicesOpen && (
+            <div className="nav-sub">
+              {serviceItems.map(item => {
+                const isActive = pathname === item.href || pathname.startsWith(item.href)
+                return (
+                  <Link key={item.href} href={item.href} className={`nav-item nav-item--sub ${isActive ? 'nav-item--active' : ''}`}>
+                    <span className="nav-item__icon" style={{
+                      color: '#fff', background: item.grad,
+                      boxShadow: 'inset 0 1.5px 0 rgba(255,255,255,0.4), inset 0 -2px 4px rgba(0,0,0,0.22), 0 3px 8px rgba(0,0,0,0.4)',
+                    }}><i className={item.iconClass}></i></span>
+                    <span className="nav-item__label">{item.label}</span>
+                    <span className="nav-item__dot"></span>
+                  </Link>
+                )
+              })}
+            </div>
+          )}
 
           <Link href="/dashboard/academy" className={`nav-item ${isInAcademy ? 'nav-item--active' : ''}`}>
             <span className="nav-item__icon"><i className="fa-solid fa-graduation-cap"></i></span>
