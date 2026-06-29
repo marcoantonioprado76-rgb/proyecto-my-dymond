@@ -218,12 +218,12 @@ function RegisterForm() {
 
         {/* Logo oficial */}
         <div className="flex flex-col items-center mb-6">
-          <img src="/logo-oficial-mydiamond.png" alt="MY DIAMOND" style={{ width: 200, height: 'auto', display: 'block', filter: 'drop-shadow(0 12px 32px rgba(0,0,0,0.5))' }} />
+          <img src="/logo-oficial-mydiamond.png" alt="MY DIAMOND" style={{ width: 200, height: 'auto', display: 'block', filter: 'drop-shadow(0 18px 42px rgba(0,0,0,0.62)) drop-shadow(0 0 30px rgba(183,53,184,0.22))' }} />
           <p className="text-xs text-[#6B7280] mt-3">Crea tu cuenta gratuita</p>
         </div>
 
         {/* Card */}
-        <div className="dm-card p-6">
+        <div className="dm-card p-6" style={{ boxShadow: '0 32px 80px -20px rgba(4,10,18,0.88), 0 10px 28px rgba(8,22,36,0.5)' }}>
 
           <h2 className="text-sm font-black text-[#111827] mb-0.5">Registro</h2>
           <p className="text-[11px] text-[#6B7280] mb-5">Completa los datos para unirte a la plataforma.</p>

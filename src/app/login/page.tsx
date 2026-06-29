@@ -61,11 +61,11 @@ export default function LoginPage() {
 
         {/* Logo oficial */}
         <div className="flex flex-col items-center mb-8">
-          <img src="/logo-oficial-mydiamond.png" alt="MY DIAMOND" style={{ width: 230, height: 'auto', display: 'block', filter: 'drop-shadow(0 12px 32px rgba(0,0,0,0.5))' }} />
+          <img src="/logo-oficial-mydiamond.png" alt="MY DIAMOND" style={{ width: 230, height: 'auto', display: 'block', filter: 'drop-shadow(0 18px 42px rgba(0,0,0,0.62)) drop-shadow(0 0 30px rgba(183,53,184,0.22))' }} />
         </div>
 
         {/* Card */}
-        <div style={{ padding: '2rem', background: '#FFFFFF', border: '1px solid #E4E9F0', borderRadius: 24, boxShadow: '0 18px 45px rgba(15,23,42,0.08)' }}>
+        <div style={{ padding: '2rem', background: '#FFFFFF', border: '1px solid #E4E9F0', borderRadius: 24, boxShadow: '0 32px 80px -20px rgba(4,10,18,0.88), 0 10px 28px rgba(8,22,36,0.5)' }}>
 
           <p className="text-[10px] font-black uppercase tracking-[0.2em] mb-5" style={{ color: '#9CA3AF' }}>Iniciar sesión</p>
 
