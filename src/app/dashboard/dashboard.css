@@ -750,9 +750,9 @@
     max-width: 100%;
     height: auto;
     display: block;
-    /* márgenes negativos: absorben el espacio transparente del PNG → el logo
-       se ve más grande sin agrandar el muro/header */
-    margin: -17px auto -15px;
+    /* El PNG ya viene recortado (sin espacio transparente), así que no hacen
+       falta márgenes negativos: el logo se ve grande y nítido sin montarse. */
+    margin: 6px auto;
     filter: drop-shadow(0 2px 8px rgba(0,0,0,0.30));
 }
 

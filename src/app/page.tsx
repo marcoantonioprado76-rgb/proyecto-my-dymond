@@ -59,9 +59,9 @@ const CSS = `
   .md-landing .nav-in{display:flex;align-items:center;justify-content:space-between;height:74px}
   .md-landing .brand{display:flex;align-items:center;gap:12px;font-family:"Archivo";font-weight:800;
     letter-spacing:.12em;font-size:15px;white-space:nowrap}
-  .md-landing .brand .wordmark{height:34px;width:auto;display:block;
+  .md-landing .brand .wordmark{height:48px;width:auto;display:block;
     filter:drop-shadow(0 0 10px rgba(164,37,255,.35))}
-  .md-landing .foot-in .brand .wordmark{height:26px}
+  .md-landing .foot-in .brand .wordmark{height:38px}
   .md-landing .brand .logo{width:auto;height:auto;display:grid;place-items:center;
     background:none;border:none;box-shadow:none;border-radius:0;animation:none}
   @keyframes logopulse{0%,100%{box-shadow:0 0 18px rgba(164,37,255,.35)}50%{box-shadow:0 0 30px rgba(196,38,211,.7)}}
