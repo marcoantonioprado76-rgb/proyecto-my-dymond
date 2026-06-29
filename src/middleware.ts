@@ -47,8 +47,9 @@ export function middleware(request: NextRequest) {
   const token = request.cookies.get('auth_token')?.value
   const { pathname } = request.nextUrl
 
-  // Bloquear bots/scrapers en rutas API (excluir webhooks y health check)
-  if (pathname.startsWith('/api/') && !pathname.startsWith('/api/webhooks/') && pathname !== '/api/health') {
+  // Bloquear bots/scrapers en rutas API (excluir webhooks, health check y el
+  // cron de verificación de compras — ya protegido por CRON_SECRET).
+  if (pathname.startsWith('/api/') && !pathname.startsWith('/api/webhooks/') && pathname !== '/api/health' && pathname !== '/api/purchases/verify') {
     if (isBotRequest(request)) {
       return new NextResponse(
         JSON.stringify({ error: 'Acceso denegado.' }),
