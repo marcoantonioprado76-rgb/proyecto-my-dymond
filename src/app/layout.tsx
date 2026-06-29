@@ -5,10 +5,8 @@ import { WalletProvider } from '@/context/WalletProvider'
 export const metadata: Metadata = {
   title: 'MY DIAMOND',
   description: 'Plataforma Oficial - MY DIAMOND',
-  icons: {
-    icon: '/logo-oficial-mydiamond.png',
-    apple: '/logo-oficial-mydiamond.png',
-  },
+  // El favicon/apple-icon los maneja Next.js automáticamente desde
+  // src/app/icon.png y src/app/apple-icon.png (generados del logo oficial).
   other: {
     'tiktok-developers-site-verification': 'z09wedDq9xCOj3EGusafCQHO8EtDU10L',
     'facebook-domain-verification': '4ig9scnmgsrs3tgzm120c0budjwwk4',
