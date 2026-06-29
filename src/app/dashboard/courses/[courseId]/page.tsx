@@ -244,9 +244,9 @@ export default function CourseDetailPage() {
     reportProgress(player.id, 100, videoElRef.current ? Math.floor(videoElRef.current.currentTime) : undefined)
   }
 
-  // Genera y descarga el certificado: usa la plantilla oficial (imagen) y solo
-  // superpone el NOMBRE del alumno. Todo lo demás (diseño, curso, sello) viene
-  // de la imagen public/certificado-plantilla.png.
+  // Genera y descarga el certificado: dibuja la plantilla oficial (imagen) y
+  // superpone los datos dinámicos: NOMBRE del alumno, NOMBRE del curso y la
+  // FECHA de finalización. El resto del diseño viene de la imagen.
   async function downloadCertificate() {
     if (!course) return
     const tpl = new Image(); tpl.crossOrigin = 'anonymous'
@@ -256,15 +256,34 @@ export default function CourseDetailPage() {
     canvas.width = W; canvas.height = H
     const ctx = canvas.getContext('2d'); if (!ctx) return
     ctx.drawImage(tpl, 0, 0, W, H)
+    const FONT = 'Georgia, "Times New Roman", serif'
 
-    // Nombre del alumno, centrado donde va en la plantilla (x≈873, centro y≈614)
+    // 1) Nombre del alumno (centrado en x≈873, centro y≈614)
     const name = (course.viewerName || 'Alumno').trim()
-    ctx.textAlign = 'center'; ctx.textBaseline = 'middle'
-    ctx.fillStyle = '#14112A'
-    let size = 96
-    ctx.font = `bold ${size}px Georgia, "Times New Roman", serif`
-    while (ctx.measureText(name).width > 1180 && size > 44) { size -= 4; ctx.font = `bold ${size}px Georgia, "Times New Roman", serif` }
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillStyle = '#14112A'
+    let ns = 96; ctx.font = `bold ${ns}px ${FONT}`
+    while (ctx.measureText(name).width > 1180 && ns > 44) { ns -= 4; ctx.font = `bold ${ns}px ${FONT}` }
     ctx.fillText(name, 873, 614)
+
+    // 2) Nombre del curso (centrado en x≈843, centro y≈839) — gradiente morado→magenta
+    const title = course.title.toUpperCase()
+    let cs = 58; ctx.font = `bold ${cs}px ${FONT}`
+    while (ctx.measureText(title).width > 820 && cs > 28) { cs -= 3; ctx.font = `bold ${cs}px ${FONT}` }
+    const tw = ctx.measureText(title).width
+    const cgrad = ctx.createLinearGradient(843 - tw / 2, 0, 843 + tw / 2, 0)
+    cgrad.addColorStop(0, '#5E5096'); cgrad.addColorStop(1, '#9E478E')
+    ctx.fillStyle = cgrad
+    ctx.fillText(title, 843, 839)
+
+    // 3) Fecha de finalización (línea inferior centrada en x≈838)
+    const dateStr = new Date().toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' })
+    const p1 = 'MY DIAMOND', p2 = ` Academy · ${dateStr}`
+    ctx.textAlign = 'left'; ctx.textBaseline = 'top'
+    ctx.font = `bold 30px ${FONT}`; const w1 = ctx.measureText(p1).width
+    ctx.font = `30px ${FONT}`; const w2 = ctx.measureText(p2).width
+    const dsx = 838 - (w1 + w2) / 2
+    ctx.font = `bold 30px ${FONT}`; ctx.fillStyle = '#3B2C7A'; ctx.fillText(p1, dsx, 1168)
+    ctx.font = `30px ${FONT}`; ctx.fillStyle = '#555562'; ctx.fillText(p2, dsx + w1, 1168)
 
     const a = document.createElement('a')
     a.href = canvas.toDataURL('image/png')
