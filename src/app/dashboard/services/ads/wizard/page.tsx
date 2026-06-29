@@ -871,7 +871,7 @@ function WizardContent() {
 
 export default function WizardPage() {
     return (
-    <div className="dm-page font-ui">
+    <div className="font-ui" style={{ minHeight: '100vh', color: '#fff', background: 'radial-gradient(circle at top right, rgba(255,9,108,0.07), transparent 30%), radial-gradient(circle at bottom left, rgba(106,53,217,0.10), transparent 32%), linear-gradient(180deg, #0B1B2B 0%, #081624 55%, #050B14 100%)' }}>
         <Suspense fallback={
             <div className="flex items-center justify-center min-h-screen">
                 <Loader2 className="animate-spin text-[#C9A7FF]" size={28} />
