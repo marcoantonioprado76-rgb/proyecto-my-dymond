@@ -24,8 +24,8 @@ interface Enrollment {
 
 const STATUS: Record<string, { label: string; color: string; bg: string; border: string; icon: string }> = {
   PENDING:              { label: 'Comprobante en revisión', color: '#f97316', bg: 'rgba(249,115,22,0.1)',  border: 'rgba(249,115,22,0.25)',  icon: '⏳' },
-  PENDING_VERIFICATION: { label: 'Verificando en blockchain', color: '#F5A623', bg: 'rgba(245,166,35,0.1)', border: 'rgba(245,166,35,0.3)',  icon: '⛓️' },
-  APPROVED:             { label: 'Acceso completo',  color: '#10B981', bg: 'rgba(16,185,129,0.08)', border: 'rgba(16,185,129,0.2)',   icon: '✓' },
+  PENDING_VERIFICATION: { label: 'Verificando en blockchain', color: '#C9A7FF', bg: 'rgba(245,166,35,0.1)', border: 'rgba(245,166,35,0.3)',  icon: '⛓️' },
+  APPROVED:             { label: 'Acceso completo',  color: '#FF2D95', bg: 'rgba(255,45,149,0.08)', border: 'rgba(255,45,149,0.2)',   icon: '✓' },
   REJECTED:             { label: 'Rechazado',        color: '#ef4444', bg: 'rgba(239,68,68,0.1)',   border: 'rgba(239,68,68,0.25)',  icon: '✕' },
 }
 
@@ -165,7 +165,7 @@ export default function MyEnrollmentsPage() {
                     </span>
                   )}
                   {e.status === 'PENDING_VERIFICATION' && (
-                    <span style={{ fontSize: 12, color: '#F5A623' }}>
+                    <span style={{ fontSize: 12, color: '#C9A7FF' }}>
                       ⛓️ Verificando transacción en blockchain BSC...
                     </span>
                   )}

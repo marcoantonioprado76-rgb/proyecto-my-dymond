@@ -23,9 +23,9 @@ interface Course {
 }
 
 const NIVEL_COLOR: Record<string, string> = {
-  Principiante: '#10B981',
-  Intermedio: '#F5A623',
-  Avanzado: '#FF2DF7',
+  Principiante: '#7DD3FC',
+  Intermedio: '#C9A7FF',
+  Avanzado: '#FF2D95',
 }
 
 const STATUS_BADGE: Record<string, { label: string; style: React.CSSProperties }> = {
@@ -35,11 +35,11 @@ const STATUS_BADGE: Record<string, { label: string; style: React.CSSProperties }
   },
   PENDING_VERIFICATION: {
     label: 'Verificando cripto',
-    style: { color: '#F5A623', background: 'rgba(245,166,35,0.1)', border: '1px solid rgba(245,166,35,0.3)' },
+    style: { color: '#C9A7FF', background: 'rgba(245,166,35,0.1)', border: '1px solid rgba(245,166,35,0.3)' },
   },
   APPROVED: {
     label: 'Acceso completo',
-    style: { color: '#10B981', background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.2)' },
+    style: { color: '#FF2D95', background: 'rgba(255,45,149,0.08)', border: '1px solid rgba(255,45,149,0.2)' },
   },
   REJECTED: {
     label: 'Rechazado',
@@ -115,8 +115,8 @@ export default function CoursesPage() {
                 <b style={{ color: '#111827' }}>{courses.length}</b> curso{courses.length !== 1 ? 's' : ''}
               </span>
               {courses.some(c => c.enrollment?.status === 'APPROVED') && (
-                <span style={{ fontSize: 11, color: 'rgba(16,185,129,0.7)' }}>
-                  <b style={{ color: '#10B981' }}>{courses.filter(c => c.enrollment?.status === 'APPROVED').length}</b> con acceso
+                <span style={{ fontSize: 11, color: 'rgba(255,45,149,0.7)' }}>
+                  <b style={{ color: '#FF2D95' }}>{courses.filter(c => c.enrollment?.status === 'APPROVED').length}</b> con acceso
                 </span>
               )}
               {courses.some(c => c.freeForPlan) && (
@@ -267,7 +267,7 @@ export default function CoursesPage() {
                     <span style={{
                       position: 'absolute', top: 8, left: 8, fontSize: 10, fontWeight: 700,
                       letterSpacing: '0.06em', padding: '3px 8px', borderRadius: 6,
-                      color: '#10B981', background: 'rgba(16,185,129,0.12)', border: '1px solid rgba(16,185,129,0.25)',
+                      color: '#FF2D95', background: 'rgba(255,45,149,0.12)', border: '1px solid rgba(255,45,149,0.25)',
                     }}>
                       Gratis con tu plan
                     </span>
@@ -305,7 +305,7 @@ export default function CoursesPage() {
                         Ver plan →
                       </Link>
                     ) : (
-                      <span style={{ fontWeight: 800, fontSize: 13, color: course.freeForPlan ? '#10B981' : '#F5A623' }}>
+                      <span style={{ fontWeight: 800, fontSize: 13, color: course.freeForPlan ? '#FF2D95' : '#C9A7FF' }}>
                         {course.freeForPlan ? 'GRATIS' : `${course.price.toFixed(2)} USDT`}
                       </span>
                     )}
