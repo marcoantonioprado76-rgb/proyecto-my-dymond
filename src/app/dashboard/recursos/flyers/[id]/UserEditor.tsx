@@ -233,12 +233,12 @@ export default function UserEditor({ templateId }: { templateId: string }) {
     'Playfair Display', 'Merriweather', 'Georgia', 'Lobster', 'Pacifico',
     'Dancing Script', 'Caveat', 'Righteous', 'Permanent Marker', 'Roboto Mono',
   ]
-  const SWATCHES = ['#ffffff', '#000000', '#D203DD', '#0D1E79', '#00FF9D', '#FFD500', '#FF2D55']
+  const SWATCHES = ['#ffffff', '#000000', '#B735B8', '#0D1E79', '#00FF9D', '#FFD500', '#FF2D55']
   const renderTextToolbar = () => {
     if (!textSel) return null
     return (
-      <div className="w-full rounded-xl bg-white/[0.05] border border-[#D203DD]/30 p-3 space-y-2.5">
-        <p className="text-[11px] font-black text-white/70 flex items-center gap-1.5"><i className="fa-solid fa-font text-[#D203DD]"></i> Texto seleccionado</p>
+      <div className="w-full rounded-xl bg-[#F4F6FA] border border-[#B735B8]/30 p-3 space-y-2.5">
+        <p className="text-[11px] font-black text-[#374151] flex items-center gap-1.5"><i className="fa-solid fa-font text-[#B735B8]"></i> Texto seleccionado</p>
         <div className="flex items-center gap-1.5 flex-wrap">
           {SWATCHES.map(c => (
             <button key={c} type="button" onClick={() => applyText({ fill: c })}
@@ -248,34 +248,34 @@ export default function UserEditor({ templateId }: { templateId: string }) {
           <label className="w-6 h-6 rounded-full border-2 border-white/25 relative cursor-pointer flex items-center justify-center" title="Color personalizado">
             <input type="color" value={textSel.fill} onChange={e => applyText({ fill: e.target.value })}
               className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
-            <i className="fa-solid fa-eye-dropper text-[9px] text-white/70"></i>
+            <i className="fa-solid fa-eye-dropper text-[9px] text-[#374151]"></i>
           </label>
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-[10px] text-white/40 w-12 shrink-0">Tamaño</span>
+          <span className="text-[10px] text-[#9CA3AF] w-12 shrink-0">Tamaño</span>
           <button type="button" onClick={() => applyText({ fontSize: Math.max(8, textSel.fontSize - 4) })}
-            className="w-7 h-7 rounded-lg bg-white/10 text-white font-black hover:bg-white/20 transition-all">−</button>
-          <span className="text-xs font-bold text-white w-9 text-center">{textSel.fontSize}</span>
+            className="w-7 h-7 rounded-lg bg-[#EEF2F7] text-[#111827] font-black hover:bg-[#E4E9F0] transition-all">−</button>
+          <span className="text-xs font-bold text-[#111827] w-9 text-center">{textSel.fontSize}</span>
           <button type="button" onClick={() => applyText({ fontSize: Math.min(400, textSel.fontSize + 4) })}
-            className="w-7 h-7 rounded-lg bg-white/10 text-white font-black hover:bg-white/20 transition-all">+</button>
+            className="w-7 h-7 rounded-lg bg-[#EEF2F7] text-[#111827] font-black hover:bg-[#E4E9F0] transition-all">+</button>
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-[10px] text-white/40 w-12 shrink-0">Fuente</span>
+          <span className="text-[10px] text-[#9CA3AF] w-12 shrink-0">Fuente</span>
           <div className="relative flex-1 min-w-0">
             <button type="button" onClick={() => setFontMenuOpen(o => !o)}
               style={{ fontFamily: textSel.fontFamily }}
-              className="w-full flex items-center justify-between gap-2 bg-black/30 border border-white/10 rounded-lg px-2.5 py-1.5 text-sm text-white outline-none hover:border-[#D203DD]/50">
+              className="w-full flex items-center justify-between gap-2 bg-white border border-[#E4E9F0] rounded-lg px-2.5 py-1.5 text-sm text-[#111827] outline-none hover:border-[#B735B8]/50">
               <span className="truncate">{textSel.fontFamily}</span>
-              <i className="fa-solid fa-chevron-down text-[10px] text-white/40 shrink-0"></i>
+              <i className="fa-solid fa-chevron-down text-[10px] text-[#9CA3AF] shrink-0"></i>
             </button>
             {fontMenuOpen && (
               <>
                 <div className="fixed inset-0 z-10" onClick={() => setFontMenuOpen(false)} />
-                <div className="absolute z-20 left-0 right-0 bottom-full mb-1 max-h-60 overflow-auto rounded-lg bg-[#0b0b14] border border-white/15 shadow-2xl">
+                <div className="absolute z-20 left-0 right-0 bottom-full mb-1 max-h-60 overflow-auto rounded-lg bg-[#0b0b14] border border-[#E4E9F0] shadow-2xl">
                   {FONTS.map(f => (
                     <button key={f} type="button" onClick={() => pickFont(f)}
                       style={{ fontFamily: f }}
-                      className={`w-full text-left px-3 py-2 text-[15px] leading-tight hover:bg-white/10 transition-colors ${textSel.fontFamily === f ? 'text-[#D203DD] bg-white/5' : 'text-white'}`}>
+                      className={`w-full text-left px-3 py-2 text-[15px] leading-tight hover:bg-[#EEF2F7] transition-colors ${textSel.fontFamily === f ? 'text-[#B735B8] bg-[#F4F6FA]' : 'text-[#111827]'}`}>
                       {f}
                     </button>
                   ))}
@@ -289,13 +289,13 @@ export default function UserEditor({ templateId }: { templateId: string }) {
   }
 
   if (loading) {
-    return <div className="flex items-center justify-center py-32 text-white/40"><i className="fa-solid fa-spinner fa-spin text-2xl"></i></div>
+    return <div className="flex items-center justify-center py-32 text-[#9CA3AF]"><i className="fa-solid fa-spinner fa-spin text-2xl"></i></div>
   }
   if (error) {
     return (
       <div className="max-w-md mx-auto text-center py-24">
         <p className="text-red-400 text-sm mb-4">{error}</p>
-        <Link href="/dashboard/recursos/flyers" className="text-[#D203DD] underline text-sm">Volver a Recursos</Link>
+        <Link href="/dashboard/recursos/flyers" className="text-[#B735B8] underline text-sm">Volver a Recursos</Link>
       </div>
     )
   }
@@ -308,18 +308,17 @@ export default function UserEditor({ templateId }: { templateId: string }) {
   const canvasW = expanded ? Math.max(260, expandedW) : inlineW
 
   return (
-    <div className="font-ui" style={{ minHeight: '100vh', color: '#fff', background: 'radial-gradient(circle at top right, rgba(255,9,108,0.06), transparent 30%), radial-gradient(circle at bottom left, rgba(106,53,217,0.10), transparent 32%), linear-gradient(180deg, #0B1B2B 0%, #081624 55%, #050B14 100%)' }}>
     <div ref={measureRef} className="max-w-5xl mx-auto px-4 py-6">
       <div className="flex items-center gap-2 sm:gap-3 mb-5">
-        <Link href="/dashboard/recursos/flyers" className="w-9 h-9 shrink-0 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-all">
-          <i className="fa-solid fa-arrow-left text-white/70 text-sm"></i>
+        <Link href="/dashboard/recursos/flyers" className="w-9 h-9 shrink-0 rounded-xl bg-[#F4F6FA] border border-[#E4E9F0] flex items-center justify-center hover:bg-[#EEF2F7] transition-all">
+          <i className="fa-solid fa-arrow-left text-[#374151] text-sm"></i>
         </Link>
         <div className="min-w-0 flex-1">
-          <h1 className="text-lg font-black text-white truncate">{template?.nombre}</h1>
-          <p className="text-xs text-white/40 capitalize">{template?.categoria}</p>
+          <h1 className="text-lg font-black text-[#111827] truncate">{template?.nombre}</h1>
+          <p className="text-xs text-[#9CA3AF] capitalize">{template?.categoria}</p>
         </div>
         <button onClick={() => setExpanded(true)} disabled={!ready}
-          className="shrink-0 flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold text-white/80 bg-white/5 border border-white/10 hover:bg-white/10 transition-all active:scale-95 disabled:opacity-50">
+          className="shrink-0 flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold text-[#374151] bg-[#F4F6FA] border border-[#E4E9F0] hover:bg-[#EEF2F7] transition-all active:scale-95 disabled:opacity-50">
           <i className="fa-solid fa-up-right-and-down-left-from-center"></i><span className="hidden sm:inline">Ampliar</span>
         </button>
       </div>
@@ -330,12 +329,12 @@ export default function UserEditor({ templateId }: { templateId: string }) {
         {/* Lienzo — el marco abraza el lienzo (sin recuadro negro). Al ampliar pasa a pantalla completa. */}
         <div className={expanded
           ? 'fixed inset-0 z-[80] bg-[#07070d]/98 backdrop-blur-sm flex flex-col items-center justify-center gap-3 p-3 overflow-y-auto'
-          : 'rounded-2xl border border-white/10 bg-black/30 p-3 w-fit max-w-full mx-auto md:mx-0'}>
+          : 'rounded-2xl border border-[#E4E9F0] bg-white p-3 w-fit max-w-full mx-auto md:mx-0'}>
           {expanded && (
             <div className="w-full max-w-3xl flex items-center justify-between gap-3 shrink-0">
-              <p className="text-sm font-bold text-white truncate">{template?.nombre}</p>
+              <p className="text-sm font-bold text-[#111827] truncate">{template?.nombre}</p>
               <button onClick={() => setExpanded(false)}
-                className="w-9 h-9 rounded-xl bg-white/5 border border-white/10 text-white/80 hover:bg-white/10 transition-all flex items-center justify-center shrink-0">
+                className="w-9 h-9 rounded-xl bg-[#F4F6FA] border border-[#E4E9F0] text-[#374151] hover:bg-[#EEF2F7] transition-all flex items-center justify-center shrink-0">
                 <i className="fa-solid fa-xmark"></i>
               </button>
             </div>
@@ -349,17 +348,17 @@ export default function UserEditor({ templateId }: { templateId: string }) {
           {expanded && (
             <div className="flex items-center gap-2 flex-wrap justify-center shrink-0">
               <button onClick={() => fileRef.current?.click()} disabled={!ready}
-                className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold text-white transition-all active:scale-95 disabled:opacity-50"
+                className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold text-[#111827] transition-all active:scale-95 disabled:opacity-50"
                 style={{ background: 'linear-gradient(135deg, #FF2D95 0%, #B735B8 48%, #233B8F 100%)' }}>
                 <i className="fa-solid fa-image"></i> {hasPhoto ? 'Cambiar foto' : 'Subir foto'}
               </button>
               <button onClick={() => download('jpeg')} disabled={!ready}
-                className="flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-black text-white transition-all active:scale-95 disabled:opacity-50"
+                className="flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-black text-[#111827] transition-all active:scale-95 disabled:opacity-50"
                 style={{ background: 'linear-gradient(135deg, #FF2D95 0%, #B735B8 48%, #233B8F 100%)' }}>
                 <i className="fa-solid fa-download"></i> JPG
               </button>
               <button onClick={() => download('png')} disabled={!ready}
-                className="flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-black text-white border border-white/15 bg-white/5 transition-all active:scale-95 disabled:opacity-50">
+                className="flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-black text-[#111827] border border-[#E4E9F0] bg-[#F4F6FA] transition-all active:scale-95 disabled:opacity-50">
                 <i className="fa-solid fa-download"></i> PNG
               </button>
             </div>
@@ -369,15 +368,15 @@ export default function UserEditor({ templateId }: { templateId: string }) {
         {/* Controles (modo en línea) */}
         <div className={`w-full md:w-64 md:shrink-0 space-y-3 ${expanded ? 'hidden' : ''}`}>
           <button onClick={() => fileRef.current?.click()} disabled={!ready}
-            className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold text-white transition-all active:scale-95 disabled:opacity-50"
+            className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold text-[#111827] transition-all active:scale-95 disabled:opacity-50"
             style={{ background: 'linear-gradient(135deg, #FF2D95 0%, #B735B8 48%, #233B8F 100%)' }}>
             <i className="fa-solid fa-image"></i> {hasPhoto ? 'Cambiar foto' : 'Subir foto'}
           </button>
 
           {renderTextToolbar()}
 
-          <div className="rounded-xl bg-white/[0.03] border border-white/10 p-3 text-[11px] text-white/45 leading-relaxed">
-            <p className="font-bold text-white/70 mb-1.5"><i className="fa-solid fa-lightbulb text-amber-400 mr-1"></i> Cómo editar</p>
+          <div className="rounded-xl bg-white/[0.03] border border-[#E4E9F0] p-3 text-[11px] text-[#111827]/45 leading-relaxed">
+            <p className="font-bold text-[#374151] mb-1.5"><i className="fa-solid fa-lightbulb text-amber-400 mr-1"></i> Cómo editar</p>
             <p>• Tu foto va <b>detrás</b> del diseño: arrastrala y escalala para acomodarla.</p>
             <p>• <b>Doble clic</b> en un texto para escribir el tuyo.</p>
             <p>• <b>Tocá un texto</b> para cambiar su color, tamaño y fuente.</p>
@@ -387,19 +386,18 @@ export default function UserEditor({ templateId }: { templateId: string }) {
 
           <div className="grid grid-cols-2 gap-2">
             <button onClick={() => download('jpeg')} disabled={!ready}
-              className="flex items-center justify-center gap-1.5 py-3 rounded-xl text-xs font-black text-white transition-all active:scale-95 disabled:opacity-50"
+              className="flex items-center justify-center gap-1.5 py-3 rounded-xl text-xs font-black text-[#111827] transition-all active:scale-95 disabled:opacity-50"
               style={{ background: 'linear-gradient(135deg, #FF2D95 0%, #B735B8 48%, #233B8F 100%)' }}>
               <i className="fa-solid fa-download"></i> JPG
             </button>
             <button onClick={() => download('png')} disabled={!ready}
-              className="flex items-center justify-center gap-1.5 py-3 rounded-xl text-xs font-black text-white border border-white/15 bg-white/5 transition-all active:scale-95 disabled:opacity-50">
+              className="flex items-center justify-center gap-1.5 py-3 rounded-xl text-xs font-black text-[#111827] border border-[#E4E9F0] bg-[#F4F6FA] transition-all active:scale-95 disabled:opacity-50">
               <i className="fa-solid fa-download"></i> PNG
             </button>
           </div>
-          <p className="text-[10px] text-white/30 text-center">Descarga en {template?.ancho}×{template?.alto}px</p>
+          <p className="text-[10px] text-[#9CA3AF] text-center">Descarga en {template?.ancho}×{template?.alto}px</p>
         </div>
       </div>
-    </div>
     </div>
   )
 }
