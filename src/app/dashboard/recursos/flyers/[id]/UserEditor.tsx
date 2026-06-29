@@ -308,6 +308,7 @@ export default function UserEditor({ templateId }: { templateId: string }) {
   const canvasW = expanded ? Math.max(260, expandedW) : inlineW
 
   return (
+    <div className="font-ui" style={{ minHeight: '100vh', color: '#fff', background: 'radial-gradient(circle at top right, rgba(255,9,108,0.06), transparent 30%), radial-gradient(circle at bottom left, rgba(106,53,217,0.10), transparent 32%), linear-gradient(180deg, #0B1B2B 0%, #081624 55%, #050B14 100%)' }}>
     <div ref={measureRef} className="max-w-5xl mx-auto px-4 py-6">
       <div className="flex items-center gap-2 sm:gap-3 mb-5">
         <Link href="/dashboard/recursos/flyers" className="w-9 h-9 shrink-0 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-all">
@@ -349,12 +350,12 @@ export default function UserEditor({ templateId }: { templateId: string }) {
             <div className="flex items-center gap-2 flex-wrap justify-center shrink-0">
               <button onClick={() => fileRef.current?.click()} disabled={!ready}
                 className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold text-white transition-all active:scale-95 disabled:opacity-50"
-                style={{ background: 'linear-gradient(135deg,#0D1E79,#D203DD)' }}>
+                style={{ background: 'linear-gradient(135deg, #FF2D95 0%, #B735B8 48%, #233B8F 100%)' }}>
                 <i className="fa-solid fa-image"></i> {hasPhoto ? 'Cambiar foto' : 'Subir foto'}
               </button>
               <button onClick={() => download('jpeg')} disabled={!ready}
-                className="flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-black text-black transition-all active:scale-95 disabled:opacity-50"
-                style={{ background: 'linear-gradient(135deg,#00FF9D,#00B4FF)' }}>
+                className="flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-black text-white transition-all active:scale-95 disabled:opacity-50"
+                style={{ background: 'linear-gradient(135deg, #FF2D95 0%, #B735B8 48%, #233B8F 100%)' }}>
                 <i className="fa-solid fa-download"></i> JPG
               </button>
               <button onClick={() => download('png')} disabled={!ready}
@@ -369,7 +370,7 @@ export default function UserEditor({ templateId }: { templateId: string }) {
         <div className={`w-full md:w-64 md:shrink-0 space-y-3 ${expanded ? 'hidden' : ''}`}>
           <button onClick={() => fileRef.current?.click()} disabled={!ready}
             className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold text-white transition-all active:scale-95 disabled:opacity-50"
-            style={{ background: 'linear-gradient(135deg,#0D1E79,#D203DD)' }}>
+            style={{ background: 'linear-gradient(135deg, #FF2D95 0%, #B735B8 48%, #233B8F 100%)' }}>
             <i className="fa-solid fa-image"></i> {hasPhoto ? 'Cambiar foto' : 'Subir foto'}
           </button>
 
@@ -386,8 +387,8 @@ export default function UserEditor({ templateId }: { templateId: string }) {
 
           <div className="grid grid-cols-2 gap-2">
             <button onClick={() => download('jpeg')} disabled={!ready}
-              className="flex items-center justify-center gap-1.5 py-3 rounded-xl text-xs font-black text-black transition-all active:scale-95 disabled:opacity-50"
-              style={{ background: 'linear-gradient(135deg,#00FF9D,#00B4FF)' }}>
+              className="flex items-center justify-center gap-1.5 py-3 rounded-xl text-xs font-black text-white transition-all active:scale-95 disabled:opacity-50"
+              style={{ background: 'linear-gradient(135deg, #FF2D95 0%, #B735B8 48%, #233B8F 100%)' }}>
               <i className="fa-solid fa-download"></i> JPG
             </button>
             <button onClick={() => download('png')} disabled={!ready}
@@ -398,6 +399,7 @@ export default function UserEditor({ templateId }: { templateId: string }) {
           <p className="text-[10px] text-white/30 text-center">Descarga en {template?.ancho}×{template?.alto}px</p>
         </div>
       </div>
+    </div>
     </div>
   )
 }
