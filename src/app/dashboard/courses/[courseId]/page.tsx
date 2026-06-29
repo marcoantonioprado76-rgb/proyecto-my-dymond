@@ -481,10 +481,10 @@ export default function CourseDetailPage() {
               <div style={{ height: '100%', width: `${coursePct}%`, borderRadius: 7, background: 'linear-gradient(90deg,#FF2D95,#B735B8,#233B8F)', transition: 'width 0.3s' }} />
             </div>
             {coursePct === 100 && (
-              <div style={{ marginTop: 12, padding: '14px 16px', borderRadius: 14, background: 'rgba(255,45,149,0.08)', border: '1px solid rgba(255,45,149,0.25)', display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+              <div style={{ marginTop: 12, padding: '14px 16px', borderRadius: 14, background: 'rgba(99,102,190,0.07)', border: '1px solid rgba(99,102,190,0.22)', display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
                 <span style={{ fontSize: 22 }}>🎓</span>
                 <div style={{ flex: 1, minWidth: 160 }}>
-                  <p style={{ fontSize: 14, fontWeight: 800, background: DG, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', margin: 0 }}>¡Completaste el curso!</p>
+                  <p style={{ fontSize: 14, fontWeight: 800, background: 'linear-gradient(135deg, #B735B8 0%, #233B8F 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', margin: 0 }}>¡Completaste el curso!</p>
                   <p style={{ fontSize: 12, color: '#6B7280', margin: '2px 0 0' }}>Descargá tu certificado de finalización.</p>
                 </div>
                 <button onClick={downloadCertificate} style={{ padding: '10px 18px', borderRadius: 10, fontSize: 13, fontWeight: 700, color: '#fff', background: 'linear-gradient(90deg,#FF2D95,#B735B8,#233B8F)', border: 'none', cursor: 'pointer' }}>
