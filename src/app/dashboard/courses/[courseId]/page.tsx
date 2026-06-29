@@ -58,19 +58,6 @@ function fmtTime(sec: number): string {
   return `${m}:${String(s % 60).padStart(2, '0')}`
 }
 
-function wrapText(ctx: CanvasRenderingContext2D, text: string, x: number, y: number, maxWidth: number, lineHeight: number) {
-  const words = text.split(' ')
-  let line = ''
-  const lines: string[] = []
-  for (const w of words) {
-    const test = line ? `${line} ${w}` : w
-    if (ctx.measureText(test).width > maxWidth && line) { lines.push(line); line = w } else { line = test }
-  }
-  if (line) lines.push(line)
-  const startY = y - ((lines.length - 1) * lineHeight) / 2
-  lines.forEach((l, i) => ctx.fillText(l, x, startY + i * lineHeight))
-}
-
 export default function CourseDetailPage() {
   const { courseId } = useParams<{ courseId: string }>()
   const [course, setCourse] = useState<Course | null>(null)
@@ -257,142 +244,32 @@ export default function CourseDetailPage() {
     reportProgress(player.id, 100, videoElRef.current ? Math.floor(videoElRef.current.currentTime) : undefined)
   }
 
-  // Genera y descarga el certificado de finalización (PNG, con el wordmark de MY DIAMOND)
+  // Genera y descarga el certificado: usa la plantilla oficial (imagen) y solo
+  // superpone el NOMBRE del alumno. Todo lo demás (diseño, curso, sello) viene
+  // de la imagen public/certificado-plantilla.png.
   async function downloadCertificate() {
     if (!course) return
-    const W = 2000, H = 1414
+    const tpl = new Image(); tpl.crossOrigin = 'anonymous'
+    await new Promise<void>(res => { tpl.onload = () => res(); tpl.onerror = () => res(); tpl.src = '/certificado-plantilla.png' })
+    const W = tpl.naturalWidth || 1698, H = tpl.naturalHeight || 1276
     const canvas = document.createElement('canvas')
     canvas.width = W; canvas.height = H
     const ctx = canvas.getContext('2d'); if (!ctx) return
-    const cx = W / 2
-    const setLS = (v: string) => { try { (ctx as unknown as { letterSpacing: string }).letterSpacing = v } catch {} }
-    const diamond = (x: number, y: number, s: number, fill: string) => {
-      ctx.save(); ctx.translate(x, y); ctx.rotate(Math.PI / 4); ctx.fillStyle = fill; ctx.fillRect(-s, -s, s * 2, s * 2); ctx.restore()
-    }
+    ctx.drawImage(tpl, 0, 0, W, H)
 
-    // ── Fondo claro plateado/lavanda con brillo cristalino ──
-    const bg = ctx.createLinearGradient(0, 0, W, H)
-    bg.addColorStop(0, '#FFFFFF'); bg.addColorStop(0.5, '#F3F1F8'); bg.addColorStop(1, '#E8E6F0')
-    ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H)
-    const shine = ctx.createRadialGradient(cx, H * 0.06, 40, cx, H * 0.06, W * 0.78)
-    shine.addColorStop(0, 'rgba(255,255,255,0.85)'); shine.addColorStop(1, 'rgba(255,255,255,0)')
-    ctx.fillStyle = shine; ctx.fillRect(0, 0, W, H)
-    // facetas cristalinas tenues en las esquinas
-    ctx.strokeStyle = 'rgba(110,95,160,0.10)'; ctx.lineWidth = 1.5
-    const facets = (ox: number, oy: number, sx: number, sy: number) => {
-      for (let i = 1; i <= 6; i++) { const d = i * 60; ctx.beginPath(); ctx.moveTo(ox + sx * d, oy); ctx.lineTo(ox, oy + sy * d); ctx.stroke() }
-      ctx.beginPath(); ctx.moveTo(ox, oy); ctx.lineTo(ox + sx * 380, oy + sy * 380); ctx.stroke()
-    }
-    facets(70, 70, 1, 1); facets(W - 70, 70, -1, 1); facets(70, H - 70, 1, -1); facets(W - 70, H - 70, -1, -1)
-
-    // ── Borde ornamentado doble + diamantes en las esquinas ──
-    ctx.strokeStyle = 'rgba(108,74,168,0.55)'; ctx.lineWidth = 3; ctx.strokeRect(54, 54, W - 108, H - 108)
-    ctx.strokeStyle = 'rgba(170,160,195,0.9)'; ctx.lineWidth = 1.5; ctx.strokeRect(78, 78, W - 156, H - 156)
-    ;([[54, 54], [W - 54, 54], [54, H - 54], [W - 54, H - 54]] as const).forEach(([x, y]) => diamond(x, y, 9, '#8257C8'))
-
-    // ── Logo ──
-    const img = new Image(); img.crossOrigin = 'anonymous'
-    await new Promise<void>(res => { img.onload = () => res(); img.onerror = () => res(); img.src = '/logo-oficial-mydiamond.png' })
-    if (img.width) { const w = 430, h = (w * img.height) / img.width; ctx.drawImage(img, cx - w / 2, 150, w, h) }
-
-    ctx.textAlign = 'center'
-    // ── Título ──
-    ctx.fillStyle = '#1B1535'; ctx.font = '700 50px Georgia, "Times New Roman", serif'; setLS('6px')
-    ctx.fillText('CERTIFICADO DE FINALIZACIÓN', cx, 500); setLS('0px')
-    ctx.strokeStyle = 'rgba(108,74,168,0.5)'; ctx.lineWidth = 2
-    ctx.beginPath(); ctx.moveTo(cx - 300, 548); ctx.lineTo(cx - 24, 548); ctx.moveTo(cx + 24, 548); ctx.lineTo(cx + 300, 548); ctx.stroke()
-    diamond(cx, 548, 8, '#6C4AA8')
-
-    // ── Cuerpo ──
-    ctx.fillStyle = '#6B6483'; ctx.font = 'italic 30px Georgia, serif'
-    ctx.fillText('Se certifica que', cx, 648)
-    ctx.fillStyle = '#16122E'; ctx.font = '700 94px Georgia, serif'
-    ctx.fillText(course.viewerName || 'Alumno', cx, 765)
-    ctx.strokeStyle = 'rgba(170,160,195,0.9)'; ctx.lineWidth = 1.5
-    ctx.beginPath(); ctx.moveTo(cx - 360, 805); ctx.lineTo(cx + 360, 805); ctx.stroke()
-    ctx.fillStyle = '#6B6483'; ctx.font = '28px Georgia, serif'
-    ctx.fillText('completó exitosamente el curso', cx, 880)
-    const tg = ctx.createLinearGradient(cx - 420, 0, cx + 420, 0)
-    tg.addColorStop(0, '#7B3FE4'); tg.addColorStop(1, '#2152C9')
-    ctx.fillStyle = tg; ctx.font = '700 62px Georgia, serif'; setLS('2px')
-    wrapText(ctx, course.title.toUpperCase(), cx, 960, 1100, 74); setLS('0px')
-    ctx.fillStyle = '#6B6483'; ctx.font = '27px Georgia, serif'
-    wrapText(ctx, 'En reconocimiento a su esfuerzo, compromiso y dedicación durante su proceso de formación.', cx, 1055, 920, 42)
-
-    // ── Pie: firma · centro · sello ──
-    const footY = 1195
-    const fsx = W * 0.21
-    ctx.fillStyle = '#16122E'; ctx.font = 'italic 600 64px "Snell Roundhand","Brush Script MT", Georgia, cursive'
-    ctx.fillText('Marco Prado', fsx, footY - 18)
-    ctx.strokeStyle = '#9089A8'; ctx.lineWidth = 1.5
-    ctx.beginPath(); ctx.moveTo(fsx - 175, footY + 22); ctx.lineTo(fsx + 175, footY + 22); ctx.stroke()
-    diamond(fsx, footY + 52, 5, '#6C4AA8')
-    ctx.fillStyle = '#3A3556'; ctx.font = '600 26px Georgia, serif'
-    ctx.fillText('Director Academy', fsx, footY + 92)
-
-    // centro: laurel + textos
-    drawLaurel(ctx, cx, footY + 6)
-    ctx.fillStyle = '#2A2545'; ctx.font = '700 28px Georgia, serif'
-    ctx.fillText('MY DIAMOND Academy', cx, footY + 80)
-    ctx.fillStyle = '#6B6483'; ctx.font = '24px Georgia, serif'
-    ctx.fillText(new Date().toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' }), cx, footY + 115)
-
-    // sello (derecha)
-    drawSeal(ctx, W * 0.79, footY + 6)
+    // Nombre del alumno, centrado donde va en la plantilla (x≈873, centro y≈614)
+    const name = (course.viewerName || 'Alumno').trim()
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle'
+    ctx.fillStyle = '#14112A'
+    let size = 96
+    ctx.font = `bold ${size}px Georgia, "Times New Roman", serif`
+    while (ctx.measureText(name).width > 1180 && size > 44) { size -= 4; ctx.font = `bold ${size}px Georgia, "Times New Roman", serif` }
+    ctx.fillText(name, 873, 614)
 
     const a = document.createElement('a')
     a.href = canvas.toDataURL('image/png')
     a.download = `certificado-${course.title.replace(/\s+/g, '-').toLowerCase()}.png`
     document.body.appendChild(a); a.click(); a.remove()
-
-    // ── Helpers de dibujo (hoisted) ──
-    function drawLaurel(c: CanvasRenderingContext2D, lx: number, ly: number) {
-      c.save(); c.translate(lx, ly); c.fillStyle = '#9A95AE'
-      for (const side of [-1, 1]) {
-        c.save(); c.scale(side, 1)
-        for (let i = 0; i < 7; i++) {
-          const t = i / 6
-          const ax = 24 + t * 34, ay = 16 - t * 52
-          c.save(); c.translate(ax, ay); c.rotate(-0.5 - t * 0.6)
-          c.beginPath(); c.ellipse(0, 0, 13, 6, 0, 0, Math.PI * 2); c.fill(); c.restore()
-        }
-        c.restore()
-      }
-      c.save(); c.translate(0, -4); c.rotate(Math.PI / 4); c.fillStyle = '#6C4AA8'; c.fillRect(-9, -9, 18, 18); c.restore()
-      c.restore()
-    }
-    function drawStar(c: CanvasRenderingContext2D, scx: number, scy: number, r: number, fill: string) {
-      c.save(); c.fillStyle = fill; c.beginPath()
-      for (let i = 0; i < 10; i++) {
-        const ang = -Math.PI / 2 + i * Math.PI / 5
-        const rr = i % 2 === 0 ? r : r * 0.45
-        const x = scx + Math.cos(ang) * rr, y = scy + Math.sin(ang) * rr
-        i === 0 ? c.moveTo(x, y) : c.lineTo(x, y)
-      }
-      c.closePath(); c.fill(); c.restore()
-    }
-    function drawSeal(c: CanvasRenderingContext2D, scx: number, scy: number) {
-      const R = 92
-      c.save(); c.textAlign = 'center'
-      c.fillStyle = '#C7C3D6'
-      const bumps = 30
-      c.beginPath()
-      for (let i = 0; i < bumps * 2; i++) {
-        const ang = (i / (bumps * 2)) * Math.PI * 2
-        const r = R + (i % 2 === 0 ? 11 : 0)
-        const x = scx + Math.cos(ang) * r, y = scy + Math.sin(ang) * r
-        i === 0 ? c.moveTo(x, y) : c.lineTo(x, y)
-      }
-      c.closePath(); c.fill()
-      c.fillStyle = '#EEECF4'; c.beginPath(); c.arc(scx, scy, R - 3, 0, Math.PI * 2); c.fill()
-      c.strokeStyle = '#7B3FE4'; c.lineWidth = 3; c.beginPath(); c.arc(scx, scy, R - 20, 0, Math.PI * 2); c.stroke()
-      c.save(); c.translate(scx, scy - 44); c.rotate(Math.PI / 4); c.fillStyle = '#7B3FE4'; c.fillRect(-9, -9, 18, 18); c.restore()
-      c.fillStyle = '#2A2545'; c.font = '700 21px Georgia, serif'
-      c.fillText('RECONOCIMIENTO', scx, scy + 2)
-      c.fillText('AL MÉRITO', scx, scy + 28)
-      drawStar(c, scx, scy + 54, 12, '#7B3FE4')
-      c.restore()
-    }
   }
 
   // Guardar la posición al ocultar la pestaña o salir de la página
