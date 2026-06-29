@@ -942,12 +942,12 @@ export default function VirtualStorePage() {
                                     <div className="flex items-stretch gap-1.5">
                                         <button
                                             onClick={() => openStoreProducts(store)}
-                                            className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-[11.5px] font-bold transition-all active:scale-[0.98] hover:brightness-110"
+                                            className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-[11.5px] font-bold transition-all active:scale-[0.98] hover:opacity-90"
                                             style={{
-                                                background: `linear-gradient(135deg, ${p.accent}2e, ${p.accent}10)`,
-                                                border: `1px solid ${p.accent}45`,
+                                                background: 'linear-gradient(135deg, #FF2D95 0%, #B735B8 48%, #233B8F 100%)',
+                                                border: 'none',
                                                 color: '#fff',
-                                                boxShadow: `0 6px 18px -10px ${p.accent}60, inset 0 1px 0 rgba(255,255,255,0.10)`,
+                                                boxShadow: '0 8px 20px -8px rgba(255,9,108,0.5), inset 0 1px 0 rgba(255,255,255,0.18)',
                                                 letterSpacing: '-0.01em',
                                             }}>
                                             <Package className="w-3 h-3" />
