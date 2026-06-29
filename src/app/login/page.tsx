@@ -61,8 +61,10 @@ export default function LoginPage() {
 
         {/* Logo oficial */}
         <div className="flex flex-col items-center mb-8">
-          <div style={{ padding: '18px 28px', borderRadius: 26, background: 'linear-gradient(135deg, #0B1B2B 0%, #081624 100%)', boxShadow: '0 20px 44px -14px rgba(8,22,36,0.55)' }}>
-            <img src="/logo-oficial-mydiamond.png" alt="MY DIAMOND" style={{ width: 168, height: 'auto', display: 'block' }} />
+          <div style={{ padding: 2, borderRadius: 28, background: 'linear-gradient(135deg, #FF2D95 0%, #B735B8 48%, #233B8F 100%)', boxShadow: '0 22px 48px -14px rgba(8,22,36,0.45)' }}>
+            <div style={{ padding: '18px 28px', borderRadius: 26, background: 'rgba(13,20,34,0.82)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)' }}>
+              <img src="/logo-oficial-mydiamond.png" alt="MY DIAMOND" style={{ width: 168, height: 'auto', display: 'block' }} />
+            </div>
           </div>
         </div>
 

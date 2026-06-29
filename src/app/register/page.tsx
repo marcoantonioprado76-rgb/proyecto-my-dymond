@@ -218,8 +218,10 @@ function RegisterForm() {
 
         {/* Logo oficial */}
         <div className="flex flex-col items-center mb-6">
-          <div style={{ padding: '14px 24px', borderRadius: 22, background: 'linear-gradient(135deg, #0B1B2B 0%, #081624 100%)', boxShadow: '0 18px 40px -14px rgba(8,22,36,0.5)' }}>
-            <img src="/logo-oficial-mydiamond.png" alt="MY DIAMOND" style={{ width: 140, height: 'auto', display: 'block' }} />
+          <div style={{ padding: 2, borderRadius: 24, background: 'linear-gradient(135deg, #FF2D95 0%, #B735B8 48%, #233B8F 100%)', boxShadow: '0 20px 44px -14px rgba(8,22,36,0.42)' }}>
+            <div style={{ padding: '14px 24px', borderRadius: 22, background: 'rgba(13,20,34,0.82)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)' }}>
+              <img src="/logo-oficial-mydiamond.png" alt="MY DIAMOND" style={{ width: 140, height: 'auto', display: 'block' }} />
+            </div>
           </div>
           <p className="text-xs text-[#6B7280] mt-3">Crea tu cuenta gratuita</p>
         </div>
