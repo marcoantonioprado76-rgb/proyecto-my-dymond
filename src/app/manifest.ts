@@ -11,7 +11,7 @@ export default function manifest(): MetadataRoute.Manifest {
         theme_color: '#D203DD',
         icons: [
             {
-                src: '/logo.png',
+                src: '/logo-oficial-mydiamond.png',
                 sizes: 'any',
                 type: 'image/png',
             },

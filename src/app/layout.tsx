@@ -6,8 +6,8 @@ export const metadata: Metadata = {
   title: 'MY DIAMOND',
   description: 'Plataforma Oficial - MY DIAMOND',
   icons: {
-    icon: '/logo.png',
-    apple: '/logo.png',
+    icon: '/logo-oficial-mydiamond.png',
+    apple: '/logo-oficial-mydiamond.png',
   },
   other: {
     'tiktok-developers-site-verification': 'z09wedDq9xCOj3EGusafCQHO8EtDU10L',

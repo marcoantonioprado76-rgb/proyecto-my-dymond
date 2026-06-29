@@ -162,7 +162,7 @@ export default function PublicTicketPage() {
       <div className="sticky top-0 z-10 border-b border-white/5" style={{ background: 'rgba(7,8,15,0.95)', backdropFilter: 'blur(12px)' }}>
         <div className="max-w-lg mx-auto px-4 py-3 flex items-center gap-3">
           <div className="w-7 h-7 rounded-lg overflow-hidden shrink-0">
-            <img src="/logo.png" alt="Logo" className="w-full h-full object-contain" />
+            <img src="/logo-oficial-mydiamond.png" alt="Logo" className="w-full h-full object-contain" />
           </div>
           <span className="text-white font-black text-sm tracking-widest uppercase">MY DIAMOND</span>
           <span className="ml-auto text-xs text-white/20">Entradas</span>

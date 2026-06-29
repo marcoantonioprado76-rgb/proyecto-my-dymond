@@ -81,11 +81,7 @@ export default function VerifyDevicePage() {
 
         {/* Logo + Brand */}
         <div className="flex flex-col items-center mb-8">
-          <div className="w-16 h-16 mb-4 rounded-2xl overflow-hidden shadow-lg shadow-black/60"
-            style={{ border: '1px solid rgba(255,255,255,0.12)' }}>
-            <img src="/logo.png" alt="Logo" className="w-full h-full object-contain" />
-          </div>
-          <h1 className="flex justify-center"><img src="/wordmark-mydiamond.png" alt="MY DIAMOND" className="h-5 w-auto" /></h1>
+          <img src="/logo-oficial-mydiamond.png" alt="MY DIAMOND" className="w-44 h-auto mb-2" />
           <p className="text-[11px] text-white/30 mt-1 tracking-widest uppercase">Network Marketing Digital</p>
         </div>
 

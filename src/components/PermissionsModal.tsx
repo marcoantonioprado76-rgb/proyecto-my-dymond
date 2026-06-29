@@ -77,10 +77,7 @@ export default function PermissionsModal() {
 
         {/* Logo */}
         <div className="flex flex-col items-center gap-3">
-          <div className="w-16 h-16 rounded-2xl overflow-hidden shadow-lg" style={{ border: '1px solid rgba(255,255,255,0.12)' }}>
-            <img src="/logo.png" alt="Logo" className="w-full h-full object-contain" />
-          </div>
-          <h1 className="flex justify-center"><img src="/wordmark-mydiamond.png" alt="MY DIAMOND" className="h-[18px] w-auto" /></h1>
+          <img src="/logo-oficial-mydiamond.png" alt="MY DIAMOND" className="w-40 h-auto" />
         </div>
 
         {/* Message */}

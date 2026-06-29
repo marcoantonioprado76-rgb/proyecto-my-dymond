@@ -41,7 +41,7 @@ createAppKit({
     name: 'MY DIAMOND',
     description: 'Pagos con USDT BEP-20',
     url: appUrl,
-    icons: [`${appUrl}/logo.png`],
+    icons: [`${appUrl}/logo-oficial-mydiamond.png`],
   },
   projectId,
   features: { analytics: false },

@@ -270,7 +270,7 @@ export default function CourseDetailPage() {
     ctx.strokeStyle = '#E4E9F0'; ctx.lineWidth = 1; ctx.strokeRect(56, 56, W - 112, H - 112)
 
     const img = new Image(); img.crossOrigin = 'anonymous'
-    await new Promise<void>(res => { img.onload = () => res(); img.onerror = () => res(); img.src = '/wordmark-mydiamond.png' })
+    await new Promise<void>(res => { img.onload = () => res(); img.onerror = () => res(); img.src = '/logo-oficial-mydiamond.png' })
     if (img.width) { const w = 440, h = (w * img.height) / img.width; ctx.drawImage(img, W / 2 - w / 2, 120, w, h) }
 
     ctx.textAlign = 'center'
