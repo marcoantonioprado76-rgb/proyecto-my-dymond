@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 
+const DG = 'linear-gradient(135deg, #FF2D95 0%, #B735B8 48%, #233B8F 100%)'
+
 interface Enrollment {
   status: 'PENDING' | 'PENDING_VERIFICATION' | 'APPROVED' | 'REJECTED'
 }
@@ -35,11 +37,11 @@ const STATUS_BADGE: Record<string, { label: string; style: React.CSSProperties }
   },
   PENDING_VERIFICATION: {
     label: 'Verificando cripto',
-    style: { color: '#C9A7FF', background: 'rgba(245,166,35,0.1)', border: '1px solid rgba(245,166,35,0.3)' },
+    style: { color: '#C9A7FF', background: 'rgba(201,167,255,0.1)', border: '1px solid rgba(201,167,255,0.3)' },
   },
   APPROVED: {
     label: 'Acceso completo',
-    style: { color: '#FF2D95', background: 'rgba(255,45,149,0.08)', border: '1px solid rgba(255,45,149,0.2)' },
+    style: { color: '#fff', background: DG, border: 'none' },
   },
   REJECTED: {
     label: 'Rechazado',
@@ -116,7 +118,7 @@ export default function CoursesPage() {
               </span>
               {courses.some(c => c.enrollment?.status === 'APPROVED') && (
                 <span style={{ fontSize: 11, color: 'rgba(255,45,149,0.7)' }}>
-                  <b style={{ color: '#FF2D95' }}>{courses.filter(c => c.enrollment?.status === 'APPROVED').length}</b> con acceso
+                  <b style={{ background: DG, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>{courses.filter(c => c.enrollment?.status === 'APPROVED').length}</b> con acceso
                 </span>
               )}
               {courses.some(c => c.freeForPlan) && (
@@ -267,7 +269,7 @@ export default function CoursesPage() {
                     <span style={{
                       position: 'absolute', top: 8, left: 8, fontSize: 10, fontWeight: 700,
                       letterSpacing: '0.06em', padding: '3px 8px', borderRadius: 6,
-                      color: '#FF2D95', background: 'rgba(255,45,149,0.12)', border: '1px solid rgba(255,45,149,0.25)',
+                      color: '#fff', background: DG, border: 'none',
                     }}>
                       Gratis con tu plan
                     </span>
@@ -305,7 +307,7 @@ export default function CoursesPage() {
                         Ver plan →
                       </Link>
                     ) : (
-                      <span style={{ fontWeight: 800, fontSize: 13, color: course.freeForPlan ? '#FF2D95' : '#C9A7FF' }}>
+                      <span style={{ fontWeight: 800, fontSize: 13, ...(course.freeForPlan ? { color: '#fff', background: DG, padding: '3px 10px', borderRadius: 999 } : { color: '#C9A7FF' }) }}>
                         {course.freeForPlan ? 'GRATIS' : `${course.price.toFixed(2)} USDT`}
                       </span>
                     )}

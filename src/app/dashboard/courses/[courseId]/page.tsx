@@ -5,6 +5,8 @@ import { useParams } from 'next/navigation'
 import Link from 'next/link'
 import { PaymentGateway } from '@/components/PaymentGateway'
 
+const DG = 'linear-gradient(135deg, #FF2D95 0%, #B735B8 48%, #233B8F 100%)'
+
 interface CourseVideo {
   id: string
   title: string
@@ -403,11 +405,11 @@ export default function CourseDetailPage() {
         <h1 style={{ fontSize: 22, fontWeight: 800, color: '#111827', marginBottom: 8 }}>{course.title}</h1>
         <p style={{ fontSize: 13, color: '#6B7280', lineHeight: 1.6, marginBottom: 16 }}>{course.description}</p>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
-          <span style={{ fontSize: 24, fontWeight: 900, color: course.freeForPlan ? '#FF2D95' : '#C9A7FF' }}>
+          <span style={{ fontSize: 24, fontWeight: 900, ...(course.freeForPlan ? { background: DG, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' } : { color: '#C9A7FF' }) }}>
             {course.freeForPlan ? 'GRATIS' : `${course.price.toFixed(2)} USDT`}
           </span>
           {course.freeForPlan && (
-            <span style={{ fontSize: 11, fontWeight: 600, color: '#FF2D95', background: 'rgba(255,45,149,0.1)', border: '1px solid rgba(255,45,149,0.2)', padding: '3px 8px', borderRadius: 6 }}>
+            <span style={{ fontSize: 11, fontWeight: 700, color: '#fff', background: DG, padding: '3px 10px', borderRadius: 6 }}>
               Incluido en tu plan
             </span>
           )}
@@ -479,16 +481,16 @@ export default function CourseDetailPage() {
           <div style={{ marginBottom: 16 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 6 }}>
               <span style={{ fontSize: 12, fontWeight: 700, color: '#6B7280' }}>Tu progreso</span>
-              <span style={{ fontSize: 12, fontWeight: 800, color: coursePct === 100 ? '#FF2D95' : '#B735B8' }}>{doneCount} de {course.videos.length} · {coursePct}%</span>
+              <span style={{ fontSize: 12, fontWeight: 800, background: DG, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>{doneCount} de {course.videos.length} · {coursePct}%</span>
             </div>
             <div style={{ height: 7, borderRadius: 7, background: 'rgba(8,22,36,0.1)', overflow: 'hidden' }}>
-              <div style={{ height: '100%', width: `${coursePct}%`, borderRadius: 7, background: coursePct === 100 ? '#FF2D95' : 'linear-gradient(90deg,#FF2D95,#B735B8,#233B8F)', transition: 'width 0.3s' }} />
+              <div style={{ height: '100%', width: `${coursePct}%`, borderRadius: 7, background: 'linear-gradient(90deg,#FF2D95,#B735B8,#233B8F)', transition: 'width 0.3s' }} />
             </div>
             {coursePct === 100 && (
               <div style={{ marginTop: 12, padding: '14px 16px', borderRadius: 14, background: 'rgba(255,45,149,0.08)', border: '1px solid rgba(255,45,149,0.25)', display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
                 <span style={{ fontSize: 22 }}>🎓</span>
                 <div style={{ flex: 1, minWidth: 160 }}>
-                  <p style={{ fontSize: 14, fontWeight: 800, color: '#FF2D95', margin: 0 }}>¡Completaste el curso!</p>
+                  <p style={{ fontSize: 14, fontWeight: 800, background: DG, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', margin: 0 }}>¡Completaste el curso!</p>
                   <p style={{ fontSize: 12, color: '#6B7280', margin: '2px 0 0' }}>Descargá tu certificado de finalización.</p>
                 </div>
                 <button onClick={downloadCertificate} style={{ padding: '10px 18px', borderRadius: 10, fontSize: 13, fontWeight: 700, color: '#fff', background: 'linear-gradient(90deg,#FF2D95,#B735B8,#233B8F)', border: 'none', cursor: 'pointer' }}>
@@ -512,7 +514,7 @@ export default function CourseDetailPage() {
                 </span>
                 <p style={{ fontSize: 13, fontWeight: 700, color: '#fff', margin: 0, flex: 1 }}>{selectedVideo.title}</p>
                 {(completedVideos.has(selectedVideo.id) || selectedVideo.completed) && (
-                  <span style={{ fontSize: 11, fontWeight: 700, color: '#FF2D95', background: 'rgba(255,45,149,0.1)', border: '1px solid rgba(255,45,149,0.2)', padding: '2px 8px', borderRadius: 6, whiteSpace: 'nowrap' }}>
+                  <span style={{ fontSize: 11, fontWeight: 700, color: '#fff', background: DG, padding: '2px 8px', borderRadius: 6, whiteSpace: 'nowrap' }}>
                     ✓ Completado
                   </span>
                 )}
@@ -648,10 +650,10 @@ export default function CourseDetailPage() {
                     <div style={{
                       width: 28, height: 28, borderRadius: '50%', flexShrink: 0,
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      background: isDone ? 'rgba(255,45,149,0.15)' : isActive ? 'rgba(255,9,108,0.15)' : 'rgba(255,255,255,0.06)',
-                      border: `1px solid ${isDone ? 'rgba(255,45,149,0.3)' : isActive ? 'rgba(255,9,108,0.4)' : 'rgba(255,255,255,0.1)'}`,
+                      background: isDone ? DG : isActive ? 'rgba(255,9,108,0.15)' : 'rgba(255,255,255,0.06)',
+                      border: `1px solid ${isDone ? 'transparent' : isActive ? 'rgba(255,9,108,0.4)' : 'rgba(255,255,255,0.1)'}`,
                       fontSize: 11, fontWeight: 700,
-                      color: isDone ? '#FF2D95' : isActive ? '#FF096C' : 'rgba(255,255,255,0.55)',
+                      color: isDone ? '#fff' : isActive ? '#FF096C' : 'rgba(255,255,255,0.55)',
                     }}>
                       {isDone ? '✓' : !isUnlocked ? '🔒' : idx + 1}
                     </div>
