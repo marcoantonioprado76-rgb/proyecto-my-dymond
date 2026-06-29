@@ -1823,8 +1823,10 @@ function ProductForm({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       })
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.error || 'Error guardando producto')
+      const raw = await res.text()
+      let data: { error?: string; product?: { id?: string } } = {}
+      try { data = raw ? JSON.parse(raw) : {} } catch { /* el servidor devolvió HTML/no-JSON (500/502/504) */ }
+      if (!res.ok) throw new Error(data.error || `Error del servidor (${res.status}). Reintenta en unos segundos.`)
       // If creating a new product, also assign it to this bot
       if (!product && data.product?.id && botId) {
         await fetch(`/api/bots/${botId}/products`, {

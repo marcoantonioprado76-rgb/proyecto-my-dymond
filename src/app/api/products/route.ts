@@ -40,6 +40,7 @@ export async function GET() {
 
 /** POST /api/products — crea producto en el catálogo del usuario */
 export async function POST(request: NextRequest) {
+ try {
   const auth = getAuth()
   if (!auth) return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
 
@@ -85,7 +86,6 @@ export async function POST(request: NextRequest) {
     )
   }
 
-  try {
     const product = await prisma.product.create({
       data: {
         userId: auth.userId,
