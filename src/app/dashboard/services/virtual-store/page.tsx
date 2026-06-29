@@ -752,16 +752,16 @@ export default function VirtualStorePage() {
                             <div key={store.id}
                                 className="relative rounded-2xl overflow-hidden group transition-all duration-300 hover:-translate-y-1"
                                 style={{
-                                    background: `radial-gradient(120% 80% at 50% -10%, ${p.accent}1c, rgba(255,255,255,0) 60%), radial-gradient(80% 80% at 100% 100%, ${p.accent}10, rgba(255,255,255,0) 62%), linear-gradient(180deg, rgba(20,24,48,0.94) 0%, rgba(255,255,255,0.94) 100%)`,
+                                    background: `radial-gradient(120% 80% at 50% -10%, ${p.accent}1c, rgba(255,255,255,0) 60%), radial-gradient(80% 80% at 100% 100%, ${p.accent}10, rgba(255,255,255,0) 62%), linear-gradient(180deg, #0B1B2B 0%, #081624 100%)`,
                                     border: '1px solid rgba(255,255,255,0.08)',
-                                    boxShadow: `0 22px 44px -22px rgba(0,0,0,0.78), 0 0 24px -14px ${p.accent}30, inset 0 1px 0 #F0F3F7`,
+                                    boxShadow: `0 22px 44px -22px rgba(0,0,0,0.78), 0 0 24px -14px ${p.accent}30, inset 0 1px 0 rgba(255,255,255,0.06)`,
                                 }}
                                 onMouseEnter={e => {
                                     e.currentTarget.style.boxShadow = `0 30px 56px -22px rgba(0,0,0,0.84), 0 0 36px -10px ${p.accent}55, 0 0 16px -8px rgba(123,91,255,0.35), inset 0 1px 0 rgba(255,255,255,0.09)`
                                     e.currentTarget.style.borderColor = `${p.accent}55`
                                 }}
                                 onMouseLeave={e => {
-                                    e.currentTarget.style.boxShadow = `0 22px 44px -22px rgba(0,0,0,0.78), 0 0 24px -14px ${p.accent}30, inset 0 1px 0 #F0F3F7`
+                                    e.currentTarget.style.boxShadow = `0 22px 44px -22px rgba(0,0,0,0.78), 0 0 24px -14px ${p.accent}30, inset 0 1px 0 rgba(255,255,255,0.06)`
                                     e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'
                                 }}>
 
