@@ -24,14 +24,15 @@ export default function RecursosLayout({ children }: { children: React.ReactNode
       </h1>
       <p className="text-sm text-[#6B7280] mt-0.5 mb-4">Plantillas editables, presentaciones y libros.</p>
 
-      <div className="flex gap-1 border-b border-[#E4E9F0] overflow-x-auto">
+      <div className="flex gap-2 overflow-x-auto pb-1">
         {TABS.map(t => {
           const active = pathname.startsWith(t.href)
           return (
             <Link key={t.href} href={t.href}
-              className={`shrink-0 px-4 py-2.5 text-sm font-bold flex items-center gap-2 border-b-2 -mb-px transition-all ${
-                active ? 'border-[#B735B8] text-[#111827]' : 'border-transparent text-[#9CA3AF] hover:text-[#111827]'
-              }`}>
+              className="shrink-0 px-4 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 transition-all active:scale-[0.98]"
+              style={active
+                ? { background: 'linear-gradient(135deg, #FF2D95 0%, #B735B8 48%, #233B8F 100%)', color: '#fff', boxShadow: '0 10px 24px -8px rgba(255,9,108,0.4)' }
+                : { background: '#FFFFFF', color: '#6B7280', border: '1px solid #E4E9F0', boxShadow: '0 4px 14px rgba(15,23,42,0.04)' }}>
               <i className={`fa-solid ${t.icon}`}></i> {t.label}
             </Link>
           )
