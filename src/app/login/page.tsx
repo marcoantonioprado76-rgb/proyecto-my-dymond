@@ -49,23 +49,19 @@ export default function LoginPage() {
 
   return (
     <div className="font-ui min-h-screen flex items-center justify-center px-4 relative overflow-hidden"
-      style={{ background: 'radial-gradient(circle at top right, rgba(255,9,108,0.08), transparent 28%), radial-gradient(circle at bottom left, rgba(35,59,143,0.08), transparent 30%), linear-gradient(135deg, #EEF2F7 0%, #F5F7FA 45%, #E9EEF5 100%)' }}>
+      style={{ background: 'radial-gradient(circle at top left, rgba(255,9,108,0.16), transparent 34%), radial-gradient(circle at bottom right, rgba(106,53,217,0.20), transparent 40%), linear-gradient(140deg, #0B1B2B 0%, #0A1320 52%, #050B14 100%)' }}>
 
       {/* Glows suaves */}
       <div className="pointer-events-none fixed inset-0 overflow-hidden">
-        <div className="absolute -top-60 -left-40 w-[600px] h-[600px] rounded-full blur-[150px]" style={{ background: 'rgba(255,9,108,0.08)' }} />
-        <div className="absolute -bottom-60 -right-40 w-[600px] h-[600px] rounded-full blur-[150px]" style={{ background: 'rgba(106,53,217,0.08)' }} />
+        <div className="absolute -top-60 -left-40 w-[600px] h-[600px] rounded-full blur-[150px]" style={{ background: 'rgba(255,9,108,0.16)' }} />
+        <div className="absolute -bottom-60 -right-40 w-[600px] h-[600px] rounded-full blur-[150px]" style={{ background: 'rgba(106,53,217,0.18)' }} />
       </div>
 
       <div className="w-full max-w-[380px] relative z-10">
 
         {/* Logo oficial */}
         <div className="flex flex-col items-center mb-8">
-          <div style={{ padding: 2, borderRadius: 28, background: 'linear-gradient(135deg, #FF2D95 0%, #B735B8 48%, #233B8F 100%)', boxShadow: '0 22px 48px -14px rgba(8,22,36,0.45)' }}>
-            <div style={{ padding: '18px 28px', borderRadius: 26, background: 'rgba(13,20,34,0.82)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)' }}>
-              <img src="/logo-oficial-mydiamond.png" alt="MY DIAMOND" style={{ width: 168, height: 'auto', display: 'block' }} />
-            </div>
-          </div>
+          <img src="/logo-oficial-mydiamond.png" alt="MY DIAMOND" style={{ width: 230, height: 'auto', display: 'block', filter: 'drop-shadow(0 12px 32px rgba(0,0,0,0.5))' }} />
         </div>
 
         {/* Card */}
@@ -145,7 +141,7 @@ export default function LoginPage() {
           </form>
         </div>
 
-        <p className="text-center text-[11px] mt-5" style={{ color: '#9CA3AF' }}>
+        <p className="text-center text-[11px] mt-5" style={{ color: 'rgba(255,255,255,0.55)' }}>
           ¿Sin cuenta?{' '}
           <Link href="/register" className="font-bold transition-colors" style={{ color: '#FF096C' }}>
             Registrarse

@@ -48,7 +48,7 @@ interface SuccessData { fullName: string; username: string; password: string }
 export default function RegisterPage() {
   return (
     <Suspense fallback={
-      <div style={{background:'linear-gradient(135deg,#F8FAFC,#F5F7FA 45%,#EEF2F7)',minHeight:'100vh',color:'#111827'}} className="font-ui min-h-screen flex items-center justify-center">
+      <div style={{background:'linear-gradient(140deg, #0B1B2B 0%, #0A1320 52%, #050B14 100%)',minHeight:'100vh',color:'#111827'}} className="font-ui min-h-screen flex items-center justify-center">
         <div className="w-8 h-8 border-2 border-[#FF096C]/30 border-t-[#FF096C] rounded-full animate-spin" />
       </div>
     }>
@@ -208,21 +208,17 @@ function RegisterForm() {
   }
 
   return (
-    <div style={{background:'linear-gradient(135deg,#F8FAFC,#F5F7FA 45%,#EEF2F7)',minHeight:'100vh',color:'#111827'}} className="font-ui min-h-screen flex items-center justify-center px-4 py-10 relative overflow-hidden">
+    <div style={{background:'linear-gradient(140deg, #0B1B2B 0%, #0A1320 52%, #050B14 100%)',minHeight:'100vh',color:'#111827'}} className="font-ui min-h-screen flex items-center justify-center px-4 py-10 relative overflow-hidden">
       <div className="pointer-events-none fixed inset-0">
-        <div className="absolute -top-32 -right-32 w-[500px] h-[500px] rounded-full bg-purple-600/10 blur-[120px]" />
-        <div className="absolute -bottom-32 -left-32 w-[500px] h-[500px] rounded-full bg-[#FF096C]/8 blur-[120px]" />
+        <div className="absolute -top-32 -right-32 w-[500px] h-[500px] rounded-full bg-purple-600/20 blur-[120px]" />
+        <div className="absolute -bottom-32 -left-32 w-[500px] h-[500px] rounded-full bg-[#FF096C]/16 blur-[120px]" />
       </div>
 
       <div className="w-full max-w-sm relative z-10">
 
         {/* Logo oficial */}
         <div className="flex flex-col items-center mb-6">
-          <div style={{ padding: 2, borderRadius: 24, background: 'linear-gradient(135deg, #FF2D95 0%, #B735B8 48%, #233B8F 100%)', boxShadow: '0 20px 44px -14px rgba(8,22,36,0.42)' }}>
-            <div style={{ padding: '14px 24px', borderRadius: 22, background: 'rgba(13,20,34,0.82)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)' }}>
-              <img src="/logo-oficial-mydiamond.png" alt="MY DIAMOND" style={{ width: 140, height: 'auto', display: 'block' }} />
-            </div>
-          </div>
+          <img src="/logo-oficial-mydiamond.png" alt="MY DIAMOND" style={{ width: 200, height: 'auto', display: 'block', filter: 'drop-shadow(0 12px 32px rgba(0,0,0,0.5))' }} />
           <p className="text-xs text-[#6B7280] mt-3">Crea tu cuenta gratuita</p>
         </div>
 
@@ -436,7 +432,7 @@ function RegisterForm() {
           </form>
         </div>
 
-        <p className="text-center text-[#9CA3AF] text-xs mt-5">
+        <p className="text-center text-white/55 text-xs mt-5">
           ¿Ya tienes cuenta?{' '}
           <Link href="/login" className="text-purple-400 hover:text-purple-300 font-bold transition-colors">
             Iniciar sesión
