@@ -65,18 +65,18 @@ export default function RecursosGaleriaPage() {
         } ${empty ? 'opacity-45' : ''}`}
         style={{
           background: active
-            ? 'radial-gradient(120% 80% at 50% -10%, rgba(210,3,221,0.22), rgba(255,255,255,0) 58%), linear-gradient(180deg, #0B1B2B 0%, #081624 60%, #050B14 100%)'
+            ? 'radial-gradient(120% 80% at 50% -10%, rgba(183,53,184,0.22), rgba(255,255,255,0) 58%), linear-gradient(180deg, #0B1B2B 0%, #081624 60%, #050B14 100%)'
             : 'linear-gradient(180deg, #0B1B2B 0%, #081624 60%, #050B14 100%)',
-          border: active ? '1px solid rgba(210,3,221,0.5)' : '1px solid rgba(255,255,255,0.08)',
+          border: active ? '1px solid rgba(183,53,184,0.5)' : '1px solid rgba(255,255,255,0.08)',
           boxShadow: '0 14px 32px -22px rgba(8,22,36,0.6)',
         }}
       >
         {/* indicador estilo radio */}
-        <span className={`w-3.5 h-3.5 rounded-full border-2 shrink-0 flex items-center justify-center ${active ? 'border-[#D203DD]' : 'border-white/30'}`}>
-          {active && <span className="w-1.5 h-1.5 rounded-full bg-[#D203DD]" />}
+        <span className={`w-3.5 h-3.5 rounded-full border-2 shrink-0 flex items-center justify-center ${active ? 'border-[#B735B8]' : 'border-white/30'}`}>
+          {active && <span className="w-1.5 h-1.5 rounded-full bg-[#B735B8]" />}
         </span>
         <span className="flex-1 text-sm font-bold truncate">{label}</span>
-        <span className={`text-[10px] font-black px-1.5 py-0.5 rounded-full ${active ? 'bg-[#D203DD]/30 text-white' : 'bg-white/10 text-white/55'}`}>{n}</span>
+        <span className={`text-[10px] font-black px-1.5 py-0.5 rounded-full ${active ? 'bg-[#B735B8]/30 text-white' : 'bg-white/10 text-white/55'}`}>{n}</span>
         <i className="fa-solid fa-chevron-right text-[10px] text-white/30 md:hidden"></i>
       </button>
     )
@@ -119,14 +119,14 @@ export default function RecursosGaleriaPage() {
           <div className="text-center py-24 text-[#111827]/40">
             <i className="fa-regular fa-image text-4xl mb-3 block opacity-50"></i>
             <p className="text-sm">Todavía no hay flyers{selected && selected !== 'todas' ? ' en esta área' : ''}.</p>
-            {isAdmin && <p className="text-xs mt-2">Subí el primero desde <Link href="/admin/recursos" className="underline text-[#D203DD]">Admin → Recursos</Link>.</p>}
+            {isAdmin && <p className="text-xs mt-2">Subí el primero desde <Link href="/admin/recursos" className="underline text-[#B735B8]">Admin → Recursos</Link>.</p>}
           </div>
         )}
 
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
           {gridItems.map(t => (
             <Link key={t.id} href={`/dashboard/recursos/flyers/${t.id}`}
-              className="group rounded-2xl overflow-hidden hover:border-[#D203DD]/40 transition-all active:scale-[0.98]"
+              className="group rounded-2xl overflow-hidden hover:border-[#B735B8]/40 transition-all active:scale-[0.98]"
               style={{ background: 'radial-gradient(120% 80% at 50% -10%, rgba(183,53,184,0.18), rgba(255,255,255,0) 58%), linear-gradient(180deg, #0B1B2B 0%, #081624 55%, #050B14 100%)', border: '1px solid rgba(255,255,255,0.08)', boxShadow: '0 22px 50px -24px rgba(8,22,36,0.6), inset 0 1px 0 rgba(255,255,255,0.06)' }}>
               <div className="relative w-full bg-black/30" style={{ aspectRatio: `${t.ancho} / ${t.alto}` }}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
