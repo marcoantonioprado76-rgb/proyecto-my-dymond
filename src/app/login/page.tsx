@@ -61,11 +61,11 @@ export default function LoginPage() {
 
         {/* Logo oficial */}
         <div className="flex flex-col items-center mb-8">
-          <img src="/logo-oficial-mydiamond.png" alt="MY DIAMOND" style={{ width: 230, height: 'auto', display: 'block', filter: 'drop-shadow(0 18px 42px rgba(0,0,0,0.62)) drop-shadow(0 0 30px rgba(183,53,184,0.22))' }} />
+          <img src="/logo-oficial-mydiamond.png" alt="MY DIAMOND" style={{ width: 230, height: 'auto', display: 'block', filter: 'drop-shadow(0 5px 12px rgba(0,0,0,0.85)) drop-shadow(0 22px 46px rgba(0,0,0,0.68)) drop-shadow(0 0 28px rgba(183,53,184,0.30))' }} />
         </div>
 
         {/* Card */}
-        <div style={{ padding: '2rem', background: '#FFFFFF', border: '1px solid #E4E9F0', borderRadius: 24, boxShadow: '0 32px 80px -20px rgba(4,10,18,0.88), 0 10px 28px rgba(8,22,36,0.5)' }}>
+        <div style={{ padding: '2rem', background: '#FFFFFF', border: '1px solid #E4E9F0', borderRadius: 24, boxShadow: '0 0 0 1px rgba(255,255,255,0.10), 0 44px 100px -22px rgba(0,0,0,0.88), 0 18px 48px rgba(0,0,0,0.6)' }}>
 
           <p className="text-[10px] font-black uppercase tracking-[0.2em] mb-5" style={{ color: '#9CA3AF' }}>Iniciar sesión</p>
 
@@ -129,8 +129,8 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full uppercase tracking-[0.18em] text-xs mt-2 flex items-center justify-center gap-2 transition-all active:scale-[0.99] disabled:opacity-60"
-              style={{ padding: '14px 20px', borderRadius: 16, fontWeight: 800, color: '#fff', border: 'none', cursor: 'pointer', background: 'linear-gradient(135deg, #FF2D95 0%, #B735B8 48%, #233B8F 100%)', boxShadow: '0 16px 36px rgba(255,9,108,0.28)' }}
+              className="dm-login-btn w-full uppercase tracking-[0.18em] text-xs mt-2 flex items-center justify-center gap-2 disabled:opacity-60"
+              style={{ padding: '14px 20px', borderRadius: 16, fontWeight: 800, color: '#fff', border: 'none', cursor: 'pointer', background: 'linear-gradient(135deg, #FF2D95 0%, #B735B8 48%, #233B8F 100%)' }}
             >
               {loading
                 ? <div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />

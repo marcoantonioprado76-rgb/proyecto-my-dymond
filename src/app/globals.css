@@ -162,3 +162,36 @@
   width: 100% !important;
   height: 100% !important;
 }
+
+/* ── Botón premium de acceso (login/registro): levantar + brillo + hundir ── */
+.dm-login-btn {
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 16px 36px rgba(255, 9, 108, 0.32);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+}
+.dm-login-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 26px 56px rgba(255, 9, 108, 0.5);
+  filter: brightness(1.05);
+}
+.dm-login-btn:active {
+  transform: translateY(0) scale(0.96);
+  box-shadow: 0 8px 20px rgba(255, 9, 108, 0.45);
+}
+.dm-login-btn::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 45%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  transform: translateX(-160%) skewX(-20deg);
+  pointer-events: none;
+}
+.dm-login-btn:hover::after { animation: dm-shine 0.7s ease; }
+.dm-login-btn:active::after { animation: dm-shine 0.45s ease; }
+@keyframes dm-shine {
+  to { transform: translateX(280%) skewX(-20deg); }
+}

@@ -218,12 +218,12 @@ function RegisterForm() {
 
         {/* Logo oficial */}
         <div className="flex flex-col items-center mb-6">
-          <img src="/logo-oficial-mydiamond.png" alt="MY DIAMOND" style={{ width: 200, height: 'auto', display: 'block', filter: 'drop-shadow(0 18px 42px rgba(0,0,0,0.62)) drop-shadow(0 0 30px rgba(183,53,184,0.22))' }} />
+          <img src="/logo-oficial-mydiamond.png" alt="MY DIAMOND" style={{ width: 200, height: 'auto', display: 'block', filter: 'drop-shadow(0 5px 12px rgba(0,0,0,0.85)) drop-shadow(0 22px 46px rgba(0,0,0,0.68)) drop-shadow(0 0 28px rgba(183,53,184,0.30))' }} />
           <p className="text-xs text-[#6B7280] mt-3">Crea tu cuenta gratuita</p>
         </div>
 
         {/* Card */}
-        <div className="dm-card p-6" style={{ boxShadow: '0 32px 80px -20px rgba(4,10,18,0.88), 0 10px 28px rgba(8,22,36,0.5)' }}>
+        <div className="dm-card p-6" style={{ boxShadow: '0 0 0 1px rgba(255,255,255,0.10), 0 44px 100px -22px rgba(0,0,0,0.88), 0 18px 48px rgba(0,0,0,0.6)' }}>
 
           <h2 className="text-sm font-black text-[#111827] mb-0.5">Registro</h2>
           <p className="text-[11px] text-[#6B7280] mb-5">Completa los datos para unirte a la plataforma.</p>
@@ -415,12 +415,11 @@ function RegisterForm() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all active:scale-[0.98] disabled:opacity-60 mt-1"
+              className="dm-login-btn w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest disabled:opacity-60 mt-1"
               style={{
-                background: 'linear-gradient(135deg, #0D1E79, #D203DD)',
+                background: 'linear-gradient(135deg, #FF2D95 0%, #B735B8 48%, #233B8F 100%)',
                 color: '#fff',
-                border: '1px solid rgba(255,255,255,0.12)',
-                boxShadow: '0 4px 20px rgba(210,3,221,0.30)',
+                border: 'none',
               }}
             >
               {loading
