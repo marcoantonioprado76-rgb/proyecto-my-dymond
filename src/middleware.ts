@@ -47,6 +47,13 @@ export function middleware(request: NextRequest) {
   const token = request.cookies.get('auth_token')?.value
   const { pathname } = request.nextUrl
 
+  // La landing está oculta: la raíz va directo al login (o al dashboard si hay
+  // sesión). El archivo de la landing (app/page.tsx) se conserva por si se quiere
+  // reactivar; basta con quitar este bloque.
+  if (pathname === '/') {
+    return NextResponse.redirect(new URL(token ? '/dashboard' : '/login', request.url))
+  }
+
   // Bloquear bots/scrapers en rutas API (excluir webhooks, health check y el
   // cron de verificación de compras — ya protegido por CRON_SECRET).
   if (pathname.startsWith('/api/') && !pathname.startsWith('/api/webhooks/') && pathname !== '/api/health' && pathname !== '/api/purchases/verify') {
@@ -88,5 +95,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/dashboard/:path*', '/admin/:path*', '/login', '/register', '/verify-device', '/api/:path*'],
+  matcher: ['/', '/dashboard/:path*', '/admin/:path*', '/login', '/register', '/verify-device', '/api/:path*'],
 }
