@@ -32,6 +32,11 @@ model User {
   /// El admin le dio acceso manual a Academy/Recursos/Shop (lo que se oculta a los
   /// usuarios de pago). Equivale a tratarlo como Fase Global para el menú.
   accessExtras        Boolean              @default(false) @map("access_extras")
+  /// Pack Empresarial (multi-empresa). organizationId = empresa a la que pertenece
+  /// (null = usuario de plataforma / MY DIAMOND directo). orgRole = su rol dentro de la empresa.
+  organizationId      String?              @map("organization_id") @db.Uuid
+  orgRole             OrgRole              @default(NONE) @map("org_role")
+  organization        Organization?        @relation("OrgMembers", fields: [organizationId], references: [id], onDelete: SetNull)
   aiCredits           Int                  @default(0) @map("ai_credits")
   /// Balance de IA en USD con 4 decimales (ej: 12.3456). Reemplaza progresivamente a aiCredits.
   aiBalanceUsd        Decimal              @default(0) @db.Decimal(10, 4) @map("ai_balance_usd")
@@ -1602,4 +1607,26 @@ model FlyerArea {
 
   @@index([activo, orden])
   @@map("flyer_areas")
+}
+
+// ── Pack Empresarial (multi-empresa / white-label) ──
+enum OrgRole {
+  NONE
+  ORG_ADMIN
+  ORG_USER
+}
+
+/// Una empresa Pack Empresarial. Tiene su admin, su cupo de usuarios y su contenido.
+model Organization {
+  id          String   @id @default(uuid()) @db.Uuid
+  name        String
+  slug        String   @unique
+  maxUsers    Int      @default(0) @map("max_users")
+  active      Boolean  @default(true)
+  billingNote String?  @map("billing_note")
+  logoUrl     String?  @map("logo_url")
+  createdAt   DateTime @default(now()) @map("created_at")
+  members     User[]   @relation("OrgMembers")
+
+  @@map("organizations")
 }

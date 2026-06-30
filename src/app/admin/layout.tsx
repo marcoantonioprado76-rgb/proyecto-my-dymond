@@ -24,11 +24,13 @@ import {
   Package,
   BrainCircuit,
   LayoutTemplate,
+  Building2,
 } from 'lucide-react'
 
 const NAV = [
   { href: '/admin', label: 'Resumen', icon: LayoutDashboard, exact: true },
   { href: '/admin/users', label: 'Usuarios', icon: Users },
+  { href: '/admin/organizations', label: 'Empresas', icon: Building2 },
   { href: '/admin/purchases', label: 'Compras', icon: ShoppingBag },
   { href: '/admin/withdrawals', label: 'Retiros', icon: Wallet },
   { href: '/admin/bonuses', label: 'Bonos Extra', icon: Gift },
