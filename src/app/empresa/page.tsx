@@ -131,9 +131,14 @@ export default function EmpresaPage() {
             <p style={{ fontSize: 12, opacity: 0.7 }}>{org?.name ?? ''}</p>
           </div>
         </div>
-        <button onClick={logout} style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)', color: 'rgba(255,180,180,0.95)', padding: '8px 14px', borderRadius: 10, cursor: 'pointer', fontWeight: 600, fontSize: 13 }}>
-          <i className="fa-solid fa-right-from-bracket" style={{ marginRight: 6 }} />Salir
-        </button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <a href="/empresa/contenido" style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.18)', color: '#fff', padding: '8px 14px', borderRadius: 10, fontWeight: 700, fontSize: 13, textDecoration: 'none' }}>
+            <i className="fa-solid fa-layer-group" style={{ marginRight: 6 }} />Mi Contenido
+          </a>
+          <button onClick={logout} style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)', color: 'rgba(255,180,180,0.95)', padding: '8px 14px', borderRadius: 10, cursor: 'pointer', fontWeight: 600, fontSize: 13 }}>
+            <i className="fa-solid fa-right-from-bracket" style={{ marginRight: 6 }} />Salir
+          </button>
+        </div>
       </header>
 
       <main style={{ maxWidth: 980, margin: '0 auto', padding: '26px 18px 60px' }}>
