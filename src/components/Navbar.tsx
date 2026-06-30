@@ -1,9 +1,12 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import NotificationBell from './NotificationBell'
+
+// Academy, Recursos y Shop solo se muestran a usuarios de Fase Global.
+const FASE_GLOBAL_ONLY = ['/dashboard/academy', '/dashboard/recursos', '/dashboard/store']
 
 const serviceItems = [
   { href: '/dashboard/services/ads/meta',      iconClass: 'fa-brands fa-meta',        label: 'Meta Ads',      grad: 'linear-gradient(145deg, #4f8dff, #1d4ed8)' },
@@ -36,6 +39,15 @@ export default function Navbar() {
   const isInAcademy  = pathname.startsWith('/dashboard/courses') || pathname.startsWith('/dashboard/podcasts') || pathname === '/dashboard/academy'
   const isInServices = pathname === '/dashboard/services' || serviceItems.some(s => pathname === s.href || pathname.startsWith(s.href))
   const [servicesOpen, setServicesOpen] = useState(isInServices)
+  // Fase Global: estos usuarios ven Academy/Recursos/Shop; los de pago, no.
+  const [faseGlobal, setFaseGlobal] = useState(false)
+  useEffect(() => {
+    fetch('/api/plan-status')
+      .then(r => r.json())
+      .then(d => setFaseGlobal(!!d.faseGlobal))
+      .catch(() => {})
+  }, [])
+  const visibleMobileItems = mobileNavItems.filter(i => faseGlobal || !FASE_GLOBAL_ONLY.includes(i.href))
 
   return (
     <>
@@ -83,22 +95,25 @@ export default function Navbar() {
             </div>
           )}
 
-          <Link href="/dashboard/academy" className={`nav-item ${isInAcademy ? 'nav-item--active' : ''}`}>
-            <span className="nav-item__icon"><i className="fa-solid fa-graduation-cap"></i></span>
-            <span className="nav-item__label">Academy</span>
-            <span className="nav-item__dot"></span>
-          </Link>
-          <Link href="/dashboard/recursos" className={`nav-item ${pathname.startsWith('/dashboard/recursos') ? 'nav-item--active' : ''}`}>
-            <span className="nav-item__icon"><i className="fa-solid fa-wand-magic-sparkles"></i></span>
-            <span className="nav-item__label">Recursos</span>
-            <span className="nav-item__dot"></span>
-          </Link>
-
-          <Link href="/dashboard/store" className={`nav-item ${pathname.startsWith('/dashboard/store') ? 'nav-item--active' : ''}`}>
-            <span className="nav-item__icon"><i className="fa-solid fa-bag-shopping"></i></span>
-            <span className="nav-item__label">Shop</span>
-            <span className="nav-item__dot"></span>
-          </Link>
+          {faseGlobal && (
+            <>
+              <Link href="/dashboard/academy" className={`nav-item ${isInAcademy ? 'nav-item--active' : ''}`}>
+                <span className="nav-item__icon"><i className="fa-solid fa-graduation-cap"></i></span>
+                <span className="nav-item__label">Academy</span>
+                <span className="nav-item__dot"></span>
+              </Link>
+              <Link href="/dashboard/recursos" className={`nav-item ${pathname.startsWith('/dashboard/recursos') ? 'nav-item--active' : ''}`}>
+                <span className="nav-item__icon"><i className="fa-solid fa-wand-magic-sparkles"></i></span>
+                <span className="nav-item__label">Recursos</span>
+                <span className="nav-item__dot"></span>
+              </Link>
+              <Link href="/dashboard/store" className={`nav-item ${pathname.startsWith('/dashboard/store') ? 'nav-item--active' : ''}`}>
+                <span className="nav-item__icon"><i className="fa-solid fa-bag-shopping"></i></span>
+                <span className="nav-item__label">Shop</span>
+                <span className="nav-item__dot"></span>
+              </Link>
+            </>
+          )}
           <Link href="/dashboard/settings" className={`nav-item ${pathname === '/dashboard/settings' ? 'nav-item--active' : ''}`}>
             <span className="nav-item__icon"><i className="fa-solid fa-gear"></i></span>
             <span className="nav-item__label">Configuración</span>
@@ -126,7 +141,7 @@ export default function Navbar() {
 
       {/* ── BARRA MÓVIL ── */}
       <nav className="bottom-nav lg:hidden" aria-label="Navegación principal">
-        {mobileNavItems.map(item => {
+        {visibleMobileItems.map(item => {
           const isActive = pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href))
           return (
             <Link key={item.href} href={item.href} className={`bnav__item ${isActive ? 'bnav__item--active' : ''}`}>
