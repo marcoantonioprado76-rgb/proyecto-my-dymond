@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 
 const DG = 'linear-gradient(135deg,#FF2D95 0%,#B735B8 48%,#233B8F 100%)'
 
-type Tab = 'courses' | 'podcasts' | 'store' | 'recursos'
+type Tab = 'courses' | 'podcasts' | 'store' | 'recursos' | 'flyers'
 
 interface CourseRow { id: string; title: string; description: string; coverUrl: string | null; price: number; freeForPlan: boolean; categoria: string | null; nivel: string | null; videos?: { title: string; youtubeUrl: string }[]; _count?: { videos: number } }
 interface PodcastRow { id: string; title: string; description: string | null; coverUrl: string | null; embedUrl: string; active: boolean; order?: number }
@@ -44,7 +44,7 @@ export default function ContenidoEmpresaPage() {
 
       <main style={{ maxWidth: 980, margin: '0 auto', padding: '24px 18px 60px' }}>
         <div style={{ display: 'flex', gap: 8, marginBottom: 18, flexWrap: 'wrap' }}>
-          {([['courses', '🎓 Cursos'], ['podcasts', '🎙️ Podcasts'], ['recursos', '📚 Recursos'], ['store', '🛍️ Tienda']] as [Tab, string][]).map(([t, label]) => (
+          {([['courses', '🎓 Cursos'], ['podcasts', '🎙️ Podcasts'], ['recursos', '📚 Recursos'], ['flyers', '🎨 Flyers'], ['store', '🛍️ Tienda']] as [Tab, string][]).map(([t, label]) => (
             <button key={t} onClick={() => setTab(t)} style={{ padding: '9px 18px', borderRadius: 11, fontWeight: 800, fontSize: 13, cursor: 'pointer', border: tab === t ? 'none' : '1px solid #E4E9F0', background: tab === t ? DG : '#fff', color: tab === t ? '#fff' : '#5B6472' }}>{label}</button>
           ))}
         </div>
@@ -56,6 +56,7 @@ export default function ContenidoEmpresaPage() {
         {tab === 'courses' && <CoursesTab />}
         {tab === 'podcasts' && <PodcastsTab />}
         {tab === 'recursos' && <RecursosTab />}
+        {tab === 'flyers' && <FlyersTab />}
         {tab === 'store' && <StoreTab />}
       </main>
     </div>
@@ -348,6 +349,40 @@ function RecursosTab() {
           {err && <p style={errP}>{err}</p>}
           <Actions onCancel={() => setModal(null)} onSave={save} busy={busy} />
         </Modal>
+      )}
+      {delId && <ConfirmDelete onCancel={() => setDelId(null)} onConfirm={() => del(delId)} busy={busy} />}
+    </>
+  )
+}
+
+/* ─────────────── FLYERS ─────────────── */
+function FlyersTab() {
+  const [items, setItems] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+  const [busy, setBusy] = useState(false)
+  const [delId, setDelId] = useState<string | null>(null)
+  async function load() { setLoading(true); try { const r = await fetch('/api/empresa/content/flyers'); const d = await r.json(); setItems(d.flyers || []) } finally { setLoading(false) } }
+  useEffect(() => { load() }, [])
+  async function del(id: string) { setBusy(true); await fetch(`/api/empresa/content/flyers/${id}`, { method: 'DELETE' }); setBusy(false); setDelId(null); load() }
+  return (
+    <>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+        <h2 style={{ fontSize: 16, fontWeight: 800 }}>Tus flyers</h2>
+        <a href="/empresa/flyer/nuevo" style={{ background: DG, color: '#fff', borderRadius: 11, padding: '10px 18px', fontWeight: 800, fontSize: 13, textDecoration: 'none' }}><i className="fa-solid fa-plus" style={{ marginRight: 7 }} />Crear flyer</a>
+      </div>
+      {loading ? <Loading /> : items.length === 0 ? <Empty text="Todavía no creaste flyers. Tocá 'Crear flyer' para diseñar uno (subís el fondo y colocás los textos)." /> : (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: 12 }}>
+          {items.map(f => (
+            <div key={f.id} style={{ background: '#fff', border: '1px solid #E4E9F0', borderRadius: 14, overflow: 'hidden' }}>
+              <div style={{ height: 120, background: `center/cover url(${f.thumbUrl || f.fondoUrl})` }} />
+              <div style={{ padding: '10px 12px' }}>
+                <p style={{ fontWeight: 700, fontSize: 13, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{f.nombre}</p>
+                <p style={{ fontSize: 11, color: '#8A93A2', marginBottom: 8 }}>{f.categoria}</p>
+                <button onClick={() => setDelId(f.id)} style={{ ...iconBtn, color: '#ef4444', width: '100%' }}><i className="fa-solid fa-trash" /></button>
+              </div>
+            </div>
+          ))}
+        </div>
       )}
       {delId && <ConfirmDelete onCancel={() => setDelId(null)} onConfirm={() => del(delId)} busy={busy} />}
     </>
