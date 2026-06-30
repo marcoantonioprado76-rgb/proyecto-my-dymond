@@ -2,14 +2,14 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { Check, Lock, Zap, Sparkles, Crown, X, Layers, MessageCircle, Store, Megaphone, FileText, Users, Video, CheckCircle2, Clock, Timer, RefreshCw, Phone, BookOpen, Play } from 'lucide-react'
+import { Check, Lock, Zap, Sparkles, Crown, X, Layers, MessageCircle, Store, Megaphone, FileText, Users, Video, CheckCircle2, Clock, Timer, RefreshCw, Phone, BookOpen, Play, Share2, Send, GraduationCap } from 'lucide-react'
 
 const PACKS = [
   {
     id: 'basic',
     name: 'Pack Básico',
     tagline: 'Tu primer agente de ventas en WhatsApp',
-    pitch: 'Automatiza tus ventas con un agente AI inteligente personalizado con tu marca, más landing page y anuncios para captar clientes.',
+    pitch: 'Automatiza tus ventas con un agente AI personalizado con tu marca, tu tienda, landing y Meta Ads para captar clientes.',
     price: 49,
     planId: 'BASIC',
     icon: Zap,
@@ -51,16 +51,20 @@ const PACKS = [
       },
       {
         icon: Megaphone,
-        title: 'Anuncios con IA',
-        features: ['Hasta 5 anuncios al mes en Meta, TikTok y Google'],
+        title: 'Meta Ads con IA',
+        features: ['Hasta 5 anuncios al mes en Meta'],
       },
       {
-        icon: Play,
-        title: 'Clipping',
-        features: ['Gana por cada 1,000 vistas de tus clips'],
+        icon: GraduationCap,
+        title: 'Academy + Recursos',
+        features: [
+          'Acceso a cursos y capacitaciones',
+          'Flyers editables, plantillas, libros y podcasts',
+        ],
       },
     ],
     notIncluded: [
+      'CRM Broadcast y Social',
       'Acceso a nuevos lanzamientos exclusivos',
     ],
   },
@@ -68,7 +72,7 @@ const PACKS = [
     id: 'pro',
     name: 'Pack Pro',
     tagline: 'Vende, anuncia y escala sin límites',
-    pitch: 'Todo lo del Básico más 2 agentes AI, más tiendas, más landings y capacitaciones en vivo por Zoom.',
+    pitch: 'Todo lo del Básico más 2 agentes AI, más tiendas y landings, CRM Broadcast, Social y capacitaciones.',
     price: 99,
     planId: 'PRO',
     icon: Sparkles,
@@ -105,9 +109,9 @@ const PACKS = [
       },
       {
         icon: Megaphone,
-        title: 'Publicidad con IA',
+        title: 'Meta Ads con IA',
         features: [
-          'Hasta 15 anuncios al mes en Meta, TikTok y Google',
+          'Hasta 15 anuncios al mes en Meta',
           'Copies e imágenes generados por IA',
           'Estrategias Advantage+ y Smart Segmentation',
         ],
@@ -122,17 +126,25 @@ const PACKS = [
         ],
       },
       {
-        icon: BookOpen,
-        title: 'Clipping',
+        icon: Send,
+        title: 'CRM Broadcast',
         features: [
-          'Gana por cada 1,000 vistas de tus clips',
+          'Gestión de contactos y conversaciones',
+          'Difusión masiva por WhatsApp',
+        ],
+      },
+      {
+        icon: Share2,
+        title: 'Social',
+        features: [
+          'Gestión y publicación en tus redes sociales',
         ],
       },
       {
         icon: Video,
-        title: 'Capacitaciones',
+        title: 'Academy + Capacitaciones',
         features: [
-          'Acceso a capacitaciones en vivo por Zoom',
+          'Cursos, recursos y podcasts',
           'Asesoramiento personalizado de 30 minutos',
         ],
       },
@@ -143,7 +155,7 @@ const PACKS = [
     id: 'elite',
     name: 'Pack Elite',
     tagline: 'El máximo poder para líderes de red',
-    pitch: 'La experiencia completa: 5 agentes AI, 5 tiendas, 40 productos, 6 landings y acceso total a todos los lanzamientos exclusivos.',
+    pitch: 'La experiencia completa: 5 agentes AI, 5 tiendas, 40 productos, 6 landings, CRM + Social y acceso total a lanzamientos exclusivos.',
     price: 199,
     planId: 'ELITE',
     icon: Crown,
@@ -187,17 +199,18 @@ const PACKS = [
       },
       {
         icon: Megaphone,
-        title: 'Publicidad con IA',
+        title: 'Meta Ads con IA',
         features: [
-          'Hasta 30 anuncios al mes en Meta, TikTok y Google',
+          'Hasta 30 anuncios al mes en Meta',
           'Copies e imágenes generados por IA',
         ],
       },
       {
-        icon: BookOpen,
-        title: 'Clipping',
+        icon: Send,
+        title: 'CRM Broadcast + Social',
         features: [
-          'Gana por cada 1,000 vistas de tus clips',
+          'CRM completo + difusión masiva por WhatsApp',
+          'Gestión y publicación en tus redes sociales',
         ],
       },
       {
