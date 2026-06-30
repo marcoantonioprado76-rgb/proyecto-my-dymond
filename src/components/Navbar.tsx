@@ -37,8 +37,9 @@ async function logout() {
 export default function Navbar() {
   const pathname = usePathname()
   const isInAcademy  = pathname.startsWith('/dashboard/courses') || pathname.startsWith('/dashboard/podcasts') || pathname === '/dashboard/academy'
-  const isInServices = pathname === '/dashboard/services' || serviceItems.some(s => pathname === s.href || pathname.startsWith(s.href))
-  const [servicesOpen, setServicesOpen] = useState(isInServices)
+  // Servicios abierto por defecto: que todos los servicios se vean en el sidebar
+  // (sobre todo para usuarios de pago, a los que se les ocultan Academy/Recursos/Shop).
+  const [servicesOpen, setServicesOpen] = useState(true)
   // Academy/Recursos/Shop: visibles para Fase Global o si el admin dio acceso manual.
   const [showExtras, setShowExtras] = useState(false)
   useEffect(() => {
