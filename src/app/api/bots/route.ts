@@ -4,7 +4,8 @@ import { cookies } from 'next/headers'
 import { prisma } from '@/lib/prisma'
 import { verifyToken } from '@/lib/auth'
 import { generateSecureToken } from '@/lib/crypto'
-import { getPlanLimits, PLAN_NAMES, type UserPlan } from '@/lib/plan-limits'
+import { PLAN_NAMES, type UserPlan } from '@/lib/plan-limits'
+import { getPlanBots } from '@/lib/plan-config'
 
 function getAuth() {
   const cookieStore = cookies()
@@ -68,14 +69,14 @@ export async function POST(request: NextRequest) {
     `
     const plan = (userRow[0]?.plan ?? 'NONE') as UserPlan
     const extraBots = userRow[0]?.extra_bots ?? 0
-    const limits = getPlanLimits(plan)
+    const maxBots = await getPlanBots(plan)
 
-    if (limits.bots === 0 && extraBots === 0) {
+    if (maxBots === 0 && extraBots === 0) {
       return NextResponse.json({ error: 'Necesitas un plan activo para crear bots.', limitReached: true, plan }, { status: 403 })
     }
 
-    if (limits.bots !== Infinity) {
-      const effectiveLimit = limits.bots + extraBots
+    if (maxBots !== Infinity) {
+      const effectiveLimit = maxBots + extraBots
       const botCount = await prisma.bot.count({ where: { userId: auth.userId } })
       if (botCount >= effectiveLimit) {
         return NextResponse.json({

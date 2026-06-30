@@ -38,6 +38,37 @@ const PLAN_PRICES = [
   },
 ]
 
+/* ─── Plan credits & bots config ────────────────────────────────── */
+const PLAN_CREDITS_BOTS = [
+  {
+    creditsKey: 'PLAN_BASIC_CREDITS',
+    botsKey: 'PLAN_BASIC_BOTS',
+    creditsDefault: '3',
+    botsDefault: '2',
+    label: 'Pack Básico',
+    color: 'text-cyan-400',
+    dot: '#22d3ee',
+  },
+  {
+    creditsKey: 'PLAN_PRO_CREDITS',
+    botsKey: 'PLAN_PRO_BOTS',
+    creditsDefault: '8',
+    botsDefault: '4',
+    label: 'Pack Pro',
+    color: 'text-purple-400',
+    dot: '#a78bfa',
+  },
+  {
+    creditsKey: 'PLAN_ELITE_CREDITS',
+    botsKey: 'PLAN_ELITE_BOTS',
+    creditsDefault: '20',
+    botsDefault: '8',
+    label: 'Pack Elite',
+    color: 'text-yellow-400',
+    dot: '#fbbf24',
+  },
+]
+
 /* ─── Toggle config ─────────────────────────────────────────────── */
 const PLAN_TOGGLES = [
   {
@@ -146,6 +177,24 @@ export default function AdminSettingsPage() {
     if (res.ok) { setSaved(key); setTimeout(() => setSaved(null), 2500) }
   }
 
+  // Guarda créditos/bots por plan. Permite 0 (un plan sin créditos o sin bots).
+  async function saveNumberKey(key: string, fallback: string) {
+    const raw = prices[key]
+    const val = (raw === undefined || raw === '') ? fallback : raw
+    if (isNaN(Number(val)) || Number(val) < 0) {
+      alert('Ingresa un número válido (0 o mayor)')
+      return
+    }
+    setSaving(key)
+    const res = await fetch('/api/admin/settings', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ key, value: val }),
+    })
+    setSaving(null)
+    if (res.ok) { setSaved(key); setTimeout(() => setSaved(null), 2500) }
+  }
+
   async function saveToggle(key: string, next: boolean) {
     setSavingToggle(key)
     setToggles(prev => ({ ...prev, [key]: next }))
@@ -202,6 +251,37 @@ export default function AdminSettingsPage() {
       </div>
       <button
         onClick={() => saveKey(settingKey)}
+        disabled={saving === settingKey}
+        className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#EEF2F7] hover:bg-white/15 border border-[#E4E9F0] text-xs font-bold transition-colors disabled:opacity-50 whitespace-nowrap"
+      >
+        {saving === settingKey
+          ? <Loader2 size={12} className="animate-spin" />
+          : saved === settingKey
+          ? <><Check size={12} className="text-green-400" /> Guardado</>
+          : <><Save size={12} /> Guardar</>
+        }
+      </button>
+    </div>
+  )
+
+  const PlanNumberInput = ({ settingKey, fallback, prefix, placeholder }: { settingKey: string; fallback: string; prefix?: string; placeholder?: string }) => (
+    <div className="flex items-center gap-2">
+      <div className="relative">
+        {prefix && (
+          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#111827]/40 text-sm font-bold">{prefix}</span>
+        )}
+        <input
+          type="number"
+          min="0"
+          step={prefix ? '0.01' : '1'}
+          placeholder={placeholder ?? fallback}
+          value={prices[settingKey] ?? ''}
+          onChange={e => setPrices(prev => ({ ...prev, [settingKey]: e.target.value }))}
+          className={`w-28 bg-black/30 border border-[#E4E9F0] rounded-xl ${prefix ? 'pl-6' : 'pl-3'} pr-3 py-2 text-sm font-bold text-white outline-none focus:border-white/30 text-right`}
+        />
+      </div>
+      <button
+        onClick={() => saveNumberKey(settingKey, fallback)}
         disabled={saving === settingKey}
         className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#EEF2F7] hover:bg-white/15 border border-[#E4E9F0] text-xs font-bold transition-colors disabled:opacity-50 whitespace-nowrap"
       >
@@ -279,6 +359,53 @@ export default function AdminSettingsPage() {
                 El <strong className="text-[#111827]/45">precio inicial</strong> se cobra cuando el usuario activa el plan por primera vez.
                 La <strong className="text-[#111827]/45">renovación</strong> se cobra cuando el plan vence y el usuario quiere extenderlo.
                 Si dejas la renovación vacía, se usará el precio inicial.
+              </p>
+            </div>
+          </section>
+
+          {/* ── Plan Credits & Bots ─────────────────────── */}
+          <section className="space-y-3">
+            <div className="flex items-center gap-2 mb-1">
+              <DollarSign size={13} className="text-[#111827]/40" />
+              <p className="text-[10px] font-black uppercase tracking-widest text-[#111827]/40">Créditos IA y Bots por plan</p>
+            </div>
+
+            <div className="rounded-2xl overflow-hidden border border-[#E4E9F0]">
+              {/* Column headers */}
+              <div className="grid grid-cols-3 px-5 py-2.5 border-b border-white/6"
+                style={{ background: 'rgba(255,255,255,0.03)' }}>
+                <span className="text-[10px] font-bold uppercase tracking-widest text-[#111827]/25">Plan</span>
+                <span className="text-[10px] font-bold uppercase tracking-widest text-[#111827]/25 flex items-center gap-1">
+                  <DollarSign size={9} /> Créditos IA (USD)
+                </span>
+                <span className="text-[10px] font-bold uppercase tracking-widest text-[#111827]/25">Bots / agentes</span>
+              </div>
+
+              {PLAN_CREDITS_BOTS.map(plan => (
+                <div key={plan.creditsKey}
+                  className="grid grid-cols-3 items-center px-5 py-4 border-b border-[#E4E9F0] last:border-0"
+                  style={{ background: 'rgba(255,255,255,0.015)' }}>
+
+                  {/* Plan name */}
+                  <div className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full shrink-0" style={{ background: plan.dot }} />
+                    <span className={`text-sm font-black ${plan.color}`}>{plan.label}</span>
+                  </div>
+
+                  {/* Credits (USD) */}
+                  <PlanNumberInput settingKey={plan.creditsKey} fallback={plan.creditsDefault} prefix="$" />
+
+                  {/* Bots */}
+                  <PlanNumberInput settingKey={plan.botsKey} fallback={plan.botsDefault} />
+                </div>
+              ))}
+            </div>
+
+            <div className="flex items-start gap-2 p-3 rounded-xl bg-white/[0.02] border border-white/6">
+              <Info size={12} className="text-[#111827]/25 mt-0.5 shrink-0" />
+              <p className="text-[11px] text-[#111827]/30 leading-relaxed">
+                Los <strong className="text-[#111827]/45">créditos IA incluidos</strong> (en USD) y la cantidad de <strong className="text-[#111827]/45">bots / agentes</strong> que cada plan otorga al usuario.
+                Si dejas un campo vacío, se usará el valor por defecto.
               </p>
             </div>
           </section>

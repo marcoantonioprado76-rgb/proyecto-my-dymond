@@ -230,6 +230,10 @@ const PACKS = [
 
 const PLAN_RANK: Record<string, number> = { NONE: 0, BASIC: 1, PRO: 2, ELITE: 3 }
 
+// Créditos IA (USD) incluidos por plan. Default; el admin los edita en Settings
+// (PLAN_BASIC_CREDITS, etc.) y la vista los lee de /api/settings.
+const PLAN_CREDIT_DEFAULTS: Record<string, number> = { BASIC: 3, PRO: 8, ELITE: 20 }
+
 function useCountdown(expiresAt: string | null) {
   const [remaining, setRemaining] = useState<{ days: number; hours: number; minutes: number; seconds: number } | null>(null)
   useEffect(() => {
@@ -259,6 +263,7 @@ export default function PlanesPage() {
   const [pendingPlan, setPendingPlan] = useState<string | null>(null)
   const [isFaseGlobal, setIsFaseGlobal] = useState(false)
   const [enabledPlans, setEnabledPlans] = useState<Record<string, boolean> | null>(null)
+  const [credits, setCredits] = useState<Record<string, number>>(PLAN_CREDIT_DEFAULTS)
   const countdown = useCountdown(planExpiresAt)
 
   useEffect(() => {
@@ -287,6 +292,11 @@ export default function PlanesPage() {
           PRO:   s['PLAN_PRO_ENABLED']   !== 'false',
           ELITE: s['PLAN_ELITE_ENABLED'] !== 'false',
         }
+        setCredits({
+          BASIC: Number(s['PLAN_BASIC_CREDITS'] ?? PLAN_CREDIT_DEFAULTS.BASIC),
+          PRO:   Number(s['PLAN_PRO_CREDITS']   ?? PLAN_CREDIT_DEFAULTS.PRO),
+          ELITE: Number(s['PLAN_ELITE_CREDITS'] ?? PLAN_CREDIT_DEFAULTS.ELITE),
+        })
         // Si todos están desactivados → redirigir a checkout con Fase Global
         if (!map.BASIC && !map.PRO && !map.ELITE) {
           router.replace('/dashboard/store/checkout?plan=BASIC&faseGlobalOnly=true')
@@ -417,6 +427,12 @@ export default function PlanesPage() {
                     <span className="text-sm text-[#6B7280] mb-1">USD</span>
                   </div>
                   <p className="text-[10px] text-[#9CA3AF] mt-0.5">30 días de acceso · renovable</p>
+                  {!pack.locked && (credits[pack.planId] ?? 0) > 0 && (
+                    <div className="inline-flex items-center gap-1.5 mt-2.5 px-2.5 py-1 rounded-full" style={{ background: 'rgba(183,53,184,0.10)', border: '1px solid rgba(183,53,184,0.25)' }}>
+                      <Sparkles size={11} className="text-[#B735B8]" />
+                      <span className="text-[10px] font-black text-[#B735B8]">+ ${credits[pack.planId]} en créditos IA incluidos</span>
+                    </div>
+                  )}
                 </div>
 
                 <div className={`h-px mb-5 ${pack.accent.featured ? 'bg-purple-500/20' : 'bg-[#F4F6FA]'}`} />
@@ -495,7 +511,7 @@ export default function PlanesPage() {
                         disabled={!!pendingPlan}
                         className="w-full py-3 rounded-2xl text-sm font-black bg-[#B735B8]/10 border border-[#B735B8]/30 text-[#B735B8] hover:bg-[#B735B8]/20 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
-                        <RefreshCw size={14} /> Renovar — $19
+                        <RefreshCw size={14} /> Renovar plan
                       </button>
                     )
                   }

@@ -4,6 +4,7 @@ import { getAdminUser, unauthorizedAdmin } from '@/lib/admin-auth'
 import { prisma } from '@/lib/prisma'
 import { sendPlanPurchaseConfirmedEmail } from '@/lib/email'
 import { reactivateUserAssetsAfterPlanRenewal } from '@/lib/plan-lifecycle'
+import { getPlanCredits } from '@/lib/plan-config'
 
 const PLAN_RANK: Record<string, number> = { NONE: 0, BASIC: 1, PRO: 2, ELITE: 3 }
 
@@ -103,6 +104,18 @@ export async function PATCH(
                 plan_expires_at = NOW() + INTERVAL '30 days'
             WHERE id = ${purchaseRequest.userId}::uuid
           `
+        }
+
+        // 4.4 Créditos IA incluidos en el plan (saldo USD). Fase Global NO recibe.
+        //     Se otorgan en cada activación/renovación (el usuario paga el precio completo).
+        if (!isFaseGlobal) {
+          const credits = await getPlanCredits(newPlan, tx)
+          if (credits > 0) {
+            await tx.$executeRaw`
+              UPDATE users SET ai_balance_usd = ai_balance_usd + ${credits}
+              WHERE id = ${purchaseRequest.userId}::uuid
+            `
+          }
         }
 
         // 4.5 Reactivar tiendas/bots que el cron expirePlans haya pausado
