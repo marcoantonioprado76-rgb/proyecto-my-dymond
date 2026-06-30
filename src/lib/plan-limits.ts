@@ -12,7 +12,7 @@ export const PLAN_LIMITS = {
         clipping: true,
     },
     BASIC: {
-        bots: 1,
+        bots: 2,
         productsPerUser: 2,
         stores: 1,
         landingPages: 1,
@@ -22,7 +22,7 @@ export const PLAN_LIMITS = {
         clipping: true,
     },
     PRO: {
-        bots: 2,
+        bots: 4,
         productsPerUser: 20,
         stores: 2,
         landingPages: 3,
@@ -32,7 +32,7 @@ export const PLAN_LIMITS = {
         clipping: true,
     },
     ELITE: {
-        bots: 5,
+        bots: 8,
         productsPerUser: 40,
         stores: 5,
         landingPages: 6,
