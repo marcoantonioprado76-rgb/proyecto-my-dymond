@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 
 const DG = 'linear-gradient(135deg,#FF2D95 0%,#B735B8 48%,#233B8F 100%)'
 
-type Tab = 'courses' | 'podcasts' | 'store'
+type Tab = 'courses' | 'podcasts' | 'store' | 'recursos'
 
 interface CourseRow { id: string; title: string; description: string; coverUrl: string | null; price: number; freeForPlan: boolean; categoria: string | null; nivel: string | null; videos?: { title: string; youtubeUrl: string }[]; _count?: { videos: number } }
 interface PodcastRow { id: string; title: string; description: string | null; coverUrl: string | null; embedUrl: string; active: boolean }
@@ -44,7 +44,7 @@ export default function ContenidoEmpresaPage() {
 
       <main style={{ maxWidth: 980, margin: '0 auto', padding: '24px 18px 60px' }}>
         <div style={{ display: 'flex', gap: 8, marginBottom: 18, flexWrap: 'wrap' }}>
-          {([['courses', '🎓 Cursos'], ['podcasts', '🎙️ Podcasts'], ['store', '🛍️ Tienda']] as [Tab, string][]).map(([t, label]) => (
+          {([['courses', '🎓 Cursos'], ['podcasts', '🎙️ Podcasts'], ['recursos', '📚 Recursos'], ['store', '🛍️ Tienda']] as [Tab, string][]).map(([t, label]) => (
             <button key={t} onClick={() => setTab(t)} style={{ padding: '9px 18px', borderRadius: 11, fontWeight: 800, fontSize: 13, cursor: 'pointer', border: tab === t ? 'none' : '1px solid #E4E9F0', background: tab === t ? DG : '#fff', color: tab === t ? '#fff' : '#5B6472' }}>{label}</button>
           ))}
         </div>
@@ -55,6 +55,7 @@ export default function ContenidoEmpresaPage() {
 
         {tab === 'courses' && <CoursesTab />}
         {tab === 'podcasts' && <PodcastsTab />}
+        {tab === 'recursos' && <RecursosTab />}
         {tab === 'store' && <StoreTab />}
       </main>
     </div>
@@ -240,6 +241,74 @@ function StoreTab() {
           <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: '#5B6472', margin: '4px 0 6px' }}>
             <input type="checkbox" checked={modal.data.active} onChange={e => setModal({ ...modal, data: { ...modal.data, active: e.target.checked } })} /> Visible en la tienda
           </label>
+          {err && <p style={errP}>{err}</p>}
+          <Actions onCancel={() => setModal(null)} onSave={save} busy={busy} />
+        </Modal>
+      )}
+      {delId && <ConfirmDelete onCancel={() => setDelId(null)} onConfirm={() => del(delId)} busy={busy} />}
+    </>
+  )
+}
+
+/* ─────────────── RECURSOS (presentaciones / libros) ─────────────── */
+function RecursosTab() {
+  const [items, setItems] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+  const [modal, setModal] = useState<{ mode: 'create' | 'edit'; data: any } | null>(null)
+  const [busy, setBusy] = useState(false)
+  const [err, setErr] = useState('')
+  const [delId, setDelId] = useState<string | null>(null)
+  const [upPdf, setUpPdf] = useState(false)
+  const EMPTY = { tipo: 'presentacion', titulo: '', categoria: '', archivoUrl: '', portadaUrl: '', paginas: '' }
+
+  async function load() { setLoading(true); try { const r = await fetch('/api/empresa/content/recursos'); const d = await r.json(); setItems(d.resources || []) } finally { setLoading(false) } }
+  useEffect(() => { load() }, [])
+
+  async function save() {
+    const d = modal!.data
+    if (!d.titulo.trim() || !d.categoria.trim() || !d.archivoUrl.trim()) { setErr('Título, categoría y archivo (PDF) son requeridos'); return }
+    setBusy(true); setErr('')
+    const body = { tipo: d.tipo, titulo: d.titulo, categoria: d.categoria, archivoUrl: d.archivoUrl, portadaUrl: d.portadaUrl || null, paginas: d.paginas || null }
+    const url = modal!.mode === 'edit' ? `/api/empresa/content/recursos/${d.id}` : '/api/empresa/content/recursos'
+    const r = await fetch(url, { method: modal!.mode === 'edit' ? 'PATCH' : 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
+    const j = await r.json(); setBusy(false)
+    if (!r.ok) { setErr(j.error || 'Error'); return }
+    setModal(null); load()
+  }
+  async function del(id: string) { setBusy(true); await fetch(`/api/empresa/content/recursos/${id}`, { method: 'DELETE' }); setBusy(false); setDelId(null); load() }
+
+  return (
+    <>
+      <ListHeader title="Tus presentaciones y libros" onCreate={() => { setErr(''); setModal({ mode: 'create', data: { ...EMPTY } }) }} />
+      {loading ? <Loading /> : items.length === 0 ? <Empty text="Todavía no cargaste presentaciones ni libros." /> : (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          {items.map(it => (
+            <Row key={it.id} cover={it.portadaUrl} title={it.titulo} subtitle={`${it.tipo === 'libro' ? '📕 Libro' : '📊 Presentación'} · ${it.categoria}`}
+              onEdit={() => { setErr(''); setModal({ mode: 'edit', data: { id: it.id, tipo: it.tipo, titulo: it.titulo, categoria: it.categoria, archivoUrl: it.archivoUrl, portadaUrl: it.portadaUrl || '', paginas: it.paginas != null ? String(it.paginas) : '' } }) }}
+              onDelete={() => setDelId(it.id)} />
+          ))}
+        </div>
+      )}
+      {modal && (
+        <Modal title={modal.mode === 'edit' ? 'Editar recurso' : 'Nuevo recurso'} onClose={() => setModal(null)}>
+          <Field label="Tipo">
+            <select style={inp} value={modal.data.tipo} onChange={e => setModal({ ...modal, data: { ...modal.data, tipo: e.target.value } })}>
+              <option value="presentacion">📊 Presentación</option>
+              <option value="libro">📕 Libro</option>
+            </select>
+          </Field>
+          <Field label="Título"><input style={inp} value={modal.data.titulo} onChange={e => setModal({ ...modal, data: { ...modal.data, titulo: e.target.value } })} /></Field>
+          <Field label="Categoría"><input style={inp} value={modal.data.categoria} onChange={e => setModal({ ...modal, data: { ...modal.data, categoria: e.target.value } })} placeholder="Ej. Ventas, Onboarding" /></Field>
+          <Field label="Archivo PDF">
+            <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+              <input style={{ ...inp, flex: 1 }} value={modal.data.archivoUrl} onChange={e => setModal({ ...modal, data: { ...modal.data, archivoUrl: e.target.value } })} placeholder="URL del PDF o subí →" />
+              <label style={{ ...iconBtn, width: 'auto', padding: '0 12px', display: 'grid', placeItems: 'center', cursor: 'pointer', color: '#B735B8' }}>
+                {upPdf ? <i className="fa-solid fa-spinner fa-spin" /> : <i className="fa-solid fa-upload" />}
+                <input type="file" accept="application/pdf,.pdf" style={{ display: 'none' }} onChange={async e => { const f = e.target.files?.[0]; if (!f) return; setUpPdf(true); const u = await uploadFile(f); setUpPdf(false); if (u) setModal(m => m ? { ...m, data: { ...m.data, archivoUrl: u } } : m) }} />
+              </label>
+            </div>
+          </Field>
+          <CoverField label="Portada (opcional)" value={modal.data.portadaUrl} onChange={(v: string) => setModal({ ...modal, data: { ...modal.data, portadaUrl: v } })} />
           {err && <p style={errP}>{err}</p>}
           <Actions onCancel={() => setModal(null)} onSave={save} busy={busy} />
         </Modal>

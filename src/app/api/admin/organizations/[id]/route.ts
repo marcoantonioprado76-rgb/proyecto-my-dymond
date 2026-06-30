@@ -88,6 +88,13 @@ export async function DELETE(_req: NextRequest, { params }: { params: { id: stri
         where: { organizationId: params.id },
         data: { organizationId: null, orgRole: 'NONE' },
       }),
+      // Retirar su contenido (no se nulifica el organizationId a propósito: eso lo
+      // volvería global/visible para todos = fuga). Se marca inactivo → invisible.
+      prisma.course.updateMany({ where: { organizationId: params.id }, data: { active: false } }),
+      prisma.podcast.updateMany({ where: { organizationId: params.id }, data: { active: false } }),
+      prisma.storeItem.updateMany({ where: { organizationId: params.id }, data: { active: false } }),
+      (prisma as any).template.updateMany({ where: { organizationId: params.id }, data: { activo: false } }),
+      (prisma as any).resource.updateMany({ where: { organizationId: params.id }, data: { activo: false } }),
       prisma.organization.delete({ where: { id: params.id } }),
     ])
 
