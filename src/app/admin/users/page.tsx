@@ -323,9 +323,22 @@ export default function AdminUsersPage() {
                       </span>
                     </td>
                     <td className="px-4 py-3">
-                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${u.isActive ? 'text-green-400 bg-green-500/10 border-green-500/20' : 'text-red-400 bg-red-500/10 border-red-500/20'}`}>
-                        {u.isActive ? 'Activo' : 'Inactivo'}
-                      </span>
+                      <div className="flex flex-col items-start gap-1">
+                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${u.isActive ? 'text-green-400 bg-green-500/10 border-green-500/20' : 'text-red-400 bg-red-500/10 border-red-500/20'}`}>
+                          {u.isActive ? 'Activo' : 'Inactivo'}
+                        </span>
+                        {(() => {
+                          const exp = u.planExpiresAt ? new Date(u.planExpiresAt) : null
+                          if (!exp) return <span className="text-[10px] text-[#9CA3AF]">Sin plan</span>
+                          const d = Math.ceil((exp.getTime() - Date.now()) / 86400000)
+                          const cls = d <= 0 ? 'text-red-500' : d <= 7 ? 'text-amber-500' : 'text-emerald-600'
+                          return (
+                            <span className={`text-[10px] font-black ${cls}`} title={`Vence: ${exp.toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })}`}>
+                              {d <= 0 ? '⚠ Vencido' : `${d} día${d === 1 ? '' : 's'} rest.`}
+                            </span>
+                          )
+                        })()}
+                      </div>
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center justify-end gap-1.5">
