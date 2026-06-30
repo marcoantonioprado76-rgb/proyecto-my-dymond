@@ -24,6 +24,13 @@ import {
   AlertOctagon,
   ExternalLink,
   RefreshCw,
+  Eye,
+  Bot,
+  Store,
+  Package,
+  LayoutTemplate,
+  Megaphone,
+  LogIn,
 } from 'lucide-react'
 
 interface UserRow {
@@ -36,8 +43,46 @@ interface UserRow {
   isActive: boolean
   isAdmin: boolean
   extraBots: number
+  extraStores: number
+  extraProducts: number
+  extraLandingPages: number
+  extraAdsPerMonth: number
   createdAt: string
   locationChanged?: boolean
+}
+
+interface ServiceLimit {
+  plan: number
+  extra: number
+  total: number
+}
+
+interface UserDetail {
+  cuenta: {
+    username: string
+    fullName: string
+    email: string
+    country: string
+    city: string
+    plan: string
+    planExpiresAt: string | null
+    isActive: boolean
+    createdAt: string
+  }
+  limites: {
+    bots: ServiceLimit
+    stores: ServiceLimit
+    products: ServiceLimit
+    landingPages: ServiceLimit
+    adsPerMonth: ServiceLimit
+  }
+  uso: {
+    bots: number
+    stores: number
+    products: number
+    landings: number
+  }
+  saldoIa: number
 }
 
 const PLAN_BADGE: Record<string, string> = {
@@ -68,6 +113,10 @@ export default function AdminUsersPage() {
   const [devicesLoading, setDevicesLoading] = useState(false)
   const [unlinking, setUnlinking] = useState<string | null>(null)
   const devicesRequestIdRef = useRef(0) // tracks latest request to avoid stale state
+  const [infoModal, setInfoModal] = useState<{ id: string; username: string; fullName: string } | null>(null)
+  const [detail, setDetail] = useState<UserDetail | null>(null)
+  const [detailLoading, setDetailLoading] = useState(false)
+  const [impersonating, setImpersonating] = useState(false)
 
   const fetchUsers = useCallback(async () => {
     setLoading(true)
@@ -157,6 +206,37 @@ export default function AdminUsersPage() {
       fetchUsers()
     }
     setUnlinking(null)
+  }
+
+  async function openInfoModal(user: { id: string; username: string; fullName: string }) {
+    setInfoModal(user)
+    setDetail(null)
+    setDetailLoading(true)
+    try {
+      const res = await fetch(`/api/admin/users/${user.id}/detail`)
+      if (res.ok) {
+        setDetail(await res.json())
+      }
+    } finally {
+      setDetailLoading(false)
+    }
+  }
+
+  async function impersonate(userId: string) {
+    setImpersonating(true)
+    try {
+      const res = await fetch(`/api/admin/users/${userId}/impersonate`, { method: 'POST' })
+      if (res.ok) {
+        window.location.href = '/dashboard'
+        return
+      }
+      const data = await res.json().catch(() => ({}))
+      alert(data.error ?? 'No se pudo entrar como usuario')
+    } catch {
+      alert('No se pudo entrar como usuario')
+    } finally {
+      setImpersonating(false)
+    }
   }
 
   return (
@@ -273,17 +353,41 @@ export default function AdminUsersPage() {
                               <option value="PRO">PRO</option>
                               <option value="ELITE">ELITE</option>
                             </select>
-                            <div className="flex items-center gap-0.5" title="Bots extra otorgados por admin">
-                              <button
-                                onClick={() => updateUser(u.id, { extraBots: Math.max(0, (u.extraBots ?? 0) - 1) })}
-                                className="w-5 h-5 rounded bg-[#F4F6FA] hover:bg-[#EEF2F7] text-[#111827]/50 hover:text-[#111827] transition-colors flex items-center justify-center text-xs font-black leading-none"
-                              >−</button>
-                              <span className="text-[10px] font-black text-[#00FF88] min-w-[1.5rem] text-center" title={`+${u.extraBots ?? 0} bots extra`}>+{u.extraBots ?? 0}</span>
-                              <button
-                                onClick={() => updateUser(u.id, { extraBots: (u.extraBots ?? 0) + 1 })}
-                                className="w-5 h-5 rounded bg-[#F4F6FA] hover:bg-[#00FF88]/20 text-[#111827]/50 hover:text-[#00FF88] transition-colors flex items-center justify-center text-xs font-black leading-none"
-                              >+</button>
-                            </div>
+                            {([
+                              { key: 'extraBots', label: 'Bots', icon: Bot, value: u.extraBots },
+                              { key: 'extraStores', label: 'Tiendas', icon: Store, value: u.extraStores },
+                              { key: 'extraProducts', label: 'Productos', icon: Package, value: u.extraProducts },
+                              { key: 'extraLandingPages', label: 'Landings', icon: LayoutTemplate, value: u.extraLandingPages },
+                              { key: 'extraAdsPerMonth', label: 'Anuncios/mes', icon: Megaphone, value: u.extraAdsPerMonth },
+                            ] as const).map(svc => {
+                              const Icon = svc.icon
+                              const v = svc.value ?? 0
+                              return (
+                                <div
+                                  key={svc.key}
+                                  className="flex items-center gap-0.5"
+                                  title={`${svc.label} extra otorgados por admin: +${v}`}
+                                >
+                                  <Icon size={11} className="text-[#B735B8] shrink-0" />
+                                  <button
+                                    onClick={() => updateUser(u.id, { [svc.key]: Math.max(0, v - 1) })}
+                                    className="w-5 h-5 rounded bg-[#F4F6FA] hover:bg-[#EEF2F7] text-[#111827]/50 hover:text-[#111827] transition-colors flex items-center justify-center text-xs font-black leading-none"
+                                  >−</button>
+                                  <span className="text-[10px] font-black text-[#B735B8] min-w-[1.25rem] text-center">+{v}</span>
+                                  <button
+                                    onClick={() => updateUser(u.id, { [svc.key]: v + 1 })}
+                                    className="w-5 h-5 rounded bg-[#F4F6FA] hover:bg-[#B735B8]/20 text-[#111827]/50 hover:text-[#B735B8] transition-colors flex items-center justify-center text-xs font-black leading-none"
+                                  >+</button>
+                                </div>
+                              )
+                            })}
+                            <button
+                              onClick={() => openInfoModal({ id: u.id, username: u.username, fullName: u.fullName })}
+                              title="Ver información del usuario"
+                              className="p-1.5 rounded-lg bg-[#B735B8]/8 border border-[#B735B8]/20 hover:bg-[#B735B8]/20 transition-colors"
+                            >
+                              <Eye size={13} className="text-[#B735B8]" />
+                            </button>
                             <button
                               onClick={() => openDevicesModal({ id: u.id, username: u.username, fullName: u.fullName })}
                               title="Ver dispositivos"
@@ -508,6 +612,163 @@ export default function AdminUsersPage() {
             <p className="text-[10px] text-[#111827]/20 text-center mt-4">
               Al desvincular, el usuario tendrá que verificar de nuevo su dispositivo
             </p>
+          </div>
+        </div>
+      )}
+
+      {/* Info modal (read-only) */}
+      {infoModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/75 backdrop-blur-sm" onClick={() => setInfoModal(null)} />
+          <div className="relative bg-[#13131f] border border-[#B735B8]/20 rounded-2xl p-6 w-full max-w-lg z-10 shadow-2xl shadow-black/60 max-h-[85vh] overflow-y-auto">
+
+            <div className="absolute top-0 left-0 right-0 h-px rounded-t-2xl"
+              style={{ background: 'linear-gradient(90deg, transparent, rgba(183,53,184,0.7), transparent)' }} />
+
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-lg bg-[#B735B8]/10 border border-[#B735B8]/20 flex items-center justify-center">
+                  <Eye size={15} className="text-[#B735B8]" />
+                </div>
+                <div>
+                  <p className="text-xs font-black text-[#111827]">{infoModal.fullName}</p>
+                  <p className="text-[10px] text-[#111827]/30">@{infoModal.username}</p>
+                </div>
+              </div>
+              <button onClick={() => setInfoModal(null)} className="p-1.5 rounded-lg hover:bg-[#EEF2F7] transition-colors">
+                <X size={14} className="text-[#111827]/40" />
+              </button>
+            </div>
+
+            {detailLoading ? (
+              <div className="flex justify-center py-10">
+                <Loader2 size={20} className="animate-spin text-[#B735B8]" />
+              </div>
+            ) : !detail ? (
+              <div className="text-center py-10">
+                <p className="text-xs text-[#111827]/25">No se pudo cargar la información</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {/* Cuenta */}
+                <div>
+                  <p className="text-[10px] font-black uppercase tracking-widest text-[#111827]/25 mb-2">Cuenta</p>
+                  <div className="grid grid-cols-2 gap-1.5">
+                    {[
+                      ['Usuario', `@${detail.cuenta.username}`],
+                      ['Nombre', detail.cuenta.fullName],
+                      ['Email', detail.cuenta.email],
+                      ['País', detail.cuenta.country],
+                      ['Ciudad', detail.cuenta.city],
+                      ['Registro', new Date(detail.cuenta.createdAt).toLocaleDateString('es', { dateStyle: 'medium' })],
+                    ].map(([k, val]) => (
+                      <div key={k} className="bg-white/[0.025] rounded-lg px-2 py-1.5">
+                        <p className="text-[9px] text-[#111827]/25 uppercase font-bold">{k}</p>
+                        <p className="text-[11px] text-[#111827]/80 truncate" title={val}>{val}</p>
+                      </div>
+                    ))}
+                    <div className="bg-white/[0.025] rounded-lg px-2 py-1.5">
+                      <p className="text-[9px] text-[#111827]/25 uppercase font-bold">Estado</p>
+                      <p className={`text-[11px] font-bold ${detail.cuenta.isActive ? 'text-green-400' : 'text-red-400'}`}>
+                        {detail.cuenta.isActive ? 'Activo' : 'Inactivo'}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Plan */}
+                <div>
+                  <p className="text-[10px] font-black uppercase tracking-widest text-[#111827]/25 mb-2">Plan</p>
+                  <div className="grid grid-cols-2 gap-1.5">
+                    <div className="bg-white/[0.025] rounded-lg px-2 py-1.5">
+                      <p className="text-[9px] text-[#111827]/25 uppercase font-bold">Plan</p>
+                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border inline-block mt-0.5 ${PLAN_BADGE[detail.cuenta.plan] ?? PLAN_BADGE.NONE}`}>
+                        {detail.cuenta.plan}
+                      </span>
+                    </div>
+                    <div className="bg-white/[0.025] rounded-lg px-2 py-1.5">
+                      <p className="text-[9px] text-[#111827]/25 uppercase font-bold">Vence</p>
+                      <p className="text-[11px] text-[#111827]/80">
+                        {detail.cuenta.planExpiresAt
+                          ? new Date(detail.cuenta.planExpiresAt).toLocaleDateString('es', { dateStyle: 'medium' })
+                          : '—'}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Límites efectivos */}
+                <div>
+                  <p className="text-[10px] font-black uppercase tracking-widest text-[#111827]/25 mb-2">
+                    Límites efectivos <span className="text-[#111827]/15 normal-case font-normal">(plan + extra = total)</span>
+                  </p>
+                  <div className="space-y-1.5">
+                    {([
+                      { label: 'Bots', icon: Bot, lim: detail.limites.bots },
+                      { label: 'Tiendas', icon: Store, lim: detail.limites.stores },
+                      { label: 'Productos', icon: Package, lim: detail.limites.products },
+                      { label: 'Landings', icon: LayoutTemplate, lim: detail.limites.landingPages },
+                      { label: 'Anuncios/mes', icon: Megaphone, lim: detail.limites.adsPerMonth },
+                    ] as const).map(svc => {
+                      const Icon = svc.icon
+                      const fmt = (n: number) => (n === Infinity ? '∞' : String(n))
+                      return (
+                        <div key={svc.label} className="flex items-center gap-2 bg-white/[0.025] rounded-lg px-2.5 py-1.5">
+                          <Icon size={12} className="text-[#B735B8] shrink-0" />
+                          <span className="text-[11px] text-[#111827]/70 flex-1">{svc.label}</span>
+                          <span className="text-[11px] text-[#111827]/50 font-mono">
+                            {fmt(svc.lim.plan)} + {fmt(svc.lim.extra)} =
+                          </span>
+                          <span className="text-[11px] font-black text-[#B735B8] font-mono min-w-[1.5rem] text-right">
+                            {fmt(svc.lim.total)}
+                          </span>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+
+                {/* Uso actual */}
+                <div>
+                  <p className="text-[10px] font-black uppercase tracking-widest text-[#111827]/25 mb-2">Uso actual</p>
+                  <div className="grid grid-cols-4 gap-1.5">
+                    {[
+                      ['Bots', detail.uso.bots],
+                      ['Tiendas', detail.uso.stores],
+                      ['Productos', detail.uso.products],
+                      ['Landings', detail.uso.landings],
+                    ].map(([k, val]) => (
+                      <div key={k as string} className="bg-white/[0.025] rounded-lg px-2 py-1.5 text-center">
+                        <p className="text-base font-black text-[#111827]/80 leading-none">{val as number}</p>
+                        <p className="text-[9px] text-[#111827]/25 uppercase font-bold mt-1">{k as string}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Saldo IA */}
+                <div>
+                  <p className="text-[10px] font-black uppercase tracking-widest text-[#111827]/25 mb-2">Saldo IA</p>
+                  <div className="bg-[#B735B8]/8 border border-[#B735B8]/20 rounded-lg px-3 py-2">
+                    <p className="text-sm font-black text-[#B735B8]">
+                      ${detail.saldoIa.toFixed(4)} <span className="text-[10px] text-[#B735B8]/60 font-bold">USD</span>
+                    </p>
+                  </div>
+                </div>
+
+                {/* Entrar como usuario */}
+                <button
+                  onClick={() => impersonate(infoModal.id)}
+                  disabled={impersonating}
+                  className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-[#B735B8]/15 border border-[#B735B8]/30 text-sm font-black text-[#B735B8] hover:bg-[#B735B8]/25 transition-colors disabled:opacity-50"
+                >
+                  {impersonating
+                    ? <Loader2 size={14} className="animate-spin" />
+                    : <><LogIn size={14} /> Entrar como usuario</>
+                  }
+                </button>
+              </div>
+            )}
           </div>
         </div>
       )}

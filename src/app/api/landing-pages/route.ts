@@ -38,12 +38,13 @@ export async function POST(request: NextRequest) {
     if (!auth) return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
 
     try {
-        // Plan limit check
-        const userPlan = await prisma.user.findUnique({ where: { id: auth.userId }, select: { plan: true } })
+        // Plan limit check (plan base + landing pages extra otorgadas por admin)
+        const userPlan = await prisma.user.findUnique({ where: { id: auth.userId }, select: { plan: true, extraLandingPages: true } })
         const plan = (userPlan?.plan ?? 'NONE') as UserPlan
+        const extraLandingPages = userPlan?.extraLandingPages ?? 0
         const limits = getPlanLimits(plan)
 
-        if (limits.landingPages === 0) {
+        if (limits.landingPages === 0 && extraLandingPages === 0) {
             return NextResponse.json({
                 error: `Las Landing Pages no están incluidas en tu ${PLAN_NAMES[plan]}. Actualiza al Pack Pro para acceder.`,
                 limitReached: true,
@@ -52,10 +53,11 @@ export async function POST(request: NextRequest) {
         }
 
         if (limits.landingPages !== Infinity) {
+            const effectiveLimit = limits.landingPages + extraLandingPages
             const lpCount = await prisma.landingPage.count({ where: { userId: auth.userId } })
-            if (lpCount >= limits.landingPages) {
+            if (lpCount >= effectiveLimit) {
                 return NextResponse.json({
-                    error: `Tu ${PLAN_NAMES[plan]} permite hasta ${limits.landingPages} landing page(s). Actualiza al Pack Elite para crear más.`,
+                    error: `Tu ${PLAN_NAMES[plan]} permite hasta ${effectiveLimit} landing page(s). Actualiza al Pack Elite para crear más.`,
                     limitReached: true,
                     plan,
                 }, { status: 403 })

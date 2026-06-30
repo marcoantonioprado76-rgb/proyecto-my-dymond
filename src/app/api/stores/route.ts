@@ -51,12 +51,13 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'Faltan campos obligatorios (nombre, slug, tipo)' }, { status: 400 })
         }
 
-        // Plan limit check
-        const user = await prisma.user.findUnique({ where: { id: auth.userId }, select: { plan: true } })
+        // Plan limit check (plan base + tiendas extra otorgadas por admin)
+        const user = await prisma.user.findUnique({ where: { id: auth.userId }, select: { plan: true, extraStores: true } })
         const plan = (user?.plan ?? 'NONE') as UserPlan
+        const extraStores = user?.extraStores ?? 0
         const limits = getPlanLimits(plan)
 
-        if (limits.stores === 0) {
+        if (limits.stores === 0 && extraStores === 0) {
             return NextResponse.json({
                 error: 'Necesitas un plan activo para crear tiendas.',
                 limitReached: true,
@@ -65,10 +66,11 @@ export async function POST(request: NextRequest) {
         }
 
         if (limits.stores !== Infinity) {
+            const effectiveLimit = limits.stores + extraStores
             const storeCount = await prisma.store.count({ where: { userId: auth.userId } })
-            if (storeCount >= limits.stores) {
+            if (storeCount >= effectiveLimit) {
                 return NextResponse.json({
-                    error: `Tu ${PLAN_NAMES[plan]} permite hasta ${limits.stores} tienda(s). Actualiza al Pack Pro para crear más.`,
+                    error: `Tu ${PLAN_NAMES[plan]} permite hasta ${effectiveLimit} tienda(s). Actualiza al Pack Pro para crear más.`,
                     limitReached: true,
                     plan,
                 }, { status: 403 })

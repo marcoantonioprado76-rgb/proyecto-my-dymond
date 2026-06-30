@@ -12,6 +12,9 @@ export interface JWTPayload {
   userId: string
   username: string
   email: string
+  /** Si está presente, la sesión es una impersonación: id del admin que la inició
+   *  (para poder volver al panel admin). Ausente en sesiones normales. */
+  imp?: string
 }
 
 export async function hashPassword(password: string): Promise<string> {

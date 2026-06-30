@@ -44,12 +44,13 @@ export async function POST(request: NextRequest) {
   const auth = getAuth()
   if (!auth) return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
 
-  // Plan limit check
-  const user = await prisma.user.findUnique({ where: { id: auth.userId }, select: { plan: true } })
+  // Plan limit check (plan base + productos extra otorgados por admin)
+  const user = await prisma.user.findUnique({ where: { id: auth.userId }, select: { plan: true, extraProducts: true } })
   const plan = (user?.plan ?? 'NONE') as UserPlan
+  const extraProducts = user?.extraProducts ?? 0
   const limits = getPlanLimits(plan)
 
-  if (limits.productsPerUser === 0) {
+  if (limits.productsPerUser === 0 && extraProducts === 0) {
     return NextResponse.json({
       error: 'Necesitas un plan activo para crear productos.',
       limitReached: true,
@@ -58,10 +59,11 @@ export async function POST(request: NextRequest) {
   }
 
   if (limits.productsPerUser !== Infinity) {
+    const effectiveLimit = limits.productsPerUser + extraProducts
     const productCount = await prisma.product.count({ where: { userId: auth.userId } })
-    if (productCount >= limits.productsPerUser) {
+    if (productCount >= effectiveLimit) {
       return NextResponse.json({
-        error: `Tu ${PLAN_NAMES[plan]} permite hasta ${limits.productsPerUser} producto(s). Actualiza al Pack Pro para agregar más.`,
+        error: `Tu ${PLAN_NAMES[plan]} permite hasta ${effectiveLimit} producto(s). Actualiza al Pack Pro para agregar más.`,
         limitReached: true,
         plan,
       }, { status: 403 })

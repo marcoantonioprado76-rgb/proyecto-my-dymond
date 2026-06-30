@@ -51,7 +51,7 @@ export async function PATCH(
   if (!admin) return unauthorizedAdmin()
 
   const body = await request.json()
-  const { plan, isActive, isAdmin: makeAdmin, extraBots } = body
+  const { plan, isActive, isAdmin: makeAdmin, extraBots, extraStores, extraProducts, extraLandingPages, extraAdsPerMonth } = body
 
   // Use raw SQL to bypass stale Prisma client
   if (plan !== undefined) {
@@ -96,12 +96,38 @@ export async function PATCH(
       UPDATE users SET extra_bots = ${val} WHERE id = ${params.id}::uuid
     `
   }
+  if (extraStores !== undefined) {
+    const val = Math.max(0, parseInt(extraStores) || 0)
+    await prisma.$executeRaw`
+      UPDATE users SET extra_stores = ${val} WHERE id = ${params.id}::uuid
+    `
+  }
+  if (extraProducts !== undefined) {
+    const val = Math.max(0, parseInt(extraProducts) || 0)
+    await prisma.$executeRaw`
+      UPDATE users SET extra_products = ${val} WHERE id = ${params.id}::uuid
+    `
+  }
+  if (extraLandingPages !== undefined) {
+    const val = Math.max(0, parseInt(extraLandingPages) || 0)
+    await prisma.$executeRaw`
+      UPDATE users SET extra_landing_pages = ${val} WHERE id = ${params.id}::uuid
+    `
+  }
+  if (extraAdsPerMonth !== undefined) {
+    const val = Math.max(0, parseInt(extraAdsPerMonth) || 0)
+    await prisma.$executeRaw`
+      UPDATE users SET extra_ads_per_month = ${val} WHERE id = ${params.id}::uuid
+    `
+  }
 
   // Return updated user via raw SQL
   const rows = await prisma.$queryRaw<Array<{
-    id: string; username: string; full_name: string; plan: string; is_active: boolean; is_admin: boolean; extra_bots: number
+    id: string; username: string; full_name: string; plan: string; is_active: boolean; is_admin: boolean
+    extra_bots: number; extra_stores: number; extra_products: number; extra_landing_pages: number; extra_ads_per_month: number
   }>>`
-    SELECT id, username, full_name, plan::text, is_active, is_admin, extra_bots
+    SELECT id, username, full_name, plan::text, is_active, is_admin,
+           extra_bots, extra_stores, extra_products, extra_landing_pages, extra_ads_per_month
     FROM users WHERE id = ${params.id}::uuid LIMIT 1
   `
   const row = rows[0]
@@ -117,6 +143,10 @@ export async function PATCH(
       isActive: row.is_active,
       isAdmin: row.is_admin,
       extraBots: row.extra_bots,
+      extraStores: row.extra_stores,
+      extraProducts: row.extra_products,
+      extraLandingPages: row.extra_landing_pages,
+      extraAdsPerMonth: row.extra_ads_per_month,
     },
   })
 }

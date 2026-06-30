@@ -21,9 +21,10 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: 'briefId, strategyId y name son requeridos' }, { status: 400 })
     }
 
-    // Plan limit check
-    const userRecord = await prisma.user.findUnique({ where: { id: user.id }, select: { plan: true } })
+    // Plan limit check (plan base + anuncios extra otorgados por admin)
+    const userRecord = await prisma.user.findUnique({ where: { id: user.id }, select: { plan: true, extraAdsPerMonth: true } })
     const plan = (userRecord?.plan ?? 'NONE') as UserPlan
+    const extraAdsPerMonth = userRecord?.extraAdsPerMonth ?? 0
     const limits = getPlanLimits(plan)
 
     if (!limits.ads) {
@@ -41,13 +42,14 @@ export async function POST(req: Request) {
     const adsThisMonth = await (prisma as any).adCampaignV2.count({
         where: { userId: user.id, createdAt: { gte: startOfMonth } }
     })
-    if (adsThisMonth >= limits.adsPerMonth) {
+    const effectiveAdsPerMonth = limits.adsPerMonth === Infinity ? Infinity : limits.adsPerMonth + extraAdsPerMonth
+    if (adsThisMonth >= effectiveAdsPerMonth) {
         return NextResponse.json({
-            error: `Alcanzaste el límite de ${limits.adsPerMonth} anuncios por mes de tu ${PLAN_NAMES[plan]}. Actualiza tu plan para crear más.`,
+            error: `Alcanzaste el límite de ${effectiveAdsPerMonth} anuncios por mes de tu ${PLAN_NAMES[plan]}. Actualiza tu plan para crear más.`,
             limitReached: true,
             plan,
             adsThisMonth,
-            adsPerMonth: limits.adsPerMonth,
+            adsPerMonth: effectiveAdsPerMonth,
         }, { status: 403 })
     }
 
