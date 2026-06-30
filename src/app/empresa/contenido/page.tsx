@@ -72,6 +72,7 @@ function CoursesTab() {
   const [delId, setDelId] = useState<string | null>(null)
 
   const EMPTY = { title: '', description: '', coverUrl: '', price: '0', freeForPlan: true, categoria: '', nivel: '', videos: [{ title: '', youtubeUrl: '' }] }
+  const [upVideo, setUpVideo] = useState(-1)
 
   async function load() { setLoading(true); try { const r = await fetch('/api/empresa/content/courses'); const d = await r.json(); setItems(d.courses || []) } finally { setLoading(false) } }
   useEffect(() => { load() }, [])
@@ -80,7 +81,7 @@ function CoursesTab() {
     const d = modal!.data
     if (!d.title.trim() || !d.description.trim()) { setErr('Título y descripción son requeridos'); return }
     setBusy(true); setErr('')
-    const body = { title: d.title, description: d.description, coverUrl: d.coverUrl || null, price: d.price || '0', freeForPlan: d.freeForPlan, categoria: d.categoria || null, nivel: d.nivel || null, videos: d.videos.filter((v: any) => v.title.trim() && v.youtubeUrl.trim()) }
+    const body = { title: d.title, description: d.description, coverUrl: d.coverUrl || null, price: d.price || '0', freeForPlan: d.freeForPlan, categoria: d.categoria || null, nivel: d.nivel || null, videos: d.videos.filter((v: any) => v.title.trim() && ((v.youtubeUrl || '').trim() || (v.videoUrl || '').trim())).map((v: any) => ({ ...v, youtubeUrl: (v.youtubeUrl || '').trim(), videoUrl: v.videoUrl || null })) }
     const url = modal!.mode === 'edit' ? `/api/empresa/content/courses/${d.id}` : '/api/empresa/content/courses'
     const r = await fetch(url, { method: modal!.mode === 'edit' ? 'PATCH' : 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
     const j = await r.json(); setBusy(false)
@@ -96,7 +97,7 @@ function CoursesTab() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           {items.map(c => (
             <Row key={c.id} cover={c.coverUrl} title={c.title} subtitle={`${c._count?.videos ?? c.videos?.length ?? 0} videos · ${c.freeForPlan ? 'Incluido' : '$' + c.price}`}
-              onEdit={() => { setErr(''); setModal({ mode: 'edit', data: { id: c.id, title: c.title, description: c.description, coverUrl: c.coverUrl || '', price: String(c.price), freeForPlan: c.freeForPlan, categoria: c.categoria || '', nivel: c.nivel || '', videos: (c.videos && c.videos.length ? c.videos.map((v: any) => ({ title: v.title, youtubeUrl: v.youtubeUrl, moduloTitulo: v.moduloTitulo || '', descripcion: v.descripcion || '', preview: !!v.preview })) : [{ title: '', youtubeUrl: '' }]) } }) }}
+              onEdit={() => { setErr(''); setModal({ mode: 'edit', data: { id: c.id, title: c.title, description: c.description, coverUrl: c.coverUrl || '', price: String(c.price), freeForPlan: c.freeForPlan, categoria: c.categoria || '', nivel: c.nivel || '', videos: (c.videos && c.videos.length ? c.videos.map((v: any) => ({ title: v.title, youtubeUrl: v.youtubeUrl || '', videoUrl: v.videoUrl || '', moduloTitulo: v.moduloTitulo || '', descripcion: v.descripcion || '', preview: !!v.preview })) : [{ title: '', youtubeUrl: '' }]) } }) }}
               onDelete={() => setDelId(c.id)} />
           ))}
         </div>
@@ -124,7 +125,19 @@ function CoursesTab() {
                   <input style={{ ...inp, flex: 1 }} placeholder="Título del video" value={v.title} onChange={e => upd({ title: e.target.value })} />
                   <button onClick={() => { const vids = modal.data.videos.filter((_: any, ix: number) => ix !== i); setModal({ ...modal, data: { ...modal.data, videos: vids.length ? vids : [{ title: '', youtubeUrl: '' }] } }) }} style={{ ...iconBtn, color: '#ef4444' }}><i className="fa-solid fa-xmark" /></button>
                 </div>
-                <input style={{ ...inp, marginBottom: 6 }} placeholder="https://youtube.com/…" value={v.youtubeUrl} onChange={e => upd({ youtubeUrl: e.target.value })} />
+                <div style={{ display: 'flex', gap: 6, marginBottom: 6 }}>
+                  <input style={{ ...inp, flex: 1 }} placeholder="https://youtube.com/… o subí un video →" value={v.youtubeUrl} onChange={e => upd({ youtubeUrl: e.target.value })} />
+                  <label style={{ ...iconBtn, width: 'auto', padding: '0 12px', display: 'grid', placeItems: 'center', cursor: 'pointer', color: '#B735B8' }} title="Subir archivo de video (mp4)">
+                    {upVideo === i ? <i className="fa-solid fa-spinner fa-spin" /> : <i className="fa-solid fa-film" />}
+                    <input type="file" accept="video/mp4,video/quicktime,video/*" style={{ display: 'none' }} onChange={async e => { const f = e.target.files?.[0]; if (!f) return; setUpVideo(i); const u = await uploadFile(f); setUpVideo(-1); if (u) upd({ videoUrl: u }) }} />
+                  </label>
+                </div>
+                {v.videoUrl && (
+                  <p style={{ fontSize: 11.5, color: '#16a34a', marginBottom: 6, display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <i className="fa-solid fa-circle-check" /> Video subido
+                    <button onClick={() => upd({ videoUrl: '' })} style={{ color: '#ef4444', background: 'none', border: 'none', cursor: 'pointer', fontSize: 11, textDecoration: 'underline' }}>quitar</button>
+                  </p>
+                )}
                 <div style={{ display: 'flex', gap: 6, marginBottom: 6 }}>
                   <input style={{ ...inp, flex: 1 }} placeholder="Módulo (opcional)" value={v.moduloTitulo || ''} onChange={e => upd({ moduloTitulo: e.target.value })} />
                   <input style={{ ...inp, flex: 1.4 }} placeholder="Descripción (opcional)" value={v.descripcion || ''} onChange={e => upd({ descripcion: e.target.value })} />
