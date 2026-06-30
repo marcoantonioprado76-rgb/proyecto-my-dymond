@@ -1630,6 +1630,12 @@ model Organization {
   active      Boolean  @default(true)
   billingNote String?  @map("billing_note")
   logoUrl     String?  @map("logo_url")
+  // Cobro propio de la empresa (transferencia / USDT) — lo configura su admin.
+  payUsdtWallet   String? @map("pay_usdt_wallet")
+  payUsdtNetwork  String? @map("pay_usdt_network")
+  payBankInfo     String? @map("pay_bank_info")     @db.Text
+  payQrUrl        String? @map("pay_qr_url")
+  payInstructions String? @map("pay_instructions")  @db.Text
   createdAt   DateTime @default(now()) @map("created_at")
   members     User[]   @relation("OrgMembers")
 

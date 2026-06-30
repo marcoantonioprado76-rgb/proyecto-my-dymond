@@ -142,6 +142,9 @@ export default function EmpresaPage() {
           <a href="/empresa/contenido" style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.18)', color: '#fff', padding: '8px 14px', borderRadius: 10, fontWeight: 700, fontSize: 13, textDecoration: 'none' }}>
             <i className="fa-solid fa-layer-group" style={{ marginRight: 6 }} />Mi Contenido
           </a>
+          <a href="/empresa/cobro" style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.18)', color: '#fff', padding: '8px 14px', borderRadius: 10, fontWeight: 700, fontSize: 13, textDecoration: 'none' }}>
+            <i className="fa-solid fa-wallet" style={{ marginRight: 6 }} />Cobro y marca
+          </a>
           <button onClick={logout} style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)', color: 'rgba(255,180,180,0.95)', padding: '8px 14px', borderRadius: 10, cursor: 'pointer', fontWeight: 600, fontSize: 13 }}>
             <i className="fa-solid fa-right-from-bracket" style={{ marginRight: 6 }} />Salir
           </button>
