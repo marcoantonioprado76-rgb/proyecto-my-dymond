@@ -35,7 +35,11 @@ export async function GET() {
     }
 
     // Acceso manual a Academy/Recursos/Shop otorgado por el admin
-    const ux = await prisma.user.findUnique({ where: { id: user.id }, select: { accessExtras: true } })
+    // + datos de Pack Empresarial (orgRole/organizationId) para el acceso al panel de empresa
+    const ux = await prisma.user.findUnique({
+      where: { id: user.id },
+      select: { accessExtras: true, orgRole: true, organizationId: true },
+    })
     const accessExtras = !!ux?.accessExtras
 
     return NextResponse.json({
@@ -44,6 +48,8 @@ export async function GET() {
       expired,
       faseGlobal,
       accessExtras,
+      orgRole: ux?.orgRole ?? 'NONE',
+      organizationId: ux?.organizationId ?? null,
     })
   } catch (err) {
     console.error('[GET /api/plan-status]', err)

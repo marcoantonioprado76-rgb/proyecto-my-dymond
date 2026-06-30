@@ -42,10 +42,15 @@ export default function Navbar() {
   const [servicesOpen, setServicesOpen] = useState(true)
   // Academy/Recursos/Shop: visibles para Fase Global o si el admin dio acceso manual.
   const [showExtras, setShowExtras] = useState(false)
+  // "Mi Empresa": acceso al panel de admin de empresa (solo orgRole ORG_ADMIN).
+  const [isOrgAdmin, setIsOrgAdmin] = useState(false)
   useEffect(() => {
     fetch('/api/plan-status')
       .then(r => r.json())
-      .then(d => setShowExtras(!!d.faseGlobal || !!d.accessExtras))
+      .then(d => {
+        setShowExtras(!!d.faseGlobal || !!d.accessExtras)
+        setIsOrgAdmin(d.orgRole === 'ORG_ADMIN')
+      })
       .catch(() => {})
   }, [])
   const visibleMobileItems = mobileNavItems.filter(i => showExtras || !FASE_GLOBAL_ONLY.includes(i.href))
@@ -114,6 +119,13 @@ export default function Navbar() {
                 <span className="nav-item__dot"></span>
               </Link>
             </>
+          )}
+          {isOrgAdmin && (
+            <a href="/empresa" className="nav-item">
+              <span className="nav-item__icon" style={{ color: '#fff', background: 'linear-gradient(145deg,#FF2D95,#B735B8)' }}><i className="fa-solid fa-building"></i></span>
+              <span className="nav-item__label">Mi Empresa</span>
+              <span className="nav-item__dot"></span>
+            </a>
           )}
           <Link href="/dashboard/settings" className={`nav-item ${pathname === '/dashboard/settings' ? 'nav-item--active' : ''}`}>
             <span className="nav-item__icon"><i className="fa-solid fa-gear"></i></span>
