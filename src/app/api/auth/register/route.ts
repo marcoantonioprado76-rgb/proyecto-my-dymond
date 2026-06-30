@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
     const {
       username, email, password, confirmPassword,
       fullName, country, city, identityDocument,
-      dateOfBirth, acceptTerms, turnstileToken
+      dateOfBirth, acceptTerms, turnstileToken, empresa
     } = body
 
     // Turnstile anti-bot (solo en producción)
@@ -80,6 +80,17 @@ export async function POST(request: NextRequest) {
 
     const passwordHash = await hashPassword(password)
 
+    // Pack Empresarial: si viene de un link de invitación de empresa (?empresa=slug),
+    // lo unimos automáticamente a esa empresa como usuario (el admin de empresa luego lo activa).
+    let orgFields: { organizationId?: string; orgRole?: 'ORG_USER' } = {}
+    if (empresa) {
+      const org = await prisma.organization.findUnique({
+        where: { slug: String(empresa) },
+        select: { id: true, active: true },
+      })
+      if (org && org.active) orgFields = { organizationId: org.id, orgRole: 'ORG_USER' }
+    }
+
     const newUser = await prisma.user.create({
       data: {
         username,
@@ -90,6 +101,7 @@ export async function POST(request: NextRequest) {
         city,
         identityDocument,
         dateOfBirth: new Date(dateOfBirth),
+        ...orgFields,
       }
     })
 

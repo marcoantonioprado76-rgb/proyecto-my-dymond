@@ -14,7 +14,7 @@ interface OrgUser {
   planExpiresAt: string | null
   orgRole: string
 }
-interface OrgInfo { name: string; maxUsers: number; active: boolean; memberCount: number }
+interface OrgInfo { name: string; slug: string; maxUsers: number; active: boolean; memberCount: number }
 
 function daysLeft(exp: string | null): number | null {
   if (!exp) return null
@@ -43,6 +43,13 @@ export default function EmpresaPage() {
   const [daysModal, setDaysModal] = useState<OrgUser | null>(null)
   const [customDays, setCustomDays] = useState('')
   const [removeModal, setRemoveModal] = useState<OrgUser | null>(null)
+  const [copied, setCopied] = useState(false)
+
+  const inviteLink = org ? `${typeof window !== 'undefined' ? window.location.origin : ''}/registro/${org.slug}` : ''
+  function copyInvite() {
+    if (!inviteLink) return
+    navigator.clipboard?.writeText(inviteLink).then(() => { setCopied(true); setTimeout(() => setCopied(false), 2000) }).catch(() => {})
+  }
 
   useEffect(() => {
     fetch('/api/plan-status')
@@ -165,6 +172,22 @@ export default function EmpresaPage() {
           <i className="fa-solid fa-file-invoice-dollar" style={{ color: '#B735B8' }} />
           Vos activás a tus usuarios y les cobrás con <strong>&nbsp;tu propia factura</strong>.
         </div>
+
+        {/* Link de invitación de la empresa */}
+        {org && (
+          <div style={{ background: '#fff', border: '1px solid #E4E9F0', borderRadius: 14, padding: '14px 16px', marginTop: 14 }}>
+            <p style={{ fontSize: 12, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#9AA3B2', marginBottom: 5 }}>
+              <i className="fa-solid fa-link" style={{ marginRight: 6, color: '#B735B8' }} />Link de invitación
+            </p>
+            <p style={{ fontSize: 12.5, color: '#5B6472', marginBottom: 9 }}>Pasale este link a tu gente: quien se registre ahí queda <strong>dentro de tu empresa</strong> automáticamente (después lo activás acá abajo).</p>
+            <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+              <input readOnly value={inviteLink} onFocus={e => e.currentTarget.select()} style={{ flex: 1, minWidth: 220, padding: '9px 12px', borderRadius: 10, border: '1px solid #D5DCE6', fontSize: 13, background: '#F7F9FC', color: '#233B8F', fontWeight: 600 }} />
+              <button onClick={copyInvite} style={{ background: copied ? '#16a34a' : DG, color: '#fff', border: 'none', borderRadius: 10, padding: '10px 18px', fontWeight: 800, fontSize: 13, cursor: 'pointer', whiteSpace: 'nowrap' }}>
+                <i className={`fa-solid ${copied ? 'fa-check' : 'fa-copy'}`} style={{ marginRight: 6 }} />{copied ? 'Copiado' : 'Copiar link'}
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Acciones */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', margin: '24px 0 12px' }}>

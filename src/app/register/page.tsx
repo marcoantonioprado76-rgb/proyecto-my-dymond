@@ -74,6 +74,17 @@ function RegisterForm() {
     identityDocument: '', dateOfBirth: '', email: '', password: '', confirmPassword: '', acceptTerms: false,
   })
 
+  // Pack Empresarial: registro por link de invitación (?empresa=slug)
+  const empresaSlug = searchParams.get('empresa') || ''
+  const [empresaName, setEmpresaName] = useState<string | null>(null)
+  useEffect(() => {
+    if (!empresaSlug) return
+    fetch(`/api/organizations/by-slug/${empresaSlug}`)
+      .then(r => (r.ok ? r.json() : null))
+      .then(d => { if (d?.name) setEmpresaName(d.name) })
+      .catch(() => {})
+  }, [empresaSlug])
+
   const update = (field: keyof FormData, value: string | boolean) => {
     if (field === 'country') {
       setCities(LATAM_DATA[value as string] || [])
@@ -110,7 +121,7 @@ function RegisterForm() {
       const res = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...form, turnstileToken }),
+        body: JSON.stringify({ ...form, turnstileToken, empresa: empresaSlug || undefined }),
       })
       const data = await res.json()
       if (!res.ok) { setError(data.error); return }
@@ -227,6 +238,13 @@ function RegisterForm() {
 
           <h2 className="text-sm font-black text-[#111827] mb-0.5">Registro</h2>
           <p className="text-[11px] text-[#6B7280] mb-5">Completa los datos para unirte a la plataforma.</p>
+
+          {empresaName && (
+            <div className="flex items-center gap-2 rounded-xl px-3 py-2.5 mb-4" style={{ background: 'rgba(183,53,184,0.08)', border: '1px solid rgba(183,53,184,0.25)' }}>
+              <User size={14} style={{ color: '#B735B8' }} className="shrink-0" />
+              <p className="text-xs" style={{ color: '#7A2E8A' }}>Te estás uniendo a <strong>{empresaName}</strong>. Al registrarte quedarás dentro de esta empresa.</p>
+            </div>
+          )}
 
           {error && (
             <div className="flex items-center gap-2 bg-red-500/10 border border-red-500/20 rounded-xl px-3 py-2.5 mb-4">
