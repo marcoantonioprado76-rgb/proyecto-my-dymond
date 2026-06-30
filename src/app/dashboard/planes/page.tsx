@@ -28,7 +28,7 @@ const PACKS = [
         icon: MessageCircle,
         title: 'Agente AI de Ventas',
         features: [
-          '4 agentes AI personalizados con tu marca',
+          '{bots} agentes AI personalizados con tu marca',
           'Responde y vende por WhatsApp automáticamente',
           'Mensajes ilimitados con tus clientes',
           'IA con el tono y voz de tu negocio',
@@ -72,7 +72,7 @@ const PACKS = [
     id: 'pro',
     name: 'Pack Pro',
     tagline: 'Vende, anuncia y escala sin límites',
-    pitch: 'Todo lo del Básico más 4 agentes AI, más tiendas y landings, CRM Broadcast, Social y capacitaciones.',
+    pitch: 'Todo lo del Básico más {bots} agentes AI, más tiendas y landings, CRM Broadcast, Social y capacitaciones.',
     price: 99,
     planId: 'PRO',
     icon: Sparkles,
@@ -91,7 +91,7 @@ const PACKS = [
         icon: MessageCircle,
         title: 'Agentes AI de Ventas',
         features: [
-          '4 agentes AI personalizados con tu marca',
+          '{bots} agentes AI personalizados con tu marca',
           'Responde y vende por WhatsApp automáticamente',
           'Mensajes ilimitados con tus clientes',
           'IA con el tono y voz de tu negocio',
@@ -155,7 +155,7 @@ const PACKS = [
     id: 'elite',
     name: 'Pack Elite',
     tagline: 'El máximo poder para líderes de red',
-    pitch: 'La experiencia completa: 8 agentes AI, 5 tiendas, 40 productos, 6 landings, CRM + Social y acceso total a lanzamientos exclusivos.',
+    pitch: 'La experiencia completa: {bots} agentes AI, 5 tiendas, 40 productos, 6 landings, CRM + Social y acceso total a lanzamientos exclusivos.',
     price: 199,
     planId: 'ELITE',
     icon: Crown,
@@ -174,7 +174,7 @@ const PACKS = [
         icon: MessageCircle,
         title: 'Agentes AI de Ventas',
         features: [
-          '8 agentes AI personalizados con tu marca',
+          '{bots} agentes AI personalizados con tu marca',
           'Responde y vende por WhatsApp automáticamente',
           'Mensajes ilimitados con tus clientes',
           'Catálogo con hasta 40 productos en total',
@@ -233,6 +233,8 @@ const PLAN_RANK: Record<string, number> = { NONE: 0, BASIC: 1, PRO: 2, ELITE: 3 
 // Créditos IA (USD) incluidos por plan. Default; el admin los edita en Settings
 // (PLAN_BASIC_CREDITS, etc.) y la vista los lee de /api/settings.
 const PLAN_CREDIT_DEFAULTS: Record<string, number> = { BASIC: 3, PRO: 8, ELITE: 20 }
+// Bots/agentes por plan. Default; el admin los edita (PLAN_BASIC_BOTS, etc.).
+const PLAN_BOTS_DEFAULTS: Record<string, number> = { BASIC: 2, PRO: 4, ELITE: 8 }
 
 function useCountdown(expiresAt: string | null) {
   const [remaining, setRemaining] = useState<{ days: number; hours: number; minutes: number; seconds: number } | null>(null)
@@ -264,6 +266,8 @@ export default function PlanesPage() {
   const [isFaseGlobal, setIsFaseGlobal] = useState(false)
   const [enabledPlans, setEnabledPlans] = useState<Record<string, boolean> | null>(null)
   const [credits, setCredits] = useState<Record<string, number>>(PLAN_CREDIT_DEFAULTS)
+  const [bots, setBots] = useState<Record<string, number>>(PLAN_BOTS_DEFAULTS)
+  const [prices, setPrices] = useState<Record<string, number>>({})
   const countdown = useCountdown(planExpiresAt)
 
   useEffect(() => {
@@ -297,6 +301,16 @@ export default function PlanesPage() {
           PRO:   Number(s['PLAN_PRO_CREDITS']   ?? PLAN_CREDIT_DEFAULTS.PRO),
           ELITE: Number(s['PLAN_ELITE_CREDITS'] ?? PLAN_CREDIT_DEFAULTS.ELITE),
         })
+        setBots({
+          BASIC: Number(s['PLAN_BASIC_BOTS'] ?? PLAN_BOTS_DEFAULTS.BASIC),
+          PRO:   Number(s['PLAN_PRO_BOTS']   ?? PLAN_BOTS_DEFAULTS.PRO),
+          ELITE: Number(s['PLAN_ELITE_BOTS'] ?? PLAN_BOTS_DEFAULTS.ELITE),
+        })
+        const pr: Record<string, number> = {}
+        if (s['PRICE_BASIC']) pr.BASIC = Number(s['PRICE_BASIC'])
+        if (s['PRICE_PRO'])   pr.PRO   = Number(s['PRICE_PRO'])
+        if (s['PRICE_ELITE']) pr.ELITE = Number(s['PRICE_ELITE'])
+        setPrices(pr)
         // Si todos están desactivados → redirigir a checkout con Fase Global
         if (!map.BASIC && !map.PRO && !map.ELITE) {
           router.replace('/dashboard/store/checkout?plan=BASIC&faseGlobalOnly=true')
@@ -419,11 +433,11 @@ export default function PlanesPage() {
                   </div>
                 </div>
 
-                <p className="text-[11px] text-[#6B7280] leading-relaxed mb-4">{pack.pitch}</p>
+                <p className="text-[11px] text-[#6B7280] leading-relaxed mb-4">{pack.pitch.replace('{bots}', String(bots[pack.planId] ?? ''))}</p>
 
                 <div className="mb-5">
                   <div className="flex items-end gap-1">
-                    <span className="text-[40px] font-black leading-none">${pack.price}</span>
+                    <span className="text-[40px] font-black leading-none">${prices[pack.planId] ?? pack.price}</span>
                     <span className="text-sm text-[#6B7280] mb-1">USD</span>
                   </div>
                   <p className="text-[10px] text-[#9CA3AF] mt-0.5">30 días de acceso · renovable</p>
@@ -454,7 +468,7 @@ export default function PlanesPage() {
                               <div className={`w-3.5 h-3.5 rounded-full flex items-center justify-center shrink-0 mt-0.5 ${pack.locked ? 'bg-[#F4F6FA]' : pack.accent.bg}`}>
                                 <Check size={8} className={pack.locked ? 'text-[#9CA3AF]' : pack.accent.text} />
                               </div>
-                              <span className={`text-[11px] leading-snug ${pack.locked ? 'text-[#9CA3AF]' : 'text-[#374151]'}`}>{feat}</span>
+                              <span className={`text-[11px] leading-snug ${pack.locked ? 'text-[#9CA3AF]' : 'text-[#374151]'}`}>{feat.replace('{bots}', String(bots[pack.planId] ?? ''))}</span>
                             </li>
                           ))}
                         </ul>
