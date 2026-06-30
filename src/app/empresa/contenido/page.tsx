@@ -7,8 +7,8 @@ const DG = 'linear-gradient(135deg,#FF2D95 0%,#B735B8 48%,#233B8F 100%)'
 type Tab = 'courses' | 'podcasts' | 'store' | 'recursos'
 
 interface CourseRow { id: string; title: string; description: string; coverUrl: string | null; price: number; freeForPlan: boolean; categoria: string | null; nivel: string | null; videos?: { title: string; youtubeUrl: string }[]; _count?: { videos: number } }
-interface PodcastRow { id: string; title: string; description: string | null; coverUrl: string | null; embedUrl: string; active: boolean }
-interface StoreRow { id: string; title: string; description: string; category: string; price: number; memberPrice: number | null; images: string[]; stock: number; active: boolean }
+interface PodcastRow { id: string; title: string; description: string | null; coverUrl: string | null; embedUrl: string; active: boolean; order?: number }
+interface StoreRow { id: string; title: string; description: string; category: string; price: number; memberPrice: number | null; images: string[]; stock: number; active: boolean; variants?: { name: string; options: string[] }[] }
 
 async function uploadFile(file: File): Promise<string | null> {
   const fd = new FormData(); fd.append('file', file)
@@ -96,7 +96,7 @@ function CoursesTab() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           {items.map(c => (
             <Row key={c.id} cover={c.coverUrl} title={c.title} subtitle={`${c._count?.videos ?? c.videos?.length ?? 0} videos · ${c.freeForPlan ? 'Incluido' : '$' + c.price}`}
-              onEdit={() => { setErr(''); setModal({ mode: 'edit', data: { id: c.id, title: c.title, description: c.description, coverUrl: c.coverUrl || '', price: String(c.price), freeForPlan: c.freeForPlan, categoria: c.categoria || '', nivel: c.nivel || '', videos: (c.videos && c.videos.length ? c.videos.map(v => ({ title: v.title, youtubeUrl: v.youtubeUrl })) : [{ title: '', youtubeUrl: '' }]) } }) }}
+              onEdit={() => { setErr(''); setModal({ mode: 'edit', data: { id: c.id, title: c.title, description: c.description, coverUrl: c.coverUrl || '', price: String(c.price), freeForPlan: c.freeForPlan, categoria: c.categoria || '', nivel: c.nivel || '', videos: (c.videos && c.videos.length ? c.videos.map((v: any) => ({ title: v.title, youtubeUrl: v.youtubeUrl, moduloTitulo: v.moduloTitulo || '', descripcion: v.descripcion || '', preview: !!v.preview })) : [{ title: '', youtubeUrl: '' }]) } }) }}
               onDelete={() => setDelId(c.id)} />
           ))}
         </div>
@@ -115,14 +115,26 @@ function CoursesTab() {
             <input type="checkbox" checked={modal.data.freeForPlan} onChange={e => setModal({ ...modal, data: { ...modal.data, freeForPlan: e.target.checked } })} />
             Incluido para mis usuarios (sin costo extra)
           </label>
-          <label style={{ fontSize: 12, color: '#6B7280', display: 'block', marginBottom: 5 }}>Videos (YouTube)</label>
-          {modal.data.videos.map((v: any, i: number) => (
-            <div key={i} style={{ display: 'flex', gap: 6, marginBottom: 6 }}>
-              <input style={{ ...inp, flex: 1 }} placeholder="Título del video" value={v.title} onChange={e => { const vids = [...modal.data.videos]; vids[i] = { ...vids[i], title: e.target.value }; setModal({ ...modal, data: { ...modal.data, videos: vids } }) }} />
-              <input style={{ ...inp, flex: 1.4 }} placeholder="https://youtube.com/…" value={v.youtubeUrl} onChange={e => { const vids = [...modal.data.videos]; vids[i] = { ...vids[i], youtubeUrl: e.target.value }; setModal({ ...modal, data: { ...modal.data, videos: vids } }) }} />
-              <button onClick={() => { const vids = modal.data.videos.filter((_: any, ix: number) => ix !== i); setModal({ ...modal, data: { ...modal.data, videos: vids.length ? vids : [{ title: '', youtubeUrl: '' }] } }) }} style={{ ...iconBtn, color: '#ef4444' }}><i className="fa-solid fa-xmark" /></button>
-            </div>
-          ))}
+          <label style={{ fontSize: 12, color: '#6B7280', display: 'block', marginBottom: 6 }}>Videos / clases (YouTube)</label>
+          {modal.data.videos.map((v: any, i: number) => {
+            const upd = (patch: any) => { const vids = [...modal.data.videos]; vids[i] = { ...vids[i], ...patch }; setModal({ ...modal, data: { ...modal.data, videos: vids } }) }
+            return (
+              <div key={i} style={{ background: '#F7F9FC', border: '1px solid #E4E9F0', borderRadius: 10, padding: 10, marginBottom: 8 }}>
+                <div style={{ display: 'flex', gap: 6, marginBottom: 6 }}>
+                  <input style={{ ...inp, flex: 1 }} placeholder="Título del video" value={v.title} onChange={e => upd({ title: e.target.value })} />
+                  <button onClick={() => { const vids = modal.data.videos.filter((_: any, ix: number) => ix !== i); setModal({ ...modal, data: { ...modal.data, videos: vids.length ? vids : [{ title: '', youtubeUrl: '' }] } }) }} style={{ ...iconBtn, color: '#ef4444' }}><i className="fa-solid fa-xmark" /></button>
+                </div>
+                <input style={{ ...inp, marginBottom: 6 }} placeholder="https://youtube.com/…" value={v.youtubeUrl} onChange={e => upd({ youtubeUrl: e.target.value })} />
+                <div style={{ display: 'flex', gap: 6, marginBottom: 6 }}>
+                  <input style={{ ...inp, flex: 1 }} placeholder="Módulo (opcional)" value={v.moduloTitulo || ''} onChange={e => upd({ moduloTitulo: e.target.value })} />
+                  <input style={{ ...inp, flex: 1.4 }} placeholder="Descripción (opcional)" value={v.descripcion || ''} onChange={e => upd({ descripcion: e.target.value })} />
+                </div>
+                <label style={{ display: 'flex', alignItems: 'center', gap: 7, fontSize: 12, color: '#5B6472' }}>
+                  <input type="checkbox" checked={!!v.preview} onChange={e => upd({ preview: e.target.checked })} /> Vista previa gratis (se ve sin inscribirse)
+                </label>
+              </div>
+            )
+          })}
           <button onClick={() => setModal({ ...modal, data: { ...modal.data, videos: [...modal.data.videos, { title: '', youtubeUrl: '' }] } })} style={{ fontSize: 12, color: '#B735B8', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 700 }}>+ Agregar video</button>
           {err && <p style={errP}>{err}</p>}
           <Actions onCancel={() => setModal(null)} onSave={save} busy={busy} />
@@ -141,7 +153,8 @@ function PodcastsTab() {
   const [busy, setBusy] = useState(false)
   const [err, setErr] = useState('')
   const [delId, setDelId] = useState<string | null>(null)
-  const EMPTY = { title: '', description: '', coverUrl: '', embedUrl: '', active: true }
+  const EMPTY = { title: '', description: '', coverUrl: '', embedUrl: '', order: '0', active: true }
+  const [upAudio, setUpAudio] = useState(false)
 
   async function load() { setLoading(true); try { const r = await fetch('/api/empresa/content/podcasts'); const d = await r.json(); setItems(d.podcasts || []) } finally { setLoading(false) } }
   useEffect(() => { load() }, [])
@@ -150,7 +163,7 @@ function PodcastsTab() {
     const d = modal!.data
     if (!d.title.trim() || !d.embedUrl.trim()) { setErr('Título y URL del audio son requeridos'); return }
     setBusy(true); setErr('')
-    const body = { title: d.title, description: d.description || null, coverUrl: d.coverUrl || null, embedUrl: d.embedUrl, order: 0, active: d.active }
+    const body = { title: d.title, description: d.description || null, coverUrl: d.coverUrl || null, embedUrl: d.embedUrl, order: Number(d.order) || 0, active: d.active }
     const url = modal!.mode === 'edit' ? `/api/empresa/content/podcasts/${d.id}` : '/api/empresa/content/podcasts'
     const r = await fetch(url, { method: modal!.mode === 'edit' ? 'PATCH' : 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
     const j = await r.json(); setBusy(false)
@@ -166,7 +179,7 @@ function PodcastsTab() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           {items.map(p => (
             <Row key={p.id} cover={p.coverUrl} title={p.title} subtitle={p.active ? 'Activo' : 'Oculto'}
-              onEdit={() => { setErr(''); setModal({ mode: 'edit', data: { id: p.id, title: p.title, description: p.description || '', coverUrl: p.coverUrl || '', embedUrl: p.embedUrl, active: p.active } }) }}
+              onEdit={() => { setErr(''); setModal({ mode: 'edit', data: { id: p.id, title: p.title, description: p.description || '', coverUrl: p.coverUrl || '', embedUrl: p.embedUrl, order: String(p.order ?? 0), active: p.active } }) }}
               onDelete={() => setDelId(p.id)} />
           ))}
         </div>
@@ -176,7 +189,16 @@ function PodcastsTab() {
           <Field label="Título"><input style={inp} value={modal.data.title} onChange={e => setModal({ ...modal, data: { ...modal.data, title: e.target.value } })} /></Field>
           <Field label="Descripción"><textarea style={{ ...inp, minHeight: 60 }} value={modal.data.description} onChange={e => setModal({ ...modal, data: { ...modal.data, description: e.target.value } })} /></Field>
           <CoverField value={modal.data.coverUrl} onChange={(v: string) => setModal({ ...modal, data: { ...modal.data, coverUrl: v } })} />
-          <Field label="URL del audio / embed (YouTube, Spotify, mp3…)"><input style={inp} value={modal.data.embedUrl} onChange={e => setModal({ ...modal, data: { ...modal.data, embedUrl: e.target.value } })} placeholder="https://…" /></Field>
+          <Field label="Audio / embed (YouTube, Spotify, o subí un mp3)">
+            <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+              <input style={{ ...inp, flex: 1 }} value={modal.data.embedUrl} onChange={e => setModal({ ...modal, data: { ...modal.data, embedUrl: e.target.value } })} placeholder="https://… o subí →" />
+              <label style={{ ...iconBtn, width: 'auto', padding: '0 12px', display: 'grid', placeItems: 'center', cursor: 'pointer', color: '#B735B8' }}>
+                {upAudio ? <i className="fa-solid fa-spinner fa-spin" /> : <i className="fa-solid fa-music" />}
+                <input type="file" accept="audio/*,.mp3,.wav,.m4a" style={{ display: 'none' }} onChange={async e => { const f = e.target.files?.[0]; if (!f) return; setUpAudio(true); const u = await uploadFile(f); setUpAudio(false); if (u) setModal(m => m ? { ...m, data: { ...m.data, embedUrl: u } } : m) }} />
+              </label>
+            </div>
+          </Field>
+          <Field label="Orden (menor aparece primero)"><input type="number" style={inp} value={modal.data.order} onChange={e => setModal({ ...modal, data: { ...modal.data, order: e.target.value } })} /></Field>
           <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: '#5B6472', margin: '4px 0 6px' }}>
             <input type="checkbox" checked={modal.data.active} onChange={e => setModal({ ...modal, data: { ...modal.data, active: e.target.checked } })} /> Visible para mis usuarios
           </label>
@@ -197,7 +219,7 @@ function StoreTab() {
   const [busy, setBusy] = useState(false)
   const [err, setErr] = useState('')
   const [delId, setDelId] = useState<string | null>(null)
-  const EMPTY = { title: '', description: '', category: 'General', price: '', memberPrice: '', stock: '0', image: '', active: true }
+  const EMPTY = { title: '', description: '', category: 'General', price: '', memberPrice: '', stock: '0', images: [''] as string[], variants: [] as { name: string; options: string }[], active: true }
 
   async function load() { setLoading(true); try { const r = await fetch('/api/empresa/content/store-items'); const d = await r.json(); setItems(d.items || []) } finally { setLoading(false) } }
   useEffect(() => { load() }, [])
@@ -206,7 +228,7 @@ function StoreTab() {
     const d = modal!.data
     if (!d.title.trim() || !d.description.trim() || !d.price) { setErr('Título, descripción y precio son requeridos'); return }
     setBusy(true); setErr('')
-    const body = { title: d.title, description: d.description, category: d.category || 'General', price: parseFloat(d.price), memberPrice: d.memberPrice ? parseFloat(d.memberPrice) : parseFloat(d.price), stock: parseInt(d.stock || '0'), images: d.image ? [d.image] : [], variants: [], active: d.active }
+    const body = { title: d.title, description: d.description, category: d.category || 'General', price: parseFloat(d.price), memberPrice: d.memberPrice ? parseFloat(d.memberPrice) : parseFloat(d.price), stock: parseInt(d.stock || '0'), images: d.images.filter((x: string) => x.trim()), variants: d.variants.filter((v: any) => v.name.trim()).map((v: any) => ({ name: v.name.trim(), options: v.options.split(',').map((o: string) => o.trim()).filter(Boolean) })), active: d.active }
     const url = modal!.mode === 'edit' ? `/api/empresa/content/store-items/${d.id}` : '/api/empresa/content/store-items'
     const r = await fetch(url, { method: modal!.mode === 'edit' ? 'PATCH' : 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
     const j = await r.json(); setBusy(false)
@@ -222,7 +244,7 @@ function StoreTab() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           {items.map(it => (
             <Row key={it.id} cover={it.images?.[0] || null} title={it.title} subtitle={`$${it.price} · stock ${it.stock} · ${it.active ? 'Activo' : 'Inactivo'}`}
-              onEdit={() => { setErr(''); setModal({ mode: 'edit', data: { id: it.id, title: it.title, description: it.description, category: it.category, price: String(it.price), memberPrice: it.memberPrice != null ? String(it.memberPrice) : '', stock: String(it.stock), image: it.images?.[0] || '', active: it.active } }) }}
+              onEdit={() => { setErr(''); setModal({ mode: 'edit', data: { id: it.id, title: it.title, description: it.description, category: it.category, price: String(it.price), memberPrice: it.memberPrice != null ? String(it.memberPrice) : '', stock: String(it.stock), images: it.images?.length ? [...it.images] : [''], variants: (it.variants || []).map(v => ({ name: v.name, options: (v.options || []).join(', ') })), active: it.active } }) }}
               onDelete={() => setDelId(it.id)} />
           ))}
         </div>
@@ -231,13 +253,14 @@ function StoreTab() {
         <Modal title={modal.mode === 'edit' ? 'Editar producto' : 'Nuevo producto'} onClose={() => setModal(null)}>
           <Field label="Título"><input style={inp} value={modal.data.title} onChange={e => setModal({ ...modal, data: { ...modal.data, title: e.target.value } })} /></Field>
           <Field label="Descripción"><textarea style={{ ...inp, minHeight: 60 }} value={modal.data.description} onChange={e => setModal({ ...modal, data: { ...modal.data, description: e.target.value } })} /></Field>
-          <CoverField label="Imagen del producto" value={modal.data.image} onChange={(v: string) => setModal({ ...modal, data: { ...modal.data, image: v } })} />
+          <ImagesField images={modal.data.images} onChange={(imgs: string[]) => setModal({ ...modal, data: { ...modal.data, images: imgs } })} />
           <div style={{ display: 'flex', gap: 10 }}>
             <Field label="Precio"><input type="number" style={inp} value={modal.data.price} onChange={e => setModal({ ...modal, data: { ...modal.data, price: e.target.value } })} /></Field>
             <Field label="Precio socio (opc.)"><input type="number" style={inp} value={modal.data.memberPrice} onChange={e => setModal({ ...modal, data: { ...modal.data, memberPrice: e.target.value } })} /></Field>
             <Field label="Stock"><input type="number" style={inp} value={modal.data.stock} onChange={e => setModal({ ...modal, data: { ...modal.data, stock: e.target.value } })} /></Field>
           </div>
-          <Field label="Categoría"><input style={inp} value={modal.data.category} onChange={e => setModal({ ...modal, data: { ...modal.data, category: e.target.value } })} /></Field>
+          <Field label="Categoría"><input style={inp} value={modal.data.category} onChange={e => setModal({ ...modal, data: { ...modal.data, category: e.target.value } })} placeholder="Ej. Ropa, Suplementos, Cursos" /></Field>
+          <VariantsField variants={modal.data.variants} onChange={(vs: { name: string; options: string }[]) => setModal({ ...modal, data: { ...modal.data, variants: vs } })} />
           <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: '#5B6472', margin: '4px 0 6px' }}>
             <input type="checkbox" checked={modal.data.active} onChange={e => setModal({ ...modal, data: { ...modal.data, active: e.target.checked } })} /> Visible en la tienda
           </label>
@@ -361,6 +384,48 @@ function CoverField({ value, onChange, label = 'Portada' }: { value: string; onC
     </Field>
   )
 }
+function ImagesField({ images, onChange }: { images: string[]; onChange: (v: string[]) => void }) {
+  const [up, setUp] = useState(-1)
+  const list = images.length ? images : ['']
+  const set = (i: number, v: string) => { const a = [...list]; a[i] = v; onChange(a) }
+  return (
+    <Field label="Imágenes del producto">
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+        {list.map((img, i) => (
+          <div key={i} style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+            {img ? <img src={img} alt="" style={{ width: 38, height: 38, borderRadius: 8, objectFit: 'cover' }} /> : <div style={{ width: 38, height: 38, borderRadius: 8, background: '#F1F3F8', display: 'grid', placeItems: 'center', color: '#C4CCD8' }}><i className="fa-solid fa-image" /></div>}
+            <input style={{ ...inp, flex: 1 }} value={img} onChange={e => set(i, e.target.value)} placeholder="URL o subí →" />
+            <label style={{ ...iconBtn, width: 'auto', padding: '0 11px', display: 'grid', placeItems: 'center', cursor: 'pointer', color: '#B735B8' }}>
+              {up === i ? <i className="fa-solid fa-spinner fa-spin" /> : <i className="fa-solid fa-upload" />}
+              <input type="file" accept="image/*" style={{ display: 'none' }} onChange={async e => { const f = e.target.files?.[0]; if (!f) return; setUp(i); const u = await uploadFile(f); setUp(-1); if (u) set(i, u) }} />
+            </label>
+            <button onClick={() => { const a = list.filter((_, ix) => ix !== i); onChange(a.length ? a : ['']) }} style={{ ...iconBtn, color: '#ef4444' }}><i className="fa-solid fa-xmark" /></button>
+          </div>
+        ))}
+        <button onClick={() => onChange([...list, ''])} style={{ fontSize: 12, color: '#B735B8', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 700, textAlign: 'left' }}>+ Agregar imagen</button>
+      </div>
+    </Field>
+  )
+}
+
+function VariantsField({ variants, onChange }: { variants: { name: string; options: string }[]; onChange: (v: { name: string; options: string }[]) => void }) {
+  const set = (i: number, k: 'name' | 'options', v: string) => { const a = [...variants]; a[i] = { ...a[i], [k]: v }; onChange(a) }
+  return (
+    <Field label="Variantes (ej. Talle: S, M, L) — opcional">
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+        {variants.map((v, i) => (
+          <div key={i} style={{ display: 'flex', gap: 6 }}>
+            <input style={{ ...inp, flex: 1 }} placeholder="Nombre (ej. Talle)" value={v.name} onChange={e => set(i, 'name', e.target.value)} />
+            <input style={{ ...inp, flex: 1.4 }} placeholder="Opciones separadas por coma" value={v.options} onChange={e => set(i, 'options', e.target.value)} />
+            <button onClick={() => onChange(variants.filter((_, ix) => ix !== i))} style={{ ...iconBtn, color: '#ef4444' }}><i className="fa-solid fa-xmark" /></button>
+          </div>
+        ))}
+        <button onClick={() => onChange([...variants, { name: '', options: '' }])} style={{ fontSize: 12, color: '#B735B8', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 700, textAlign: 'left' }}>+ Agregar variante</button>
+      </div>
+    </Field>
+  )
+}
+
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return <div style={{ flex: 1, marginBottom: 10 }}><label style={{ fontSize: 12, color: '#6B7280', display: 'block', marginBottom: 5 }}>{label}</label>{children}</div>
 }
