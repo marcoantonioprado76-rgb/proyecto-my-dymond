@@ -42,6 +42,18 @@ export async function GET() {
     })
     const accessExtras = !!ux?.accessExtras
 
+    // Marca de la empresa (Pack Empresarial): nombre + logo para mostrar a sus usuarios.
+    let orgName: string | null = null
+    let orgLogoUrl: string | null = null
+    if (ux?.organizationId) {
+      const org = await prisma.organization.findUnique({
+        where: { id: ux.organizationId },
+        select: { name: true, logoUrl: true },
+      })
+      orgName = org?.name ?? null
+      orgLogoUrl = org?.logoUrl ?? null
+    }
+
     return NextResponse.json({
       plan: expired ? 'NONE' : plan,
       planExpiresAt: planExpiresAt?.toISOString() ?? null,
@@ -50,6 +62,8 @@ export async function GET() {
       accessExtras,
       orgRole: ux?.orgRole ?? 'NONE',
       organizationId: ux?.organizationId ?? null,
+      orgName,
+      orgLogoUrl,
     })
   } catch (err) {
     console.error('[GET /api/plan-status]', err)

@@ -764,12 +764,16 @@ model PackPurchaseRequest {
   faseGlobalNote  String?       @map("fase_global_note")
   status          RequestStatus @default(PENDING)
   notes           String?
+  // Pack Empresarial: si la solicitud es de un usuario de empresa, la revisa/aprueba
+  // el admin de ESA empresa (no el super-admin). null = solicitud normal de MY DIAMOND.
+  organizationId  String?       @map("organization_id") @db.Uuid
   reviewedBy      String?       @map("reviewed_by") @db.Uuid
   reviewedAt      DateTime?     @map("reviewed_at")
   createdAt       DateTime      @default(now()) @map("created_at")
   updatedAt       DateTime      @updatedAt @map("updated_at")
   user            User          @relation(fields: [userId], references: [id])
 
+  @@index([organizationId, status])
   @@map("pack_purchase_requests")
 }
 

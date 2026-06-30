@@ -268,6 +268,12 @@ export default function PlanesPage() {
   const [credits, setCredits] = useState<Record<string, number>>(PLAN_CREDIT_DEFAULTS)
   const [bots, setBots] = useState<Record<string, number>>(PLAN_BOTS_DEFAULTS)
   const [prices, setPrices] = useState<Record<string, number>>({})
+  // Pack Empresarial: si el usuario es de una empresa, ve cómo pagarle a SU empresa.
+  const [orgPay, setOrgPay] = useState<{ name: string; logoUrl: string | null; payUsdtWallet: string | null; payUsdtNetwork: string | null; payBankInfo: string | null; payQrUrl: string | null; payInstructions: string | null } | null>(null)
+  const [proofUrl, setProofUrl] = useState('')
+  const [upProof, setUpProof] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
+  const [submitted, setSubmitted] = useState(false)
   const countdown = useCountdown(planExpiresAt)
 
   useEffect(() => {
@@ -285,6 +291,11 @@ export default function PlanesPage() {
         const pending = (d.requests ?? []).find((r: { status: string; plan: string }) => r.status === 'PENDING')
         if (pending) setPendingPlan(pending.plan)
       })
+      .catch(() => {})
+    // Pack Empresarial: datos de cobro de la empresa del usuario (si pertenece a una).
+    fetch('/api/empresa/pago')
+      .then(r => r.json())
+      .then(d => { if (d.payment) setOrgPay(d.payment) })
       .catch(() => {})
     // Cargar disponibilidad de planes
     fetch('/api/settings')
@@ -320,6 +331,83 @@ export default function PlanesPage() {
       })
       .catch(() => setEnabledPlans({ BASIC: true, PRO: true, ELITE: true }))
   }, [router])
+
+  // ── Usuario de empresa: ve cómo pagarle a SU empresa (no los packs de MY DIAMOND) ──
+  if (orgPay) {
+    const submitProof = async () => {
+      if (!proofUrl) return
+      setSubmitting(true)
+      const r = await fetch('/api/empresa/pago/solicitar', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ paymentProofUrl: proofUrl, paymentMethod: 'MANUAL' }) })
+      setSubmitting(false)
+      if (r.ok) { setSubmitted(true); setProofUrl('') }
+    }
+    const DG = 'linear-gradient(135deg,#FF2D95 0%,#B735B8 48%,#233B8F 100%)'
+    const inpS: React.CSSProperties = { width: '100%', padding: '10px 12px', borderRadius: 10, border: '1px solid #D5DCE6', fontSize: 13, background: '#F7F9FC', color: '#233B8F', fontWeight: 600 }
+    return (
+      <div className="font-ui" style={{ background: 'linear-gradient(135deg,#EEF2F7,#F5F7FA)', minHeight: '100vh' }}>
+        <div className="px-4 md:px-6 pt-8 max-w-2xl mx-auto pb-24 text-[#111827]">
+          <div style={{ textAlign: 'center', marginBottom: 20 }}>
+            {orgPay.logoUrl ? <img src={orgPay.logoUrl} alt={orgPay.name} style={{ height: 54, objectFit: 'contain', marginBottom: 10 }} /> : null}
+            <h1 style={{ fontSize: 24, fontWeight: 900 }}>{currentPlan !== 'NONE' ? 'Tu plan está activo' : 'Activá tu cuenta'}</h1>
+            <p style={{ fontSize: 14, color: '#5B6472', marginTop: 4 }}>Pagás directamente a <strong>{orgPay.name}</strong>.</p>
+          </div>
+
+          {currentPlan !== 'NONE' ? (
+            <div style={{ background: 'rgba(22,163,74,0.08)', border: '1px solid rgba(22,163,74,0.25)', borderRadius: 14, padding: '16px 18px', color: '#15803d', fontWeight: 700, textAlign: 'center' }}>
+              <Check size={18} style={{ display: 'inline', marginRight: 6 }} /> Ya tenés acceso activo. Para renovar, contactá a tu empresa.
+            </div>
+          ) : (
+            <>
+              {(orgPay.payUsdtWallet || orgPay.payUsdtNetwork) && (
+                <div style={{ background: '#fff', border: '1px solid #E4E9F0', borderRadius: 14, padding: '16px 18px', marginBottom: 12 }}>
+                  <h3 style={{ fontWeight: 800, fontSize: 14, marginBottom: 10 }}>💎 USDT / Cripto</h3>
+                  {orgPay.payUsdtNetwork && <p style={{ fontSize: 13, color: '#5B6472', marginBottom: 6 }}>Red: <strong>{orgPay.payUsdtNetwork}</strong></p>}
+                  {orgPay.payUsdtWallet && <input readOnly value={orgPay.payUsdtWallet} onFocus={e => e.currentTarget.select()} style={inpS} />}
+                </div>
+              )}
+              {orgPay.payBankInfo && (
+                <div style={{ background: '#fff', border: '1px solid #E4E9F0', borderRadius: 14, padding: '16px 18px', marginBottom: 12 }}>
+                  <h3 style={{ fontWeight: 800, fontSize: 14, marginBottom: 10 }}>🏦 Transferencia</h3>
+                  <pre style={{ whiteSpace: 'pre-wrap', fontFamily: 'inherit', fontSize: 13, color: '#33405A', margin: 0 }}>{orgPay.payBankInfo}</pre>
+                </div>
+              )}
+              {orgPay.payQrUrl && (
+                <div style={{ background: '#fff', border: '1px solid #E4E9F0', borderRadius: 14, padding: '16px 18px', marginBottom: 12, textAlign: 'center' }}>
+                  <h3 style={{ fontWeight: 800, fontSize: 14, marginBottom: 10 }}>📱 QR de pago</h3>
+                  <img src={orgPay.payQrUrl} alt="QR" style={{ maxWidth: 220, margin: '0 auto', borderRadius: 10 }} />
+                </div>
+              )}
+              {orgPay.payInstructions && (
+                <div style={{ background: 'rgba(35,59,143,0.06)', border: '1px solid rgba(35,59,143,0.15)', borderRadius: 14, padding: '14px 16px', marginBottom: 12, fontSize: 13, color: '#33405A' }}>
+                  <pre style={{ whiteSpace: 'pre-wrap', fontFamily: 'inherit', margin: 0 }}>{orgPay.payInstructions}</pre>
+                </div>
+              )}
+
+              {/* Subir comprobante */}
+              <div style={{ background: '#fff', border: '1px solid #E4E9F0', borderRadius: 14, padding: '16px 18px', marginTop: 16 }}>
+                <h3 style={{ fontWeight: 800, fontSize: 14, marginBottom: 8 }}>✅ Ya pagué — enviar comprobante</h3>
+                {submitted ? (
+                  <p style={{ color: '#15803d', fontWeight: 700, fontSize: 14 }}><Check size={16} style={{ display: 'inline', marginRight: 6 }} /> ¡Comprobante enviado! Esperá que tu empresa active tu cuenta.</p>
+                ) : (
+                  <>
+                    <p style={{ fontSize: 13, color: '#5B6472', marginBottom: 10 }}>Subí la captura/foto de tu pago y tu empresa te activará.</p>
+                    <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+                      <label style={{ display: 'inline-flex', alignItems: 'center', gap: 7, padding: '9px 14px', borderRadius: 10, border: '1px solid #E4E9F0', cursor: 'pointer', fontSize: 13, fontWeight: 700, color: '#B735B8' }}>
+                        {upProof ? '⏳ Subiendo…' : (proofUrl ? '✓ Comprobante listo' : '📎 Elegir comprobante')}
+                        <input type="file" accept="image/*" style={{ display: 'none' }} onChange={async e => { const f = e.target.files?.[0]; if (!f) return; setUpProof(true); const fd = new FormData(); fd.append('file', f); const rr = await fetch('/api/upload', { method: 'POST', body: fd }); const dd = await rr.json().catch(() => ({})); setUpProof(false); if (dd.url) setProofUrl(dd.url) }} />
+                      </label>
+                      <button onClick={submitProof} disabled={!proofUrl || submitting} style={{ background: (!proofUrl || submitting) ? '#C4CCD8' : DG, color: '#fff', border: 'none', borderRadius: 10, padding: '10px 20px', fontWeight: 800, fontSize: 13, cursor: (!proofUrl || submitting) ? 'not-allowed' : 'pointer' }}>{submitting ? 'Enviando…' : 'Enviar comprobante'}</button>
+                    </div>
+                    {proofUrl && <img src={proofUrl} alt="comprobante" style={{ marginTop: 10, maxHeight: 120, borderRadius: 8 }} />}
+                  </>
+                )}
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="font-ui" style={{ background: 'radial-gradient(circle at top right, rgba(255,9,108,0.08), transparent 28%), radial-gradient(circle at bottom left, rgba(35,59,143,0.08), transparent 30%), linear-gradient(135deg, #EEF2F7 0%, #F5F7FA 45%, #E9EEF5 100%)', minHeight: '100vh' }}>

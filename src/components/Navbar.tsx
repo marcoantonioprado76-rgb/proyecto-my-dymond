@@ -44,12 +44,15 @@ export default function Navbar() {
   const [showExtras, setShowExtras] = useState(false)
   // "Mi Empresa": acceso al panel de admin de empresa (solo orgRole ORG_ADMIN).
   const [isOrgAdmin, setIsOrgAdmin] = useState(false)
+  // Marca de la empresa (Pack Empresarial) para los usuarios de empresa.
+  const [org, setOrg] = useState<{ name: string; logoUrl: string | null } | null>(null)
   useEffect(() => {
     fetch('/api/plan-status')
       .then(r => r.json())
       .then(d => {
         setShowExtras(!!d.faseGlobal || !!d.accessExtras)
         setIsOrgAdmin(d.orgRole === 'ORG_ADMIN')
+        if (d.organizationId && d.orgName) setOrg({ name: d.orgName, logoUrl: d.orgLogoUrl ?? null })
       })
       .catch(() => {})
   }, [])
@@ -62,6 +65,15 @@ export default function Navbar() {
         <Link href="/dashboard" className="sidebar__logo">
           <img src="/logo-oficial-mydiamond.png" alt="MY DIAMOND" className="sidebar__logo-official" />
         </Link>
+
+        {org && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, margin: '0 14px 12px', padding: '7px 10px', borderRadius: 10, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)' }} title={`Empresa: ${org.name}`}>
+            {org.logoUrl
+              ? <img src={org.logoUrl} alt={org.name} style={{ height: 22, maxWidth: 80, objectFit: 'contain' }} />
+              : <i className="fa-solid fa-building" style={{ color: '#B735B8', fontSize: 14 }} />}
+            <span style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.85)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{org.name}</span>
+          </div>
+        )}
 
         <nav className="sidebar__nav" aria-label="Menú">
 
