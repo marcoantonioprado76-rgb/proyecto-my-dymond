@@ -31,6 +31,7 @@ import {
   LayoutTemplate,
   Megaphone,
   LogIn,
+  SlidersHorizontal,
 } from 'lucide-react'
 
 interface UserRow {
@@ -102,6 +103,8 @@ export default function AdminUsersPage() {
   const [updating, setUpdating] = useState<string | null>(null)
   const [deleteModal, setDeleteModal] = useState<{ id: string; username: string; fullName: string } | null>(null)
   const [deleting, setDeleting] = useState(false)
+  // Modal de servicios extra (agrupa los 5 controles +/- bajo un solo ícono)
+  const [extrasModalId, setExtrasModalId] = useState<string | null>(null)
   const [devicesModal, setDevicesModal] = useState<{ id: string; username: string; fullName: string } | null>(null)
   const [devices, setDevices] = useState<{
     id: string; deviceId: string; label: string | null; lastSeen: string; createdAt: string
@@ -353,34 +356,13 @@ export default function AdminUsersPage() {
                               <option value="PRO">PRO</option>
                               <option value="ELITE">ELITE</option>
                             </select>
-                            {([
-                              { key: 'extraBots', label: 'Bots', icon: Bot, value: u.extraBots },
-                              { key: 'extraStores', label: 'Tiendas', icon: Store, value: u.extraStores },
-                              { key: 'extraProducts', label: 'Productos', icon: Package, value: u.extraProducts },
-                              { key: 'extraLandingPages', label: 'Landings', icon: LayoutTemplate, value: u.extraLandingPages },
-                              { key: 'extraAdsPerMonth', label: 'Anuncios/mes', icon: Megaphone, value: u.extraAdsPerMonth },
-                            ] as const).map(svc => {
-                              const Icon = svc.icon
-                              const v = svc.value ?? 0
-                              return (
-                                <div
-                                  key={svc.key}
-                                  className="flex items-center gap-0.5"
-                                  title={`${svc.label} extra otorgados por admin: +${v}`}
-                                >
-                                  <Icon size={11} className="text-[#B735B8] shrink-0" />
-                                  <button
-                                    onClick={() => updateUser(u.id, { [svc.key]: Math.max(0, v - 1) })}
-                                    className="w-5 h-5 rounded bg-[#F4F6FA] hover:bg-[#EEF2F7] text-[#111827]/50 hover:text-[#111827] transition-colors flex items-center justify-center text-xs font-black leading-none"
-                                  >−</button>
-                                  <span className="text-[10px] font-black text-[#B735B8] min-w-[1.25rem] text-center">+{v}</span>
-                                  <button
-                                    onClick={() => updateUser(u.id, { [svc.key]: v + 1 })}
-                                    className="w-5 h-5 rounded bg-[#F4F6FA] hover:bg-[#B735B8]/20 text-[#111827]/50 hover:text-[#B735B8] transition-colors flex items-center justify-center text-xs font-black leading-none"
-                                  >+</button>
-                                </div>
-                              )
-                            })}
+                            <button
+                              onClick={() => setExtrasModalId(u.id)}
+                              title="Servicios extra (manual)"
+                              className="p-1.5 rounded-lg bg-[#B735B8]/8 border border-[#B735B8]/20 hover:bg-[#B735B8]/20 transition-colors"
+                            >
+                              <SlidersHorizontal size={13} className="text-[#B735B8]" />
+                            </button>
                             <button
                               onClick={() => openInfoModal({ id: u.id, username: u.username, fullName: u.fullName })}
                               title="Ver información del usuario"
@@ -824,6 +806,59 @@ export default function AdminUsersPage() {
           </div>
         </div>
       )}
+
+      {/* Modal de servicios extra (agrupa los 5 controles bajo un ícono) */}
+      {extrasModalId && (() => {
+        const eu = users.find(u => u.id === extrasModalId)
+        if (!eu) return null
+        const SERVICES = [
+          { key: 'extraBots', label: 'Bots / Agentes', icon: Bot, value: eu.extraBots },
+          { key: 'extraStores', label: 'Tiendas virtuales', icon: Store, value: eu.extraStores },
+          { key: 'extraProducts', label: 'Productos', icon: Package, value: eu.extraProducts },
+          { key: 'extraLandingPages', label: 'Landing pages', icon: LayoutTemplate, value: eu.extraLandingPages },
+          { key: 'extraAdsPerMonth', label: 'Anuncios / mes', icon: Megaphone, value: eu.extraAdsPerMonth },
+        ] as const
+        return (
+          <div className="fixed inset-0 z-[80] flex items-center justify-center p-4">
+            <div className="absolute inset-0 bg-black/75 backdrop-blur-sm" onClick={() => setExtrasModalId(null)} />
+            <div className="relative w-full max-w-sm rounded-2xl border border-[#E4E9F0] bg-white shadow-2xl overflow-hidden">
+              <div className="flex items-center justify-between gap-3 px-5 py-4 border-b border-[#E4E9F0]">
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <div className="w-9 h-9 rounded-xl bg-[#B735B8]/10 border border-[#B735B8]/20 flex items-center justify-center shrink-0">
+                    <SlidersHorizontal size={16} className="text-[#B735B8]" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-xs font-black text-[#111827] truncate">Servicios extra · {eu.fullName}</p>
+                    <p className="text-[10px] text-[#111827]/40 truncate">@{eu.username} · se suman al límite del plan</p>
+                  </div>
+                </div>
+                <button onClick={() => setExtrasModalId(null)} className="p-1.5 rounded-lg hover:bg-[#EEF2F7] transition-colors shrink-0">
+                  <X size={15} className="text-[#111827]/50" />
+                </button>
+              </div>
+              <div className="p-4 space-y-2">
+                {SERVICES.map(svc => {
+                  const Icon = svc.icon
+                  const v = svc.value ?? 0
+                  return (
+                    <div key={svc.key} className="flex items-center justify-between gap-3 px-3 py-2.5 rounded-xl bg-[#F8FAFC] border border-[#E4E9F0]">
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <Icon size={15} className="text-[#B735B8] shrink-0" />
+                        <span className="text-xs font-bold text-[#374151] truncate">{svc.label}</span>
+                      </div>
+                      <div className="flex items-center gap-1.5 shrink-0">
+                        <button onClick={() => updateUser(eu.id, { [svc.key]: Math.max(0, v - 1) })} className="w-7 h-7 rounded-lg bg-white border border-[#E4E9F0] hover:bg-[#EEF2F7] text-[#111827]/60 hover:text-[#111827] transition-colors flex items-center justify-center text-sm font-black">−</button>
+                        <span className="text-sm font-black text-[#B735B8] min-w-[2.5rem] text-center">+{v}</span>
+                        <button onClick={() => updateUser(eu.id, { [svc.key]: v + 1 })} className="w-7 h-7 rounded-lg bg-white border border-[#E4E9F0] hover:bg-[#B735B8]/15 text-[#111827]/60 hover:text-[#B735B8] transition-colors flex items-center justify-center text-sm font-black">+</button>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+          </div>
+        )
+      })()}
     </div>
   </div>
   )
