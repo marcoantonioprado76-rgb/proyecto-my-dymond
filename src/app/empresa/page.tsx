@@ -138,13 +138,11 @@ export default function EmpresaPage() {
             <p style={{ fontSize: 12, opacity: 0.7 }}>{org?.name ?? ''}</p>
           </div>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <a href="/empresa/contenido" style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.18)', color: '#fff', padding: '8px 14px', borderRadius: 10, fontWeight: 700, fontSize: 13, textDecoration: 'none' }}>
-            <i className="fa-solid fa-layer-group" style={{ marginRight: 6 }} />Mi Contenido
-          </a>
-          <a href="/empresa/cobro" style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.18)', color: '#fff', padding: '8px 14px', borderRadius: 10, fontWeight: 700, fontSize: 13, textDecoration: 'none' }}>
-            <i className="fa-solid fa-wallet" style={{ marginRight: 6 }} />Cobro y marca
-          </a>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+          <a href="/empresa/contenido" style={navLink}><i className="fa-solid fa-layer-group" style={{ marginRight: 6 }} />Mi Contenido</a>
+          <a href="/empresa/solicitudes" style={navLink}><i className="fa-solid fa-receipt" style={{ marginRight: 6 }} />Solicitudes</a>
+          <a href="/empresa/reportes" style={navLink}><i className="fa-solid fa-chart-simple" style={{ marginRight: 6 }} />Reportes</a>
+          <a href="/empresa/cobro" style={navLink}><i className="fa-solid fa-wallet" style={{ marginRight: 6 }} />Cobro y marca</a>
           <button onClick={logout} style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)', color: 'rgba(255,180,180,0.95)', padding: '8px 14px', borderRadius: 10, cursor: 'pointer', fontWeight: 600, fontSize: 13 }}>
             <i className="fa-solid fa-right-from-bracket" style={{ marginRight: 6 }} />Salir
           </button>
@@ -319,6 +317,7 @@ export default function EmpresaPage() {
   )
 }
 
+const navLink: React.CSSProperties = { background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.18)', color: '#fff', padding: '8px 14px', borderRadius: 10, fontWeight: 700, fontSize: 13, textDecoration: 'none' }
 const iconBtn: React.CSSProperties = { width: 34, height: 34, borderRadius: 9, border: '1px solid #E4E9F0', background: '#fff', color: '#5B6472', cursor: 'pointer', fontSize: 13 }
 const inputStyle: React.CSSProperties = { width: '100%', padding: '11px 14px', borderRadius: 11, border: '1px solid #D5DCE6', fontSize: 14, marginTop: 4, outline: 'none' }
 const modalActions: React.CSSProperties = { display: 'flex', gap: 10, justifyContent: 'flex-end', marginTop: 18 }
