@@ -34,11 +34,16 @@ export async function GET() {
       faseGlobal = (lastPurchase?.paymentMethod as string) === 'FASE_GLOBAL'
     }
 
+    // Acceso manual a Academy/Recursos/Shop otorgado por el admin
+    const ux = await prisma.user.findUnique({ where: { id: user.id }, select: { accessExtras: true } })
+    const accessExtras = !!ux?.accessExtras
+
     return NextResponse.json({
       plan: expired ? 'NONE' : plan,
       planExpiresAt: planExpiresAt?.toISOString() ?? null,
       expired,
       faseGlobal,
+      accessExtras,
     })
   } catch (err) {
     console.error('[GET /api/plan-status]', err)

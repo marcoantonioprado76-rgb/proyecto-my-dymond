@@ -39,15 +39,15 @@ export default function Navbar() {
   const isInAcademy  = pathname.startsWith('/dashboard/courses') || pathname.startsWith('/dashboard/podcasts') || pathname === '/dashboard/academy'
   const isInServices = pathname === '/dashboard/services' || serviceItems.some(s => pathname === s.href || pathname.startsWith(s.href))
   const [servicesOpen, setServicesOpen] = useState(isInServices)
-  // Fase Global: estos usuarios ven Academy/Recursos/Shop; los de pago, no.
-  const [faseGlobal, setFaseGlobal] = useState(false)
+  // Academy/Recursos/Shop: visibles para Fase Global o si el admin dio acceso manual.
+  const [showExtras, setShowExtras] = useState(false)
   useEffect(() => {
     fetch('/api/plan-status')
       .then(r => r.json())
-      .then(d => setFaseGlobal(!!d.faseGlobal))
+      .then(d => setShowExtras(!!d.faseGlobal || !!d.accessExtras))
       .catch(() => {})
   }, [])
-  const visibleMobileItems = mobileNavItems.filter(i => faseGlobal || !FASE_GLOBAL_ONLY.includes(i.href))
+  const visibleMobileItems = mobileNavItems.filter(i => showExtras || !FASE_GLOBAL_ONLY.includes(i.href))
 
   return (
     <>
@@ -95,7 +95,7 @@ export default function Navbar() {
             </div>
           )}
 
-          {faseGlobal && (
+          {showExtras && (
             <>
               <Link href="/dashboard/academy" className={`nav-item ${isInAcademy ? 'nav-item--active' : ''}`}>
                 <span className="nav-item__icon"><i className="fa-solid fa-graduation-cap"></i></span>

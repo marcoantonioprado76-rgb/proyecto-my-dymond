@@ -29,6 +29,9 @@ model User {
   extraProducts       Int                  @default(0) @map("extra_products")
   extraLandingPages   Int                  @default(0) @map("extra_landing_pages")
   extraAdsPerMonth    Int                  @default(0) @map("extra_ads_per_month")
+  /// El admin le dio acceso manual a Academy/Recursos/Shop (lo que se oculta a los
+  /// usuarios de pago). Equivale a tratarlo como Fase Global para el menú.
+  accessExtras        Boolean              @default(false) @map("access_extras")
   aiCredits           Int                  @default(0) @map("ai_credits")
   /// Balance de IA en USD con 4 decimales (ej: 12.3456). Reemplaza progresivamente a aiCredits.
   aiBalanceUsd        Decimal              @default(0) @db.Decimal(10, 4) @map("ai_balance_usd")

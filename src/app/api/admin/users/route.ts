@@ -33,6 +33,8 @@ export async function GET(request: NextRequest) {
       extra_products: number
       extra_landing_pages: number
       extra_ads_per_month: number
+      access_extras: boolean
+      plan_expires_at: Date | null
       created_at: Date
       location_changed: boolean
     }>>`
@@ -50,6 +52,8 @@ export async function GET(request: NextRequest) {
         u.extra_products,
         u.extra_landing_pages,
         u.extra_ads_per_month,
+        u.access_extras,
+        u.plan_expires_at,
         u.created_at,
         (SELECT COALESCE(bool_or(td.location_changed), false) FROM trusted_devices td WHERE td.user_id = u.id) AS location_changed
       FROM users u
@@ -90,6 +94,8 @@ export async function GET(request: NextRequest) {
       extraProducts: u.extra_products ?? 0,
       extraLandingPages: u.extra_landing_pages ?? 0,
       extraAdsPerMonth: u.extra_ads_per_month ?? 0,
+      accessExtras: u.access_extras ?? false,
+      planExpiresAt: u.plan_expires_at,
       createdAt: u.created_at,
       locationChanged: u.location_changed,
     })),

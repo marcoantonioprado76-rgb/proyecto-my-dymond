@@ -32,6 +32,8 @@ import {
   Megaphone,
   LogIn,
   SlidersHorizontal,
+  GraduationCap,
+  CalendarPlus,
 } from 'lucide-react'
 
 interface UserRow {
@@ -48,6 +50,8 @@ interface UserRow {
   extraProducts: number
   extraLandingPages: number
   extraAdsPerMonth: number
+  accessExtras: boolean
+  planExpiresAt: string | null
   createdAt: string
   locationChanged?: boolean
 }
@@ -105,6 +109,9 @@ export default function AdminUsersPage() {
   const [deleting, setDeleting] = useState(false)
   // Modal de servicios extra (agrupa los 5 controles +/- bajo un solo ícono)
   const [extrasModalId, setExtrasModalId] = useState<string | null>(null)
+  // Modal para ampliar días de suscripción
+  const [daysModalId, setDaysModalId] = useState<string | null>(null)
+  const [customDays, setCustomDays] = useState('')
   const [devicesModal, setDevicesModal] = useState<{ id: string; username: string; fullName: string } | null>(null)
   const [devices, setDevices] = useState<{
     id: string; deviceId: string; label: string | null; lastSeen: string; createdAt: string
@@ -362,6 +369,13 @@ export default function AdminUsersPage() {
                               className="p-1.5 rounded-lg bg-[#B735B8]/8 border border-[#B735B8]/20 hover:bg-[#B735B8]/20 transition-colors"
                             >
                               <SlidersHorizontal size={13} className="text-[#B735B8]" />
+                            </button>
+                            <button
+                              onClick={() => { setCustomDays(''); setDaysModalId(u.id) }}
+                              title="Ampliar días de suscripción"
+                              className="p-1.5 rounded-lg bg-emerald-500/8 border border-emerald-500/20 hover:bg-emerald-500/20 transition-colors"
+                            >
+                              <CalendarPlus size={13} className="text-emerald-600" />
                             </button>
                             <button
                               onClick={() => openInfoModal({ id: u.id, username: u.username, fullName: u.fullName })}
@@ -837,6 +851,21 @@ export default function AdminUsersPage() {
                 </button>
               </div>
               <div className="p-4 space-y-2">
+                {/* Acceso manual a Academy / Recursos / Shop (lo que se oculta a usuarios de pago) */}
+                <div className="flex items-center justify-between gap-3 px-3 py-2.5 rounded-xl bg-[#B735B8]/8 border border-[#B735B8]/20">
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <GraduationCap size={15} className="text-[#B735B8] shrink-0" />
+                    <span className="text-xs font-bold text-[#374151]">Acceso a Academy / Recursos / Shop</span>
+                  </div>
+                  <button
+                    onClick={() => updateUser(eu.id, { accessExtras: !eu.accessExtras })}
+                    title={eu.accessExtras ? 'Quitar acceso' : 'Dar acceso'}
+                    className={`relative w-10 h-5 rounded-full transition-colors shrink-0 ${eu.accessExtras ? 'bg-[#B735B8]' : 'bg-[#E4E9F0]'}`}
+                  >
+                    <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-all ${eu.accessExtras ? 'left-[1.375rem]' : 'left-0.5'}`} />
+                  </button>
+                </div>
+                <div className="h-px bg-[#E4E9F0] my-1" />
                 {SERVICES.map(svc => {
                   const Icon = svc.icon
                   const v = svc.value ?? 0
@@ -854,6 +883,56 @@ export default function AdminUsersPage() {
                     </div>
                   )
                 })}
+              </div>
+            </div>
+          </div>
+        )
+      })()}
+
+      {/* Modal para ampliar días de suscripción */}
+      {daysModalId && (() => {
+        const du = users.find(u => u.id === daysModalId)
+        if (!du) return null
+        const exp = du.planExpiresAt ? new Date(du.planExpiresAt) : null
+        const expStr = exp ? exp.toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' }) : 'Sin vencimiento'
+        const addAndClose = async (n: number) => { await updateUser(du.id, { addDays: n }); setDaysModalId(null) }
+        return (
+          <div className="fixed inset-0 z-[80] flex items-center justify-center p-4">
+            <div className="absolute inset-0 bg-black/75 backdrop-blur-sm" onClick={() => setDaysModalId(null)} />
+            <div className="relative w-full max-w-sm rounded-2xl border border-[#E4E9F0] bg-white shadow-2xl overflow-hidden">
+              <div className="flex items-center justify-between gap-3 px-5 py-4 border-b border-[#E4E9F0]">
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <div className="w-9 h-9 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center shrink-0">
+                    <CalendarPlus size={16} className="text-emerald-600" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-xs font-black text-[#111827] truncate">Ampliar suscripción · {du.fullName}</p>
+                    <p className="text-[10px] text-[#111827]/40 truncate">Vence: {expStr}</p>
+                  </div>
+                </div>
+                <button onClick={() => setDaysModalId(null)} className="p-1.5 rounded-lg hover:bg-[#EEF2F7] transition-colors shrink-0">
+                  <X size={15} className="text-[#111827]/50" />
+                </button>
+              </div>
+              <div className="p-4 space-y-3">
+                <div className="grid grid-cols-3 gap-2">
+                  {[7, 30, 90].map(n => (
+                    <button key={n} onClick={() => addAndClose(n)} disabled={updating === du.id}
+                      className="py-2.5 rounded-xl bg-[#F8FAFC] border border-[#E4E9F0] hover:bg-emerald-500/10 hover:border-emerald-500/30 text-[#374151] hover:text-emerald-700 text-xs font-black transition-all disabled:opacity-50">
+                      +{n} días
+                    </button>
+                  ))}
+                </div>
+                <div className="flex items-center gap-2">
+                  <input type="number" min={1} max={3650} value={customDays} onChange={e => setCustomDays(e.target.value)}
+                    placeholder="Días personalizados" className="flex-1 px-3 py-2.5 rounded-xl bg-[#F8FAFC] border border-[#E4E9F0] text-sm text-[#111827] outline-none focus:border-emerald-500/40" />
+                  <button onClick={() => { const n = parseInt(customDays); if (n > 0) addAndClose(n) }} disabled={!parseInt(customDays) || updating === du.id}
+                    className="px-4 py-2.5 rounded-xl text-xs font-black text-white transition-all active:scale-95 disabled:opacity-50"
+                    style={{ background: 'linear-gradient(135deg, #10B981 0%, #059669 100%)' }}>
+                    Aplicar
+                  </button>
+                </div>
+                <p className="text-[10px] text-[#9CA3AF] text-center">Se suma sobre la fecha de vencimiento actual.</p>
               </div>
             </div>
           </div>

@@ -51,7 +51,7 @@ export async function PATCH(
   if (!admin) return unauthorizedAdmin()
 
   const body = await request.json()
-  const { plan, isActive, isAdmin: makeAdmin, extraBots, extraStores, extraProducts, extraLandingPages, extraAdsPerMonth } = body
+  const { plan, isActive, isAdmin: makeAdmin, extraBots, extraStores, extraProducts, extraLandingPages, extraAdsPerMonth, accessExtras, addDays } = body
 
   // Use raw SQL to bypass stale Prisma client
   if (plan !== undefined) {
@@ -120,14 +120,34 @@ export async function PATCH(
       UPDATE users SET extra_ads_per_month = ${val} WHERE id = ${params.id}::uuid
     `
   }
+  // Acceso manual a Academy/Recursos/Shop (como Fase Global)
+  if (accessExtras !== undefined) {
+    await prisma.$executeRaw`
+      UPDATE users SET access_extras = ${!!accessExtras} WHERE id = ${params.id}::uuid
+    `
+  }
+  // Ampliar días de suscripción (suma sobre la fecha mayor entre la actual y NOW)
+  if (addDays !== undefined) {
+    const days = Math.max(1, Math.min(3650, parseInt(addDays) || 0))
+    if (days > 0) {
+      await prisma.$executeRaw`
+        UPDATE users
+        SET plan_expires_at = GREATEST(COALESCE(plan_expires_at, NOW()), NOW()) + make_interval(days => ${days}),
+            is_active = true
+        WHERE id = ${params.id}::uuid
+      `
+    }
+  }
 
   // Return updated user via raw SQL
   const rows = await prisma.$queryRaw<Array<{
     id: string; username: string; full_name: string; plan: string; is_active: boolean; is_admin: boolean
     extra_bots: number; extra_stores: number; extra_products: number; extra_landing_pages: number; extra_ads_per_month: number
+    access_extras: boolean; plan_expires_at: Date | null
   }>>`
     SELECT id, username, full_name, plan::text, is_active, is_admin,
-           extra_bots, extra_stores, extra_products, extra_landing_pages, extra_ads_per_month
+           extra_bots, extra_stores, extra_products, extra_landing_pages, extra_ads_per_month,
+           access_extras, plan_expires_at
     FROM users WHERE id = ${params.id}::uuid LIMIT 1
   `
   const row = rows[0]
@@ -147,6 +167,8 @@ export async function PATCH(
       extraProducts: row.extra_products,
       extraLandingPages: row.extra_landing_pages,
       extraAdsPerMonth: row.extra_ads_per_month,
+      accessExtras: row.access_extras,
+      planExpiresAt: row.plan_expires_at,
     },
   })
 }
