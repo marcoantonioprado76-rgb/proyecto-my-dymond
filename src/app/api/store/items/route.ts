@@ -2,6 +2,7 @@ export const dynamic = 'force-dynamic'
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { getAuthUser } from '@/lib/auth'
+import { contentOrgWhere } from '@/lib/org-content'
 
 /** GET /api/store/items?category=X — lista items activos */
 export async function GET(req: NextRequest) {
@@ -14,13 +15,18 @@ export async function GET(req: NextRequest) {
 
     // Determine if current user is an active member
     let isMember = false
+    // Aislamiento por empresa: por defecto (sin sesión) solo contenido global (NULL)
+    let orgWhere: { organizationId: string | null } = { organizationId: null }
     try {
       const user = await getAuthUser()
       if (user) {
+        orgWhere = await contentOrgWhere(user.id)
         const dbUser = await prisma.user.findUnique({ where: { id: user.id }, select: { plan: true, isActive: true } })
         isMember = !!(dbUser && dbUser.plan !== 'NONE' && dbUser.isActive)
       }
     } catch { /* not logged in */ }
+
+    Object.assign(where, orgWhere)
 
     const items = await prisma.storeItem.findMany({
       where,
@@ -37,7 +43,7 @@ export async function GET(req: NextRequest) {
 
     // Categorías únicas para los filtros
     const allItems = await prisma.storeItem.findMany({
-      where: { active: true },
+      where: { ...orgWhere, active: true },
       select: { category: true },
       distinct: ['category'],
       orderBy: { category: 'asc' },

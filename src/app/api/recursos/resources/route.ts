@@ -4,6 +4,7 @@ import { z } from 'zod'
 import { prisma } from '@/lib/prisma'
 import { getAuthUser } from '@/lib/auth'
 import { isRecursosAdmin } from '@/lib/recursos'
+import { contentOrgWhere } from '@/lib/org-content'
 
 const createSchema = z.object({
   tipo: z.enum(['presentacion', 'libro']),
@@ -25,9 +26,11 @@ export async function GET(req: Request) {
   const tipo = searchParams.get('tipo') || undefined
   const categoria = searchParams.get('categoria') || undefined
   const verTodas = searchParams.get('todos') === '1' && admin
+  const orgWhere = await contentOrgWhere(user.id)
 
   const resources = await (prisma as any).resource.findMany({
     where: {
+      ...orgWhere,
       ...(tipo ? { tipo } : {}),
       ...(categoria ? { categoria } : {}),
       ...(verTodas ? {} : { activo: true }),

@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import { prisma } from '@/lib/prisma'
 import { verifyToken } from '@/lib/auth'
+import { validateOrganizationId } from '@/lib/org-content'
 
 function getAuth() {
   const token = cookies().get('auth_token')?.value
@@ -26,8 +27,13 @@ export async function PATCH(
     if (!await requireAdmin()) return NextResponse.json({ error: 'No autorizado' }, { status: 403 })
 
     const body = await req.json()
+
+    const org = await validateOrganizationId(body.organizationId)
+    if (!org.ok) return NextResponse.json({ error: org.error }, { status: 400 })
+
     const data: any = {}
 
+    if (!org.skip) data.organizationId = org.value
     if (body.title != null) data.title = body.title.trim()
     if (body.description != null) data.description = body.description.trim()
     if (body.category != null) data.category = body.category.trim()

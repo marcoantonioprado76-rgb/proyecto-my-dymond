@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import { prisma } from '@/lib/prisma'
 import { verifyToken } from '@/lib/auth'
+import { validateOrganizationId } from '@/lib/org-content'
 
 function getAuth() {
   const token = cookies().get('auth_token')?.value
@@ -38,11 +39,14 @@ export async function POST(req: NextRequest) {
     if (!await requireAdmin()) return NextResponse.json({ error: 'No autorizado' }, { status: 403 })
 
     const body = await req.json()
-    const { title, description, category, price, memberPrice, pv, stock, images, variants, active } = body
+    const { title, description, category, price, memberPrice, pv, stock, images, variants, active, organizationId } = body
 
     if (!title || !description || price == null || memberPrice == null || memberPrice === '') {
       return NextResponse.json({ error: 'title, description, price y memberPrice son requeridos' }, { status: 400 })
     }
+
+    const org = await validateOrganizationId(organizationId)
+    if (!org.ok) return NextResponse.json({ error: org.error }, { status: 400 })
 
     const item = await prisma.storeItem.create({
       data: {
@@ -56,6 +60,7 @@ export async function POST(req: NextRequest) {
         images: Array.isArray(images) ? images : [],
         variants: Array.isArray(variants) ? variants : [],
         active: active !== false,
+        organizationId: org.skip ? null : org.value,
       },
     })
 

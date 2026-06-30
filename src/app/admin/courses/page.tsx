@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback, useRef } from 'react'
 import { BookOpen, Plus, Edit2, Trash2, Check, X, Loader2, RefreshCw, ExternalLink, Upload } from 'lucide-react'
+import OrgSelector from '@/components/OrgSelector'
 
 //  Types 
 
@@ -25,6 +26,7 @@ interface Course {
   coverUrl: string | null
   price: number
   freeForPlan: boolean
+  organizationId: string | null
   categoria: string | null
   nivel: string | null
   active: boolean
@@ -52,6 +54,7 @@ interface CourseModalData {
   coverUrl: string
   price: string
   freeForPlan: boolean
+  organizationId: string | null
   categoria: string
   nivel: string
   videos: CourseVideo[]
@@ -82,7 +85,7 @@ const STATUS_LABEL: Record<string, string> = {
   REJECTED: 'Rechazado',
 }
 
-const EMPTY_COURSE: CourseModalData = { title: '', description: '', coverUrl: '', price: '', freeForPlan: false, categoria: '', nivel: '', videos: [{ title: '', youtubeUrl: '' }] }
+const EMPTY_COURSE: CourseModalData = { title: '', description: '', coverUrl: '', price: '', freeForPlan: false, organizationId: null, categoria: '', nivel: '', videos: [{ title: '', youtubeUrl: '' }] }
 
 //  Main component 
 
@@ -165,7 +168,7 @@ export default function AdminCoursesPage() {
     const videos = data.videos
       .filter(v => v.title.trim() && (v.youtubeUrl.trim() || v.videoUrl))
       .map(v => ({ ...v, youtubeUrl: v.youtubeUrl.trim(), videoUrl: v.videoUrl || null }))
-    const body = { title: data.title, description: data.description, coverUrl: data.coverUrl || null, price: data.price, freeForPlan: data.freeForPlan, categoria: data.categoria || null, nivel: data.nivel || null, videos }
+    const body = { title: data.title, description: data.description, coverUrl: data.coverUrl || null, price: data.price, freeForPlan: data.freeForPlan, organizationId: data.organizationId ?? null, categoria: data.categoria || null, nivel: data.nivel || null, videos }
 
     const res = mode === 'create'
       ? await fetch('/api/admin/courses', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
@@ -362,6 +365,7 @@ export default function AdminCoursesPage() {
                         coverUrl: c.coverUrl ?? '',
                         price: String(Number(c.price)),
                         freeForPlan: c.freeForPlan,
+                        organizationId: c.organizationId ?? null,
                         categoria: c.categoria ?? '',
                         nivel: c.nivel ?? '',
                         videos: c.videos.length > 0
@@ -596,6 +600,9 @@ export default function AdminCoursesPage() {
                   <option value="Avanzado" style={{ background: '#1a1a1a' }}>Avanzado</option>
                 </select>
               </div>
+            </div>
+            <div style={{ marginBottom: 14 }}>
+              <OrgSelector value={courseModal.data.organizationId} onChange={v => setCourseModal({ ...courseModal, data: { ...courseModal.data, organizationId: v } })} />
             </div>
 
             {/* Free for plan toggle */}

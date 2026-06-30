@@ -4,6 +4,7 @@ import { z } from 'zod'
 import { prisma } from '@/lib/prisma'
 import { getAuthUser } from '@/lib/auth'
 import { zonasSchema, isRecursosAdmin } from '@/lib/recursos'
+import { contentOrgWhere } from '@/lib/org-content'
 
 const createSchema = z.object({
   nombre: z.string().min(1).max(120),
@@ -25,9 +26,10 @@ export async function GET(req: Request) {
   const { searchParams } = new URL(req.url)
   const categoria = searchParams.get('categoria') || undefined
   const verTodas = searchParams.get('todos') === '1' && admin
+  const orgWhere = await contentOrgWhere(user.id)
 
   const templates = await (prisma as any).template.findMany({
-    where: { ...(verTodas ? {} : { activo: true }), ...(categoria ? { categoria } : {}) },
+    where: { ...orgWhere, ...(verTodas ? {} : { activo: true }), ...(categoria ? { categoria } : {}) },
     orderBy: { createdAt: 'desc' },
     select: {
       id: true, nombre: true, categoria: true,

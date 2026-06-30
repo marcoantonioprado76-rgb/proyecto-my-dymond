@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getAuthUser } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { verifyBscTransaction } from '@/lib/blockchain'
+import { viewerOrgId } from '@/lib/org-content'
 
 /** POST /api/courses/[courseId]/enroll */
 export async function POST(
@@ -24,10 +25,16 @@ export async function POST(
 
     const course = await prisma.course.findUnique({
       where: { id: params.courseId },
-      select: { id: true, active: true, freeForPlan: true, price: true },
+      select: { id: true, active: true, freeForPlan: true, price: true, organizationId: true },
     })
 
     if (!course || !course.active) {
+      return NextResponse.json({ error: 'Curso no encontrado' }, { status: 404 })
+    }
+
+    // Aislamiento por empresa: no permitir inscribirse a un curso de otra empresa
+    const oid = await viewerOrgId(user.id)
+    if (((course as any).organizationId ?? null) !== oid) {
       return NextResponse.json({ error: 'Curso no encontrado' }, { status: 404 })
     }
 

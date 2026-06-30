@@ -4,6 +4,7 @@ import { z } from 'zod'
 import { prisma } from '@/lib/prisma'
 import { getAuthUser } from '@/lib/auth'
 import { zonasSchema, isRecursosAdmin } from '@/lib/recursos'
+import { viewerOrgId } from '@/lib/org-content'
 
 // GET /api/recursos/templates/[id]  → una plantilla completa (con zonas) para el editor
 export async function GET(_req: Request, { params }: { params: { id: string } }) {
@@ -12,6 +13,11 @@ export async function GET(_req: Request, { params }: { params: { id: string } })
 
   const template = await (prisma as any).template.findUnique({ where: { id: params.id } })
   if (!template || !template.activo) {
+    return NextResponse.json({ error: 'Plantilla no encontrada' }, { status: 404 })
+  }
+  // Aislamiento por empresa: la plantilla debe pertenecer a la empresa del que mira
+  const oid = await viewerOrgId(user.id)
+  if ((template.organizationId ?? null) !== oid) {
     return NextResponse.json({ error: 'Plantilla no encontrada' }, { status: 404 })
   }
   return NextResponse.json({ template })

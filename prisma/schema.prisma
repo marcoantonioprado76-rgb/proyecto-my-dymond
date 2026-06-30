@@ -946,6 +946,7 @@ model ClippingSnapshot {
 
 model Course {
   id            String             @id @default(uuid()) @db.Uuid
+  organizationId String?           @map("organization_id") @db.Uuid
   title         String
   description   String             @db.Text
   coverUrl      String?            @map("cover_url")
@@ -1139,6 +1140,7 @@ model ClippingPayout {
 
 model StoreItem {
   id          String   @id @default(uuid()) @db.Uuid
+  organizationId String? @map("organization_id") @db.Uuid
   title       String
   description String
   category    String   @default("General")
@@ -1421,6 +1423,7 @@ model AdminOtpCode {
 
 model Podcast {
   id          String   @id @default(uuid()) @db.Uuid
+  organizationId String? @map("organization_id") @db.Uuid
   title       String
   description String?
   coverUrl    String?  @map("cover_url")
@@ -1564,6 +1567,7 @@ model BroadcastLog {
 // `creadoPor` guarda el userId del admin que la creó (sin FK, a propósito).
 model Template {
   id        String   @id @default(uuid()) @db.Uuid
+  organizationId String? @map("organization_id") @db.Uuid
   nombre    String
   categoria String
   ancho     Int
@@ -1583,6 +1587,7 @@ model Template {
 // Sección AISLADA, sin relaciones. tipo = 'presentacion' | 'libro'.
 model Resource {
   id         String   @id @default(uuid()) @db.Uuid
+  organizationId String? @map("organization_id") @db.Uuid
   tipo       String
   titulo     String
   categoria  String

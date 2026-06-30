@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import { prisma } from '@/lib/prisma'
 import { verifyToken } from '@/lib/auth'
+import { validateOrganizationId } from '@/lib/org-content'
 
 function getAuth() {
   const cookieStore = cookies()
@@ -45,7 +46,7 @@ export async function POST(req: NextRequest) {
     if (!await requireAdmin(auth)) return NextResponse.json({ error: 'No autorizado' }, { status: 403 })
 
     const body = await req.json()
-    const { title, description, coverUrl, price, freeForPlan, videos, categoria, nivel } = body
+    const { title, description, coverUrl, price, freeForPlan, videos, categoria, nivel, organizationId } = body
 
     if (!title || !description || price === undefined) {
       return NextResponse.json({ error: 'title, description y price son requeridos' }, { status: 400 })
@@ -56,6 +57,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Precio inválido' }, { status: 400 })
     }
 
+    const org = await validateOrganizationId(organizationId)
+    if (!org.ok) return NextResponse.json({ error: org.error }, { status: 400 })
+
     const course = await prisma.course.create({
       data: {
         title,
@@ -65,6 +69,7 @@ export async function POST(req: NextRequest) {
         freeForPlan: freeForPlan === true,
         categoria: categoria || null,
         nivel: nivel || null,
+        organizationId: org.skip ? null : org.value,
         active: true,
         videos: {
           create: Array.isArray(videos)

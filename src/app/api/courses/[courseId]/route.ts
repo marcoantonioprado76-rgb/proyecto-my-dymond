@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getAuthUser } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { supabaseAdmin } from '@/lib/supabase'
+import { viewerOrgId } from '@/lib/org-content'
 
 const VIDEO_BUCKET = 'course-videos'
 const SIGN_EXPIRY = 60 * 60 * 6 // 6 horas — dura la sesión de visualización
@@ -25,6 +26,12 @@ export async function GET(
     })
 
     if (!course || !course.active) {
+      return NextResponse.json({ error: 'Curso no encontrado' }, { status: 404 })
+    }
+
+    // Aislamiento por empresa: el curso debe pertenecer a la empresa del que mira
+    const oid = await viewerOrgId(user.id)
+    if (((course as any).organizationId ?? null) !== oid) {
       return NextResponse.json({ error: 'Curso no encontrado' }, { status: 404 })
     }
 

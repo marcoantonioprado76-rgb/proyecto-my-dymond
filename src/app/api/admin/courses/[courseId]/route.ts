@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import { prisma } from '@/lib/prisma'
 import { verifyToken } from '@/lib/auth'
+import { validateOrganizationId } from '@/lib/org-content'
 
 function getAuth() {
   const cookieStore = cookies()
@@ -27,7 +28,10 @@ export async function PATCH(
     if (!await requireAdmin(auth)) return NextResponse.json({ error: 'No autorizado' }, { status: 403 })
 
     const body = await req.json()
-    const { title, description, coverUrl, price, active, freeForPlan, videos, categoria, nivel } = body
+    const { title, description, coverUrl, price, active, freeForPlan, videos, categoria, nivel, organizationId } = body
+
+    const org = await validateOrganizationId(organizationId)
+    if (!org.ok) return NextResponse.json({ error: org.error }, { status: 400 })
 
     const data: any = {}
     if (title !== undefined) data.title = title
@@ -38,6 +42,7 @@ export async function PATCH(
     if (freeForPlan !== undefined) data.freeForPlan = freeForPlan === true
     if (categoria !== undefined) data.categoria = categoria || null
     if (nivel !== undefined) data.nivel = nivel || null
+    if (!org.skip) data.organizationId = org.value
 
     // Replace all videos if provided
     if (Array.isArray(videos)) {

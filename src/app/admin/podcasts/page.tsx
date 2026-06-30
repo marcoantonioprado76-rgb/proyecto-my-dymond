@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef } from 'react'
 import { Mic, Plus, Edit2, Trash2, Check, X, Loader2, Upload, Link, Music } from 'lucide-react'
+import OrgSelector from '@/components/OrgSelector'
 
 interface Podcast {
   id: string
@@ -11,6 +12,7 @@ interface Podcast {
   embedUrl: string
   active: boolean
   order: number
+  organizationId: string | null
   createdAt: string
 }
 
@@ -22,10 +24,11 @@ interface PodcastModalData {
   embedUrl: string
   order: string
   active: boolean
+  organizationId: string | null
   mediaMode: 'url' | 'file'
 }
 
-const EMPTY: PodcastModalData = { title: '', description: '', coverUrl: '', embedUrl: '', order: '0', active: true, mediaMode: 'url' }
+const EMPTY: PodcastModalData = { title: '', description: '', coverUrl: '', embedUrl: '', order: '0', active: true, organizationId: null, mediaMode: 'url' }
 
 const AUDIO_EXTS = ['.mp3', '.wav', '.ogg', '.aac', '.m4a']
 function isAudioUrl(url: string) {
@@ -94,6 +97,7 @@ export default function AdminPodcastsPage() {
       embedUrl: data.embedUrl.trim(),
       order: Number(data.order) || 0,
       active: data.active,
+      organizationId: data.organizationId ?? null,
     }
     const url = mode === 'edit' ? `/api/admin/podcasts/${data.id}` : '/api/admin/podcasts'
     const res = await fetch(url, { method: mode === 'edit' ? 'PATCH' : 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
@@ -151,7 +155,7 @@ export default function AdminPodcastsPage() {
                   </p>
                 </div>
                 {/* Actions */}
-                <button onClick={() => { setSaveError(null); setModal({ mode: 'edit', data: { id: p.id, title: p.title, description: p.description ?? '', coverUrl: p.coverUrl ?? '', embedUrl: p.embedUrl, order: String(p.order), active: p.active, mediaMode: isAudioUrl(p.embedUrl) ? 'file' : 'url' } }) }}
+                <button onClick={() => { setSaveError(null); setModal({ mode: 'edit', data: { id: p.id, title: p.title, description: p.description ?? '', coverUrl: p.coverUrl ?? '', embedUrl: p.embedUrl, order: String(p.order), active: p.active, organizationId: p.organizationId ?? null, mediaMode: isAudioUrl(p.embedUrl) ? 'file' : 'url' } }) }}
                   style={{ padding: '6px 10px', borderRadius: 8, background: '#F0F3F7', border: '1px solid rgba(255,255,255,0.08)', cursor: 'pointer' }}>
                   <Edit2 size={13} className="text-[#111827]/50" />
                 </button>
@@ -291,6 +295,8 @@ export default function AdminPodcastsPage() {
                   {modal.data.active ? <><Check size={12} /> Activo</> : <><X size={12} /> Oculto</>}
                 </button>
               </div>
+
+              <OrgSelector value={modal.data.organizationId} onChange={v => setModal({ ...modal, data: { ...modal.data, organizationId: v } })} />
 
               {saveError && <p style={{ fontSize: 12, color: '#ef4444' }}>{saveError}</p>}
 

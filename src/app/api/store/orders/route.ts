@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getAuthUser } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { verifyBscTransaction } from '@/lib/blockchain'
+import { viewerOrgId } from '@/lib/org-content'
 
 /** POST /api/store/orders — crear pedido desde carrito */
 export async function POST(req: NextRequest) {
@@ -47,6 +48,12 @@ export async function POST(req: NextRequest) {
     })
 
     if (dbItems.length !== cartItems.length) {
+      return NextResponse.json({ error: 'Uno o más productos no están disponibles' }, { status: 400 })
+    }
+
+    // Aislamiento por empresa: no permitir comprar productos de otra empresa
+    const oid = await viewerOrgId(user.id)
+    if (dbItems.some(d => ((d as any).organizationId ?? null) !== oid)) {
       return NextResponse.json({ error: 'Uno o más productos no están disponibles' }, { status: 400 })
     }
 

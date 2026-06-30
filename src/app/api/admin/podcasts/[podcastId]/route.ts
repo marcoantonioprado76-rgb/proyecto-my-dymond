@@ -2,6 +2,7 @@ export const dynamic = 'force-dynamic'
 import { NextRequest, NextResponse } from 'next/server'
 import { getAuthUser } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { validateOrganizationId } from '@/lib/org-content'
 
 export async function PATCH(
   req: NextRequest,
@@ -12,6 +13,10 @@ export async function PATCH(
     if (!user?.isAdmin) return NextResponse.json({ error: 'No autorizado' }, { status: 403 })
 
     const body = await req.json()
+
+    const org = await validateOrganizationId(body.organizationId)
+    if (!org.ok) return NextResponse.json({ error: org.error }, { status: 400 })
+
     const data: any = {}
     if (body.title !== undefined)       data.title       = body.title.trim()
     if (body.description !== undefined) data.description = body.description?.trim() || null
@@ -19,6 +24,7 @@ export async function PATCH(
     if (body.embedUrl !== undefined)    data.embedUrl    = body.embedUrl.trim()
     if (body.order !== undefined)       data.order       = Number(body.order)
     if (body.active !== undefined)      data.active      = Boolean(body.active)
+    if (!org.skip)                      data.organizationId = org.value
 
     const podcast = await (prisma as any).podcast.update({
       where: { id: params.podcastId },

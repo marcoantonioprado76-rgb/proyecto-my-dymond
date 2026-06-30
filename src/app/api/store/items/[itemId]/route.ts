@@ -2,6 +2,7 @@ export const dynamic = 'force-dynamic'
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { getAuthUser } from '@/lib/auth'
+import { viewerOrgId } from '@/lib/org-content'
 
 /** GET /api/store/items/[itemId] — detalle del item */
 export async function GET(
@@ -18,13 +19,21 @@ export async function GET(
     }
 
     let isMember = false
+    // Aislamiento por empresa: sin sesión el que mira es de plataforma (NULL)
+    let oid: string | null = null
     try {
       const user = await getAuthUser()
       if (user) {
+        oid = await viewerOrgId(user.id)
         const dbUser = await prisma.user.findUnique({ where: { id: user.id }, select: { plan: true, isActive: true } })
         isMember = !!(dbUser && dbUser.plan !== 'NONE' && dbUser.isActive)
       }
     } catch { /* not logged in */ }
+
+    // El item debe pertenecer a la empresa del que mira
+    if (((item as any).organizationId ?? null) !== oid) {
+      return NextResponse.json({ error: 'Producto no encontrado' }, { status: 404 })
+    }
 
     const effectivePrice = isMember && item.memberPrice != null ? Number(item.memberPrice) : Number(item.price)
 

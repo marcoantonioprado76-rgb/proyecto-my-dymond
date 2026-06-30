@@ -2,6 +2,7 @@ export const dynamic = 'force-dynamic'
 import { NextRequest, NextResponse } from 'next/server'
 import { getAuthUser } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { validateOrganizationId } from '@/lib/org-content'
 
 export async function GET() {
   try {
@@ -23,10 +24,13 @@ export async function POST(req: NextRequest) {
     const user = await getAuthUser()
     if (!user?.isAdmin) return NextResponse.json({ error: 'No autorizado' }, { status: 403 })
 
-    const { title, description, coverUrl, embedUrl, order } = await req.json()
+    const { title, description, coverUrl, embedUrl, order, organizationId } = await req.json()
     if (!title?.trim() || !embedUrl?.trim()) {
       return NextResponse.json({ error: 'Título y URL son obligatorios' }, { status: 400 })
     }
+
+    const org = await validateOrganizationId(organizationId)
+    if (!org.ok) return NextResponse.json({ error: org.error }, { status: 400 })
 
     const podcast = await (prisma as any).podcast.create({
       data: {
@@ -35,6 +39,7 @@ export async function POST(req: NextRequest) {
         coverUrl: coverUrl?.trim() || null,
         embedUrl: embedUrl.trim(),
         order: Number(order) || 0,
+        organizationId: org.skip ? null : org.value,
       },
     })
     return NextResponse.json({ podcast })

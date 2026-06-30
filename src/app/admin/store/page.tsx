@@ -2,11 +2,13 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { RefreshCw, Loader2, Plus, Trash2, Edit2, X, Upload } from 'lucide-react'
+import OrgSelector from '@/components/OrgSelector'
 
 interface StoreItem {
   id: string; title: string; description: string; category: string
   price: number; memberPrice: number | null; images: string[]; stock: number
   variants: { name: string; options: string[] }[]; active: boolean
+  organizationId: string | null
 }
 
 interface OrderItem {
@@ -43,7 +45,7 @@ const STATUS_BADGE: Record<string, string> = {
 
 const CATEGORIES = ['Suplementos', 'Ropa', 'Accesorios', 'Bienestar', 'Belleza', 'Nutrición', 'Tecnología', 'Hogar', 'General', 'Otra']
 
-const EMPTY_ITEM = { title: '', description: '', category: 'General', customCategory: '', price: '', memberPrice: '', stock: '0', images: [''], variants: [] as { name: string; options: string }[], active: true }
+const EMPTY_ITEM = { title: '', description: '', category: 'General', customCategory: '', price: '', memberPrice: '', stock: '0', images: [''], variants: [] as { name: string; options: string }[], active: true, organizationId: null as string | null }
 
 const INPUT = 'w-full bg-[#F4F6FA] border border-[#E4E9F0] rounded-lg px-3 py-2 text-[#111827] text-sm outline-none'
 const LABEL = 'block text-[11px] text-[#111827]/40 mb-1'
@@ -99,6 +101,7 @@ export default function AdminStorePage() {
       images: item.images.length ? item.images : [''],
       variants: item.variants.map(v => ({ name: v.name, options: v.options.join(', ') })),
       active: item.active,
+      organizationId: item.organizationId ?? null,
     })
     setItemError(''); setItemModal(true)
   }
@@ -144,6 +147,7 @@ export default function AdminStorePage() {
       images: form.images.filter(s => s.trim()),
       variants: form.variants.filter(v => v.name.trim()).map(v => ({ name: v.name.trim(), options: v.options.split(',').map(o => o.trim()).filter(Boolean) })),
       active: form.active,
+      organizationId: form.organizationId ?? null,
     }
     const url = editingItem ? `/api/admin/store/items/${editingItem.id}` : '/api/admin/store/items'
     const method = editingItem ? 'PATCH' : 'POST'
@@ -496,6 +500,8 @@ export default function AdminStorePage() {
                 <input type="checkbox" id="active-toggle" checked={form.active} onChange={e => setF('active', e.target.checked)} style={{ width: 16, height: 16, cursor: 'pointer' }} />
                 <label htmlFor="active-toggle" style={{ fontSize: 13, color: '#6B7280', cursor: 'pointer' }}>Producto activo (visible en la tienda)</label>
               </div>
+
+              <OrgSelector value={form.organizationId} onChange={v => setForm(f => ({ ...f, organizationId: v }))} />
 
               <button onClick={saveItem} disabled={saving}
                 style={{ padding: '12px 0', borderRadius: 10, fontWeight: 700, fontSize: 14, cursor: saving ? 'not-allowed' : 'pointer', border: 'none',

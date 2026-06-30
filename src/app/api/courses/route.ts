@@ -2,6 +2,7 @@ export const dynamic = 'force-dynamic'
 import { NextResponse } from 'next/server'
 import { getAuthUser } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { contentOrgWhere } from '@/lib/org-content'
 
 /** GET /api/courses — lista cursos activos con estado de inscripción del usuario */
 export async function GET() {
@@ -10,9 +11,10 @@ export async function GET() {
     if (!user) return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
 
     const hasPlan = user.plan !== 'NONE'
+    const orgWhere = await contentOrgWhere(user.id)
 
     const courses = await prisma.course.findMany({
-      where: { active: true },
+      where: { ...orgWhere, active: true },
       orderBy: { createdAt: 'desc' },
       select: {
         id: true,

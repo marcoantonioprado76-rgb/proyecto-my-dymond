@@ -4,6 +4,7 @@ import { z } from 'zod'
 import { prisma } from '@/lib/prisma'
 import { getAuthUser } from '@/lib/auth'
 import { isRecursosAdmin } from '@/lib/recursos'
+import { viewerOrgId } from '@/lib/org-content'
 
 // GET /api/recursos/resources/[id]  → una presentación/libro (para el visor)
 export async function GET(_req: Request, { params }: { params: { id: string } }) {
@@ -12,6 +13,11 @@ export async function GET(_req: Request, { params }: { params: { id: string } })
 
   const resource = await (prisma as any).resource.findUnique({ where: { id: params.id } })
   if (!resource || !resource.activo) {
+    return NextResponse.json({ error: 'Recurso no encontrado' }, { status: 404 })
+  }
+  // Aislamiento por empresa: el recurso debe pertenecer a la empresa del que mira
+  const oid = await viewerOrgId(user.id)
+  if ((resource.organizationId ?? null) !== oid) {
     return NextResponse.json({ error: 'Recurso no encontrado' }, { status: 404 })
   }
   return NextResponse.json({ resource })
