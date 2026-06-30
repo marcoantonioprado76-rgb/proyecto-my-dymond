@@ -378,7 +378,10 @@ function FlyersTab() {
               <div style={{ padding: '10px 12px' }}>
                 <p style={{ fontWeight: 700, fontSize: 13, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{f.nombre}</p>
                 <p style={{ fontSize: 11, color: '#8A93A2', marginBottom: 8 }}>{f.categoria}</p>
-                <button onClick={() => setDelId(f.id)} style={{ ...iconBtn, color: '#ef4444', width: '100%' }}><i className="fa-solid fa-trash" /></button>
+                <div style={{ display: 'flex', gap: 6 }}>
+                  <a href={`/empresa/flyer/nuevo?id=${f.id}`} title="Editar" style={{ ...iconBtn, flex: 1, display: 'grid', placeItems: 'center', textDecoration: 'none' }}><i className="fa-solid fa-pen" /></a>
+                  <button onClick={() => setDelId(f.id)} title="Eliminar" style={{ ...iconBtn, flex: 1, color: '#ef4444' }}><i className="fa-solid fa-trash" /></button>
+                </div>
               </div>
             </div>
           ))}

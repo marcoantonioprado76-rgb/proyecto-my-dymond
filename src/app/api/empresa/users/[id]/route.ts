@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getOrgAdmin, unauthorizedOrg } from '@/lib/org-auth'
 import { prisma } from '@/lib/prisma'
 import { reactivateUserAssetsAfterPlanRenewal } from '@/lib/plan-lifecycle'
+import { createNotification } from '@/lib/notifications'
 
 /**
  * PATCH /api/empresa/users/[id]
@@ -84,6 +85,16 @@ export async function PATCH(
       await prisma.$executeRaw`
         UPDATE users SET is_active = ${!!isActive} WHERE id = ${userId}::uuid
       `
+    }
+
+    // Avisar al usuario si se le activó/renovó el plan.
+    if ((plan && plan !== 'NONE') || (addDays && parseInt(addDays) > 0)) {
+      await createNotification(
+        userId,
+        '¡Tu cuenta fue activada! 🎉',
+        'Tu empresa activó tu acceso. Ya podés usar la plataforma.',
+        '/dashboard'
+      ).catch(() => {})
     }
 
     // Devolver usuario actualizado

@@ -14,6 +14,7 @@ const newId = () => `t${++counter}_${Date.now()}`
 
 export default function NuevoFlyerPage() {
   const [guardOk, setGuardOk] = useState(false)
+  const [editId, setEditId] = useState<string | null>(null)
   const [fondoUrl, setFondoUrl] = useState('')
   const [ancho, setAncho] = useState(0)
   const [alto, setAlto] = useState(0)
@@ -32,6 +33,17 @@ export default function NuevoFlyerPage() {
     fetch('/api/plan-status').then(r => r.json()).then(d => {
       if (d.orgRole !== 'ORG_ADMIN') { window.location.href = '/dashboard'; return }
       setGuardOk(true)
+      const id = new URLSearchParams(window.location.search).get('id')
+      if (id) {
+        setEditId(id)
+        fetch(`/api/empresa/content/flyers/${id}`).then(r => r.json()).then(dd => {
+          const f = dd.flyer
+          if (!f) return
+          setNombre(f.nombre); setCategoria(f.categoria); setFondoUrl(f.fondoUrl); setAncho(f.ancho); setAlto(f.alto)
+          setTexts(Array.isArray(f.zonas?.texts) ? f.zonas.texts.map((t: any) => ({ ...t })) : [])
+          setPhoto(f.zonas?.photo ?? null)
+        }).catch(() => {})
+      }
     }).catch(() => { window.location.href = '/dashboard' })
   }, [])
 
@@ -83,7 +95,7 @@ export default function NuevoFlyerPage() {
     if (!nombre.trim()) { setErr('Ponele un nombre al flyer'); return }
     setSaving(true); setErr('')
     const body = { nombre: nombre.trim(), categoria, ancho, alto, fondoUrl, zonas: { photo, texts } }
-    const r = await fetch('/api/empresa/content/flyers', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
+    const r = await fetch(editId ? `/api/empresa/content/flyers/${editId}` : '/api/empresa/content/flyers', { method: editId ? 'PATCH' : 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
     const d = await r.json().catch(() => ({}))
     setSaving(false)
     if (!r.ok) { setErr(d.error || 'No se pudo guardar'); return }
@@ -97,7 +109,7 @@ export default function NuevoFlyerPage() {
   return (
     <div style={{ minHeight: '100vh', background: 'linear-gradient(180deg,#F5F7FB,#EEF1F8)', color: '#0B1B2B' }}>
       <header style={{ background: 'linear-gradient(135deg,#0B1B2B,#050B14)', color: '#fff', padding: '14px 22px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <p style={{ fontWeight: 800, fontSize: 15 }}>Nuevo flyer</p>
+        <p style={{ fontWeight: 800, fontSize: 15 }}>{editId ? 'Editar flyer' : 'Nuevo flyer'}</p>
         <a href="/empresa/contenido" style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)', color: '#fff', padding: '8px 14px', borderRadius: 10, fontSize: 13, fontWeight: 600, textDecoration: 'none' }}><i className="fa-solid fa-arrow-left" style={{ marginRight: 6 }} />Volver</a>
       </header>
 

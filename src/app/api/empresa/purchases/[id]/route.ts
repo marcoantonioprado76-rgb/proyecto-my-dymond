@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getOrgAdmin, unauthorizedOrg } from '@/lib/org-auth'
 import { prisma } from '@/lib/prisma'
 import { reactivateUserAssetsAfterPlanRenewal } from '@/lib/plan-lifecycle'
+import { createNotification } from '@/lib/notifications'
 
 /**
  * PATCH /api/empresa/purchases/[id]
@@ -63,6 +64,14 @@ export async function PATCH(
         await reactivateUserAssetsAfterPlanRenewal(targetUserId, tx)
       })
 
+      // Avisar al usuario que su empresa lo activó.
+      await createNotification(
+        targetUserId,
+        '¡Tu cuenta fue activada! 🎉',
+        'Tu empresa aprobó tu pago y activó tu acceso. Ya podés usar la plataforma.',
+        '/dashboard'
+      ).catch(() => {})
+
       return NextResponse.json({ success: true })
     }
 
@@ -75,6 +84,12 @@ export async function PATCH(
             notes = COALESCE(${notes ?? null}, notes)
         WHERE id = ${reqId}::uuid
       `
+      await createNotification(
+        purchaseRequest.userId,
+        'Tu comprobante fue revisado',
+        'Tu empresa revisó tu pago. Si hubo un problema, volvé a enviar el comprobante o contactala.',
+        '/planes'
+      ).catch(() => {})
       return NextResponse.json({ success: true })
     }
 

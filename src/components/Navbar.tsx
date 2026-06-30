@@ -44,6 +44,8 @@ export default function Navbar() {
   const [showExtras, setShowExtras] = useState(false)
   // "Mi Empresa": acceso al panel de admin de empresa (solo orgRole ORG_ADMIN).
   const [isOrgAdmin, setIsOrgAdmin] = useState(false)
+  // Solicitudes de pago pendientes (badge para el admin de empresa).
+  const [orgPending, setOrgPending] = useState(0)
   // Marca de la empresa (Pack Empresarial) para los usuarios de empresa.
   const [org, setOrg] = useState<{ name: string; logoUrl: string | null } | null>(null)
   useEffect(() => {
@@ -53,6 +55,9 @@ export default function Navbar() {
         setShowExtras(!!d.faseGlobal || !!d.accessExtras)
         setIsOrgAdmin(d.orgRole === 'ORG_ADMIN')
         if (d.organizationId && d.orgName) setOrg({ name: d.orgName, logoUrl: d.orgLogoUrl ?? null })
+        if (d.orgRole === 'ORG_ADMIN') {
+          fetch('/api/empresa/purchases').then(r => r.json()).then(p => setOrgPending((p.requests || []).filter((x: { status: string }) => x.status === 'PENDING').length)).catch(() => {})
+        }
       })
       .catch(() => {})
   }, [])
@@ -136,7 +141,9 @@ export default function Navbar() {
             <a href="/empresa" className="nav-item">
               <span className="nav-item__icon" style={{ color: '#fff', background: 'linear-gradient(145deg,#FF2D95,#B735B8)' }}><i className="fa-solid fa-building"></i></span>
               <span className="nav-item__label">Mi Empresa</span>
-              <span className="nav-item__dot"></span>
+              {orgPending > 0
+                ? <span style={{ marginLeft: 'auto', background: '#ef4444', color: '#fff', borderRadius: 999, fontSize: 11, fontWeight: 800, minWidth: 18, height: 18, display: 'inline-grid', placeItems: 'center', padding: '0 5px' }}>{orgPending}</span>
+                : <span className="nav-item__dot"></span>}
             </a>
           )}
           <Link href="/dashboard/settings" className={`nav-item ${pathname === '/dashboard/settings' ? 'nav-item--active' : ''}`}>

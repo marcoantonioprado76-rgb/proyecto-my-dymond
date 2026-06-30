@@ -44,6 +44,7 @@ export default function EmpresaPage() {
   const [customDays, setCustomDays] = useState('')
   const [removeModal, setRemoveModal] = useState<OrgUser | null>(null)
   const [copied, setCopied] = useState(false)
+  const [pendingCount, setPendingCount] = useState(0)
 
   const inviteLink = org ? `${typeof window !== 'undefined' ? window.location.origin : ''}/registro/${org.slug}` : ''
   function copyInvite() {
@@ -58,6 +59,7 @@ export default function EmpresaPage() {
         if (d.orgRole !== 'ORG_ADMIN') { window.location.href = '/dashboard'; return }
         setGuardOk(true)
         loadUsers()
+        fetch('/api/empresa/purchases').then(r => r.json()).then(d => setPendingCount((d.requests || []).filter((x: { status: string }) => x.status === 'PENDING').length)).catch(() => {})
       })
       .catch(() => { window.location.href = '/dashboard' })
   }, [])
@@ -140,7 +142,10 @@ export default function EmpresaPage() {
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
           <a href="/empresa/contenido" style={navLink}><i className="fa-solid fa-layer-group" style={{ marginRight: 6 }} />Mi Contenido</a>
-          <a href="/empresa/solicitudes" style={navLink}><i className="fa-solid fa-receipt" style={{ marginRight: 6 }} />Solicitudes</a>
+          <a href="/empresa/solicitudes" style={{ ...navLink, position: 'relative' }}>
+            <i className="fa-solid fa-receipt" style={{ marginRight: 6 }} />Solicitudes
+            {pendingCount > 0 && <span style={{ position: 'absolute', top: -6, right: -6, background: '#ef4444', color: '#fff', borderRadius: 999, fontSize: 11, fontWeight: 800, minWidth: 18, height: 18, display: 'grid', placeItems: 'center', padding: '0 5px' }}>{pendingCount}</span>}
+          </a>
           <a href="/empresa/reportes" style={navLink}><i className="fa-solid fa-chart-simple" style={{ marginRight: 6 }} />Reportes</a>
           <a href="/empresa/cobro" style={navLink}><i className="fa-solid fa-wallet" style={{ marginRight: 6 }} />Cobro y marca</a>
           <button onClick={logout} style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)', color: 'rgba(255,180,180,0.95)', padding: '8px 14px', borderRadius: 10, cursor: 'pointer', fontWeight: 600, fontSize: 13 }}>
