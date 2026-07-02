@@ -153,9 +153,9 @@ export default function PodcastDetailPage() {
                     <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.6)', fontVariantNumeric: 'tabular-nums' }}>{fmt(cur)} / {fmt(dur)}</span>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, width: 130 }}>
                       <i className="fa-solid fa-volume-high" style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)' }} />
-                      <input type="range" min={0} max={1} step={0.01} value={vol}
+                      <input type="range" min={0} max={1} step={0.01} value={vol} className="dm-vol"
                         onChange={e => { const v = parseFloat(e.target.value); setVol(v); if (audioRef.current) audioRef.current.volume = v }}
-                        style={{ flex: 1, accentColor: '#B735B8', height: 4 }} />
+                        style={{ flex: 1, ['--pct' as any]: `${vol * 100}%` }} />
                     </div>
                   </div>
                 </div>

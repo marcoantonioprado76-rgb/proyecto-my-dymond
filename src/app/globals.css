@@ -195,3 +195,45 @@
 @keyframes dm-shine {
   to { transform: translateX(280%) skewX(-20deg); }
 }
+
+/* Slider de volumen fino (reproductor de podcast). Usa --pct para el relleno. */
+.dm-vol {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+  height: 14px;
+}
+.dm-vol::-webkit-slider-runnable-track {
+  height: 4px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #B735B8 var(--pct, 100%), rgba(255,255,255,0.18) var(--pct, 100%));
+}
+.dm-vol::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  margin-top: -4px;
+  border-radius: 50%;
+  background: #fff;
+  border: 2px solid #B735B8;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.45);
+}
+.dm-vol::-moz-range-track {
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.18);
+}
+.dm-vol::-moz-range-progress {
+  height: 4px;
+  border-radius: 999px;
+  background: #B735B8;
+}
+.dm-vol::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #fff;
+  border: 2px solid #B735B8;
+}
