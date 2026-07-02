@@ -672,12 +672,14 @@ model AdStrategy {
   isGlobal      Boolean        @default(true) @map("is_global")
   savedByUser   Boolean        @default(false) @map("saved_by_user")
   userId        String?        @map("user_id") @db.Uuid
+  briefId       String?        @map("brief_id") @db.Uuid
   sortOrder     Int            @default(0) @map("sort_order")
   isActive      Boolean        @default(true) @map("is_active")
   createdAt     DateTime       @default(now()) @map("created_at")
   campaigns     AdCampaignV2[]
 
   @@index([platform, isActive])
+  @@index([userId, briefId])
   @@map("ad_strategies")
 }
 
@@ -685,10 +687,16 @@ model AdCampaignV2 {
   id                 String              @id @default(uuid()) @db.Uuid
   userId             String              @map("user_id") @db.Uuid
   briefId            String              @map("brief_id") @db.Uuid
-  strategyId         String              @map("strategy_id") @db.Uuid
+  strategyId         String?             @map("strategy_id") @db.Uuid
   connectedAccountId String?             @map("connected_account_id") @db.Uuid
   platform           AdPlatform
   name               String
+  // Snapshot de la estrategia (la campaña es autónoma desde que se crea)
+  objective          String?
+  destination        String?
+  mediaType          String?             @map("media_type")
+  mediaCount         Int?                @map("media_count")
+  strategyName       String?             @map("strategy_name")
   status             CampaignStatus      @default(DRAFT)
   dailyBudgetUSD     Float               @default(0) @map("daily_budget_usd")
   locations          String[]
@@ -706,7 +714,7 @@ model AdCampaignV2 {
   updatedAt          DateTime            @updatedAt @map("updated_at")
   user               User                @relation(fields: [userId], references: [id], onDelete: Cascade)
   brief              BusinessBrief       @relation(fields: [briefId], references: [id])
-  strategy           AdStrategy          @relation(fields: [strategyId], references: [id])
+  strategy           AdStrategy?         @relation(fields: [strategyId], references: [id], onDelete: SetNull)
   connectedAccount   AdConnectedAccount? @relation(fields: [connectedAccountId], references: [id])
   creatives          AdCreative[]
 
