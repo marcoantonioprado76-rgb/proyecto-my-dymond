@@ -156,7 +156,8 @@ export default function ResourcesAdmin({ tipo }: { tipo: 'presentacion' | 'libro
       <div className="flex items-center justify-between gap-4 mb-5">
         <p className="text-xs text-[#6B7280]">{items.length} {items.length === 1 ? l.sing : l.plur}. Sube el PDF; la portada y el nº de páginas se generan solos.</p>
         <button onClick={() => setOpen(o => !o)}
-          className="shrink-0 flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold text-white bg-[#B735B8] hover:opacity-90 transition-all">
+          className="shrink-0 flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold text-white hover:opacity-90 transition-all"
+          style={{ background: 'linear-gradient(135deg,#FF2D95 0%,#B735B8 48%,#233B8F 100%)' }}>
           <Plus size={15} /> {open ? 'Cerrar' : `Nuevo`}
         </button>
       </div>
@@ -212,7 +213,8 @@ export default function ResourcesAdmin({ tipo }: { tipo: 'presentacion' | 'libro
           <div className="flex gap-2 justify-end">
             <button type="button" onClick={resetForm} className="px-4 py-2.5 rounded-xl text-sm font-bold text-[#6B7280] bg-[#F0F3F7] hover:bg-[#E4E9F0] transition-all">Cancelar</button>
             <button type="submit" disabled={saving || analizando}
-              className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold text-white bg-[#B735B8] hover:opacity-90 transition-all disabled:opacity-50">
+              className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold text-white hover:opacity-90 transition-all disabled:opacity-50"
+              style={{ background: 'linear-gradient(135deg,#FF2D95 0%,#B735B8 48%,#233B8F 100%)' }}>
               {saving ? <><Loader2 size={14} className="animate-spin" /> Subiendo…</> : <>Guardar {l.sing}</>}
             </button>
           </div>

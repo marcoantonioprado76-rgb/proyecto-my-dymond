@@ -102,7 +102,8 @@ export default function AreasManager() {
               placeholder="Nueva área (ej. Promociones)"
               className="flex-1 px-3 py-2 rounded-xl bg-[#F0F3F7] border border-[#E4E9F0] text-sm text-[#111827] placeholder-[#9CA3AF] focus:border-[#B735B8] outline-none" />
             <button type="submit" disabled={adding || !nuevo.trim()}
-              className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-bold text-white bg-[#B735B8] hover:opacity-90 transition-all disabled:opacity-50">
+              className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-bold text-white hover:opacity-90 transition-all disabled:opacity-50"
+              style={{ background: 'linear-gradient(135deg,#FF2D95 0%,#B735B8 48%,#233B8F 100%)' }}>
               {adding ? <Loader2 size={14} className="animate-spin" /> : <Plus size={15} />} Agregar
             </button>
           </form>

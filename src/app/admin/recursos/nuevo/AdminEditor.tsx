@@ -291,7 +291,8 @@ export default function AdminEditor() {
           </div>
 
           <button onClick={save} disabled={saving}
-            className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-black text-white bg-purple-600 hover:bg-purple-500 transition-all active:scale-95 disabled:opacity-60">
+            className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-black text-white hover:opacity-90 transition-all active:scale-95 disabled:opacity-60"
+            style={{ background: 'linear-gradient(135deg,#FF2D95 0%,#B735B8 48%,#233B8F 100%)' }}>
             {saving ? <><i className="fa-solid fa-spinner fa-spin"></i> Guardando…</> : <><i className="fa-solid fa-check"></i> Guardar plantilla</>}
           </button>
           {error && <p className="text-red-400 text-xs text-center">{error}</p>}
