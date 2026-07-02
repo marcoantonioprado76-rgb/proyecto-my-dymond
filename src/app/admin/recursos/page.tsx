@@ -68,7 +68,7 @@ export default function AdminRecursosPage() {
       <div className="flex items-center justify-between gap-4 mb-6">
         <p className="text-xs text-[#111827]/40">{items.length} plantilla(s). Acá subís y administrás las plantillas editables (flyers).</p>
         <Link href="/admin/recursos/nuevo"
-          className="shrink-0 flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold text-[#111827] bg-purple-600 hover:bg-purple-500 transition-all">
+          className="shrink-0 flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold text-white bg-[#B735B8] hover:opacity-90 transition-all">
           <Plus size={15} /> Nueva plantilla
         </Link>
       </div>
@@ -83,21 +83,21 @@ export default function AdminRecursosPage() {
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
           {items.map(t => (
             <div key={t.id} className="rounded-2xl overflow-hidden border border-[#E4E9F0] bg-white">
-              <div className="relative w-full bg-black/30" style={{ aspectRatio: `${t.ancho} / ${t.alto}` }}>
+              <div className="relative w-full bg-[#F0F3F7]" style={{ aspectRatio: `${t.ancho} / ${t.alto}` }}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={t.thumbUrl || t.fondoUrl} alt={t.nombre} className="w-full h-full object-cover" loading="lazy" />
-                {!t.activo && <span className="absolute top-2 left-2 text-[9px] font-black px-2 py-0.5 rounded-full bg-black/70 text-white/70">OCULTA</span>}
+                {!t.activo && <span className="absolute top-2 left-2 text-[9px] font-black px-2 py-0.5 rounded-full bg-[#0B1B2B]/80 text-white">OCULTA</span>}
               </div>
               <div className="p-2.5">
                 <p className="text-xs font-bold text-[#111827] truncate">{t.nombre}</p>
                 <p className="text-[10px] text-[#111827]/35 capitalize mb-2">{t.categoria}</p>
                 <div className="flex gap-1.5">
                   <button onClick={() => toggle(t)} disabled={busy === t.id}
-                    className={`flex-1 flex items-center justify-center gap-1 py-1.5 rounded-lg text-[10px] font-bold transition-all disabled:opacity-50 ${t.activo ? 'bg-amber-500/15 text-amber-300 border border-amber-500/25' : 'bg-green-500/15 text-green-300 border border-green-500/25'}`}>
+                    className={`flex-1 flex items-center justify-center gap-1 py-1.5 rounded-lg text-[10px] font-bold transition-all disabled:opacity-50 ${t.activo ? 'bg-amber-500/15 text-amber-600 border border-amber-500/30' : 'bg-emerald-500/15 text-emerald-600 border border-emerald-500/30'}`}>
                     {t.activo ? <><EyeOff size={11} /> Ocultar</> : <><Eye size={11} /> Activar</>}
                   </button>
                   <button onClick={() => remove(t)} disabled={busy === t.id}
-                    className="px-2.5 py-1.5 rounded-lg text-red-300 bg-red-500/15 border border-red-500/25 transition-all disabled:opacity-50">
+                    className="px-2.5 py-1.5 rounded-lg text-red-500 bg-red-500/10 border border-red-500/20 transition-all disabled:opacity-50">
                     <Trash2 size={11} />
                   </button>
                 </div>

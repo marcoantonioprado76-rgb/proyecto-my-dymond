@@ -12,13 +12,13 @@ const TABS = [
 export default function RecursosTabs() {
   const pathname = usePathname()
   return (
-    <div className="flex gap-1 mb-6 border-b border-white/10">
+    <div className="flex gap-1 mb-6 border-b border-[#E4E9F0]">
       {TABS.map(t => {
         const active = pathname === t.href
         return (
           <Link key={t.href} href={t.href}
             className={`flex items-center gap-2 px-4 py-2.5 text-sm font-bold border-b-2 -mb-px transition-all ${
-              active ? 'border-[#D203DD] text-white' : 'border-transparent text-white/45 hover:text-white/80'
+              active ? 'border-[#B735B8] text-[#111827]' : 'border-transparent text-[#9CA3AF] hover:text-[#6B7280]'
             }`}>
             <i className={`fa-solid ${t.icon} text-xs`}></i> {t.label}
           </Link>
