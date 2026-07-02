@@ -264,33 +264,33 @@ export default function CountryMapSelector({ selected, onChange }: Props) {
     return (
         <div className="space-y-3">
             {/* Map container */}
-            <div className="relative bg-white border border-[#E4E9F0] rounded-2xl overflow-hidden">
+            <div className="relative bg-[#070714] border border-white/8 rounded-2xl overflow-hidden">
                 {/* Zoom controls */}
                 <div className="absolute top-2 right-2 z-10 flex flex-col gap-1">
                     <button
                         onClick={() => setZoom(z => Math.min(z * 1.6, 12))}
-                        className="w-7 h-7 rounded-lg bg-white/90 border border-[#E4E9F0] shadow-sm flex items-center justify-center hover:bg-[#F0F3F7] text-[#6B7280] hover:text-[#111827] transition-all"
+                        className="w-7 h-7 rounded-lg bg-black/60 border border-white/10 flex items-center justify-center hover:bg-white/10 text-white/60 hover:text-white transition-all"
                     ><ZoomIn size={13} /></button>
                     <button
                         onClick={() => setZoom(z => Math.max(z / 1.6, 1))}
-                        className="w-7 h-7 rounded-lg bg-white/90 border border-[#E4E9F0] shadow-sm flex items-center justify-center hover:bg-[#F0F3F7] text-[#6B7280] hover:text-[#111827] transition-all"
+                        className="w-7 h-7 rounded-lg bg-black/60 border border-white/10 flex items-center justify-center hover:bg-white/10 text-white/60 hover:text-white transition-all"
                     ><ZoomOut size={13} /></button>
                     <button
                         onClick={() => { setZoom(1); setCenter([0, 20]) }}
-                        className="w-7 h-7 rounded-lg bg-white/90 border border-[#E4E9F0] shadow-sm flex items-center justify-center hover:bg-[#F0F3F7] text-[#6B7280] hover:text-[#111827] transition-all"
+                        className="w-7 h-7 rounded-lg bg-black/60 border border-white/10 flex items-center justify-center hover:bg-white/10 text-white/60 hover:text-white transition-all"
                     ><RotateCcw size={11} /></button>
                 </div>
 
                 {/* Tooltip */}
                 {tooltip && (
-                    <div className="absolute top-2 left-2 z-10 px-2 py-1 bg-white/95 border border-[#E4E9F0] shadow-sm rounded-lg text-[11px] text-[#111827] pointer-events-none">
+                    <div className="absolute top-2 left-2 z-10 px-2 py-1 bg-black/80 border border-white/10 rounded-lg text-[11px] text-white pointer-events-none">
                         {tooltip}
                     </div>
                 )}
 
                 {/* Hint */}
                 {!showCities && (
-                    <div className="absolute bottom-2 left-2 z-10 text-[10px] text-[#9CA3AF] pointer-events-none">
+                    <div className="absolute bottom-2 left-2 z-10 text-[10px] text-white/20 pointer-events-none">
                         Acerca el mapa para ver ciudades
                     </div>
                 )}
@@ -322,9 +322,9 @@ export default function CountryMapSelector({ selected, onChange }: Props) {
                                             onMouseEnter={() => setTooltip(info?.name || null)}
                                             onMouseLeave={() => setTooltip(null)}
                                             style={{
-                                                default: { fill: isSel ? '#6A35D9' : '#E4E9F0', stroke: '#D5DCE6', strokeWidth: 0.4, outline: 'none', cursor: info ? 'pointer' : 'default' },
-                                                hover: { fill: isSel ? '#6A35D9' : '#DDD6F3', stroke: '#C9D2DE', strokeWidth: 0.4, outline: 'none', cursor: info ? 'pointer' : 'default' },
-                                                pressed: { fill: '#6A35D9', outline: 'none' }
+                                                default: { fill: isSel ? '#B735B8' : '#0B1B2B', stroke: '#050B14', strokeWidth: 0.4, outline: 'none', cursor: info ? 'pointer' : 'default' },
+                                                hover: { fill: isSel ? '#B735B8' : '#102A55', stroke: '#050B14', strokeWidth: 0.4, outline: 'none', cursor: info ? 'pointer' : 'default' },
+                                                pressed: { fill: '#5b21b6', outline: 'none' }
                                             }}
                                         />
                                     )
@@ -354,8 +354,8 @@ export default function CountryMapSelector({ selected, onChange }: Props) {
                                     {/* Visible dot */}
                                     <circle
                                         r={dotR}
-                                        fill={isSel ? '#233B8F' : countrySelected ? '#9B70E7' : '#94A3B8'}
-                                        stroke={isSel ? '#233B8F' : '#9CA3AF'}
+                                        fill={isSel ? '#4C97D8' : countrySelected ? '#B735B8' : '#64748b'}
+                                        stroke={isSel ? '#4C97D8' : '#081624'}
                                         strokeWidth={isSel ? 1.5 : 0.8}
                                         style={{ pointerEvents: 'none', transition: 'all 0.15s' }}
                                     />
@@ -363,7 +363,7 @@ export default function CountryMapSelector({ selected, onChange }: Props) {
                                         <text
                                             textAnchor="middle"
                                             y={-8}
-                                            style={{ fontSize: `${Math.max(3, 4.5 / zoom)}px`, fill: '#233B8F', fontWeight: 700, pointerEvents: 'none' }}
+                                            style={{ fontSize: `${Math.max(3, 4.5 / zoom)}px`, fill: '#4C97D8', fontWeight: 700, pointerEvents: 'none' }}
                                         >
                                             {city.name}
                                         </text>
@@ -377,33 +377,33 @@ export default function CountryMapSelector({ selected, onChange }: Props) {
 
             {/* City search */}
             <div className="relative">
-                <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#9CA3AF]" />
+                <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/30" />
                 <input
                     value={citySearch}
                     onChange={e => setCitySearch(e.target.value)}
                     placeholder="Buscar ciudad o departamento (Ej: Bogotá, Medellín...)"
-                    className="w-full bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl pl-8 pr-3 py-2 text-sm text-[#111827] focus:outline-none focus:border-[#E4E9F0] placeholder:text-[#9CA3AF]"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl pl-8 pr-3 py-2 text-sm text-white focus:outline-none focus:border$1-white/10 placeholder:text-white/20"
                 />
                 {citySearch && (
-                    <button onClick={() => setCitySearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#9CA3AF] hover:text-[#111827]">
+                    <button onClick={() => setCitySearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-white/30 hover:text-white">
                         <X size={12} />
                     </button>
                 )}
                 {cityResults.length > 0 && (
-                    <div className="absolute top-full left-0 right-0 mt-1 z-20 bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl overflow-hidden shadow-xl max-h-48 overflow-y-auto">
+                    <div className="absolute top-full left-0 right-0 mt-1 z-20 bg-[#0d0d1f] border border-white/10 rounded-xl overflow-hidden shadow-xl max-h-48 overflow-y-auto">
                         {cityResults.map(c => {
                             const isSel = selectedCities.includes(c.name)
                             return (
                                 <button
                                     key={`${c.name}-${c.country}`}
                                     onClick={() => { toggle(c.name); setCitySearch('') }}
-                                    className={`w-full flex items-center justify-between px-3 py-2.5 text-sm hover:bg-[#F4F6FA] transition-all text-left ${isSel ? 'text-[#233B8F]' : 'text-[#6B7280]'}`}
+                                    className={`w-full flex items-center justify-between px-3 py-2.5 text-sm hover:bg-white/5 transition-all text-left ${isSel ? 'text-[#4C97D8]' : 'text-white/70'}`}
                                 >
                                     <span className="flex items-center gap-2">
-                                        <MapPin size={11} className="text-[#9CA3AF] shrink-0" />
+                                        <MapPin size={11} className="text-white/30 shrink-0" />
                                         {c.name}
                                     </span>
-                                    <span className="text-xs text-[#9CA3AF]">{CODE_TO_NAME[c.country] || c.country}</span>
+                                    <span className="text-xs text-white/25">{CODE_TO_NAME[c.country] || c.country}</span>
                                 </button>
                             )
                         })}
@@ -415,23 +415,23 @@ export default function CountryMapSelector({ selected, onChange }: Props) {
             {selected.length > 0 ? (
                 <div className="flex flex-wrap gap-1.5">
                     {selectedCountries.map(code => (
-                        <span key={code} className="flex items-center gap-1 text-xs bg-[#6A35D9]/10 border border-[#E4E9F0] text-[#6A35D9] px-2.5 py-1 rounded-full">
+                        <span key={code} className="flex items-center gap-1 text-xs bg-[#B735B8]/10 border border$1-white/10 text-[#B735B8] px-2.5 py-1 rounded-full">
                             {CODE_TO_NAME[code] || code}
-                            <button onClick={() => toggle(code)} className="hover:text-[#DC2626] ml-0.5"><X size={9} /></button>
+                            <button onClick={() => toggle(code)} className="hover:text-[#F87171] ml-0.5"><X size={9} /></button>
                         </span>
                     ))}
                     {selectedCities.map(city => (
-                        <span key={city} className="flex items-center gap-1 text-xs bg-[#233B8F]/10 border border-[#E4E9F0] text-[#233B8F] px-2.5 py-1 rounded-full">
+                        <span key={city} className="flex items-center gap-1 text-xs bg-[#4C97D8]/10 border border$1-white/10 text-[#4C97D8] px-2.5 py-1 rounded-full">
                             <MapPin size={9} />{city}
-                            <button onClick={() => toggle(city)} className="hover:text-[#DC2626] ml-0.5"><X size={9} /></button>
+                            <button onClick={() => toggle(city)} className="hover:text-[#F87171] ml-0.5"><X size={9} /></button>
                         </span>
                     ))}
-                    <button onClick={() => onChange([])} className="text-[11px] text-[#9CA3AF] hover:text-[#DC2626] px-2 py-1 transition-colors">
+                    <button onClick={() => onChange([])} className="text-[11px] text-white/20 hover:text-[#F87171] px-2 py-1 transition-colors">
                         Limpiar todo
                     </button>
                 </div>
             ) : (
-                <p className="text-[11px] text-[#9CA3AF] flex items-center gap-1.5 px-1">
+                <p className="text-[11px] text-white/20 flex items-center gap-1.5 px-1">
                     <Globe size={11} /> Sin selección: el anuncio se mostrará globalmente
                 </p>
             )}

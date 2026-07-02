@@ -7,13 +7,12 @@ import { useEffect, useState } from 'react'
  * degradado + shimmer + transición suave, puntos animados y barra indeterminada.
  * variant="full" para overlays; variant="compact" para slots (imágenes).
  */
-// Degradados de marca MY DIAMOND (familia rosa → morado → azul del diamond-gradient)
 const GRADIENTS = [
-    'linear-gradient(90deg,#FF096C,#6A35D9,#233B8F)',
-    'linear-gradient(90deg,#6A35D9,#B735B8,#FF096C)',
-    'linear-gradient(90deg,#233B8F,#6A35D9,#B735B8)',
-    'linear-gradient(90deg,#B735B8,#9B70E7,#233B8F)',
-    'linear-gradient(90deg,#FF096C,#B735B8,#6A35D9)',
+    'linear-gradient(90deg,#B735B8,#4C97D8,#B735B8)',
+    'linear-gradient(90deg,#4C97D8,#4C97D8,#4C97D8)',
+    'linear-gradient(90deg,#FB923C,#FF2D95,#FB923C)',
+    'linear-gradient(90deg,#22C55E,#4C97D8,#22C55E)',
+    'linear-gradient(90deg,#B735B8,#B735B8,#B735B8)',
 ]
 
 export function AiThinking({ messages, className = '', variant = 'full' }:
@@ -36,7 +35,7 @@ export function AiThinking({ messages, className = '', variant = 'full' }:
 
     if (compact) {
         return (
-            <div className={`absolute inset-0 flex flex-col items-center justify-center gap-2.5 bg-[#F4F6FA] px-3 ${className}`}>
+            <div className={`absolute inset-0 flex flex-col items-center justify-center gap-2.5 bg-[#050B14]/85 px-3 ${className}`}>
                 <div className="ai-dots"><span /><span /><span /></div>
                 <div className="ai-grad-text text-[10px] font-bold text-center transition-all duration-300" style={textStyle}>{messages[idx]}</div>
             </div>

@@ -73,13 +73,13 @@ const PERIODS = [
 ]
 
 const METRICS = [
-    { key: 'spend',         label: 'Gasto',            color: '#059669' },
-    { key: 'linkClicks',    label: 'Clics enlace',     color: '#6A35D9' },
-    { key: 'impressions',   label: 'Impresiones',      color: '#233B8F' },
-    { key: 'reach',         label: 'Alcance',          color: '#FF096C' },
+    { key: 'spend',         label: 'Gasto',            color: '#22C55E' },
+    { key: 'linkClicks',    label: 'Clics enlace',     color: '#B735B8' },
+    { key: 'impressions',   label: 'Impresiones',      color: '#4C97D8' },
+    { key: 'reach',         label: 'Alcance',          color: '#FF2D95' },
     { key: 'conversations', label: 'Conversaciones WA', color: '#25D366' },
-    { key: 'conversions',   label: 'Conversiones',     color: '#D97706' },
-    { key: 'videoViews',    label: 'Vistas de video',  color: '#DC2626' },
+    { key: 'conversions',   label: 'Conversiones',     color: '#FBBF24' },
+    { key: 'videoViews',    label: 'Vistas de video',  color: '#F87171' },
 ]
 
 const MONTHS = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic']
@@ -160,9 +160,9 @@ function MultiLineChart({ days, activeMetrics }: { days: DailyAgg[]; activeMetri
                 </defs>
                 {[0, 0.5, 1].map((f, i) => {
                     const y = padT + f * (H - padT - padB)
-                    return <line key={i} x1={padL} y1={y} x2={W - padR} y2={y} stroke="rgba(15,23,42,0.08)" strokeWidth="1" strokeDasharray={i === 0 ? 'none' : '4 6'} />
+                    return <line key={i} x1={padL} y1={y} x2={W - padR} y2={y} stroke="rgba(255,255,255,0.05)" strokeWidth="1" strokeDasharray={i === 0 ? 'none' : '4 6'} />
                 })}
-                <line x1={padL} y1={H - padB} x2={W - padR} y2={H - padB} stroke="rgba(15,23,42,0.08)" strokeWidth="1" />
+                <line x1={padL} y1={H - padB} x2={W - padR} y2={H - padB} stroke="rgba(255,255,255,0.07)" strokeWidth="1" />
                 {lines.map(l => (
                     <g key={l.key}>
                         {days.length === 1 ? (
@@ -180,12 +180,12 @@ function MultiLineChart({ days, activeMetrics }: { days: DailyAgg[]; activeMetri
                 ))}
                 {hoverIdx !== null && hoverX !== null && (
                     <>
-                        <line x1={hoverX} y1={padT} x2={hoverX} y2={H - padB} stroke="rgba(15,23,42,0.08)" strokeWidth="1" strokeDasharray="4 3" />
+                        <line x1={hoverX} y1={padT} x2={hoverX} y2={H - padB} stroke="rgba(255,255,255,0.15)" strokeWidth="1" strokeDasharray="4 3" />
                         {lines.map(l => <circle key={l.key} cx={l.pts[hoverIdx]?.x} cy={l.pts[hoverIdx]?.y} r="4" fill={l.color} stroke="rgba(0,0,0,0.6)" strokeWidth="1.5" />)}
                     </>
                 )}
                 {xIdx.map(i => (
-                    <text key={i} x={xOf(i)} y={H - 8} textAnchor="middle" fontSize="8.5" fill="rgba(17,24,39,0.55)" fontFamily="system-ui">
+                    <text key={i} x={xOf(i)} y={H - 8} textAnchor="middle" fontSize="8.5" fill="rgba(255,255,255,0.25)" fontFamily="system-ui">
                         {fmtShort(days[i].date)}
                     </text>
                 ))}
@@ -194,16 +194,16 @@ function MultiLineChart({ days, activeMetrics }: { days: DailyAgg[]; activeMetri
                 <div style={{
                     position: 'absolute', top: 0,
                     left: `clamp(8px, calc(${(hoverIdx / Math.max(days.length - 1, 1)) * 100}% - 80px), calc(100% - 168px))`,
-                    background: '#FFFFFF', border: '1px solid rgba(15,23,42,0.08)',
+                    background: '#0D0F1E', border: '1px solid rgba(255,255,255,0.1)',
                     borderRadius: '10px', padding: '8px 12px', pointerEvents: 'none', zIndex: 10, minWidth: '160px',
                 }}>
-                    <p style={{ color: 'rgba(17,24,39,0.55)', fontSize: '10px', fontWeight: 700, marginBottom: '6px' }}>
+                    <p style={{ color: 'rgba(255,255,255,0.45)', fontSize: '10px', fontWeight: 700, marginBottom: '6px' }}>
                         {fmtShort(days[hoverIdx].date)}
                     </p>
                     {lines.map(l => (
                         <div key={l.key} style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '3px' }}>
                             <span style={{ width: 7, height: 7, borderRadius: '50%', background: l.color, flexShrink: 0 }} />
-                            <span style={{ color: 'rgba(17,24,39,0.55)', fontSize: '10px' }}>{l.label}:</span>
+                            <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: '10px' }}>{l.label}:</span>
                             <span style={{ color: '#fff', fontSize: '10px', fontWeight: 700 }}>
                                 {l.key === 'spend' ? `$${Number(l.pts[hoverIdx]?.val ?? 0).toFixed(2)}` : fmt(l.pts[hoverIdx]?.val ?? 0)}
                             </span>
@@ -312,64 +312,64 @@ export default function AnalyticsPage() {
     }
 
     const summaryCards = [
-        { label: 'Gasto',              value: `$${grand.spend.toFixed(2)}`, color: '#059669', icon: DollarSign },
-        { label: 'Clics enlace',       value: fmt(grand.linkClicks),        color: '#6A35D9', icon: MousePointerClick },
-        { label: 'Impresiones',        value: fmt(grand.impressions),       color: '#233B8F', icon: Eye },
-        { label: 'Alcance',            value: fmt(grand.reach),             color: '#FF096C', icon: Users },
-        { label: 'CTR',                value: `${ctr}%`,                   color: '#059669', icon: TrendingUp },
-        { label: 'CPC',                value: `$${cpc}`,                   color: '#9B70E7', icon: Zap },
-        { label: 'CPM',                value: `$${cpm}`,                   color: '#233B8F', icon: BarChart3 },
+        { label: 'Gasto',              value: `$${grand.spend.toFixed(2)}`, color: '#22C55E', icon: DollarSign },
+        { label: 'Clics enlace',       value: fmt(grand.linkClicks),        color: '#B735B8', icon: MousePointerClick },
+        { label: 'Impresiones',        value: fmt(grand.impressions),       color: '#4C97D8', icon: Eye },
+        { label: 'Alcance',            value: fmt(grand.reach),             color: '#FF2D95', icon: Users },
+        { label: 'CTR',                value: `${ctr}%`,                   color: '#22C55E', icon: TrendingUp },
+        { label: 'CPC',                value: `$${cpc}`,                   color: '#B735B8', icon: Zap },
+        { label: 'CPM',                value: `$${cpm}`,                   color: '#4C97D8', icon: BarChart3 },
         ...(grand.conversations > 0 ? [{ label: 'Conv. WhatsApp', value: fmt(grand.conversations), color: '#25D366', icon: Target }] : []),
-        ...(grand.conversations > 0 && cpConv ? [{ label: 'Costo/Conv. WA', value: `$${cpConv}`, color: '#059669', icon: DollarSign }] : []),
-        ...(grand.conversions > 0 ? [{ label: 'Conversiones',  value: fmt(grand.conversions),  color: '#D97706', icon: Target }] : []),
-        ...(grand.conversions > 0 && cpa ? [{ label: 'CPA', value: `$${cpa}`, color: '#EA580C', icon: DollarSign }] : []),
-        ...(grand.purchases > 0 ? [{ label: 'Compras', value: fmt(grand.purchases), color: '#D97706', icon: Target }] : []),
-        ...(grand.leads > 0 ? [{ label: 'Leads', value: fmt(grand.leads), color: '#9B70E7', icon: Users }] : []),
-        ...(grand.videoViews > 0 ? [{ label: 'Vistas video', value: fmt(grand.videoViews), color: '#DC2626', icon: BarChart3 }] : []),
-        ...(grand.landingPageViews > 0 ? [{ label: 'Vistas landing', value: fmt(grand.landingPageViews), color: '#059669', icon: Eye }] : []),
+        ...(grand.conversations > 0 && cpConv ? [{ label: 'Costo/Conv. WA', value: `$${cpConv}`, color: '#22C55E', icon: DollarSign }] : []),
+        ...(grand.conversions > 0 ? [{ label: 'Conversiones',  value: fmt(grand.conversions),  color: '#FBBF24', icon: Target }] : []),
+        ...(grand.conversions > 0 && cpa ? [{ label: 'CPA', value: `$${cpa}`, color: '#FB923C', icon: DollarSign }] : []),
+        ...(grand.purchases > 0 ? [{ label: 'Compras', value: fmt(grand.purchases), color: '#FBBF24', icon: Target }] : []),
+        ...(grand.leads > 0 ? [{ label: 'Leads', value: fmt(grand.leads), color: '#B735B8', icon: Users }] : []),
+        ...(grand.videoViews > 0 ? [{ label: 'Vistas video', value: fmt(grand.videoViews), color: '#F87171', icon: BarChart3 }] : []),
+        ...(grand.landingPageViews > 0 ? [{ label: 'Vistas landing', value: fmt(grand.landingPageViews), color: '#22C55E', icon: Eye }] : []),
     ]
 
     return (
-        <div className="px-4 md:px-6 pt-6 max-w-5xl mx-auto pb-24 text-[#111827]">
+        <div className="px-4 md:px-6 pt-6 max-w-5xl mx-auto pb-24 text-white" style={{ background: 'radial-gradient(120% 60% at 50% -5%, rgba(183,53,184,0.14), rgba(255,255,255,0) 55%), radial-gradient(90% 60% at 100% 110%, rgba(106,53,217,0.12), rgba(255,255,255,0) 60%), linear-gradient(180deg, #0B1B2B 0%, #081624 55%, #050B14 100%)', minHeight: 'calc(100vh - 1.5rem)', borderRadius: 24, border: '1px solid rgba(255,255,255,0.06)' }}>
 
             {/* Header */}
             <div className="flex items-center gap-3 mb-6">
                 <Link href="/dashboard/services/ads/meta"
-                    className="w-9 h-9 rounded-xl bg-[#F4F6FA] border border-[#E4E9F0] flex items-center justify-center hover:bg-[#F0F3F7] transition-all shrink-0">
+                    className="w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-all shrink-0">
                     <ArrowLeft size={15} />
                 </Link>
                 <div className="flex-1 min-w-0">
                     <h1 className="text-lg md:text-xl font-black uppercase tracking-tighter">Analytics de Campañas</h1>
-                    <p className="text-[11px] text-[#9CA3AF]">Métricas de tus campañas publicadas en Meta Ads</p>
+                    <p className="text-[11px] text-white/30">Métricas de tus campañas publicadas en Meta Ads</p>
                 </div>
                 <button onClick={() => fetchData(true)}
-                    className="w-9 h-9 rounded-xl bg-[#F4F6FA] border border-[#E4E9F0] flex items-center justify-center hover:bg-[#F0F3F7] transition-all">
-                    <RefreshCw size={14} className={refreshing ? 'animate-spin text-[#6A35D9]' : ''} />
+                    className="w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-all">
+                    <RefreshCw size={14} className={refreshing ? 'animate-spin text-[#B735B8]' : ''} />
                 </button>
             </div>
 
             {/* Error banner */}
             {fetchError && (
-                <div className="mb-5 flex items-center gap-3 p-3.5 rounded-2xl text-[#DC2626] text-xs"
-                    style={{ background: 'rgba(220,38,38,0.08)', border: '1px solid rgba(220,38,38,0.2)' }}>
+                <div className="mb-5 flex items-center gap-3 p-3.5 rounded-2xl text-[#F87171] text-xs"
+                    style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)' }}>
                     <span className="flex-1">{fetchError}</span>
-                    <button onClick={() => setFetchError(null)} className="text-[#DC2626]/50 hover:text-[#DC2626]">✕</button>
+                    <button onClick={() => setFetchError(null)} className="text-[#F87171]/50 hover:text-[#F87171]">✕</button>
                 </div>
             )}
 
             {/* Filters */}
             <div className="flex flex-wrap gap-2 mb-6">
-                <div className="flex gap-1 bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl p-1">
+                <div className="flex gap-1 bg-white/5 border border-white/10 rounded-xl p-1">
                     {PERIODS.map(p => (
                         <button key={p.key} onClick={() => setPeriod(p.key)}
-                            className={`text-xs font-bold px-3 py-1.5 rounded-lg transition-all ${period === p.key ? 'bg-[#6A35D9] text-white' : 'text-[#9CA3AF] hover:text-[#6B7280]'}`}>
+                            className={`text-xs font-bold px-3 py-1.5 rounded-lg transition-all ${period === p.key ? 'bg-[#B735B8] text-white' : 'text-white/40 hover:text-white/70'}`}>
                             {p.label}
                         </button>
                     ))}
                 </div>
                 {campaigns.length > 1 && (
                     <select value={selectedCampaign} onChange={e => setSelectedCampaign(e.target.value)}
-                        className="bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-3 py-2 text-xs text-[#111827] focus:outline-none focus:border-[#E4E9F0] [&>option]:bg-white">
+                        className="bg-[#0B1B2B] border border-white/20 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border$1-white/10 [&>option]:bg-[#0B1B2B]">
                         <option value="ALL">Todas las campañas</option>
                         {campaigns.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                     </select>
@@ -378,15 +378,15 @@ export default function AnalyticsPage() {
 
             {loading ? (
                 <div className="flex flex-col items-center justify-center py-32 gap-3">
-                    <Loader2 size={28} className="animate-spin text-[#6A35D9]" />
-                    <p className="text-[#9CA3AF] text-sm">Cargando métricas desde Meta Ads...</p>
+                    <Loader2 size={28} className="animate-spin text-[#B735B8]" />
+                    <p className="text-white/30 text-sm">Cargando métricas desde Meta Ads...</p>
                 </div>
             ) : daily.length === 0 ? (
-                <div className="text-center py-24 bg-white/[0.015] border border-dashed border-[#E4E9F0] rounded-3xl">
-                    <BarChart3 size={32} className="text-[#9CA3AF] mx-auto mb-3" />
-                    <p className="text-[#9CA3AF] font-bold text-sm">Sin datos para este período</p>
-                    <p className="text-[#9CA3AF] text-xs mt-1">Las campañas publicadas aparecerán aquí</p>
-                    <Link href="/dashboard/services/ads/meta" className="mt-4 inline-flex items-center gap-1.5 text-xs font-bold text-[#6A35D9] hover:underline">
+                <div className="text-center py-24 bg-white/[0.015] border border-dashed border-white/8 rounded-3xl">
+                    <BarChart3 size={32} className="text-white/20 mx-auto mb-3" />
+                    <p className="text-white/40 font-bold text-sm">Sin datos para este período</p>
+                    <p className="text-white/20 text-xs mt-1">Las campañas publicadas aparecerán aquí</p>
+                    <Link href="/dashboard/services/ads/meta" className="mt-4 inline-flex items-center gap-1.5 text-xs font-bold text-[#B735B8] hover:underline">
                         ← Volver a Campañas
                     </Link>
                 </div>
@@ -395,7 +395,7 @@ export default function AnalyticsPage() {
                     {/* Summary cards */}
                     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 mb-5">
                         {summaryCards.map(({ label, value, color, icon: Icon }) => (
-                            <div key={label} className="bg-[#F4F6FA] border border-[#E4E9F0] rounded-2xl p-3.5">
+                            <div key={label} className="bg-white/3 border border-white/8 rounded-2xl p-3.5">
                                 <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest mb-1.5" style={{ color }}>
                                     <Icon size={10} /> {label}
                                 </div>
@@ -405,7 +405,7 @@ export default function AnalyticsPage() {
                     </div>
 
                     {/* Chart */}
-                    <div className="bg-[#F4F6FA] border border-[#E4E9F0] rounded-2xl p-4 md:p-5 mb-4">
+                    <div className="bg-white/3 border border-white/8 rounded-2xl p-4 md:p-5 mb-4">
                         <div className="flex flex-wrap gap-2 mb-5">
                             {METRICS.map(m => {
                                 const on = activeMetrics.has(m.key)
@@ -414,8 +414,8 @@ export default function AnalyticsPage() {
                                         className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold border transition-all"
                                         style={on
                                             ? { background: m.color + '20', borderColor: m.color + '50', color: m.color }
-                                            : { background: 'rgba(15,23,42,0.08)', borderColor: 'rgba(15,23,42,0.08)', color: 'rgba(17,24,39,0.55)' }}>
-                                        <span style={{ width: 7, height: 7, borderRadius: '50%', background: on ? m.color : 'rgba(17,24,39,0.55)', display: 'inline-block', flexShrink: 0 }} />
+                                            : { background: 'rgba(255,255,255,0.03)', borderColor: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.3)' }}>
+                                        <span style={{ width: 7, height: 7, borderRadius: '50%', background: on ? m.color : 'rgba(255,255,255,0.2)', display: 'inline-block', flexShrink: 0 }} />
                                         {m.label}
                                     </button>
                                 )
@@ -426,32 +426,32 @@ export default function AnalyticsPage() {
 
                     {/* Per-campaign totals */}
                     {totals.length > 1 && (
-                        <div className="bg-[#F4F6FA] border border-[#E4E9F0] rounded-2xl overflow-hidden mb-4">
-                            <div className="px-4 py-3 border-b border-[#E4E9F0]">
-                                <p className="text-[10px] font-bold uppercase tracking-widest text-[#9CA3AF]">Por campaña</p>
+                        <div className="bg-white/3 border border-white/8 rounded-2xl overflow-hidden mb-4">
+                            <div className="px-4 py-3 border-b border-white/6">
+                                <p className="text-[10px] font-bold uppercase tracking-widest text-white/30">Por campaña</p>
                             </div>
                             <div className="overflow-x-auto">
                                 <table className="w-full text-xs">
                                     <thead>
-                                        <tr className="border-b border-[#E4E9F0]">
+                                        <tr className="border-b border-white/5">
                                             {['Campaña', 'Gasto', 'Clics enlace', 'Impresiones', 'Alcance', 'Conv. WA', 'Conversiones', 'CTR', 'CPC', 'CPM'].map(h => (
-                                                <th key={h} className="px-4 py-2.5 text-left text-[10px] font-bold uppercase tracking-widest text-[#9CA3AF]">{h}</th>
+                                                <th key={h} className="px-4 py-2.5 text-left text-[10px] font-bold uppercase tracking-widest text-white/25">{h}</th>
                                             ))}
                                         </tr>
                                     </thead>
                                     <tbody>
                                         {totals.map(t => (
-                                            <tr key={t.campaignId} className="border-b border-[#E4E9F0] hover:bg-white/[0.02] transition-colors">
-                                                <td className="px-4 py-2.5 font-bold text-[#6B7280] max-w-[180px] truncate">{t.campaignName}</td>
-                                                <td className="px-4 py-2.5 font-bold" style={{ color: '#059669' }}>${t.spend}</td>
-                                                <td className="px-4 py-2.5 font-bold" style={{ color: '#6A35D9' }}>{fmt(t.linkClicks ?? t.clicks)}</td>
-                                                <td className="px-4 py-2.5" style={{ color: '#233B8F' }}>{fmt(t.impressions)}</td>
-                                                <td className="px-4 py-2.5" style={{ color: '#FF096C' }}>{fmt(t.reach ?? 0)}</td>
+                                            <tr key={t.campaignId} className="border-b border-white/4 hover:bg-white/[0.02] transition-colors">
+                                                <td className="px-4 py-2.5 font-bold text-white/80 max-w-[180px] truncate">{t.campaignName}</td>
+                                                <td className="px-4 py-2.5 font-bold" style={{ color: '#22C55E' }}>${t.spend}</td>
+                                                <td className="px-4 py-2.5 font-bold" style={{ color: '#B735B8' }}>{fmt(t.linkClicks ?? t.clicks)}</td>
+                                                <td className="px-4 py-2.5" style={{ color: '#4C97D8' }}>{fmt(t.impressions)}</td>
+                                                <td className="px-4 py-2.5" style={{ color: '#FF2D95' }}>{fmt(t.reach ?? 0)}</td>
                                                 <td className="px-4 py-2.5 font-bold" style={{ color: '#25D366' }}>{fmt(t.conversations ?? 0)}</td>
-                                                <td className="px-4 py-2.5" style={{ color: '#D97706' }}>{fmt(t.conversions ?? 0)}</td>
-                                                <td className="px-4 py-2.5" style={{ color: '#059669' }}>{t.ctr}%</td>
-                                                <td className="px-4 py-2.5" style={{ color: '#9B70E7' }}>${t.cpc}</td>
-                                                <td className="px-4 py-2.5" style={{ color: '#233B8F' }}>${t.cpm ?? '0.00'}</td>
+                                                <td className="px-4 py-2.5" style={{ color: '#FBBF24' }}>{fmt(t.conversions ?? 0)}</td>
+                                                <td className="px-4 py-2.5" style={{ color: '#22C55E' }}>{t.ctr}%</td>
+                                                <td className="px-4 py-2.5" style={{ color: '#B735B8' }}>${t.cpc}</td>
+                                                <td className="px-4 py-2.5" style={{ color: '#4C97D8' }}>${t.cpm ?? '0.00'}</td>
                                             </tr>
                                         ))}
                                     </tbody>
@@ -461,16 +461,16 @@ export default function AnalyticsPage() {
                     )}
 
                     {/* Daily breakdown */}
-                    <div className="bg-[#F4F6FA] border border-[#E4E9F0] rounded-2xl overflow-hidden">
-                        <div className="px-4 py-3 border-b border-[#E4E9F0]">
-                            <p className="text-[10px] font-bold uppercase tracking-widest text-[#9CA3AF]">Detalle diario</p>
+                    <div className="bg-white/3 border border-white/8 rounded-2xl overflow-hidden">
+                        <div className="px-4 py-3 border-b border-white/6">
+                            <p className="text-[10px] font-bold uppercase tracking-widest text-white/30">Detalle diario</p>
                         </div>
                         <div className="overflow-x-auto">
                             <table className="w-full text-xs">
                                 <thead>
-                                    <tr className="border-b border-[#E4E9F0]">
+                                    <tr className="border-b border-white/5">
                                         {['Fecha', 'Gasto', 'Clics enlace', 'Impresiones', 'Alcance', 'Conv. WA', 'Conversiones', 'CTR', 'CPC', 'CPM'].map(h => (
-                                            <th key={h} className="px-4 py-2.5 text-left text-[10px] font-bold uppercase tracking-widest text-[#9CA3AF]">{h}</th>
+                                            <th key={h} className="px-4 py-2.5 text-left text-[10px] font-bold uppercase tracking-widest text-white/25">{h}</th>
                                         ))}
                                     </tr>
                                 </thead>
@@ -481,17 +481,17 @@ export default function AnalyticsPage() {
                                         const dayCpc = lc > 0 ? (d.spend / lc).toFixed(2) : '0.00'
                                         const dayCpm = d.impressions > 0 ? ((d.spend / d.impressions) * 1000).toFixed(2) : '0.00'
                                         return (
-                                            <tr key={d.date} className="border-b border-[#E4E9F0] hover:bg-white/[0.02] transition-colors">
-                                                <td className="px-4 py-2.5 text-[#6B7280] font-medium">{fmtShort(d.date)}</td>
-                                                <td className="px-4 py-2.5 font-bold" style={{ color: '#059669' }}>${d.spend.toFixed(2)}</td>
-                                                <td className="px-4 py-2.5 font-bold" style={{ color: '#6A35D9' }}>{fmt(lc)}</td>
-                                                <td className="px-4 py-2.5" style={{ color: '#233B8F' }}>{fmt(d.impressions)}</td>
-                                                <td className="px-4 py-2.5" style={{ color: '#FF096C' }}>{fmt(d.reach ?? 0)}</td>
+                                            <tr key={d.date} className="border-b border-white/4 hover:bg-white/[0.02] transition-colors">
+                                                <td className="px-4 py-2.5 text-white/60 font-medium">{fmtShort(d.date)}</td>
+                                                <td className="px-4 py-2.5 font-bold" style={{ color: '#22C55E' }}>${d.spend.toFixed(2)}</td>
+                                                <td className="px-4 py-2.5 font-bold" style={{ color: '#B735B8' }}>{fmt(lc)}</td>
+                                                <td className="px-4 py-2.5" style={{ color: '#4C97D8' }}>{fmt(d.impressions)}</td>
+                                                <td className="px-4 py-2.5" style={{ color: '#FF2D95' }}>{fmt(d.reach ?? 0)}</td>
                                                 <td className="px-4 py-2.5 font-bold" style={{ color: '#25D366' }}>{fmt(d.conversations ?? 0)}</td>
-                                                <td className="px-4 py-2.5" style={{ color: '#D97706' }}>{fmt(d.conversions ?? 0)}</td>
-                                                <td className="px-4 py-2.5" style={{ color: '#059669' }}>{dayCtr}%</td>
-                                                <td className="px-4 py-2.5" style={{ color: '#9B70E7' }}>${dayCpc}</td>
-                                                <td className="px-4 py-2.5" style={{ color: '#233B8F' }}>${dayCpm}</td>
+                                                <td className="px-4 py-2.5" style={{ color: '#FBBF24' }}>{fmt(d.conversions ?? 0)}</td>
+                                                <td className="px-4 py-2.5" style={{ color: '#22C55E' }}>{dayCtr}%</td>
+                                                <td className="px-4 py-2.5" style={{ color: '#B735B8' }}>${dayCpc}</td>
+                                                <td className="px-4 py-2.5" style={{ color: '#4C97D8' }}>${dayCpm}</td>
                                             </tr>
                                         )
                                     })}

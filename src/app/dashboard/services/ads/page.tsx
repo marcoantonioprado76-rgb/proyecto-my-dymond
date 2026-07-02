@@ -59,19 +59,19 @@ const PLATFORMS = [
 
 export default function AdsHubPage() {
     return (
-        <div className="px-4 md:px-6 xl:px-10 pt-6 pb-28 max-w-screen-lg mx-auto text-[#111827]">
+        <div className="px-4 md:px-6 xl:px-10 pt-6 pb-28 max-w-screen-lg mx-auto text-white" style={{ background: 'radial-gradient(120% 60% at 50% -5%, rgba(183,53,184,0.14), rgba(255,255,255,0) 55%), radial-gradient(90% 60% at 100% 110%, rgba(106,53,217,0.12), rgba(255,255,255,0) 60%), linear-gradient(180deg, #0B1B2B 0%, #081624 55%, #050B14 100%)', minHeight: 'calc(100vh - 1.5rem)', borderRadius: 24, border: '1px solid rgba(255,255,255,0.06)' }}>
 
             {/* Header */}
             <div className="mb-10">
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full mb-4"
-                    style={{ background: 'rgba(15,23,42,0.08)', border: '1px solid rgba(15,23,42,0.08)' }}>
-                    <Sparkles size={11} className="text-[#9CA3AF]" />
-                    <span className="text-[10px] font-black uppercase tracking-widest text-[#9CA3AF]">Servicios de Publicidad</span>
+                    style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}>
+                    <Sparkles size={11} className="text-white/40" />
+                    <span className="text-[10px] font-black uppercase tracking-widest text-white/40">Servicios de Publicidad</span>
                 </div>
                 <h1 className="text-3xl md:text-4xl font-black tracking-tight leading-tight mb-2">
                     Ads <span className="text-transparent bg-clip-text" style={{ backgroundImage: 'linear-gradient(90deg, #0081FB, #EE1D52, #4285F4)' }}>AI</span>
                 </h1>
-                <p className="text-sm text-[#9CA3AF] max-w-md leading-relaxed">
+                <p className="text-sm text-white/35 max-w-md leading-relaxed">
                     Gestioná tus campañas publicitarias en todas las plataformas desde un solo lugar, impulsado por inteligencia artificial.
                 </p>
             </div>
@@ -105,14 +105,14 @@ export default function AdsHubPage() {
                                             : <><Clock size={9} />Próximamente</>}
                                     </span>
                                 </div>
-                                <p className="text-xs text-[#9CA3AF] mb-3">{p.sublabel}</p>
-                                <p className="text-sm text-[#9CA3AF] leading-relaxed mb-4 max-w-xl">{p.desc}</p>
+                                <p className="text-xs text-white/35 mb-3">{p.sublabel}</p>
+                                <p className="text-sm text-white/50 leading-relaxed mb-4 max-w-xl">{p.desc}</p>
 
                                 {/* Feature pills */}
                                 <div className="flex flex-wrap gap-2">
                                     {p.features.map((f) => (
-                                        <span key={f} className="text-[10px] font-semibold px-2.5 py-1 rounded-full text-[#9CA3AF]"
-                                            style={{ background: 'rgba(15,23,42,0.08)', border: '1px solid rgba(15,23,42,0.08)' }}>
+                                        <span key={f} className="text-[10px] font-semibold px-2.5 py-1 rounded-full text-white/40"
+                                            style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
                                             {f}
                                         </span>
                                     ))}
