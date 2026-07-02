@@ -10,6 +10,7 @@ interface Podcast {
   description: string | null
   coverUrl: string | null
   embedUrl: string
+  categoria: string | null
   active: boolean
   order: number
   organizationId: string | null
@@ -22,13 +23,14 @@ interface PodcastModalData {
   description: string
   coverUrl: string
   embedUrl: string
+  categoria: string
   order: string
   active: boolean
   organizationId: string | null
   mediaMode: 'url' | 'file'
 }
 
-const EMPTY: PodcastModalData = { title: '', description: '', coverUrl: '', embedUrl: '', order: '0', active: true, organizationId: null, mediaMode: 'url' }
+const EMPTY: PodcastModalData = { title: '', description: '', coverUrl: '', embedUrl: '', categoria: '', order: '0', active: true, organizationId: null, mediaMode: 'url' }
 
 const AUDIO_EXTS = ['.mp3', '.wav', '.ogg', '.aac', '.m4a']
 function isAudioUrl(url: string) {
@@ -95,6 +97,7 @@ export default function AdminPodcastsPage() {
       description: data.description.trim() || null,
       coverUrl: data.coverUrl.trim() || null,
       embedUrl: data.embedUrl.trim(),
+      categoria: data.categoria.trim() || null,
       order: Number(data.order) || 0,
       active: data.active,
       organizationId: data.organizationId ?? null,
@@ -155,7 +158,7 @@ export default function AdminPodcastsPage() {
                   </p>
                 </div>
                 {/* Actions */}
-                <button onClick={() => { setSaveError(null); setModal({ mode: 'edit', data: { id: p.id, title: p.title, description: p.description ?? '', coverUrl: p.coverUrl ?? '', embedUrl: p.embedUrl, order: String(p.order), active: p.active, organizationId: p.organizationId ?? null, mediaMode: isAudioUrl(p.embedUrl) ? 'file' : 'url' } }) }}
+                <button onClick={() => { setSaveError(null); setModal({ mode: 'edit', data: { id: p.id, title: p.title, description: p.description ?? '', coverUrl: p.coverUrl ?? '', embedUrl: p.embedUrl, categoria: p.categoria ?? '', order: String(p.order), active: p.active, organizationId: p.organizationId ?? null, mediaMode: isAudioUrl(p.embedUrl) ? 'file' : 'url' } }) }}
                   style={{ padding: '6px 10px', borderRadius: 8, background: '#F0F3F7', border: '1px solid #E4E9F0', cursor: 'pointer' }}>
                   <Edit2 size={13} className="text-[#111827]/50" />
                 </button>
@@ -278,6 +281,17 @@ export default function AdminPodcastsPage() {
                     )}
                   </>
                 )}
+              </div>
+
+              {/* Categoría */}
+              <div>
+                <label style={{ fontSize: 12, color: '#6B7280', display: 'block', marginBottom: 6 }}>Categoría (escribí una nueva o elegí; es el filtro que verán los usuarios)</label>
+                <input type="text" list="pod-cats" value={modal.data.categoria} onChange={e => setModal({ ...modal, data: { ...modal.data, categoria: e.target.value } })}
+                  placeholder="Ej. Producto, Negocio, Desarrollo Personal, Plan de Pagos…"
+                  style={{ width: '100%', padding: '8px 10px', borderRadius: 8, fontSize: 13, color: '#fff', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', outline: 'none', boxSizing: 'border-box' }} />
+                <datalist id="pod-cats">
+                  {Array.from(new Set(podcasts.map(p => p.categoria).filter(Boolean))).map(c => <option key={c as string} value={c as string} />)}
+                </datalist>
               </div>
 
               {/* Order */}

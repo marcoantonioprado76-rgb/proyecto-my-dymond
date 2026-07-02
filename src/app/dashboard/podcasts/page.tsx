@@ -9,6 +9,7 @@ interface Podcast {
   description: string | null
   coverUrl: string | null
   embedUrl: string
+  categoria: string | null
   order: number
   createdAt: string
 }
@@ -29,6 +30,7 @@ export default function PodcastsPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [search, setSearch] = useState('')
+  const [cat, setCat] = useState('Todos')
   const [selected, setSelected] = useState<Podcast | null>(null)
 
   const heroRef = useRef<HTMLDivElement>(null)
@@ -49,7 +51,10 @@ export default function PodcastsPage() {
       .catch(() => { setError('Error al cargar podcasts'); setLoading(false) })
   }, [])
 
-  const filtered = podcasts.filter(p => p.title.toLowerCase().includes(search.toLowerCase()))
+  const cats = Array.from(new Set(podcasts.map(p => p.categoria).filter(Boolean))) as string[]
+  const filtered = podcasts.filter(p =>
+    p.title.toLowerCase().includes(search.toLowerCase()) &&
+    (cat === 'Todos' || p.categoria === cat))
 
   function choose(p: Podcast, play = false) {
     setSelected(p); setCur(0); setDur(0); setPlaying(false)
@@ -175,6 +180,25 @@ export default function PodcastsPage() {
           <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Buscar episodios por tema o palabra clave..."
             style={{ width: '100%', padding: '12px 16px 12px 38px', borderRadius: 14, fontSize: 14, color: '#111827', outline: 'none', background: '#fff', border: '1px solid #E8EAF2', boxSizing: 'border-box' }} />
         </div>
+
+        {/* Chips de categoría (se crean solos al categorizar podcasts en el admin) */}
+        {cats.length > 0 && (
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 16 }}>
+            {['Todos', ...cats].map(c => {
+              const active = cat === c
+              return (
+                <button key={c} onClick={() => setCat(c)}
+                  style={{ padding: '8px 16px', borderRadius: 999, fontSize: 13, fontWeight: 800, cursor: 'pointer',
+                    border: active ? 'none' : '1px solid #E8EAF2',
+                    background: active ? DG : '#fff',
+                    color: active ? '#fff' : '#5B6472',
+                    boxShadow: active ? '0 8px 20px -10px rgba(183,53,184,0.7)' : 'none' }}>
+                  {c}
+                </button>
+              )
+            })}
+          </div>
+        )}
 
         {/* Lista */}
         {filtered.length === 0 ? (

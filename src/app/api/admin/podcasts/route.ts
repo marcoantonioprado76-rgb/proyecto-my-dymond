@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
     const user = await getAuthUser()
     if (!user?.isAdmin) return NextResponse.json({ error: 'No autorizado' }, { status: 403 })
 
-    const { title, description, coverUrl, embedUrl, order, organizationId } = await req.json()
+    const { title, description, coverUrl, embedUrl, categoria, order, organizationId } = await req.json()
     if (!title?.trim() || !embedUrl?.trim()) {
       return NextResponse.json({ error: 'Título y URL son obligatorios' }, { status: 400 })
     }
@@ -38,6 +38,7 @@ export async function POST(req: NextRequest) {
         description: description?.trim() || null,
         coverUrl: coverUrl?.trim() || null,
         embedUrl: embedUrl.trim(),
+        categoria: categoria?.trim() || null,
         order: Number(order) || 0,
         organizationId: org.skip ? null : org.value,
       },

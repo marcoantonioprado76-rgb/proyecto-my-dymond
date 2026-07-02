@@ -22,6 +22,7 @@ export async function PATCH(
     if (body.description !== undefined) data.description = body.description?.trim() || null
     if (body.coverUrl !== undefined)    data.coverUrl    = body.coverUrl?.trim() || null
     if (body.embedUrl !== undefined)    data.embedUrl    = body.embedUrl.trim()
+    if (body.categoria !== undefined)   data.categoria   = body.categoria?.trim() || null
     if (body.order !== undefined)       data.order       = Number(body.order)
     if (body.active !== undefined)      data.active      = Boolean(body.active)
     if (!org.skip)                      data.organizationId = org.value

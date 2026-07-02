@@ -1432,6 +1432,7 @@ model Podcast {
   description String?
   coverUrl    String?  @map("cover_url")
   embedUrl    String   @map("embed_url")
+  categoria   String?
   active      Boolean  @default(true)
   order       Int      @default(0)
   createdAt   DateTime @default(now()) @map("created_at")
