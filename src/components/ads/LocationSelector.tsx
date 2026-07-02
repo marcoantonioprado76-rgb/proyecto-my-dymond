@@ -109,10 +109,10 @@ export default function LocationSelector({ selected, onChange, platform = 'meta'
     }
 
     return (
-        <div className="bg-dark-900/60 border border-white/10 rounded-2xl overflow-hidden">
+        <div className="bg-dark-900/60 border border-[#E4E9F0] rounded-2xl overflow-hidden">
             {/* Selected chips */}
             {selected.length > 0 && (
-                <div className="px-4 pt-3 pb-2 flex flex-wrap gap-1.5 border-b border-white/5">
+                <div className="px-4 pt-3 pb-2 flex flex-wrap gap-1.5 border-b border-[#E4E9F0]">
                     {selected.map(loc => {
                         const parsed = parseLocation(loc)
                         return (
@@ -121,29 +121,29 @@ export default function LocationSelector({ selected, onChange, platform = 'meta'
                                 : 'bg-blue-500/10 border-blue-500/20 text-blue-300'}`}>
                                 {parsed.type === 'country' ? <Globe size={10} /> : parsed.type === 'region' ? <Building2 size={10} /> : <MapPin size={10} />}
                                 {parsed.name}
-                                <button onClick={() => removeLocation(loc)} className="text-white/30 hover:text-red-400 transition-all ml-0.5">
+                                <button onClick={() => removeLocation(loc)} className="text-[#9CA3AF] hover:text-red-400 transition-all ml-0.5">
                                     <X size={10} />
                                 </button>
                             </span>
                         )
                     })}
-                    <button onClick={() => onChange([])} className="text-[10px] text-white/20 hover:text-red-400 transition-all px-1">
+                    <button onClick={() => onChange([])} className="text-[10px] text-[#9CA3AF] hover:text-red-400 transition-all px-1">
                         Limpiar todo
                     </button>
                 </div>
             )}
 
             {/* Tabs */}
-            <div className="flex border-b border-white/8">
+            <div className="flex border-b border-[#E4E9F0]">
                 {([
                     ['country', 'Países', <Globe size={12} />, selectedCountries.length],
                     ['city', 'Departamentos', <Building2 size={12} />, selectedCities.length],
                 ] as const).map(([key, label, icon, count]) => (
                     <button key={key} onClick={() => { setTab(key); setSearch('') }}
-                        className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs font-bold transition-all ${tab === key ? 'text-white border-b-2 border-purple-500' : 'text-white/30 hover:text-white/60'}`}>
+                        className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs font-bold transition-all ${tab === key ? 'text-[#111827] border-b-2 border-purple-500' : 'text-[#9CA3AF] hover:text-[#6B7280]'}`}>
                         {icon} {label}
                         {count > 0 && (
-                            <span className={`text-[9px] px-1.5 py-0.5 rounded-full ${tab === key ? 'bg-purple-500/30 text-purple-200' : 'bg-white/8 text-white/40'}`}>{count}</span>
+                            <span className={`text-[9px] px-1.5 py-0.5 rounded-full ${tab === key ? 'bg-purple-500/30 text-purple-200' : 'bg-[#F0F3F7] text-[#9CA3AF]'}`}>{count}</span>
                         )}
                     </button>
                 ))}
@@ -152,12 +152,12 @@ export default function LocationSelector({ selected, onChange, platform = 'meta'
             {/* Search */}
             <div className="px-3 pt-3 pb-2">
                 <div className="relative">
-                    <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/30" />
+                    <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#9CA3AF]" />
                     <input
                         value={search}
                         onChange={e => setSearch(e.target.value)}
                         placeholder={tab === 'country' ? 'Buscar país...' : 'Buscar departamento / región...'}
-                        className="w-full bg-white/5 border border-white/10 rounded-xl pl-8 pr-3 py-2 text-xs text-white focus:outline-none focus:border-purple-500/50 placeholder:text-white/20"
+                        className="w-full bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl pl-8 pr-3 py-2 text-xs text-[#111827] focus:outline-none focus:border-purple-500/50 placeholder:text-[#9CA3AF]"
                     />
                 </div>
             </div>
@@ -172,15 +172,15 @@ export default function LocationSelector({ selected, onChange, platform = 'meta'
                                 <button key={c.code} onClick={() => toggleCountry(c.code)}
                                     className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-medium text-left transition-all ${isSelected
                                         ? 'bg-purple-500/20 border border-purple-500/40 text-purple-200'
-                                        : 'bg-white/3 border border-white/8 text-white/60 hover:bg-white/8 hover:text-white/90'}`}>
-                                    <span className="font-black text-[10px] text-white/30 w-5 shrink-0">{c.code}</span>
+                                        : 'bg-white/3 border border-[#E4E9F0] text-[#6B7280] hover:bg-[#F0F3F7] hover:text-[#6B7280]'}`}>
+                                    <span className="font-black text-[10px] text-[#9CA3AF] w-5 shrink-0">{c.code}</span>
                                     <span className="truncate flex-1">{c.name}</span>
                                     {isSelected && <X size={10} className="shrink-0 text-purple-400" />}
                                 </button>
                             )
                         })}
                         {filteredCountries.length === 0 && (
-                            <p className="col-span-2 text-center text-xs text-white/20 py-6">Sin resultados</p>
+                            <p className="col-span-2 text-center text-xs text-[#9CA3AF] py-6">Sin resultados</p>
                         )}
                     </div>
                 </div>
@@ -192,7 +192,7 @@ export default function LocationSelector({ selected, onChange, platform = 'meta'
                     <div className="space-y-1 max-h-52 overflow-y-auto pr-0.5">
                         {/* Buscando en vivo */}
                         {searching && (
-                            <div className="flex items-center justify-center gap-2 py-6 text-xs text-white/30">
+                            <div className="flex items-center justify-center gap-2 py-6 text-xs text-[#9CA3AF]">
                                 <Loader2 size={13} className="animate-spin" /> Buscando departamentos / regiones…
                             </div>
                         )}
@@ -206,13 +206,13 @@ export default function LocationSelector({ selected, onChange, platform = 'meta'
                                 <button key={val} onClick={() => toggleLive(item)}
                                     className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs text-left transition-all ${isSelected
                                         ? 'bg-blue-500/15 border border-blue-500/30 text-blue-200'
-                                        : 'bg-white/3 border border-white/8 text-white/60 hover:bg-white/8 hover:text-white/90'}`}>
+                                        : 'bg-white/3 border border-[#E4E9F0] text-[#6B7280] hover:bg-[#F0F3F7] hover:text-[#6B7280]'}`}>
                                     {isRegion
-                                        ? <Building2 size={11} className={`shrink-0 ${isSelected ? 'text-blue-400' : 'text-white/20'}`} />
-                                        : <MapPin size={11} className={`shrink-0 ${isSelected ? 'text-blue-400' : 'text-white/20'}`} />}
+                                        ? <Building2 size={11} className={`shrink-0 ${isSelected ? 'text-blue-400' : 'text-[#9CA3AF]'}`} />
+                                        : <MapPin size={11} className={`shrink-0 ${isSelected ? 'text-blue-400' : 'text-[#9CA3AF]'}`} />}
                                     <div className="flex-1 min-w-0">
-                                        <p className="font-medium truncate">{item.name} {isRegion && <span className="text-[9px] text-white/30">· depto/región</span>}</p>
-                                        <p className="text-[10px] text-white/30 truncate">{[item.region, item.countryName].filter(Boolean).join(', ') || item.countryCode}</p>
+                                        <p className="font-medium truncate">{item.name} {isRegion && <span className="text-[9px] text-[#9CA3AF]">· depto/región</span>}</p>
+                                        <p className="text-[10px] text-[#9CA3AF] truncate">{[item.region, item.countryName].filter(Boolean).join(', ') || item.countryCode}</p>
                                     </div>
                                     {isSelected && <X size={10} className="shrink-0 text-blue-400" />}
                                 </button>
@@ -220,7 +220,7 @@ export default function LocationSelector({ selected, onChange, platform = 'meta'
                         })}
 
                         {!searching && live.length === 0 && (
-                            <p className="text-center text-xs text-white/20 py-6">
+                            <p className="text-center text-xs text-[#9CA3AF] py-6">
                                 {liveError && q.length >= 2
                                     ? 'Conectá tu cuenta de Meta para buscar departamentos.'
                                     : q.length >= 2
@@ -229,7 +229,7 @@ export default function LocationSelector({ selected, onChange, platform = 'meta'
                             </p>
                         )}
                     </div>
-                    <p className="text-[10px] text-white/15 mt-2 text-center">
+                    <p className="text-[10px] text-[#9CA3AF] mt-2 text-center">
                         {live.length > 0
                             ? 'Departamentos / regiones reales de Meta — segmentan correctamente'
                             : 'Segmentá por departamento (no por ciudad). Buscá el nombre y seleccionalo.'}

@@ -17,7 +17,7 @@ const PLATFORMS = [
 ]
 
 const STATUS_LABELS: Record<string, { label: string; color: string; dot: string; bg: string }> = {
-    DRAFT:      { label: 'Borrador',   color: 'text-white/40',   dot: 'bg-white/25',              bg: 'bg-white/5 border-white/10' },
+    DRAFT:      { label: 'Borrador',   color: 'text-[#9CA3AF]',   dot: 'bg-[#F0F3F7]',              bg: 'bg-[#F4F6FA] border-[#E4E9F0]' },
     READY:      { label: 'Listo',      color: 'text-blue-400',   dot: 'bg-blue-400',              bg: 'bg-blue-500/10 border-blue-500/20' },
     PUBLISHING: { label: 'Publicando', color: 'text-yellow-400', dot: 'bg-yellow-400 animate-pulse', bg: 'bg-yellow-500/10 border-yellow-500/20' },
     PUBLISHED:  { label: 'Publicado',  color: 'text-emerald-400',dot: 'bg-emerald-400',           bg: 'bg-emerald-500/10 border-emerald-500/20' },
@@ -153,7 +153,7 @@ function AdsDashboardInner() {
     const visibleCampaigns = selectedBriefId ? campaigns.filter((c: any) => c.briefId === selectedBriefId) : campaigns
 
     return (
-        <div className="px-4 md:px-6 xl:px-10 pt-6 pb-28 max-w-screen-2xl mx-auto text-white">
+        <div className="px-4 md:px-6 xl:px-10 pt-6 pb-28 max-w-screen-2xl mx-auto text-[#111827]">
 
             <div className="mb-4 flex justify-end"><AIKeySelector compact /></div>
 
@@ -168,14 +168,14 @@ function AdsDashboardInner() {
                 <div className="relative flex flex-col sm:flex-row sm:items-center justify-between gap-5">
                     <div className="flex items-center gap-4">
                         <Link href="/dashboard/services/ads"
-                            className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 hover:bg-white/10 transition-all"
-                            style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}
+                            className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 hover:bg-[#F0F3F7] transition-all"
+                            style={{ background: 'rgba(15,23,42,0.08)', border: '1px solid rgba(15,23,42,0.08)' }}
                             title="Volver a plataformas">
-                            <ArrowLeft size={16} className="text-white/50" />
+                            <ArrowLeft size={16} className="text-[#9CA3AF]" />
                         </Link>
                         <div className="w-13 h-13 rounded-2xl flex items-center justify-center shrink-0"
                             style={{ background: 'linear-gradient(135deg, rgba(0,129,251,0.3), rgba(59,130,246,0.2))', border: '1px solid rgba(0,129,251,0.35)', width: 52, height: 52 }}>
-                            <span className="text-white font-black text-xl">f</span>
+                            <span className="text-[#111827] font-black text-xl">f</span>
                         </div>
                         <div>
                             <div className="flex items-center gap-2 mb-0.5">
@@ -187,42 +187,42 @@ function AdsDashboardInner() {
                                     AI
                                 </span>
                             </div>
-                            <p className="text-xs text-white/35 font-medium">Facebook & Instagram · Impulsado por IA</p>
+                            <p className="text-xs text-[#9CA3AF] font-medium">Facebook & Instagram · Impulsado por IA</p>
                         </div>
                     </div>
 
                     <div className="flex items-center gap-2 flex-nowrap overflow-x-auto scrollbar-hide -mx-1 px-1">
                         <Link href="/dashboard/services/ads/wizard"
-                            className="shrink-0 flex items-center gap-2 text-white text-sm font-bold px-3 sm:px-5 py-2.5 rounded-xl transition-all active:scale-[0.97] shadow-[0_0_30px_rgba(139,92,246,0.35)]"
+                            className="shrink-0 flex items-center gap-2 text-[#111827] text-sm font-bold px-3 sm:px-5 py-2.5 rounded-xl transition-all active:scale-[0.97] shadow-[0_0_30px_rgba(139,92,246,0.35)]"
                             style={{ background: 'linear-gradient(135deg, #7c3aed, #3b82f6)' }}>
                             <Plus size={15} />
                             <span className="hidden sm:inline">Nueva&nbsp;</span>Campaña
                         </Link>
                         <Link href="/dashboard/services/ads/brief?new=1"
-                            className="group relative shrink-0 flex items-center gap-2 text-white text-sm font-black px-3 sm:px-5 py-2.5 rounded-xl transition-all active:scale-[0.97] overflow-hidden animate-pulse-glow"
+                            className="group relative shrink-0 flex items-center gap-2 text-[#111827] text-sm font-black px-3 sm:px-5 py-2.5 rounded-xl transition-all active:scale-[0.97] overflow-hidden animate-pulse-glow"
                             style={{ background: 'linear-gradient(135deg, #ec4899, #8b5cf6 55%, #6366f1)' }}>
                             {/* brillo que cruza */}
                             <span className="pointer-events-none absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700"
-                                style={{ background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent)' }} />
+                                style={{ background: 'linear-gradient(90deg, transparent, rgba(17,24,39,0.55), transparent)' }} />
                             <Sparkles size={15} className="relative animate-pulse" />
                             <span className="relative"><span className="hidden sm:inline">Crear&nbsp;</span>Negocio</span>
-                            <span className="relative text-[8px] font-black px-1.5 py-0.5 rounded-full bg-white/25 leading-none">IA</span>
+                            <span className="relative text-[8px] font-black px-1.5 py-0.5 rounded-full bg-[#F0F3F7] leading-none">IA</span>
                         </Link>
                         <Link href="/dashboard/services/ads/analytics"
-                            className="shrink-0 flex items-center gap-2 text-white/60 text-sm font-bold px-3 sm:px-4 py-2.5 rounded-xl hover:bg-white/10 transition-all"
-                            style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}>
+                            className="shrink-0 flex items-center gap-2 text-[#6B7280] text-sm font-bold px-3 sm:px-4 py-2.5 rounded-xl hover:bg-[#F0F3F7] transition-all"
+                            style={{ background: 'rgba(15,23,42,0.08)', border: '1px solid rgba(15,23,42,0.08)' }}>
                             <Activity size={14} />
                             <span className="hidden sm:inline">Analytics</span>
                         </Link>
                         <Link href="/dashboard/services/ads/history"
-                            className="shrink-0 flex items-center gap-2 text-white/60 text-sm font-bold px-3 sm:px-4 py-2.5 rounded-xl hover:bg-white/10 transition-all"
-                            style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}>
+                            className="shrink-0 flex items-center gap-2 text-[#6B7280] text-sm font-bold px-3 sm:px-4 py-2.5 rounded-xl hover:bg-[#F0F3F7] transition-all"
+                            style={{ background: 'rgba(15,23,42,0.08)', border: '1px solid rgba(15,23,42,0.08)' }}>
                             <BarChart3 size={14} />
                             <span className="hidden sm:inline">Historial</span>
                         </Link>
                         <button onClick={fetchAll}
-                            className="shrink-0 w-10 h-10 rounded-xl flex items-center justify-center text-white/40 hover:text-white transition-all"
-                            style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}>
+                            className="shrink-0 w-10 h-10 rounded-xl flex items-center justify-center text-[#9CA3AF] hover:text-[#111827] transition-all"
+                            style={{ background: 'rgba(15,23,42,0.08)', border: '1px solid rgba(15,23,42,0.08)' }}>
                             <RefreshCw size={14} />
                         </button>
                     </div>
@@ -245,14 +245,14 @@ function AdsDashboardInner() {
                         <div className="w-12 h-12 rounded-full border-2 border-purple-500/20 border-t-purple-400 animate-spin" />
                         <div className="absolute inset-0 rounded-full blur-md" style={{ background: 'rgba(139,92,246,0.1)' }} />
                     </div>
-                    <p className="text-white/25 text-xs font-medium tracking-widest uppercase">Cargando</p>
+                    <p className="text-[#9CA3AF] text-xs font-medium tracking-widest uppercase">Cargando</p>
                 </div>
             ) : (
                 <div className="space-y-6">
 
                     {/* ── SETUP ───────────────────────────── */}
                     {!allReady && (
-                        <div className="rounded-3xl p-5 md:p-6" style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.07)' }}>
+                        <div className="rounded-3xl p-5 md:p-6" style={{ background: 'rgba(15,23,42,0.08)', border: '1px solid rgba(15,23,42,0.08)' }}>
                             <div className="flex items-center justify-between mb-4">
                                 <div className="flex items-center gap-2.5">
                                     <Rocket size={15} className="text-purple-400" />
@@ -261,10 +261,10 @@ function AdsDashboardInner() {
                                 <div className="flex items-center gap-2">
                                     <div className="flex gap-1">
                                         {[0,1,2].map(i => (
-                                            <div key={i} className={`h-1 w-8 rounded-full transition-all duration-500 ${i < stepsCompleted ? 'bg-purple-400' : 'bg-white/8'}`} />
+                                            <div key={i} className={`h-1 w-8 rounded-full transition-all duration-500 ${i < stepsCompleted ? 'bg-purple-400' : 'bg-[#F0F3F7]'}`} />
                                         ))}
                                     </div>
-                                    <span className="text-[10px] text-white/30 font-bold tabular-nums">{stepsCompleted}/3</span>
+                                    <span className="text-[10px] text-[#9CA3AF] font-bold tabular-nums">{stepsCompleted}/3</span>
                                 </div>
                             </div>
                             <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
@@ -282,13 +282,13 @@ function AdsDashboardInner() {
                                             <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${step.done ? 'bg-emerald-500/15' : 'bg-white/4 group-hover:bg-purple-500/12'}`}>
                                                 {step.done
                                                     ? <CheckCircle2 size={15} className="text-emerald-400" />
-                                                    : <Icon size={15} className="text-white/35 group-hover:text-purple-400 transition-colors" />}
+                                                    : <Icon size={15} className="text-[#9CA3AF] group-hover:text-purple-400 transition-colors" />}
                                             </div>
                                             <div className="flex-1 min-w-0">
                                                 <p className="text-xs font-bold truncate">{step.label}</p>
-                                                <p className="text-[10px] text-white/25 truncate">{step.done ? '✓ Completado' : step.desc}</p>
+                                                <p className="text-[10px] text-[#9CA3AF] truncate">{step.done ? '✓ Completado' : step.desc}</p>
                                             </div>
-                                            {!step.done && <ChevronRight size={12} className="text-white/15 group-hover:text-purple-400 shrink-0 transition-colors" />}
+                                            {!step.done && <ChevronRight size={12} className="text-[#9CA3AF] group-hover:text-purple-400 shrink-0 transition-colors" />}
                                         </Link>
                                     )
                                 })}
@@ -299,7 +299,7 @@ function AdsDashboardInner() {
                     {/* ── API KEY (acceso rápido, siempre visible) ── */}
                     <Link href="/dashboard/services/ads/setup"
                         className="flex items-center gap-3 p-3.5 rounded-2xl transition-all hover:bg-white/[0.04] active:scale-[0.995]"
-                        style={{ background: 'rgba(255,255,255,0.02)', border: `1px solid ${hasOpenAI ? 'rgba(52,211,153,0.2)' : 'rgba(251,146,60,0.28)'}` }}>
+                        style={{ background: 'rgba(15,23,42,0.08)', border: `1px solid ${hasOpenAI ? 'rgba(52,211,153,0.2)' : 'rgba(251,146,60,0.28)'}` }}>
                         <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
                             style={{ background: hasOpenAI ? 'rgba(52,211,153,0.12)' : 'rgba(251,146,60,0.12)' }}>
                             <Brain size={16} className={hasOpenAI ? 'text-emerald-400' : 'text-orange-400'} />
@@ -309,7 +309,7 @@ function AdsDashboardInner() {
                                 API Key de OpenAI
                                 {hasOpenAI && <CheckCircle2 size={12} className="text-emerald-400" />}
                             </p>
-                            <p className="text-[10px] text-white/30 truncate">
+                            <p className="text-[10px] text-[#9CA3AF] truncate">
                                 {hasOpenAI ? '✓ Configurada — genera textos e imágenes con IA' : 'Falta configurar — necesaria para generar con IA'}
                             </p>
                         </div>
@@ -323,7 +323,7 @@ function AdsDashboardInner() {
                     {campaigns.length > 0 && (
                         <div className="grid grid-cols-4 gap-2 sm:gap-3">
                             {[
-                                { label: 'Total', value: campaigns.length, icon: Target, color: 'text-white', accent: 'rgba(139,92,246,0.12)', border: 'rgba(139,92,246,0.2)', iconColor: 'text-purple-400' },
+                                { label: 'Total', value: campaigns.length, icon: Target, color: 'text-[#111827]', accent: 'rgba(139,92,246,0.12)', border: 'rgba(139,92,246,0.2)', iconColor: 'text-purple-400' },
                                 { label: 'Publicadas', value: published, icon: Flame, color: 'text-emerald-400', accent: 'rgba(52,211,153,0.08)', border: 'rgba(52,211,153,0.18)', iconColor: 'text-emerald-400' },
                                 { label: 'Borradores', value: drafts, icon: Clock, color: 'text-blue-400', accent: 'rgba(96,165,250,0.08)', border: 'rgba(96,165,250,0.18)', iconColor: 'text-blue-400' },
                                 { label: 'Fallidas', value: failed, icon: XCircle, color: 'text-red-400', accent: 'rgba(248,113,113,0.08)', border: 'rgba(248,113,113,0.18)', iconColor: 'text-red-400' },
@@ -333,12 +333,12 @@ function AdsDashboardInner() {
                                     <div key={stat.label} className="relative overflow-hidden rounded-2xl p-2.5 sm:p-4 flex flex-col sm:flex-row items-center gap-1 sm:gap-3 text-center sm:text-left"
                                         style={{ background: stat.accent, border: `1px solid ${stat.border}` }}>
                                         <div className="w-10 h-10 rounded-xl hidden sm:flex items-center justify-center shrink-0"
-                                            style={{ background: 'rgba(255,255,255,0.04)' }}>
+                                            style={{ background: 'rgba(15,23,42,0.08)' }}>
                                             <Icon size={17} className={stat.iconColor} />
                                         </div>
                                         <div>
                                             <p className={`text-xl sm:text-2xl font-black leading-none tabular-nums ${stat.color}`}>{stat.value}</p>
-                                            <p className="text-[9px] sm:text-[10px] text-white/30 font-medium mt-0.5 leading-tight">{stat.label}</p>
+                                            <p className="text-[9px] sm:text-[10px] text-[#9CA3AF] font-medium mt-0.5 leading-tight">{stat.label}</p>
                                         </div>
                                     </div>
                                 )
@@ -350,7 +350,7 @@ function AdsDashboardInner() {
                     {/* Plataformas */}
                         <div>
                             <div className="flex items-center justify-between mb-3">
-                                <span className="text-[10px] font-bold uppercase tracking-widest text-white/25">Plataformas</span>
+                                <span className="text-[10px] font-bold uppercase tracking-widest text-[#9CA3AF]">Plataformas</span>
                                 <Link href="/dashboard/services/ads/setup" className="flex items-center gap-1 text-[10px] text-purple-400 hover:underline">
                                     <Settings2 size={10} /> Configurar
                                 </Link>
@@ -363,8 +363,8 @@ function AdsDashboardInner() {
                                         <div key={platform.id}
                                             className="relative overflow-hidden rounded-2xl p-3.5"
                                             style={{
-                                                background: platform.comingSoon ? 'rgba(255,255,255,0.01)' : isConnected ? 'rgba(255,255,255,0.03)' : 'rgba(255,255,255,0.015)',
-                                                border: platform.comingSoon ? '1px dashed rgba(255,255,255,0.05)' : isConnected ? '1px solid rgba(255,255,255,0.1)' : '1px dashed rgba(255,255,255,0.07)',
+                                                background: platform.comingSoon ? 'rgba(15,23,42,0.08)' : isConnected ? 'rgba(15,23,42,0.08)' : 'rgba(15,23,42,0.08)',
+                                                border: platform.comingSoon ? '1px dashed rgba(15,23,42,0.08)' : isConnected ? '1px solid rgba(15,23,42,0.08)' : '1px dashed rgba(15,23,42,0.08)',
                                                 opacity: platform.comingSoon ? 0.5 : 1,
                                             }}>
                                             <div className="pointer-events-none absolute -top-6 -right-6 w-20 h-20 rounded-full blur-[40px]"
@@ -372,15 +372,15 @@ function AdsDashboardInner() {
 
                                             <div className="relative flex items-center gap-3">
                                             <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
-                                                style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)' }}>
+                                                style={{ background: 'rgba(15,23,42,0.08)', border: '1px solid rgba(15,23,42,0.08)' }}>
                                                 <span className={`font-black text-sm ${platform.textColor}`}>{platform.letter}</span>
                                             </div>
 
                                             <div className="flex-1 min-w-0">
                                                 <p className="font-bold text-xs leading-tight">{platform.label}</p>
                                                 {isConnected && !platform.comingSoon && integration?.connectedAccount
-                                                    ? <p className="text-[10px] text-white/30 truncate">↳ {integration.connectedAccount.displayName}</p>
-                                                    : <p className="text-[10px] text-white/20 truncate">{platform.sub}</p>
+                                                    ? <p className="text-[10px] text-[#9CA3AF] truncate">↳ {integration.connectedAccount.displayName}</p>
+                                                    : <p className="text-[10px] text-[#9CA3AF] truncate">{platform.sub}</p>
                                                 }
                                             </div>
 
@@ -400,15 +400,15 @@ function AdsDashboardInner() {
 
                                             {platform.comingSoon
                                                 ? <span className="text-[10px] font-bold py-1.5 px-3 rounded-xl shrink-0 cursor-not-allowed"
-                                                    style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', color: 'rgba(255,255,255,0.2)' }}>
+                                                    style={{ background: 'rgba(15,23,42,0.08)', border: '1px solid rgba(15,23,42,0.08)', color: 'rgba(17,24,39,0.55)' }}>
                                                     Próximamente
                                                   </span>
                                                 : <button onClick={() => handleConnect(platform.id)}
                                                     className="text-[10px] font-bold py-1.5 px-3 rounded-xl shrink-0 transition-all active:scale-[0.97]"
                                                     style={{
-                                                        background: isConnected ? 'rgba(255,255,255,0.05)' : 'rgba(139,92,246,0.15)',
-                                                        border: isConnected ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(139,92,246,0.3)',
-                                                        color: isConnected ? 'rgba(255,255,255,0.4)' : '#c4b5fd'
+                                                        background: isConnected ? 'rgba(15,23,42,0.08)' : 'rgba(139,92,246,0.15)',
+                                                        border: isConnected ? '1px solid rgba(15,23,42,0.08)' : '1px solid rgba(139,92,246,0.3)',
+                                                        color: isConnected ? 'rgba(17,24,39,0.55)' : '#c4b5fd'
                                                     }}>
                                                     {isConnected ? 'Reconf.' : '+ Conectar'}
                                                   </button>
@@ -417,9 +417,9 @@ function AdsDashboardInner() {
 
                                             {/* Panel de detalles SIEMPRE visible (cada categoría con su flechita) */}
                                             {isConnected && platform.id === 'META' && (loadingMetaDetails || metaDetails) && (
-                                                <div className="relative mt-3 pt-3 border-t border-white/8">
+                                                <div className="relative mt-3 pt-3 border-t border-[#E4E9F0]">
                                                     {loadingMetaDetails && !metaDetails ? (
-                                                        <div className="flex items-center gap-2 text-[11px] text-white/35 py-2">
+                                                        <div className="flex items-center gap-2 text-[11px] text-[#9CA3AF] py-2">
                                                             <Loader2 size={12} className="animate-spin" /> Cargando datos de tu cuenta de Meta…
                                                         </div>
                                                     ) : metaDetails?.needsReconnect ? (
@@ -461,7 +461,7 @@ function AdsDashboardInner() {
                         {/* Mis Negocios */}
                         <div>
                             <div className="flex items-center justify-between mb-3">
-                                <span className="text-[10px] font-bold uppercase tracking-widest text-white/25">Mis Negocios</span>
+                                <span className="text-[10px] font-bold uppercase tracking-widest text-[#9CA3AF]">Mis Negocios</span>
                                 <Link href="/dashboard/services/ads/brief" className="flex items-center gap-1 text-[10px] text-purple-400 hover:underline">
                                     Gestionar <ArrowRight size={10} />
                                 </Link>
@@ -470,12 +470,12 @@ function AdsDashboardInner() {
                             {allBriefs.length === 0 ? (
                                 <Link href="/dashboard/services/ads/brief"
                                     className="flex flex-col items-center justify-center rounded-2xl py-10 gap-3 group transition-all"
-                                    style={{ background: 'rgba(255,255,255,0.015)', border: '1px dashed rgba(255,255,255,0.07)' }}>
+                                    style={{ background: 'rgba(15,23,42,0.08)', border: '1px dashed rgba(15,23,42,0.08)' }}>
                                     <div className="w-10 h-10 rounded-xl flex items-center justify-center"
                                         style={{ background: 'rgba(139,92,246,0.1)', border: '1px solid rgba(139,92,246,0.2)' }}>
                                         <FileText size={16} className="text-purple-400" />
                                     </div>
-                                    <p className="text-xs text-white/30 font-medium">Crear perfil de negocio</p>
+                                    <p className="text-xs text-[#9CA3AF] font-medium">Crear perfil de negocio</p>
                                 </Link>
                             ) : (
                                 <div className="space-y-2">
@@ -491,7 +491,7 @@ function AdsDashboardInner() {
                                         <div key={b.id}
                                             onClick={() => setSelectedBriefId(sel ? null : b.id)}
                                             className="flex flex-wrap lg:flex-nowrap items-center gap-2 lg:gap-3 rounded-2xl px-3 py-2.5 lg:px-3.5 lg:py-3 group cursor-pointer transition-all"
-                                            style={{ background: sel ? 'rgba(124,58,237,0.14)' : 'rgba(255,255,255,0.03)', border: sel ? '1px solid rgba(139,92,246,0.5)' : '1px solid rgba(255,255,255,0.07)' }}>
+                                            style={{ background: sel ? 'rgba(124,58,237,0.14)' : 'rgba(15,23,42,0.08)', border: sel ? '1px solid rgba(139,92,246,0.5)' : '1px solid rgba(15,23,42,0.08)' }}>
                                             <div className="flex items-center gap-2 min-w-0 w-full lg:w-auto lg:flex-1">
                                                 <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0"
                                                     style={{ background: sel ? 'rgba(139,92,246,0.25)' : 'rgba(139,92,246,0.12)', border: '1px solid rgba(139,92,246,0.2)' }}>
@@ -499,15 +499,15 @@ function AdsDashboardInner() {
                                                 </div>
                                                 <div className="flex-1 min-w-0">
                                                     <p className="text-xs font-bold truncate">{b.name}</p>
-                                                    <p className="text-[10px] text-white/25 truncate">{b.industry}</p>
+                                                    <p className="text-[10px] text-[#9CA3AF] truncate">{b.industry}</p>
                                                 </div>
                                                 {sel && <span className="text-[9px] font-black px-2 py-0.5 rounded-full shrink-0 bg-purple-500/20 text-purple-300 border border-purple-500/30">FILTRANDO</span>}
                                             </div>
                                             <div className="flex items-center gap-1.5 w-full lg:w-auto shrink-0">
                                                 <Link href={`/dashboard/services/ads/brief?edit=${b.id}`}
                                                     onClick={e => e.stopPropagation()}
-                                                    className="flex items-center justify-center gap-1 text-[10px] font-bold px-2.5 py-1.5 rounded-xl flex-1 lg:flex-none transition-all active:scale-[0.97] text-white/50 hover:text-white"
-                                                    style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.12)' }}
+                                                    className="flex items-center justify-center gap-1 text-[10px] font-bold px-2.5 py-1.5 rounded-xl flex-1 lg:flex-none transition-all active:scale-[0.97] text-[#9CA3AF] hover:text-[#111827]"
+                                                    style={{ background: 'rgba(15,23,42,0.08)', border: '1px solid rgba(15,23,42,0.08)' }}
                                                     title="Editar negocio">
                                                     <Settings2 size={10} /> Editar
                                                 </Link>
@@ -529,8 +529,8 @@ function AdsDashboardInner() {
                     <div>
                         <div className="flex items-center justify-between mb-3">
                             <div className="flex items-center gap-2 min-w-0">
-                                <TrendingUp size={12} className="text-white/30 shrink-0" />
-                                <span className="text-[10px] font-bold uppercase tracking-widest text-white/25 shrink-0">Campañas</span>
+                                <TrendingUp size={12} className="text-[#9CA3AF] shrink-0" />
+                                <span className="text-[10px] font-bold uppercase tracking-widest text-[#9CA3AF] shrink-0">Campañas</span>
                                 {selectedBriefName && (
                                     <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-500/15 border border-purple-500/25 text-purple-300 truncate">
                                         {selectedBriefName}
@@ -545,17 +545,17 @@ function AdsDashboardInner() {
 
                         {visibleCampaigns.length === 0 ? (
                             <div className="flex flex-col items-center justify-center py-20 gap-4 rounded-3xl text-center px-4"
-                                style={{ background: 'rgba(255,255,255,0.015)', border: '1px dashed rgba(255,255,255,0.07)' }}>
+                                style={{ background: 'rgba(15,23,42,0.08)', border: '1px dashed rgba(15,23,42,0.08)' }}>
                                 <div className="w-14 h-14 rounded-full flex items-center justify-center"
                                     style={{ background: 'rgba(139,92,246,0.1)', border: '1px solid rgba(139,92,246,0.2)' }}>
                                     <Sparkles className="text-purple-400" size={22} />
                                 </div>
                                 <div>
-                                    <p className="text-white/40 text-sm font-bold mb-1">{selectedBriefName ? `Sin campañas para ${selectedBriefName}` : 'Sin campañas todavía'}</p>
-                                    <p className="text-white/20 text-xs">Crea tu primera campaña impulsada por IA</p>
+                                    <p className="text-[#9CA3AF] text-sm font-bold mb-1">{selectedBriefName ? `Sin campañas para ${selectedBriefName}` : 'Sin campañas todavía'}</p>
+                                    <p className="text-[#9CA3AF] text-xs">Crea tu primera campaña impulsada por IA</p>
                                 </div>
                                 <Link href={selectedBriefId ? `/dashboard/services/ads/wizard?briefId=${selectedBriefId}` : '/dashboard/services/ads/wizard'}
-                                    className="flex items-center gap-2 text-white text-sm font-bold px-5 py-2.5 rounded-xl transition-all"
+                                    className="flex items-center gap-2 text-[#111827] text-sm font-bold px-5 py-2.5 rounded-xl transition-all"
                                     style={{ background: 'linear-gradient(135deg, #7c3aed, #3b82f6)' }}>
                                     <Plus size={14} /> Crear campaña
                                 </Link>
@@ -568,21 +568,21 @@ function AdsDashboardInner() {
                                     return (
                                         <div key={campaign.id}
                                             className="group rounded-2xl p-3 lg:p-4 flex flex-wrap lg:flex-nowrap items-center gap-2 lg:gap-3 transition-all"
-                                            style={{ background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.07)' }}
-                                            onMouseEnter={e => (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)')}
-                                            onMouseLeave={e => (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.07)')}>
+                                            style={{ background: 'rgba(15,23,42,0.08)', border: '1px solid rgba(15,23,42,0.08)' }}
+                                            onMouseEnter={e => (e.currentTarget.style.borderColor = 'rgba(15,23,42,0.08)')}
+                                            onMouseLeave={e => (e.currentTarget.style.borderColor = 'rgba(15,23,42,0.08)')}>
 
                                             <div className="flex items-center gap-2.5 min-w-0 w-full lg:w-auto lg:flex-1">
                                                 {/* platform icon */}
                                                 <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
-                                                    style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}>
+                                                    style={{ background: 'rgba(15,23,42,0.08)', border: '1px solid rgba(15,23,42,0.08)' }}>
                                                     {platform && <span className={`font-black text-sm ${platform.textColor}`}>{platform.letter}</span>}
                                                 </div>
 
                                                 {/* info */}
                                                 <div className="flex-1 min-w-0">
                                                     <p className="font-bold text-sm leading-tight truncate">{campaign.name}</p>
-                                                    <p className="text-[10px] text-white/25 truncate mt-0.5">{campaign.strategy?.name || campaign.brief?.name}</p>
+                                                    <p className="text-[10px] text-[#9CA3AF] truncate mt-0.5">{campaign.strategy?.name || campaign.brief?.name}</p>
                                                 </div>
                                             </div>
 
@@ -602,7 +602,7 @@ function AdsDashboardInner() {
                                                 {campaign.status === 'DRAFT' && (
                                                     <Link href={`/dashboard/services/ads/campaign/${campaign.strategyId || campaign.id}?edit=${campaign.id}`}
                                                         className="text-[10px] font-bold px-3 py-1.5 rounded-xl transition-all"
-                                                        style={{ background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.5)', border: '1px solid rgba(255,255,255,0.1)' }}>
+                                                        style={{ background: 'rgba(15,23,42,0.08)', color: 'rgba(17,24,39,0.72)', border: '1px solid rgba(15,23,42,0.08)' }}>
                                                         Continuar
                                                     </Link>
                                                 )}
@@ -636,7 +636,7 @@ function AdsDashboardInner() {
                                                 {(campaign.status === 'PUBLISHED' || campaign.status === 'PAUSED') && (
                                                     <Link href={`/dashboard/services/ads/campaign/${campaign.strategyId || campaign.id}?edit=${campaign.id}`}
                                                         className="text-[10px] font-bold px-3 py-1.5 rounded-xl transition-all"
-                                                        style={{ background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.5)', border: '1px solid rgba(255,255,255,0.1)' }}>
+                                                        style={{ background: 'rgba(15,23,42,0.08)', color: 'rgba(17,24,39,0.72)', border: '1px solid rgba(15,23,42,0.08)' }}>
                                                         Editar
                                                     </Link>
                                                 )}
@@ -655,8 +655,8 @@ function AdsDashboardInner() {
                                 })}
 
                                 <Link href="/dashboard/services/ads/history"
-                                    className="flex items-center justify-center gap-2 py-3 rounded-2xl text-xs text-white/30 font-bold hover:text-white/60 transition-all"
-                                    style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)' }}>
+                                    className="flex items-center justify-center gap-2 py-3 rounded-2xl text-xs text-[#9CA3AF] font-bold hover:text-[#6B7280] transition-all"
+                                    style={{ background: 'rgba(15,23,42,0.08)', border: '1px solid rgba(15,23,42,0.08)' }}>
                                     Ver todas las campañas <ArrowRight size={11} />
                                 </Link>
                             </div>
@@ -677,19 +677,19 @@ function DetailBlock({ title, emoji, items }: { title: string; emoji: string; it
     const list = items || []
     const multiple = list.length > 1
     return (
-        <div className="rounded-lg sm:rounded-xl p-1.5 sm:p-2.5" style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)' }}>
+        <div className="rounded-lg sm:rounded-xl p-1.5 sm:p-2.5" style={{ background: 'rgba(15,23,42,0.08)', border: '1px solid rgba(15,23,42,0.08)' }}>
             <button onClick={() => multiple && setOpen(o => !o)}
                 className={`w-full flex items-center gap-0.5 sm:gap-1 ${multiple ? 'cursor-pointer' : 'cursor-default'}`}>
-                <span className="text-[7px] sm:text-[9px] font-bold uppercase tracking-wide sm:tracking-widest text-white/30 flex-1 text-left truncate leading-tight">{emoji} {title}</span>
-                {list.length > 0 && <span className="text-[8px] sm:text-[9px] font-black text-white/40 tabular-nums">{list.length}</span>}
-                {multiple && <span className="text-white/45 text-[9px] sm:text-[10px] leading-none">{open ? '▴' : '▾'}</span>}
+                <span className="text-[7px] sm:text-[9px] font-bold uppercase tracking-wide sm:tracking-widest text-[#9CA3AF] flex-1 text-left truncate leading-tight">{emoji} {title}</span>
+                {list.length > 0 && <span className="text-[8px] sm:text-[9px] font-black text-[#9CA3AF] tabular-nums">{list.length}</span>}
+                {multiple && <span className="text-[#9CA3AF] text-[9px] sm:text-[10px] leading-none">{open ? '▴' : '▾'}</span>}
             </button>
             {list.length === 0 ? (
-                <p className="text-[9px] sm:text-[11px] text-white/20 mt-0.5 sm:mt-1">—</p>
+                <p className="text-[9px] sm:text-[11px] text-[#9CA3AF] mt-0.5 sm:mt-1">—</p>
             ) : (
                 <ul className="mt-0.5 sm:mt-1 space-y-0.5">
                     {(open ? list : list.slice(0, 1)).map((it, i) => (
-                        <li key={i} className="text-[9px] sm:text-[11px] font-semibold text-white/70 truncate leading-tight" title={it}>{it}</li>
+                        <li key={i} className="text-[9px] sm:text-[11px] font-semibold text-[#6B7280] truncate leading-tight" title={it}>{it}</li>
                     ))}
                     {!open && multiple && (
                         <li onClick={() => setOpen(true)} className="text-[8px] sm:text-[10px] font-bold text-blue-300/70 hover:text-blue-300 cursor-pointer">+{list.length - 1} más ▾</li>

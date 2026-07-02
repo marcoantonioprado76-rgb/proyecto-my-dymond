@@ -218,14 +218,14 @@ function CreateBriefView({ onSaved, onCancel }: { onSaved: (b: Brief) => void; o
     const fmtTime = (s: number) => `${Math.floor(s / 60).toString().padStart(2, '0')}:${(s % 60).toString().padStart(2, '0')}`
 
     return (
-        <div className="px-4 md:px-6 xl:px-10 pt-6 max-w-screen-xl 2xl:max-w-screen-2xl mx-auto pb-24 text-white">
+        <div className="px-4 md:px-6 xl:px-10 pt-6 max-w-screen-xl 2xl:max-w-screen-2xl mx-auto pb-24 text-[#111827]">
             <div className="flex items-center gap-4 mb-8">
-                <button onClick={onCancel} className="w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-all">
+                <button onClick={onCancel} className="w-9 h-9 rounded-xl bg-[#F4F6FA] border border-[#E4E9F0] flex items-center justify-center hover:bg-[#F0F3F7] transition-all">
                     <ArrowLeft size={16} />
                 </button>
                 <div>
                     <h1 className="text-xl font-black uppercase tracking-tighter">Nuevo Negocio</h1>
-                    <p className="text-xs text-white/30">Describe tu negocio y la IA generará el perfil</p>
+                    <p className="text-xs text-[#9CA3AF]">Describe tu negocio y la IA generará el perfil</p>
                 </div>
             </div>
 
@@ -241,7 +241,7 @@ function CreateBriefView({ onSaved, onCancel }: { onSaved: (b: Brief) => void; o
                     {/* PASO 1 — Categoría del negocio (arriba de todo, obligatoria) */}
                     <p className="text-[11px] font-bold text-purple-300 mb-2.5 flex items-center gap-1.5">
                         <Sparkles size={12} /> Describí tu negocio
-                        <span className="text-white/25 font-normal">— la IA detecta el rubro automáticamente</span>
+                        <span className="text-[#9CA3AF] font-normal">— la IA detecta el rubro automáticamente</span>
                     </p>
 
                     {/* Ayuda: prompt para ChatGPT (adaptado a la categoría elegida) */}
@@ -249,7 +249,7 @@ function CreateBriefView({ onSaved, onCancel }: { onSaved: (b: Brief) => void; o
                         <p className="text-[11px] font-bold text-blue-300 mb-1 flex items-center gap-1.5">
                             🤖 ¿No sabés qué escribir? Usá tu ChatGPT
                         </p>
-                        <p className="text-[10px] text-white/45 leading-relaxed mb-2.5">
+                        <p className="text-[10px] text-[#9CA3AF] leading-relaxed mb-2.5">
                             Copiá este prompt, pegalo en tu ChatGPT y respondé las preguntas (ChatGPT detecta tu rubro y pregunta lo relevante). Al final te dará un texto completo — pegalo abajo y generá el brief.
                         </p>
                         <button onClick={copyChatGptPrompt}
@@ -258,10 +258,10 @@ function CreateBriefView({ onSaved, onCancel }: { onSaved: (b: Brief) => void; o
                         </button>
                     </div>
 
-                    <div className="flex gap-2 mb-6 bg-white/5 p-1 rounded-2xl border border-white/8">
+                    <div className="flex gap-2 mb-6 bg-[#F4F6FA] p-1 rounded-2xl border border-[#E4E9F0]">
                         {(['text', 'audio'] as const).map(mode => (
                             <button key={mode} onClick={() => setInputMode(mode)}
-                                className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-bold transition-all ${inputMode === mode ? 'bg-white text-black' : 'text-white/40 hover:text-white/70'}`}>
+                                className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-bold transition-all ${inputMode === mode ? 'bg-white text-black' : 'text-[#9CA3AF] hover:text-[#6B7280]'}`}>
                                 {mode === 'text' ? <><Type size={15} /> Escribir</> : <><Mic size={15} /> Grabar</>}
                             </button>
                         ))}
@@ -271,9 +271,9 @@ function CreateBriefView({ onSaved, onCancel }: { onSaved: (b: Brief) => void; o
                         <div className="space-y-4">
                             <textarea value={text} onChange={e => setText(e.target.value)} rows={9}
                                 placeholder="Pegá acá la descripción de tu negocio. ¿No sabés qué escribir? Copiá el prompt de ChatGPT (botón de arriba), respondé sus preguntas y pegá el resultado. Cuanto más completo, mejor el brief (incluí: qué vendés, a quién, qué problema resolvés, beneficios, diferencial, objetivo, país y ciudades)."
-                                className="w-full bg-[#1c1d2e] border border-white/20 rounded-2xl px-4 py-3 text-sm text-white resize-none focus:outline-none focus:border-purple-500/50 placeholder:text-white/25 leading-relaxed" />
+                                className="w-full bg-[#F4F6FA] border border-[#E4E9F0] rounded-2xl px-4 py-3 text-sm text-[#111827] resize-none focus:outline-none focus:border-purple-500/50 placeholder:text-[#9CA3AF] leading-relaxed" />
                             <div className="flex items-center justify-between -mt-1">
-                                <span className={`text-[11px] font-bold ${text.trim().length >= 80 ? 'text-emerald-400' : 'text-white/30'}`}>
+                                <span className={`text-[11px] font-bold ${text.trim().length >= 80 ? 'text-emerald-400' : 'text-[#9CA3AF]'}`}>
                                     {text.trim().length >= 80 ? '✓ Buen detalle' : `${text.trim().length}/80 — agregá más detalle`}
                                 </span>
                             </div>
@@ -300,7 +300,7 @@ function CreateBriefView({ onSaved, onCancel }: { onSaved: (b: Brief) => void; o
                                 ]} />
                             ) : (
                                 <button onClick={generateBrief} disabled={text.trim().length < 80 || metaConnected === false}
-                                    className="btn-ai-glass w-full flex items-center justify-center gap-2 text-white font-black py-4 rounded-2xl disabled:opacity-50 transition-all">
+                                    className="btn-ai-glass w-full flex items-center justify-center gap-2 text-[#111827] font-black py-4 rounded-2xl disabled:opacity-50 transition-all">
                                     <Sparkles size={18} /> Generar Brief con IA
                                 </button>
                             )}
@@ -314,19 +314,19 @@ function CreateBriefView({ onSaved, onCancel }: { onSaved: (b: Brief) => void; o
                                     <button onClick={recording ? stopRecording : startRecording}
                                         className={`relative w-28 h-28 rounded-full flex items-center justify-center transition-all ${recording ? 'bg-red-500 shadow-[0_0_60px_rgba(239,68,68,0.5)]' : 'bg-purple-600 shadow-[0_0_60px_rgba(139,92,246,0.4)]'}`}>
                                         {recording && <span className="absolute inset-0 rounded-full bg-red-400 animate-ping opacity-25" />}
-                                        {recording ? <Square size={32} className="text-white" /> : <Mic size={32} className="text-white" />}
+                                        {recording ? <Square size={32} className="text-[#111827]" /> : <Mic size={32} className="text-[#111827]" />}
                                     </button>
                                     {recording && <p className="text-4xl font-black font-mono text-red-400">{fmtTime(recordingTime)}</p>}
-                                    {!recording && <p className="text-sm text-white/40">Toca para grabar</p>}
+                                    {!recording && <p className="text-sm text-[#9CA3AF]">Toca para grabar</p>}
                                 </div>
                             ) : (
                                 <div className="flex flex-col items-center gap-4">
                                     <div className="w-20 h-20 rounded-full bg-green-500/20 border-2 border-green-500/40 flex items-center justify-center">
                                         <Volume2 size={32} className="text-green-400" />
                                     </div>
-                                    <p className="text-sm text-white/60">Audio ({fmtTime(recordingTime)})</p>
+                                    <p className="text-sm text-[#6B7280]">Audio ({fmtTime(recordingTime)})</p>
                                     <div className="flex gap-3">
-                                        <button onClick={() => { setAudioBlob(null); setRecordingTime(0) }} className="px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-sm font-bold hover:bg-white/10 transition-all flex items-center gap-2">
+                                        <button onClick={() => { setAudioBlob(null); setRecordingTime(0) }} className="px-4 py-2 rounded-xl bg-[#F4F6FA] border border-[#E4E9F0] text-sm font-bold hover:bg-[#F0F3F7] transition-all flex items-center gap-2">
                                             <RefreshCw size={14} /> Volver a grabar
                                         </button>
                                         <button onClick={transcribeAudio} disabled={transcribing} className="px-6 py-2 rounded-xl bg-purple-600 text-white text-sm font-bold hover:bg-purple-500 disabled:opacity-50 transition-all flex items-center gap-2">
@@ -346,30 +346,30 @@ function CreateBriefView({ onSaved, onCancel }: { onSaved: (b: Brief) => void; o
                             <p className="text-sm font-bold text-green-300">{brief.name} · {brief.industry}</p>
                             <p className="text-xs text-green-400/60 mt-0.5">Brief generado. Puedes editarlo antes de guardar.</p>
                         </div>
-                        <button onClick={() => setBrief(null)} className="ml-auto text-xs font-bold text-white/30 hover:text-white/60 transition-all">Descartar</button>
+                        <button onClick={() => setBrief(null)} className="ml-auto text-xs font-bold text-[#9CA3AF] hover:text-[#6B7280] transition-all">Descartar</button>
                     </div>
 
                     {/* Lo nuevo que generó la IA según la categoría (orientado a los anuncios) */}
                     {(() => { const b = brief as any; const cat = AD_CATEGORIES.find(c => c.id === b.category); return (
                         <div className="p-4 rounded-2xl space-y-3" style={{ background: 'rgba(139,92,246,0.06)', border: '1px solid rgba(139,92,246,0.18)' }}>
                             <p className="text-[11px] font-bold text-purple-300 flex items-center gap-1.5">
-                                <Sparkles size={12} /> Enfoque del anuncio {cat && <span className="text-white/30 font-normal">· {cat.emoji} {cat.label}</span>}
+                                <Sparkles size={12} /> Enfoque del anuncio {cat && <span className="text-[#9CA3AF] font-normal">· {cat.emoji} {cat.label}</span>}
                             </p>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-[11px]">
                                 {Array.isArray(b.benefits) && b.benefits.length > 0 && (
-                                    <div><p className="text-white/30 font-bold uppercase mb-1">Beneficios</p><ul className="space-y-0.5">{b.benefits.map((x: string, i: number) => <li key={i} className="text-white/60 flex gap-1.5"><span className="text-purple-400">✓</span>{x}</li>)}</ul></div>
+                                    <div><p className="text-[#9CA3AF] font-bold uppercase mb-1">Beneficios</p><ul className="space-y-0.5">{b.benefits.map((x: string, i: number) => <li key={i} className="text-[#6B7280] flex gap-1.5"><span className="text-purple-400">✓</span>{x}</li>)}</ul></div>
                                 )}
                                 {Array.isArray(b.adConcepts) && b.adConcepts.length > 0 && (
-                                    <div><p className="text-white/30 font-bold uppercase mb-1">Conceptos visuales</p><ul className="space-y-0.5">{b.adConcepts.map((x: string, i: number) => <li key={i} className="text-white/60 flex gap-1.5"><span className="text-blue-400">▸</span>{x}</li>)}</ul></div>
+                                    <div><p className="text-[#9CA3AF] font-bold uppercase mb-1">Conceptos visuales</p><ul className="space-y-0.5">{b.adConcepts.map((x: string, i: number) => <li key={i} className="text-[#6B7280] flex gap-1.5"><span className="text-blue-400">▸</span>{x}</li>)}</ul></div>
                                 )}
-                                {b.transformation && <div className="sm:col-span-2"><p className="text-white/30 font-bold uppercase mb-1">Transformación (antes→después)</p><p className="text-white/60">{b.transformation}</p></div>}
-                                {b.targetCustomer && <div><p className="text-white/30 font-bold uppercase mb-1">Cliente ideal</p><p className="text-white/60">{b.targetCustomer}</p></div>}
+                                {b.transformation && <div className="sm:col-span-2"><p className="text-[#9CA3AF] font-bold uppercase mb-1">Transformación (antes→después)</p><p className="text-[#6B7280]">{b.transformation}</p></div>}
+                                {b.targetCustomer && <div><p className="text-[#9CA3AF] font-bold uppercase mb-1">Cliente ideal</p><p className="text-[#6B7280]">{b.targetCustomer}</p></div>}
                                 <div className="flex gap-4">
-                                    {b.positioning && <div><p className="text-white/30 font-bold uppercase mb-1">Posicionamiento</p><p className="text-white/60 capitalize">{b.positioning}</p></div>}
-                                    {b.emotion && <div><p className="text-white/30 font-bold uppercase mb-1">Emoción</p><p className="text-white/60">{b.emotion}</p></div>}
+                                    {b.positioning && <div><p className="text-[#9CA3AF] font-bold uppercase mb-1">Posicionamiento</p><p className="text-[#6B7280] capitalize">{b.positioning}</p></div>}
+                                    {b.emotion && <div><p className="text-[#9CA3AF] font-bold uppercase mb-1">Emoción</p><p className="text-[#6B7280]">{b.emotion}</p></div>}
                                 </div>
                                 {b.categoryData && Object.keys(b.categoryData).length > 0 && (
-                                    <div className="sm:col-span-2"><p className="text-white/30 font-bold uppercase mb-1">Datos del rubro</p><div className="flex flex-wrap gap-1.5">{Object.entries(b.categoryData).map(([k, v]) => v ? <span key={k} className="px-2 py-0.5 rounded-lg bg-white/5 border border-white/8 text-white/55">{String(v)}</span> : null)}</div></div>
+                                    <div className="sm:col-span-2"><p className="text-[#9CA3AF] font-bold uppercase mb-1">Datos del rubro</p><div className="flex flex-wrap gap-1.5">{Object.entries(b.categoryData).map(([k, v]) => v ? <span key={k} className="px-2 py-0.5 rounded-lg bg-[#F4F6FA] border border-[#E4E9F0] text-[#6B7280]">{String(v)}</span> : null)}</div></div>
                                 )}
                             </div>
                         </div>
@@ -378,7 +378,7 @@ function CreateBriefView({ onSaved, onCancel }: { onSaved: (b: Brief) => void; o
                     <EditBriefForm brief={brief} onChange={setBrief} />
 
                     <div className="flex gap-3 pt-2">
-                        <button onClick={onCancel} className="flex-1 py-3 rounded-2xl bg-white/5 border border-white/10 text-sm font-bold hover:bg-white/10 transition-all">
+                        <button onClick={onCancel} className="flex-1 py-3 rounded-2xl bg-[#F4F6FA] border border-[#E4E9F0] text-sm font-bold hover:bg-[#F0F3F7] transition-all">
                             Cancelar
                         </button>
                         <button onClick={saveBrief} disabled={saving} className="flex-1 py-3 rounded-2xl bg-gradient-to-r from-purple-600 to-blue-600 text-white text-sm font-bold hover:opacity-90 disabled:opacity-50 transition-all flex items-center justify-center gap-2">
@@ -409,14 +409,14 @@ function EditBriefView({ brief, onSaved, onCancel }: { brief: Brief; onSaved: (b
     }
 
     return (
-        <div className="px-4 md:px-6 xl:px-10 pt-6 max-w-screen-xl 2xl:max-w-screen-2xl mx-auto pb-24 text-white">
+        <div className="px-4 md:px-6 xl:px-10 pt-6 max-w-screen-xl 2xl:max-w-screen-2xl mx-auto pb-24 text-[#111827]">
             <div className="flex items-center gap-4 mb-8">
-                <button onClick={onCancel} className="w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-all">
+                <button onClick={onCancel} className="w-9 h-9 rounded-xl bg-[#F4F6FA] border border-[#E4E9F0] flex items-center justify-center hover:bg-[#F0F3F7] transition-all">
                     <ArrowLeft size={16} />
                 </button>
                 <div>
                     <h1 className="text-xl font-black uppercase tracking-tighter">Editar Negocio</h1>
-                    <p className="text-xs text-white/30">{brief.name}</p>
+                    <p className="text-xs text-[#9CA3AF]">{brief.name}</p>
                 </div>
             </div>
             {error && (
@@ -427,7 +427,7 @@ function EditBriefView({ brief, onSaved, onCancel }: { brief: Brief; onSaved: (b
             )}
             <EditBriefForm brief={form} onChange={setForm} />
             <div className="flex gap-3 mt-6">
-                <button onClick={onCancel} className="flex-1 py-3 rounded-2xl bg-white/5 border border-white/10 text-sm font-bold hover:bg-white/10 transition-all">Cancelar</button>
+                <button onClick={onCancel} className="flex-1 py-3 rounded-2xl bg-[#F4F6FA] border border-[#E4E9F0] text-sm font-bold hover:bg-[#F0F3F7] transition-all">Cancelar</button>
                 <button onClick={save} disabled={saving} className="flex-1 py-3 rounded-2xl bg-gradient-to-r from-purple-600 to-blue-600 text-white text-sm font-bold hover:opacity-90 disabled:opacity-50 transition-all flex items-center justify-center gap-2">
                     {saving ? <><Loader2 size={16} className="animate-spin" /> Guardando...</> : <><Save size={16} /> Guardar Cambios</>}
                 </button>
@@ -460,7 +460,7 @@ function EditBriefForm({ brief, onChange }: { brief: BriefForm; onChange: (b: Br
                 <TagList label="Puntos de Dolor" items={brief.painPoints} onChange={v => onChange({ ...brief, painPoints: v })} placeholder="Ej: Dificultad para bajar de peso..." />
                 <TagList label="Intereses" items={brief.interests} onChange={v => onChange({ ...brief, interests: v })} placeholder="Ej: Salud y bienestar..." />
                 <div>
-                    <label className="text-xs font-bold text-white/40 uppercase tracking-widest block mb-2">Ubicaciones <span className="text-purple-400/60 font-normal lowercase">· detectadas por IA, podés ajustarlas</span></label>
+                    <label className="text-xs font-bold text-[#9CA3AF] uppercase tracking-widest block mb-2">Ubicaciones <span className="text-purple-400/60 font-normal lowercase">· detectadas por IA, podés ajustarlas</span></label>
                     <LocationSelector selected={brief.targetLocations || []} onChange={v => onChange({ ...brief, targetLocations: v })} platform="meta" />
                 </div>
             </Section>
@@ -475,8 +475,8 @@ function EditBriefForm({ brief, onChange }: { brief: BriefForm; onChange: (b: Br
             {((brief as any).category || (brief as any).benefits || (brief as any).adConcepts) && (
                 <Section title="Enfoque del Anuncio (IA)">
                     <div>
-                        <label className="text-xs font-bold text-white/40 uppercase tracking-widest block mb-2">Categoría <span className="text-purple-400/60 font-normal lowercase">· detectada por IA, podés cambiarla</span></label>
-                        <select value={(brief as any).category || 'otro'} onChange={e => onChange({ ...brief, category: e.target.value } as any)} className="w-full bg-[#1c1d2e] border border-white/20 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-purple-500/50 [&>option]:bg-[#1c1d2e]">
+                        <label className="text-xs font-bold text-[#9CA3AF] uppercase tracking-widest block mb-2">Categoría <span className="text-purple-400/60 font-normal lowercase">· detectada por IA, podés cambiarla</span></label>
+                        <select value={(brief as any).category || 'otro'} onChange={e => onChange({ ...brief, category: e.target.value } as any)} className="w-full bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-3 py-2.5 text-sm text-[#111827] focus:outline-none focus:border-purple-500/50 [&>option]:bg-white">
                             {AD_CATEGORIES.map(c => <option key={c.id} value={c.id}>{c.emoji} {c.label}</option>)}
                         </select>
                     </div>
@@ -487,18 +487,18 @@ function EditBriefForm({ brief, onChange }: { brief: BriefForm; onChange: (b: Br
                         <div className="md:col-span-2"><TextareaField label="Cliente Ideal" value={(brief as any).targetCustomer || ''} onChange={(e: any) => onChange({ ...brief, targetCustomer: e.target.value } as any)} /></div>
                         <div className="md:col-span-2 grid grid-cols-3 gap-3">
                             <div>
-                                <label className="text-xs font-bold text-white/40 uppercase tracking-widest block mb-2">Edad mín.</label>
+                                <label className="text-xs font-bold text-[#9CA3AF] uppercase tracking-widest block mb-2">Edad mín.</label>
                                 <input type="number" min={18} max={65} value={(brief as any).targetAgeMin ?? ''} onChange={e => onChange({ ...brief, targetAgeMin: e.target.value ? Number(e.target.value) : undefined } as any)}
-                                    placeholder="18" className="w-full bg-[#1c1d2e] border border-white/20 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-purple-500/50" />
+                                    placeholder="18" className="w-full bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-3 py-2.5 text-sm text-[#111827] focus:outline-none focus:border-purple-500/50" />
                             </div>
                             <div>
-                                <label className="text-xs font-bold text-white/40 uppercase tracking-widest block mb-2">Edad máx.</label>
+                                <label className="text-xs font-bold text-[#9CA3AF] uppercase tracking-widest block mb-2">Edad máx.</label>
                                 <input type="number" min={18} max={65} value={(brief as any).targetAgeMax ?? ''} onChange={e => onChange({ ...brief, targetAgeMax: e.target.value ? Number(e.target.value) : undefined } as any)}
-                                    placeholder="65" className="w-full bg-[#1c1d2e] border border-white/20 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-purple-500/50" />
+                                    placeholder="65" className="w-full bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-3 py-2.5 text-sm text-[#111827] focus:outline-none focus:border-purple-500/50" />
                             </div>
                             <div>
-                                <label className="text-xs font-bold text-white/40 uppercase tracking-widest block mb-2">Género</label>
-                                <select value={(brief as any).targetGender || 'all'} onChange={e => onChange({ ...brief, targetGender: e.target.value } as any)} className="w-full bg-[#1c1d2e] border border-white/20 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-purple-500/50 [&>option]:bg-[#1c1d2e]">
+                                <label className="text-xs font-bold text-[#9CA3AF] uppercase tracking-widest block mb-2">Género</label>
+                                <select value={(brief as any).targetGender || 'all'} onChange={e => onChange({ ...brief, targetGender: e.target.value } as any)} className="w-full bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-3 py-2.5 text-sm text-[#111827] focus:outline-none focus:border-purple-500/50 [&>option]:bg-white">
                                     <option value="all">Todos</option>
                                     <option value="male">Hombres</option>
                                     <option value="female">Mujeres</option>
@@ -506,8 +506,8 @@ function EditBriefForm({ brief, onChange }: { brief: BriefForm; onChange: (b: Br
                             </div>
                         </div>
                         <div>
-                            <label className="text-xs font-bold text-white/40 uppercase tracking-widest block mb-2">Posicionamiento</label>
-                            <select value={(brief as any).positioning || ''} onChange={e => onChange({ ...brief, positioning: e.target.value } as any)} className="w-full bg-[#1c1d2e] border border-white/20 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-purple-500/50 [&>option]:bg-[#1c1d2e]">
+                            <label className="text-xs font-bold text-[#9CA3AF] uppercase tracking-widest block mb-2">Posicionamiento</label>
+                            <select value={(brief as any).positioning || ''} onChange={e => onChange({ ...brief, positioning: e.target.value } as any)} className="w-full bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-3 py-2.5 text-sm text-[#111827] focus:outline-none focus:border-purple-500/50 [&>option]:bg-white">
                                 <option value="">—</option>
                                 <option value="premium">Premium</option>
                                 <option value="medio">Medio</option>
@@ -518,7 +518,7 @@ function EditBriefForm({ brief, onChange }: { brief: BriefForm; onChange: (b: Br
                     </div>
                     {(brief as any).categoryData && Object.keys((brief as any).categoryData).length > 0 && (
                         <div>
-                            <label className="text-xs font-bold text-white/40 uppercase tracking-widest block mb-2">Datos del Rubro</label>
+                            <label className="text-xs font-bold text-[#9CA3AF] uppercase tracking-widest block mb-2">Datos del Rubro</label>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                 {Object.entries((brief as any).categoryData).map(([k, v]) => (
                                     <InputField key={k} label={k} value={(v as string) || ''} onChange={(e: any) => onChange({ ...brief, categoryData: { ...(brief as any).categoryData, [k]: e.target.value } } as any)} />
@@ -532,8 +532,8 @@ function EditBriefForm({ brief, onChange }: { brief: BriefForm; onChange: (b: Br
             <Section title="Estrategia">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label className="text-xs font-bold text-white/40 uppercase tracking-widest block mb-2">Objetivo Principal</label>
-                        <select {...field('primaryObjective')} className="w-full bg-[#1c1d2e] border border-white/20 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-purple-500/50 [&>option]:bg-[#1c1d2e]">
+                        <label className="text-xs font-bold text-[#9CA3AF] uppercase tracking-widest block mb-2">Objetivo Principal</label>
+                        <select {...field('primaryObjective')} className="w-full bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-3 py-2.5 text-sm text-[#111827] focus:outline-none focus:border-purple-500/50 [&>option]:bg-white">
                             <option value="conversion">Conversión / Ventas</option>
                             <option value="leads">Generación de Leads</option>
                             <option value="traffic">Tráfico al sitio</option>
@@ -549,8 +549,8 @@ function EditBriefForm({ brief, onChange }: { brief: BriefForm; onChange: (b: Br
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
     return (
-        <div className="bg-dark-900/40 border border-white/8 rounded-2xl p-5 space-y-4">
-            <p className="text-[10px] font-bold uppercase tracking-widest text-white/30">{title}</p>
+        <div className="bg-dark-900/40 border border-[#E4E9F0] rounded-2xl p-5 space-y-4">
+            <p className="text-[10px] font-bold uppercase tracking-widest text-[#9CA3AF]">{title}</p>
             {children}
         </div>
     )
@@ -561,7 +561,7 @@ function TagList({ label, items, onChange, placeholder }: { label: string; items
     const add = () => { const v = input.trim(); if (v && !items.includes(v)) onChange([...items, v]); setInput('') }
     return (
         <div>
-            <label className="text-xs font-bold text-white/40 uppercase tracking-widest block mb-2">{label}</label>
+            <label className="text-xs font-bold text-[#9CA3AF] uppercase tracking-widest block mb-2">{label}</label>
             <div className="flex flex-wrap gap-2 mb-2">
                 {items.map((item, i) => (
                     <span key={i} className="flex items-center gap-1.5 text-xs bg-purple-500/10 border border-purple-500/20 text-purple-300 px-3 py-1.5 rounded-full font-medium">
@@ -572,8 +572,8 @@ function TagList({ label, items, onChange, placeholder }: { label: string; items
             </div>
             <div className="flex gap-2">
                 <input value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), add())}
-                    placeholder={placeholder} className="flex-1 bg-[#1c1d2e] border border-white/20 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-500/50 placeholder:text-white/30" />
-                <button onClick={add} className="px-3 py-2 bg-white/5 border border-white/10 rounded-xl text-xs font-bold hover:bg-purple-500/20 transition-all">+ Agregar</button>
+                    placeholder={placeholder} className="flex-1 bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-3 py-2 text-sm text-[#111827] focus:outline-none focus:border-purple-500/50 placeholder:text-[#9CA3AF]" />
+                <button onClick={add} className="px-3 py-2 bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl text-xs font-bold hover:bg-purple-500/20 transition-all">+ Agregar</button>
             </div>
         </div>
     )
@@ -582,8 +582,8 @@ function TagList({ label, items, onChange, placeholder }: { label: string; items
 function InputField({ label, value, onChange, placeholder }: { label: string; value: string; onChange: any; placeholder?: string }) {
     return (
         <div>
-            <label className="text-xs font-bold text-white/40 uppercase tracking-widest block mb-2">{label}</label>
-            <input value={value} onChange={onChange} placeholder={placeholder} className="w-full bg-[#1c1d2e] border border-white/20 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-purple-500/50 placeholder:text-white/30" />
+            <label className="text-xs font-bold text-[#9CA3AF] uppercase tracking-widest block mb-2">{label}</label>
+            <input value={value} onChange={onChange} placeholder={placeholder} className="w-full bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-3 py-2.5 text-sm text-[#111827] focus:outline-none focus:border-purple-500/50 placeholder:text-[#9CA3AF]" />
         </div>
     )
 }
@@ -591,8 +591,8 @@ function InputField({ label, value, onChange, placeholder }: { label: string; va
 function TextareaField({ label, value, onChange }: { label: string; value: string; onChange: any }) {
     return (
         <div>
-            <label className="text-xs font-bold text-white/40 uppercase tracking-widest block mb-2">{label}</label>
-            <textarea value={value} onChange={onChange} rows={3} className="w-full bg-[#1c1d2e] border border-white/20 rounded-xl px-3 py-2.5 text-sm text-white resize-none focus:outline-none focus:border-purple-500/50 leading-relaxed" />
+            <label className="text-xs font-bold text-[#9CA3AF] uppercase tracking-widest block mb-2">{label}</label>
+            <textarea value={value} onChange={onChange} rows={3} className="w-full bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-3 py-2.5 text-sm text-[#111827] resize-none focus:outline-none focus:border-purple-500/50 leading-relaxed" />
         </div>
     )
 }

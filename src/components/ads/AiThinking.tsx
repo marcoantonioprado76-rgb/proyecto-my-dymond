@@ -35,7 +35,7 @@ export function AiThinking({ messages, className = '', variant = 'full' }:
 
     if (compact) {
         return (
-            <div className={`absolute inset-0 flex flex-col items-center justify-center gap-2.5 bg-[#0a0818]/85 px-3 ${className}`}>
+            <div className={`absolute inset-0 flex flex-col items-center justify-center gap-2.5 bg-[#F4F6FA] px-3 ${className}`}>
                 <div className="ai-dots"><span /><span /><span /></div>
                 <div className="ai-grad-text text-[10px] font-bold text-center transition-all duration-300" style={textStyle}>{messages[idx]}</div>
             </div>
