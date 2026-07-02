@@ -2,8 +2,13 @@ export const dynamic = 'force-dynamic'
 import { NextRequest, NextResponse } from 'next/server'
 import { getAuthUser } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
-import { resolveOpenAIKey, chargeForChatUsage } from '@/lib/ai-credits'
+import { decrypt } from '@/lib/ads/encryption'
+
+const ENC_KEY = process.env.ADS_ENCRYPTION_KEY
+if (!ENC_KEY) throw new Error('ADS_ENCRYPTION_KEY env var is not set')
+
 import { generateStrategySuggestions } from '@/lib/ads/openai-ads'
+import { resolveAdsKey, logAiUsage } from '@/lib/ai-credits'
 
 export async function POST(req: NextRequest) {
     const user = await getAuthUser()
@@ -20,38 +25,37 @@ export async function POST(req: NextRequest) {
         })
         if (!brief) return NextResponse.json({ error: 'Brief no encontrado' }, { status: 404 })
 
-        // Modelo: si el usuario tiene una key propia configurada, respetamos su modelo elegido;
-        // si no, usamos gpt-4o por defecto.
-        const openaiConfig = await (prisma as any).openAIConfig.findUnique({ where: { userId: user.id } })
-        const model = openaiConfig?.model || 'gpt-4o'
-
-        // Resolver key (NO cobra todavía — el cobro va por tokens reales después)
-        const resolved = await resolveOpenAIKey(user.id)
-        if (!resolved.ok) {
-            if (resolved.error === 'NO_CREDITS') {
-                return NextResponse.json({
-                    error: 'Sin saldo de IA. Comprá saldo o configurá tu propia API Key.',
-                    code: 'NO_CREDITS',
-                    balanceUsd: resolved.balanceUsd,
-                }, { status: 402 })
+        // Leer los campos NUEVOS (category + ai_data) con SQL crudo y fusionarlos al brief,
+        // así la estrategia usa TODO el brief (benefits, positioning, transformation, etc.).
+        // Con guarda: si las columnas aún no existen, sigue con el brief viejo.
+        try {
+            const rows: any[] = await prisma.$queryRawUnsafe(
+                'SELECT category, ai_data FROM business_briefs WHERE id = $1::uuid LIMIT 1', briefId,
+            )
+            if (rows?.[0]) {
+                if (rows[0].category) brief.category = rows[0].category
+                let ai = rows[0].ai_data
+                if (typeof ai === 'string') { try { ai = JSON.parse(ai) } catch { ai = null } }
+                if (ai && typeof ai === 'object' && !Array.isArray(ai)) Object.assign(brief, ai)
             }
-            return NextResponse.json({
-                error: 'No hay API Key disponible para esta función. Configurá tu propia key o pedile al admin que active la global.',
-                code: resolved.error,
-            }, { status: 400 })
+        } catch (e) {
+            console.warn('[suggest] no se pudo leer ai_data:', e instanceof Error ? e.message : e)
         }
 
-        // Generate AI suggestions + capturar tokens consumidos
-        let usage: { promptTokens: number; completionTokens: number } | null = null
-        const suggestions = await generateStrategySuggestions(
-            brief, resolved.key, model, platform, objective, destination, mediaType,
-            (u) => { usage = u },
-        )
-        if (resolved.source === 'admin' && usage) {
-            const u = usage as { promptTokens: number; completionTokens: number }
-            chargeForChatUsage(user.id, model, u.promptTokens, u.completionTokens, 'ads.strategies.suggest', { briefId })
-                .catch(e => console.error('[StrategySuggest] charge error:', e))
+        // Key propia (Configuración → IA) o la global del sistema si hay saldo
+        const openaiConfig = await (prisma as any).openAIConfig.findUnique({ where: { userId: user.id } })
+        const resolvedKey = await resolveAdsKey(user.id)
+        if (!resolvedKey) {
+            return NextResponse.json({ error: 'Configura tu API key de OpenAI en Configuración → IA, o compra créditos de IA.' }, { status: 400 })
         }
+        const apiKey = resolvedKey.key
+        const aiModel = openaiConfig?.model || 'gpt-5.1'
+
+        // Generate AI suggestions using the configured model
+        const suggestions = await generateStrategySuggestions(
+            brief, apiKey, aiModel, platform, objective, destination, mediaType,
+            (p, c) => { if (resolvedKey.isGlobal) logAiUsage({ userId: user.id, service: 'ads-strategies', model: aiModel, promptTokens: p, completionTokens: c }).catch(() => {}) },
+        )
 
         // Delete old AI suggestions that are NOT referenced by any campaign AND not saved by user
         const usedStrategyIds = (await (prisma as any).adCampaignV2.findMany({
@@ -62,6 +66,7 @@ export async function POST(req: NextRequest) {
         await (prisma as any).adStrategy.deleteMany({
             where: {
                 userId: user.id,
+                briefId,
                 isGlobal: false,
                 savedByUser: false,
                 ...(usedStrategyIds.length > 0 ? { id: { notIn: usedStrategyIds } } : {})
@@ -115,6 +120,7 @@ export async function POST(req: NextRequest) {
                     advantageType: s.advantageType,
                     isGlobal: false,
                     userId: user.id,
+                    briefId,
                     sortOrder: i,
                     isActive: true,
                 }

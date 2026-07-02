@@ -2,14 +2,23 @@ export const dynamic = 'force-dynamic'
 import { NextResponse } from 'next/server'
 import { getAuthUser } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { decrypt } from '@/lib/ads/encryption'
 import { generateAdCopies } from '@/lib/ads/openai-ads'
-import { resolveOpenAIKey, chargeForChatUsage } from '@/lib/ai-credits'
+import { resolveAdsKey, logAiUsage } from '@/lib/ai-credits'
+
+const ENC_KEY = process.env.ADS_ENCRYPTION_KEY
+if (!ENC_KEY) throw new Error('ADS_ENCRYPTION_KEY env var is not set')
 
 export async function POST(req: Request, { params }: { params: { id: string } }) {
     const user = await getAuthUser()
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
     const oaiConfig = await (prisma as any).openAIConfig.findUnique({ where: { userId: user.id } })
+    const resolvedKey = await resolveAdsKey(user.id)
+    if (!resolvedKey) {
+        return NextResponse.json({ error: 'Configura tu OpenAI API Key en Configuración → IA, o compra créditos de IA.' }, { status: 400 })
+    }
+    const apiKey = resolvedKey.key
     const model = oaiConfig?.model || 'gpt-4o'
 
     const campaign = await (prisma as any).adCampaignV2.findFirst({
@@ -21,20 +30,22 @@ export async function POST(req: Request, { params }: { params: { id: string } })
     })
     if (!campaign) return NextResponse.json({ error: 'Campaña no encontrada' }, { status: 404 })
 
-    // Resolver key (NO cobra todavía — cobro por tokens reales después)
-    const resolved = await resolveOpenAIKey(user.id)
-    if (!resolved.ok) {
-        if (resolved.error === 'NO_CREDITS') {
-            return NextResponse.json({
-                error: 'Sin saldo de IA. Comprá saldo o configurá tu propia API Key.',
-                code: 'NO_CREDITS', balanceUsd: resolved.balanceUsd,
-            }, { status: 402 })
-        }
-        return NextResponse.json({ error: 'No hay API Key disponible.', code: resolved.error }, { status: 400 })
+    // Fusionar los campos nuevos del brief (ai_data) → hooks por rubro + beneficios en el copy.
+    if (campaign.brief?.id) {
+        try {
+            const rows: any[] = await prisma.$queryRawUnsafe(
+                'SELECT category, ai_data FROM business_briefs WHERE id = $1::uuid LIMIT 1', campaign.brief.id,
+            )
+            if (rows?.[0]) {
+                if (rows[0].category) campaign.brief.category = rows[0].category
+                let ai = rows[0].ai_data
+                if (typeof ai === 'string') { try { ai = JSON.parse(ai) } catch { ai = null } }
+                if (ai && typeof ai === 'object' && !Array.isArray(ai)) Object.assign(campaign.brief, ai)
+            }
+        } catch (e) { console.warn('[Copies] ai_data:', e instanceof Error ? e.message : e) }
     }
 
     try {
-        let usage: { promptTokens: number; completionTokens: number } | null = null
         const copies = await generateAdCopies({
             brief: {
                 name: campaign.brief.name,
@@ -52,23 +63,23 @@ export async function POST(req: Request, { params }: { params: { id: string } })
                 keyMessages: campaign.brief.keyMessages,
                 personalityTraits: campaign.brief.personalityTraits,
                 contentThemes: campaign.brief.contentThemes,
-                engagementLevel: campaign.brief.engagementLevel || 'medio'
-            },
-            strategyName: campaign.strategy.name,
-            platform: campaign.strategy.platform,
-            objective: campaign.strategy.objective,
-            destination: campaign.strategy.destination,
-            mediaType: campaign.strategy.mediaType,
-            count: campaign.strategy.mediaCount,
-            apiKey: resolved.key,
-            model: oaiConfig?.model || model,
-            onUsage: (u) => { usage = u },
+                engagementLevel: campaign.brief.engagementLevel || 'medio',
+                // Datos nuevos → hooks por rubro + beneficios
+                category: campaign.brief.category,
+                benefits: campaign.brief.benefits,
+                targetCustomer: campaign.brief.targetCustomer,
+                transformation: campaign.brief.transformation,
+            } as any,
+            strategyName: campaign.strategyName ?? campaign.strategy?.name,
+            platform: campaign.platform,
+            objective: campaign.objective ?? campaign.strategy?.objective,
+            destination: campaign.destination ?? campaign.strategy?.destination,
+            mediaType: campaign.mediaType ?? campaign.strategy?.mediaType,
+            count: campaign.mediaCount ?? campaign.strategy?.mediaCount,
+            apiKey,
+            model,
+            onUsage: (p, c) => { if (resolvedKey.isGlobal) logAiUsage({ userId: user.id, service: 'ads-copies', model, promptTokens: p, completionTokens: c }).catch(() => {}) },
         })
-        if (resolved.source === 'admin' && usage) {
-            const u = usage as { promptTokens: number; completionTokens: number }
-            chargeForChatUsage(user.id, model, u.promptTokens, u.completionTokens, 'ads.copies', { campaignId: params.id })
-                .catch(e => console.error('[GenerateCopies] charge error:', e))
-        }
 
         // Upsert by slotIndex: update existing records (preserving uploaded mediaUrl/mediaType)
         // or create new ones if slot doesn't exist yet. This avoids duplicate records.
@@ -143,7 +154,6 @@ export async function POST(req: Request, { params }: { params: { id: string } })
 
         return NextResponse.json({ creatives: saved, count: saved.length })
     } catch (err: any) {
-        // Sin pre-cobro, no hay refund que hacer.
         console.error('[GenerateCopies]', err)
         return NextResponse.json({ error: err.message || 'Error al generar copies' }, { status: 500 })
     }

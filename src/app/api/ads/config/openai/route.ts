@@ -18,7 +18,11 @@ export async function GET() {
     if (!config) return NextResponse.json({ config: null })
 
     let apiKeyMasked = '••••••••••••????'
-    try { apiKeyMasked = '••••••••••••' + decrypt(config.apiKeyEnc, ENC_KEY).slice(-4) } catch {}
+    try {
+        apiKeyMasked = '••••••••••••' + decrypt(config.apiKeyEnc, ENC_KEY).slice(-4)
+    } catch (e) {
+        console.error('[OpenAI Config GET] Failed to decrypt API key:', e)
+    }
 
     return NextResponse.json({
         config: {

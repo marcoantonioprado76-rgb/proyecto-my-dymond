@@ -3,7 +3,8 @@ import { NextResponse } from 'next/server'
 import { getAuthUser } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { AdPlatform } from '@prisma/client'
-import { getPlanLimits, PLAN_NAMES, type UserPlan } from '@/lib/plan-limits'
+import { PLAN_NAMES } from '@/lib/plan-limits'
+import { getUserLimits } from '@/lib/user-limits'
 
 export async function POST(req: Request) {
     const user = await getAuthUser()
@@ -21,11 +22,8 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: 'briefId, strategyId y name son requeridos' }, { status: 400 })
     }
 
-    // Plan limit check (plan base + anuncios extra otorgados por admin)
-    const userRecord = await prisma.user.findUnique({ where: { id: user.id }, select: { plan: true, extraAdsPerMonth: true } })
-    const plan = (userRecord?.plan ?? 'NONE') as UserPlan
-    const extraAdsPerMonth = userRecord?.extraAdsPerMonth ?? 0
-    const limits = getPlanLimits(plan)
+    // Límite efectivo (pack + overrides del admin)
+    const { plan, limits } = await getUserLimits(user.id)
 
     if (!limits.ads) {
         return NextResponse.json({
@@ -42,14 +40,13 @@ export async function POST(req: Request) {
     const adsThisMonth = await (prisma as any).adCampaignV2.count({
         where: { userId: user.id, createdAt: { gte: startOfMonth } }
     })
-    const effectiveAdsPerMonth = limits.adsPerMonth === Infinity ? Infinity : limits.adsPerMonth + extraAdsPerMonth
-    if (adsThisMonth >= effectiveAdsPerMonth) {
+    if (adsThisMonth >= limits.adsPerMonth) {
         return NextResponse.json({
-            error: `Alcanzaste el límite de ${effectiveAdsPerMonth} anuncios por mes de tu ${PLAN_NAMES[plan]}. Actualiza tu plan para crear más.`,
+            error: `Alcanzaste el límite de ${limits.adsPerMonth} anuncios por mes de tu ${PLAN_NAMES[plan]}. Actualiza tu plan para crear más.`,
             limitReached: true,
             plan,
             adsThisMonth,
-            adsPerMonth: effectiveAdsPerMonth,
+            adsPerMonth: limits.adsPerMonth,
         }, { status: 403 })
     }
 
@@ -86,7 +83,8 @@ export async function POST(req: Request) {
         }
     }
 
-    // Create campaign
+    // Create campaign — guardamos una "foto" de la estrategia dentro de la campaña
+    // para que sea autónoma (no dependa de la estrategia para editar/publicar).
     const campaign = await (prisma as any).adCampaignV2.create({
         data: {
             userId: user.id,
@@ -95,14 +93,20 @@ export async function POST(req: Request) {
             platform: strategy.platform as AdPlatform,
             name: name.trim(),
             status: 'DRAFT',
-            dailyBudgetUSD: Math.max(0, parseFloat(dailyBudgetUSD) || 0),
+            dailyBudgetUSD: parseFloat(dailyBudgetUSD || '0'),
             locations: locations || [],
             connectedAccountId,
             pageId: pageId || null,
             whatsappNumber: whatsappNumber || null,
             welcomeMessage: welcomeMessage || null,
             pixelId: pixelId || null,
-            destinationUrl: destinationUrl || null
+            destinationUrl: destinationUrl || null,
+            // Snapshot de la estrategia
+            objective: strategy.objective,
+            destination: strategy.destination,
+            mediaType: strategy.mediaType,
+            mediaCount: strategy.mediaCount,
+            strategyName: strategy.name,
         },
         include: {
             brief: true,
@@ -120,7 +124,7 @@ export async function GET() {
     const campaigns = await (prisma as any).adCampaignV2.findMany({
         where: { userId: user.id },
         include: {
-            brief: { select: { name: true, industry: true } },
+            brief: { select: { name: true, industry: true, targetLocations: true } },
             strategy: { select: { name: true, platform: true, destination: true, mediaType: true, mediaCount: true } },
             creatives: { select: { id: true, slotIndex: true, mediaUrl: true, isApproved: true } }
         },

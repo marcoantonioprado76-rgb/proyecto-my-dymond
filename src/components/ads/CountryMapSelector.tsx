@@ -264,26 +264,26 @@ export default function CountryMapSelector({ selected, onChange }: Props) {
     return (
         <div className="space-y-3">
             {/* Map container */}
-            <div className="relative bg-[#0D1E79]/50 border border-purple-500/20 rounded-2xl overflow-hidden">
+            <div className="relative bg-[#070714] border border-white/8 rounded-2xl overflow-hidden">
                 {/* Zoom controls */}
                 <div className="absolute top-2 right-2 z-10 flex flex-col gap-1">
                     <button
                         onClick={() => setZoom(z => Math.min(z * 1.6, 12))}
-                        className="w-7 h-7 rounded-lg bg-black/60 border border-purple-500/25 flex items-center justify-center hover:bg-white/10 text-white/60 hover:text-white transition-all"
+                        className="w-7 h-7 rounded-lg bg-black/60 border border-white/10 flex items-center justify-center hover:bg-white/10 text-white/60 hover:text-white transition-all"
                     ><ZoomIn size={13} /></button>
                     <button
                         onClick={() => setZoom(z => Math.max(z / 1.6, 1))}
-                        className="w-7 h-7 rounded-lg bg-black/60 border border-purple-500/25 flex items-center justify-center hover:bg-white/10 text-white/60 hover:text-white transition-all"
+                        className="w-7 h-7 rounded-lg bg-black/60 border border-white/10 flex items-center justify-center hover:bg-white/10 text-white/60 hover:text-white transition-all"
                     ><ZoomOut size={13} /></button>
                     <button
                         onClick={() => { setZoom(1); setCenter([0, 20]) }}
-                        className="w-7 h-7 rounded-lg bg-black/60 border border-purple-500/25 flex items-center justify-center hover:bg-white/10 text-white/60 hover:text-white transition-all"
+                        className="w-7 h-7 rounded-lg bg-black/60 border border-white/10 flex items-center justify-center hover:bg-white/10 text-white/60 hover:text-white transition-all"
                     ><RotateCcw size={11} /></button>
                 </div>
 
                 {/* Tooltip */}
                 {tooltip && (
-                    <div className="absolute top-2 left-2 z-10 px-2 py-1 bg-black/80 border border-purple-500/25 rounded-lg text-[11px] text-white pointer-events-none">
+                    <div className="absolute top-2 left-2 z-10 px-2 py-1 bg-black/80 border border-white/10 rounded-lg text-[11px] text-white pointer-events-none">
                         {tooltip}
                     </div>
                 )}
@@ -322,7 +322,7 @@ export default function CountryMapSelector({ selected, onChange }: Props) {
                                             onMouseEnter={() => setTooltip(info?.name || null)}
                                             onMouseLeave={() => setTooltip(null)}
                                             style={{
-                                                default: { fill: isSel ? '#D203DD' : '#1a1a3e', stroke: '#0d0d2b', strokeWidth: 0.4, outline: 'none', cursor: info ? 'pointer' : 'default' },
+                                                default: { fill: isSel ? '#7c3aed' : '#1a1a3e', stroke: '#0d0d2b', strokeWidth: 0.4, outline: 'none', cursor: info ? 'pointer' : 'default' },
                                                 hover: { fill: isSel ? '#8b5cf6' : '#2d2b69', stroke: '#0d0d2b', strokeWidth: 0.4, outline: 'none', cursor: info ? 'pointer' : 'default' },
                                                 pressed: { fill: '#5b21b6', outline: 'none' }
                                             }}
@@ -382,7 +382,7 @@ export default function CountryMapSelector({ selected, onChange }: Props) {
                     value={citySearch}
                     onChange={e => setCitySearch(e.target.value)}
                     placeholder="Buscar ciudad o departamento (Ej: Bogotá, Medellín...)"
-                    className="w-full bg-white/5 border border-purple-500/25 rounded-xl pl-8 pr-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500/50 placeholder:text-white/20"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl pl-8 pr-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500/50 placeholder:text-white/20"
                 />
                 {citySearch && (
                     <button onClick={() => setCitySearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-white/30 hover:text-white">
@@ -390,7 +390,7 @@ export default function CountryMapSelector({ selected, onChange }: Props) {
                     </button>
                 )}
                 {cityResults.length > 0 && (
-                    <div className="absolute top-full left-0 right-0 mt-1 z-20 bg-[#0D1E79]/60 border border-purple-500/25 rounded-xl overflow-hidden shadow-xl max-h-48 overflow-y-auto">
+                    <div className="absolute top-full left-0 right-0 mt-1 z-20 bg-[#0d0d1f] border border-white/10 rounded-xl overflow-hidden shadow-xl max-h-48 overflow-y-auto">
                         {cityResults.map(c => {
                             const isSel = selectedCities.includes(c.name)
                             return (

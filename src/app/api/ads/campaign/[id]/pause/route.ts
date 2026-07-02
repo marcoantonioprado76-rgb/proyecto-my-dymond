@@ -35,15 +35,12 @@ export async function POST(_req: Request, { params }: { params: { id: string } }
     try {
         const accessToken = decrypt(campaign.connectedAccount.integration.token.accessTokenEncrypted, ENC_KEY!)
         const adapter = AdapterFactory.getAdapter(campaign.platform)
+        await adapter.pauseCampaign(accessToken, campaign.connectedAccount.providerAccountId, campaign.providerCampaignId)
 
-        await (prisma as any).adCampaignV2.update({ where: { id: params.id }, data: { status: 'PAUSED' } })
-
-        try {
-            await adapter.pauseCampaign(accessToken, campaign.connectedAccount.providerAccountId, campaign.providerCampaignId)
-        } catch (adapterErr: any) {
-            await (prisma as any).adCampaignV2.update({ where: { id: params.id }, data: { status: 'PUBLISHED' } })
-            throw adapterErr
-        }
+        await (prisma as any).adCampaignV2.update({
+            where: { id: params.id },
+            data: { status: 'PAUSED' }
+        })
 
         return NextResponse.json({ success: true })
     } catch (err: any) {

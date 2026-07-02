@@ -7,37 +7,82 @@ import {
     Image as ImageIcon, Video, Zap, Eye, X,
     ChevronLeft, ChevronRight, Globe, Wand2, Star, Gauge, Trophy,
     Target, TrendingUp, Bot, Layers, LayoutGrid, FileText, Coins,
-    ChevronDown, ChevronUp, BarChart2, Cpu
+    ChevronDown, ChevronUp, BarChart2, Cpu, Download
 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter, useParams, useSearchParams } from 'next/navigation'
-import LocationSelector, { resolveBriefLocations } from '@/components/ads/LocationSelector'
-import AIKeySelector from '@/components/AIKeySelector'
+import LocationSelector from '@/components/ads/LocationSelector'
+import { AiThinking } from '@/components/ads/AiThinking'
 
-// Moneda de la cuenta publicitaria: símbolo + mínimos/paso sensatos (aprox. el
-// mínimo diario que pide Meta por moneda). El monto SIEMPRE va en la moneda de
-// la cuenta — Meta lo interpreta así. Fallback genérico para monedas no listadas.
-const CURRENCY_INFO: Record<string, { symbol: string; min: number; max: number; step: number }> = {
-    USD: { symbol: '$', min: 5, max: 100, step: 1 },
-    EUR: { symbol: '€', min: 5, max: 100, step: 1 },
-    MXN: { symbol: '$', min: 100, max: 2000, step: 10 },
-    COP: { symbol: '$', min: 20000, max: 400000, step: 1000 },
-    ARS: { symbol: '$', min: 3000, max: 60000, step: 500 },
-    CLP: { symbol: '$', min: 4000, max: 80000, step: 500 },
-    PEN: { symbol: 'S/', min: 18, max: 360, step: 2 },
-    BOB: { symbol: 'Bs', min: 35, max: 700, step: 5 },
-    BRL: { symbol: 'R$', min: 25, max: 500, step: 5 },
-    GTQ: { symbol: 'Q', min: 40, max: 800, step: 5 },
-    DOP: { symbol: 'RD$', min: 300, max: 6000, step: 50 },
-    UYU: { symbol: '$U', min: 200, max: 4000, step: 50 },
-    PYG: { symbol: '₲', min: 35000, max: 700000, step: 5000 },
-    HNL: { symbol: 'L', min: 125, max: 2500, step: 25 },
-    CRC: { symbol: '₡', min: 2500, max: 50000, step: 500 },
-    NIO: { symbol: 'C$', min: 180, max: 3600, step: 20 },
-    PAB: { symbol: 'B/.', min: 5, max: 100, step: 1 },
+// Overlay "IA pensando" mientras se genera una imagen: animación de texto + frases que rotan.
+const AI_GEN_MESSAGES = [
+    'Analizando tu producto…',
+    'Eligiendo el ángulo ganador…',
+    'Pintando la escena…',
+    'Resaltando los beneficios…',
+    'Puliendo los detalles…',
+]
+function AiGeneratingOverlay() {
+    return <AiThinking variant="compact" messages={AI_GEN_MESSAGES} />
 }
-function currencyInfo(code?: string) {
-    return CURRENCY_INFO[(code || 'USD').toUpperCase()] || { symbol: (code || '$'), min: 5, max: 100, step: 1 }
+
+// Overlay de publicación: cohete + barra de progreso que sube y se frena en ~92%
+// hasta que el server responde (no sabemos el % real, así que es progreso por etapas).
+const PUBLISH_STAGES = [
+    'Conectando con Meta…',
+    'Creando la campaña…',
+    'Configurando audiencias y presupuesto…',
+    'Subiendo tus creativos…',
+    'Creando los anuncios…',
+    'Revisando todo…',
+]
+function PublishProgress({ active, failed }: { active: boolean; failed: boolean }) {
+    const [pct, setPct] = useState(0)
+    const [show, setShow] = useState(false)
+    const shownRef = useRef(false)
+    const setShown = (v: boolean) => { shownRef.current = v; setShow(v) }
+    const failedRef = useRef(failed)
+    failedRef.current = failed
+    useEffect(() => {
+        if (active) {
+            setShown(true); setPct(0)
+            let p = 0
+            const id = setInterval(() => {
+                p += (92 - p) * 0.045 + 0.4      // sube rápido al inicio, se frena cerca de 92
+                if (p > 92) p = 92
+                setPct(p)
+            }, 220)
+            return () => clearInterval(id)
+        } else if (shownRef.current) {
+            if (failedRef.current) { setShown(false); return }  // falló → ocultar sin "publicado"
+            setPct(100)                          // terminó OK → completa la barra
+            const t = setTimeout(() => setShown(false), 750)
+            return () => clearTimeout(t)
+        }
+    }, [active])  // eslint-disable-line react-hooks/exhaustive-deps
+    if (!show) return null
+    const stage = Math.min(PUBLISH_STAGES.length - 1, Math.floor(pct / (100 / PUBLISH_STAGES.length)))
+    return (
+        <div className="fixed inset-0 z-[120] flex flex-col items-center justify-center bg-[#08060f]/93 backdrop-blur-md px-6 gap-7">
+            <div className="text-5xl" style={{ transform: `translateY(${(1 - pct / 100) * 14}px)`, transition: 'transform .3s ease' }}>🚀</div>
+            <div className="w-full max-w-sm">
+                <div className="flex items-end justify-between mb-2.5 gap-3">
+                    <span className="ai-grad-text text-sm font-extrabold leading-tight" style={{ backgroundImage: 'linear-gradient(90deg,#f0abfc,#67e8f9,#f0abfc)' }}>
+                        {pct >= 100 ? '¡Publicado!' : PUBLISH_STAGES[stage]}
+                    </span>
+                    <span className="text-base font-black text-white shrink-0">{Math.round(pct)}%</span>
+                </div>
+                <div className="relative h-3 rounded-full bg-white/10 overflow-hidden border border-white/10">
+                    <div className="h-full rounded-full" style={{
+                        width: `${pct}%`, transition: 'width .3s ease-out',
+                        background: 'linear-gradient(90deg,#a855f7,#ec4899,#f59e0b,#22d3ee,#a855f7)',
+                        backgroundSize: '300% 100%', animation: 'ai-liquid 3s ease infinite',
+                    }} />
+                </div>
+                <p className="text-center text-white/45 text-[11px] mt-3.5 font-semibold">Esto puede tardar un momento. No cierres esta ventana 🙏</p>
+            </div>
+        </div>
+    )
 }
 
 function CampaignPageInner() {
@@ -64,18 +109,16 @@ function CampaignPageInner() {
     const [error, setError] = useState<string | null>(null)
     const [success, setSuccess] = useState<string | null>(null)
     const [configSaved, setConfigSaved] = useState(false)
+    const [tab, setTab] = useState<'config' | 'creativos'>('config')
     const [copiesGenerated, setCopiesGenerated] = useState(false)
     const [showPreview, setShowPreview] = useState(false)
     const [previewIdx, setPreviewIdx] = useState(0)
     const [showAdvanced, setShowAdvanced] = useState(false)
-    const [genWaChat, setGenWaChat] = useState(false)
-    const [audienceProfile, setAudienceProfile] = useState<any>(null)
-    const [genAudience, setGenAudience] = useState(false)
 
     // AI image generation per slot
     const [generatingImages, setGeneratingImages] = useState<Record<number, boolean>>({})
     const [imageGenPanel, setImageGenPanel] = useState<number | null>(null)
-    const [imageQuality, setImageQuality] = useState<'fast' | 'standard' | 'premium'>('standard')
+    const [imageQuality, setImageQuality] = useState<'fast' | 'standard' | 'premium'>('fast')
     const [imageFormat, setImageFormat] = useState<'square' | 'vertical' | 'horizontal'>('square')
     const [imageCustomPrompts, setImageCustomPrompts] = useState<Record<number, string>>({})
     // Reference product photos for AI generation (separate from slot images)
@@ -84,7 +127,7 @@ function CampaignPageInner() {
 
     // Bulk image generation
     const [showBulkPanel, setShowBulkPanel] = useState(false)
-    const [bulkQuality, setBulkQuality] = useState<'fast' | 'standard' | 'premium'>('standard')
+    const [bulkQuality, setBulkQuality] = useState<'fast' | 'standard' | 'premium'>('fast')
     const [bulkFormat, setBulkFormat] = useState<'square' | 'vertical' | 'horizontal'>('square')
     const [bulkStyle] = useState<'auto'>('auto')
     const [bulkGenerating, setBulkGenerating] = useState(false)
@@ -97,6 +140,7 @@ function CampaignPageInner() {
     const [suggestingField, setSuggestingField] = useState<string | null>(null)
     const [suggestions, setSuggestions] = useState<Record<string, string[]>>({})
     const [activeSuggestionKey, setActiveSuggestionKey] = useState<string | null>(null)
+    const [fillingChat, setFillingChat] = useState<'whatsappGreeting' | 'quickReply' | null>(null)
 
     // Advanced options
     const [advantageAudience, setAdvantageAudience] = useState(true)
@@ -185,16 +229,96 @@ function CampaignPageInner() {
 
     useEffect(() => { fetchAll() }, [strategyId])
 
-    // Si la cuenta es de otra moneda y el presupuesto quedó por debajo del mínimo
-    // de esa moneda, lo subimos al mínimo (Meta rechaza montos muy bajos).
+    // Prompt LIBRE (como el generador admin): el usuario escribe el prompt y se manda
+    // TAL CUAL a gpt-image-2. Opcional: botón "Generar con IA" que lo escribe solo
+    // (gpt-5.1, en español) según el brief + la estrategia, y cae en la misma caja.
+    const [bulkUserPrompt, setBulkUserPrompt] = useState('') // prompt libre del usuario (flujo masivo)
+    const [showManualPrompt, setShowManualPrompt] = useState(false) // muestra el textarea del prompt manual
+    const [aiPromptLoading, setAiPromptLoading] = useState(false)
+    async function generateAiPrompt(slotIndex?: number) {
+        if (!campaign?.id) return
+        setAiPromptLoading(true); setError(null)
+        try {
+            const res = await fetch(`/api/ads/campaign/${campaign.id}/image-prompts`, {
+                method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({}),
+            })
+            const data = await res.json()
+            if (res.ok && typeof data.prompt === 'string' && data.prompt.trim()) {
+                if (typeof slotIndex === 'number') setImageCustomPrompts(prev => ({ ...prev, [slotIndex]: data.prompt.trim() }))
+                else setBulkUserPrompt(data.prompt.trim())
+            } else {
+                setError(data.error || 'No se pudo generar el prompt con IA')
+            }
+        } catch { setError('Error al generar el prompt con IA') }
+        finally { setAiPromptLoading(false) }
+    }
+
+    // MOTOR DE DIVERSIDAD (Andromeda): genera un prompt DISTINTO por cada anuncio
+    // (matriz P.D.A. + arquetipo) → cada imagen es un "Entity ID" distinto.
+    async function generateDiversePrompts() {
+        if (!campaign?.id || !creatives.length) return
+        setAiPromptLoading(true); setError(null)
+        try {
+            const res = await fetch(`/api/ads/campaign/${campaign.id}/image-prompts`, {
+                method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ count: creatives.length }),
+            })
+            const data = await res.json()
+            if (res.ok && Array.isArray(data.prompts) && data.prompts.length) {
+                setImageCustomPrompts(prev => {
+                    const next = { ...prev }
+                    creatives.forEach((c: any, idx: number) => { next[c.slotIndex] = data.prompts[idx % data.prompts.length] })
+                    return next
+                })
+            } else {
+                setError(data.error || 'No se pudieron generar los prompts diversos')
+            }
+        } catch { setError('Error al generar la diversidad') }
+        finally { setAiPromptLoading(false) }
+    }
+
+    // Descargar la imagen generada (para guardarla antes de publicar — al publicar se
+    // borra del storage). Usa blob para forzar la descarga aunque sea cross-origin.
+    async function downloadImage(url: string, name: string) {
+        try {
+            const res = await fetch(url)
+            const blob = await res.blob()
+            const a = document.createElement('a')
+            a.href = URL.createObjectURL(blob)
+            a.download = name
+            document.body.appendChild(a)
+            a.click()
+            a.remove()
+            setTimeout(() => URL.revokeObjectURL(a.href), 5000)
+        } catch {
+            window.open(url, '_blank') // respaldo: abrir en pestaña nueva
+        }
+    }
+
+    // Firma de los slots con video "procesando" — el polling solo se reinicia cuando
+    // cambia ESTE conjunto, no en cada edición de texto.
+    const processingSig = creatives
+        .filter((c: any) => c.metaMediaStatus === 'processing')
+        .map((c: any) => c.slotIndex)
+        .join(',')
+
+    // Polling: mientras algún video se esté procesando en Meta, consultar cada 6s
+    // para mostrar "Preparando → Listo".
     useEffect(() => {
-        const acct = accounts.find((a: any) => a.providerAccountId === form.providerAccountId)
-        if (!acct) return
-        const ci = currencyInfo(acct.currency)
-        const val = parseFloat(form.dailyBudgetUSD || '0') || 0
-        if (val < ci.min) setForm(f => ({ ...f, dailyBudgetUSD: String(ci.min) }))
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [form.providerAccountId, accounts])
+        if (!campaign?.id || !processingSig) return
+        const iv = setInterval(async () => {
+            try {
+                const res = await fetch(`/api/ads/campaign/${campaign.id}/media-status`)
+                if (!res.ok) return
+                const data = await res.json()
+                const map: Record<number, string | null> = {}
+                for (const it of (data.items ?? [])) map[it.slotIndex] = it.metaMediaStatus
+                setCreatives(prev => prev.map((c: any) =>
+                    map[c.slotIndex] !== undefined ? { ...c, metaMediaStatus: map[c.slotIndex] } : c
+                ))
+            } catch { /* reintenta en el siguiente tick */ }
+        }, 6000)
+        return () => clearInterval(iv)
+    }, [campaign?.id, processingSig])
 
     // Reset adFormat to 'single' when loaded strategy is a messaging destination
     useEffect(() => {
@@ -202,40 +326,6 @@ function CampaignPageInner() {
             setAdFormat('single')
         }
     }, [strategy?.destination])
-
-    // ── Pre-cargar la ubicación del brief, resuelta DINÁMICAMENTE con la búsqueda
-    // real de Meta (funciona para CUALQUIER lugar que genere la IA). La lista
-    // estática solo es respaldo instantáneo si Meta no responde.
-    const locPrefillTried = useRef(false)
-    async function resolveLocationsSmart(texts: string[]): Promise<string[]> {
-        const out: string[] = []
-        const push = (v: string) => { if (v && !out.includes(v)) out.push(v) }
-        for (const raw of texts || []) {
-            for (const piece of String(raw).split(/[,/;|\n]+/).map(s => s.trim()).filter(Boolean)) {
-                let done = false
-                try {
-                    const res = await fetch(`/api/ads/integrations/meta/locations?q=${encodeURIComponent(piece)}`)
-                    if (res.ok) {
-                        const list = (await res.json()).locations || []
-                        const top = list.find((l: any) => l.type === 'country') || list[0]
-                        if (top?.type === 'country' && top.countryCode) { push(String(top.countryCode).toUpperCase()); done = true }
-                        else if (top?.key) { push(`city:${top.key}:${top.name}`); done = true } // ciudad con clave REAL de Meta
-                    }
-                } catch { /* cae al respaldo estático */ }
-                if (!done) resolveBriefLocations([piece]).forEach(push)
-            }
-        }
-        return out
-    }
-    useEffect(() => {
-        if (locPrefillTried.current || loading) return
-        if (!brief?.targetLocations?.length || form.locations.length > 0) return
-        locPrefillTried.current = true
-        resolveLocationsSmart(brief.targetLocations).then(locs => {
-            if (locs.length) setForm(f => (f.locations.length === 0 ? { ...f, locations: locs } : f))
-        })
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [loading, brief])
 
     async function fetchPixels(accountId: string) {
         if (!accountId) { setPixels([]); return }
@@ -251,59 +341,80 @@ function CampaignPageInner() {
     async function fetchAll() {
         setLoading(true)
         try {
-            // Promise.allSettled + parseo aislado: si una request rompe, las demás
-            // siguen poblando su state. La estrategia es REQUERIDA (early return),
-            // las otras son tolerantes a fallo.
-            const [strRes, briefRes] = await Promise.allSettled([
+            const [strRes, briefRes] = await Promise.all([
                 fetch('/api/ads/strategies'),
                 fetch('/api/ads/brief')
             ])
-            let strData: any = { strategies: [] }
-            let briefData: any = { brief: null }
-            if (strRes.status === 'fulfilled' && strRes.value.ok) {
-                try { strData = await strRes.value.json() } catch { /* fallback {} */ }
-            }
-            if (briefRes.status === 'fulfilled' && briefRes.value.ok) {
-                try { briefData = await briefRes.value.json() } catch { /* fallback {} */ }
-            }
-            const strat = strData.strategies?.find((s: any) => s.id === strategyId)
-            if (!strat) { router.push('/dashboard/services/ads/strategies'); return }
-            setStrategy(strat)
-            setBrief(briefData.brief)
+            const [strData, briefData] = await Promise.all([strRes.json(), briefRes.json()])
 
+            // Cargar primero la campaña existente (si estamos editando)
             let existingCampaign: any = null
             if (editCampaignId) {
                 const campRes = await fetch(`/api/ads/campaign/${editCampaignId}`)
                 if (campRes.ok) {
                     const campData = await campRes.json()
                     existingCampaign = campData.campaign
-                    setCampaign(existingCampaign)
-                    if (existingCampaign.brief) setBrief(existingCampaign.brief)
-                    setForm(f => ({
-                        ...f,
-                        name: existingCampaign.name || f.name,
-                        dailyBudgetUSD: String(existingCampaign.dailyBudgetUSD ?? f.dailyBudgetUSD),
-                        locations: existingCampaign.locations || [],
-                        pageId: existingCampaign.pageId || '',
-                        whatsappNumber: existingCampaign.whatsappNumber || '',
-                        welcomeMessage: existingCampaign.welcomeMessage?.split('||QA:')[0] || '',
-                        whatsappQuestion: existingCampaign.welcomeMessage?.split('||QA:')[1] || '',
-                        pixelId: existingCampaign.pixelId || '',
-                        destinationUrl: existingCampaign.destinationUrl || '',
-                    }))
-                    if (existingCampaign.creatives?.length > 0) {
-                        setCreatives(existingCampaign.creatives)
-                        const hasCopies = existingCampaign.creatives.some((c: any) => c.primaryText)
-                        if (hasCopies) setCopiesGenerated(true)
-                    } else {
-                        const slots = Array.from({ length: strat.mediaCount }, (_, i) => ({
-                            id: null, slotIndex: i, primaryText: '', headline: '', description: '', hook: '',
-                            mediaUrl: null, mediaType: strat.mediaType, aiGenerated: false, isApproved: false
-                        }))
-                        setCreatives(slots)
-                    }
-                    setConfigSaved(true)
                 }
+            }
+
+            // Estrategia: por strategyId, o RECONSTRUIDA desde la "foto" de la campaña
+            // (la campaña es autónoma: funciona aunque la estrategia ya no exista).
+            let strat = strData.strategies?.find((s: any) => s.id === strategyId)
+            if (!strat && existingCampaign) {
+                strat = {
+                    id: existingCampaign.strategyId || existingCampaign.id,
+                    name: existingCampaign.strategyName || existingCampaign.name,
+                    platform: existingCampaign.platform,
+                    objective: existingCampaign.objective,
+                    destination: existingCampaign.destination,
+                    mediaType: existingCampaign.mediaType,
+                    mediaCount: existingCampaign.mediaCount ?? 1,
+                    // mínimo bajo para no anclar el slider al presupuesto ya guardado
+                    minBudgetUSD: 1,
+                }
+            }
+            if (!strat) { router.push('/dashboard/services/ads/wizard'); return }
+            setStrategy(strat)
+            setBrief(briefData.brief)
+
+            if (existingCampaign) {
+                setCampaign(existingCampaign)
+                if (existingCampaign.brief) setBrief(existingCampaign.brief)
+                // Países por defecto: si la campaña no tiene, usar los del negocio (brief.targetLocations)
+                const defaultLocations = (existingCampaign.locations?.length
+                    ? existingCampaign.locations
+                    : (existingCampaign.brief?.targetLocations || briefData.brief?.targetLocations || []))
+                const greeting = existingCampaign.welcomeMessage?.split('||QA:')[0] || ''
+                const quickReply = existingCampaign.welcomeMessage?.split('||QA:')[1] || ''
+                setForm(f => ({
+                    ...f,
+                    name: existingCampaign.name || f.name,
+                    dailyBudgetUSD: String(existingCampaign.dailyBudgetUSD ?? f.dailyBudgetUSD),
+                    locations: defaultLocations,
+                    pageId: existingCampaign.pageId || '',
+                    whatsappNumber: existingCampaign.whatsappNumber || '',
+                    welcomeMessage: greeting,
+                    whatsappQuestion: quickReply,
+                    pixelId: existingCampaign.pixelId || '',
+                    destinationUrl: existingCampaign.destinationUrl || '',
+                }))
+                // Si el destino es WhatsApp y el chat está vacío → autollenar saludo + respuesta con IA
+                const dest = existingCampaign.destination || strat.destination
+                if (dest === 'whatsapp' && !greeting && !quickReply) {
+                    autoFillWhatsAppChat(existingCampaign.id)
+                }
+                if (existingCampaign.creatives?.length > 0) {
+                    setCreatives(existingCampaign.creatives)
+                    const hasCopies = existingCampaign.creatives.some((c: any) => c.primaryText)
+                    if (hasCopies) setCopiesGenerated(true)
+                } else {
+                    const slots = Array.from({ length: strat.mediaCount }, (_, i) => ({
+                        id: null, slotIndex: i, primaryText: '', headline: '', description: '', hook: '',
+                        mediaUrl: null, mediaType: strat.mediaType, aiGenerated: false, isApproved: false
+                    }))
+                    setCreatives(slots)
+                }
+                setConfigSaved(true)
             }
 
             if (!existingCampaign?.brief && briefData.brief) {
@@ -327,58 +438,26 @@ function CampaignPageInner() {
                 }
             }
 
+            // Mostrar el editor YA (no esperar las llamadas lentas a Meta).
+            // Las páginas/pixels/números de WhatsApp se cargan en segundo plano y
+            // llenan los desplegables cuando estén listos.
+            setLoading(false)
+
             if (strat.platform === 'META') {
-                // Mismo patrón allSettled: pages/pixels/whatsapp-numbers son
-                // independientes y si una falla no debería tumbar a las otras.
-                const [pagesRes, pixelsRes, waRes] = await Promise.allSettled([
+                const [pagesRes, pixelsRes, waRes] = await Promise.all([
                     fetch('/api/ads/integrations/meta/pages'),
                     firstAccountId
                         ? fetch(`/api/ads/integrations/meta/pixels?adAccountId=${firstAccountId}`)
                         : Promise.resolve(new Response(JSON.stringify({ pixels: [] }))),
                     fetch('/api/ads/integrations/meta/whatsapp-numbers')
                 ])
-                if (pagesRes.status === 'fulfilled' && pagesRes.value.ok) {
-                    try { const d = await pagesRes.value.json(); setPages(d.pages || []) } catch { /* keep prev */ }
-                }
-                if (pixelsRes.status === 'fulfilled' && pixelsRes.value.ok) {
-                    try { const d = await pixelsRes.value.json(); setPixels(d.pixels || []) } catch { /* keep prev */ }
-                }
-                if (waRes.status === 'fulfilled' && waRes.value.ok) {
-                    try { const d = await waRes.value.json(); setWaNumbers(d.phoneNumbers || []) } catch { /* keep prev */ }
-                }
+                const [pData, pxData, waData] = await Promise.all([pagesRes.json(), pixelsRes.json(), waRes.json()])
+                setPages(pData.pages || [])
+                setPixels(pxData.pixels || [])
+                setWaNumbers(waData.phoneNumbers || [])
             }
         } catch (e) { console.error(e) }
         finally { setLoading(false) }
-    }
-
-    // Genera la audiencia (edad/género/intereses) con IA, desde el brief
-    async function generateAudience() {
-        if (!campaign) return
-        setGenAudience(true); setError(null)
-        try {
-            const res = await fetch(`/api/ads/campaign/${campaign.id}/audience`, { method: 'POST' })
-            const data = await res.json()
-            if (!res.ok) { setError(data.error || 'No se pudo generar la audiencia'); return }
-            setAudienceProfile(data.audience)
-        } catch { setError('Error de conexión') }
-        finally { setGenAudience(false) }
-    }
-
-    // Genera el saludo + botón de respuesta rápida con IA (desde el brief)
-    async function generateWaChat() {
-        if (!campaign) return
-        setGenWaChat(true); setError(null)
-        try {
-            const res = await fetch(`/api/ads/campaign/${campaign.id}/whatsapp-chat`, { method: 'POST' })
-            const data = await res.json()
-            if (!res.ok) { setError(data.error || 'No se pudo generar el chat'); return }
-            setForm(f => ({
-                ...f,
-                welcomeMessage: (data.chat?.greeting || f.welcomeMessage).slice(0, 180),
-                whatsappQuestion: (data.chat?.quickReply || f.whatsappQuestion).slice(0, 160),
-            }))
-        } catch { setError('Error de conexión') }
-        finally { setGenWaChat(false) }
     }
 
     async function saveConfig() {
@@ -439,21 +518,23 @@ function CampaignPageInner() {
                 setCreatives(slots)
             }
             setConfigSaved(true)
+            setTab('creativos') // avanzar al siguiente tab automáticamente
             setSuccess('✓ Configuración guardada')
             setTimeout(() => setSuccess(null), 3000)
-            setTimeout(() => creativesRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 200)
+            if (typeof window !== 'undefined') window.scrollTo({ top: 0, behavior: 'smooth' })
         } catch { setError('Error de conexión') }
         finally { setSavingConfig(false) }
     }
 
     async function handleFileUpload(slotIndex: number, file: File) {
-        if (!campaign) return
-        // Validación de tamaño antes de subir (evita upload colgado)
-        const isVideo = file.type.startsWith('video')
-        const maxMB = isVideo ? 100 : 10
+        if (!campaign) {
+            setError('Guarda la configuración primero antes de subir archivos')
+            return
+        }
+        // Warn on very large files before attempting upload
+        const maxMB = file.type.startsWith('video') ? 50 : 20
         if (file.size > maxMB * 1024 * 1024) {
-            const sizeMB = (file.size / (1024 * 1024)).toFixed(1)
-            setError(`El ${isVideo ? 'video' : 'archivo'} pesa ${sizeMB} MB y supera el límite de ${maxMB} MB. Comprímelo o usa uno más liviano.`)
+            setError(`El archivo es demasiado grande. Máximo ${maxMB}MB para ${file.type.startsWith('video') ? 'videos' : 'imágenes'}.`)
             return
         }
         const blobUrl = URL.createObjectURL(file)
@@ -471,7 +552,15 @@ function CampaignPageInner() {
             if (res.ok && data.mediaUrl) {
                 setCreatives(prev => prev.map(c =>
                     c.slotIndex === slotIndex
-                        ? { ...c, mediaUrl: data.mediaUrl, mediaType: file.type.startsWith('video') ? 'video' : 'image', uploading: false }
+                        ? {
+                            ...c,
+                            id: c.id || data.creativeId || null,
+                            mediaUrl: data.mediaUrl,
+                            mediaType: file.type.startsWith('video') ? 'video' : 'image',
+                            uploading: false,
+                            // Estado de pre-subida a Meta (video): 'processing' mientras Meta transcodifica
+                            metaMediaStatus: data.metaMediaStatus ?? null,
+                        }
                         : c
                 ))
                 URL.revokeObjectURL(blobUrl)
@@ -480,8 +569,8 @@ function CampaignPageInner() {
                 setCreatives(prev => prev.map(c => c.slotIndex === slotIndex ? { ...c, mediaUrl: null, uploading: false } : c))
                 URL.revokeObjectURL(blobUrl)
             }
-        } catch {
-            setError('Error de conexión al subir archivo')
+        } catch (e: any) {
+            setError('Error de conexión al subir archivo. Verifica tu conexión e intenta de nuevo.')
             setCreatives(prev => prev.map(c => c.slotIndex === slotIndex ? { ...c, mediaUrl: null, uploading: false } : c))
         }
     }
@@ -522,7 +611,7 @@ function CampaignPageInner() {
             const data = await res.json()
             if (res.ok && data.mediaUrl) {
                 setRefImageUrls(prev => ({ ...prev, [slotIndex]: data.mediaUrl }))
-                setImageCustomPrompts(prev => ({ ...prev, [slotIndex]: generateSmartPrompt(slotIndex, true) }))
+                // tu prompt queda libre: no autocompletar al subir la foto
             } else {
                 setError(data.error || 'Error al subir foto de referencia')
             }
@@ -562,8 +651,10 @@ function CampaignPageInner() {
 
     async function generateImage(slotIndex: number) {
         if (!campaign) return
+        const hasRef = !!(refImageUrls[slotIndex] || creatives.find(c => c.slotIndex === slotIndex)?.mediaUrl?.startsWith('http'))
+        if (!hasRef) { setError('Subí la foto de tu producto para generar este anuncio.'); return }
         const sizeMap: Record<string, string> = {
-            square: '1024x1024', vertical: '1024x1792', horizontal: '1792x1024',
+            square: '1024x1024', vertical: '1024x1536', horizontal: '1536x1024',
         }
         setGeneratingImages(prev => ({ ...prev, [slotIndex]: true }))
         setImageGenPanel(null)
@@ -577,9 +668,10 @@ function CampaignPageInner() {
                     slotIndex,
                     creativeId: creative?.id || undefined,
                     quality: imageQuality,
-                    size: sizeMap[imageFormat] || '1024x1024',
+                    size: '1024x1024', // fijo 1:1 (sin opción de elegir)
                     customPrompt: imageCustomPrompts[slotIndex]?.trim() || undefined,
                     referenceImageUrl: refImageUrls[slotIndex] || undefined,
+                    freePrompt: true, // tu prompt libre → gpt-image-2 tal cual (como el admin)
                 })
             })
             const data = await res.json()
@@ -595,11 +687,14 @@ function CampaignPageInner() {
 
     async function generateAllImages() {
         if (!campaign) return
+        if (!bulkRefImageUrl && Object.keys(refImageUrls).length === 0) {
+            setError('Subí la foto de tu producto antes de generar las imágenes.'); return
+        }
         setShowBulkPanel(false)
         setBulkGenerating(true)
         setBulkProgress(0)
         const sizeMap: Record<string, string> = {
-            square: '1024x1024', vertical: '1024x1792', horizontal: '1792x1024',
+            square: '1024x1024', vertical: '1024x1536', horizontal: '1536x1024',
         }
         const slots = creatives
         const generating: Record<number, boolean> = {}
@@ -607,7 +702,8 @@ function CampaignPageInner() {
         setGeneratingImages(generating)
 
         let done = 0
-        await Promise.all(slots.map(async (creative: any) => {
+        const CONCURRENCY = 3 // generar de a 3 (no todas de golpe → evita timeouts de OpenAI)
+        const genOne = async (creative: any) => {
             try {
                 const res = await fetch(`/api/ads/campaign/${campaign.id}/images`, {
                     method: 'POST',
@@ -616,9 +712,11 @@ function CampaignPageInner() {
                         slotIndex: creative.slotIndex,
                         creativeId: creative.id || undefined,
                         quality: bulkQuality,
-                        size: sizeMap[bulkFormat] || '1024x1024',
-                        customPrompt: getBulkPrompt(creative.slotIndex, bulkStyle),
-                        referenceImageUrl: refImageUrls[creative.slotIndex] || undefined,
+                        size: '1024x1024', // fijo 1:1
+                        // Tu prompt libre (el del slot, o el masivo) → tal cual a gpt-image-2.
+                        customPrompt: (imageCustomPrompts[creative.slotIndex]?.trim() || bulkUserPrompt?.trim()) || undefined,
+                        referenceImageUrl: refImageUrls[creative.slotIndex] || bulkRefImageUrl || undefined,
+                        freePrompt: true,
                     })
                 })
                 const data = await res.json()
@@ -635,7 +733,10 @@ function CampaignPageInner() {
                 setBulkProgress(done)
                 setGeneratingImages(prev => ({ ...prev, [creative.slotIndex]: false }))
             }
-        }))
+        }
+        for (let i = 0; i < slots.length; i += CONCURRENCY) {
+            await Promise.all(slots.slice(i, i + CONCURRENCY).map(genOne))
+        }
         setBulkGenerating(false)
     }
 
@@ -665,6 +766,48 @@ function CampaignPageInner() {
     function applySuggestion(slotIndex: number, field: string, text: string) {
         setCreatives(prev => prev.map((c, j) => j === slotIndex ? { ...c, [field]: text } : c))
         setActiveSuggestionKey(null)
+    }
+
+    // Auto-llena saludo + respuesta rápida con IA (cuando el destino es WhatsApp).
+    // Corre en segundo plano; no bloquea la carga del editor.
+    async function autoFillWhatsAppChat(campaignId: string) {
+        for (const field of ['whatsappGreeting', 'quickReply'] as const) {
+            try {
+                setFillingChat(field)
+                const res = await fetch(`/api/ads/campaign/${campaignId}/suggest`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ field, currentContent: '' }),
+                })
+                const data = await res.json()
+                const text = String(data.suggestions?.[0] || '').trim()
+                if (text) {
+                    if (field === 'whatsappGreeting') setForm(f => f.welcomeMessage ? f : ({ ...f, welcomeMessage: text.slice(0, 180) }))
+                    else setForm(f => f.whatsappQuestion ? f : ({ ...f, whatsappQuestion: text.slice(0, 160) }))
+                }
+            } catch { /* silencioso */ }
+            finally { setFillingChat(null) }
+        }
+    }
+
+    async function fillChatWithAI(field: 'whatsappGreeting' | 'quickReply') {
+        if (!campaign || fillingChat) return
+        setFillingChat(field)
+        try {
+            const current = field === 'whatsappGreeting' ? form.welcomeMessage : form.whatsappQuestion
+            const res = await fetch(`/api/ads/campaign/${campaign.id}/suggest`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ field, currentContent: current })
+            })
+            const data = await res.json()
+            if (!res.ok) { setError(data.error || 'Error al generar con IA'); return }
+            const text = String(data.suggestions?.[0] || '').trim()
+            if (!text) { setError('La IA no devolvió texto'); return }
+            if (field === 'whatsappGreeting') setForm(f => ({ ...f, welcomeMessage: text.slice(0, 180) }))
+            else setForm(f => ({ ...f, whatsappQuestion: text.slice(0, 160) }))
+        } catch { setError('Error al generar con IA') }
+        finally { setFillingChat(null) }
     }
 
     async function saveCopies() {
@@ -699,7 +842,7 @@ function CampaignPageInner() {
             const data = await res.json()
             if (!res.ok) return setError(data.error || 'Error al publicar')
             setSuccess('¡Campaña publicada exitosamente!')
-            setTimeout(() => router.push('/dashboard/services/ads'), 2500)
+            setTimeout(() => router.push('/dashboard/services/ads/meta'), 2500)
         } catch { setError('Error al publicar') }
         finally { setPublishing(false) }
     }
@@ -707,7 +850,7 @@ function CampaignPageInner() {
     if (loading) {
         return (
             <div className="flex items-center justify-center min-h-[60vh]">
-                <Loader2 className="animate-spin text-[#C9A7FF]" size={32} />
+                <Loader2 className="animate-spin text-purple-400" size={32} />
             </div>
         )
     }
@@ -724,53 +867,73 @@ function CampaignPageInner() {
     // ── Render ──────────────────────────────────────────────────────────────
 
     return (
-        <div className="px-4 md:px-6 xl:px-10 pt-6 max-w-4xl xl:max-w-5xl 2xl:max-w-6xl mx-auto pb-36 text-[#111827]">
+        <div className="px-4 md:px-6 xl:px-10 pt-6 max-w-4xl xl:max-w-5xl 2xl:max-w-6xl mx-auto pb-36 text-white">
 
-            {/* ── Header (sobre fondo perla → texto OSCURO) ── */}
-            <div className="flex items-center gap-3 mb-6">
-                <Link href="/dashboard/services/ads/strategies"
-                    className="w-9 h-9 shrink-0 rounded-xl flex items-center justify-center text-white hover:opacity-90 transition-all"
-                    style={{ background: 'linear-gradient(135deg, #FF2D95 0%, #B735B8 48%, #233B8F 100%)' }}>
+            {/* Overlay de publicación: cohete + barra de progreso */}
+            <PublishProgress active={publishing} failed={!!error} />
+
+            {/* ── Header ── */}
+            <div className="flex items-center gap-3 mb-6"
+                style={{ background: 'linear-gradient(135deg,rgba(139,92,246,0.1) 0%,rgba(59,130,246,0.05) 100%)', border: '1px solid rgba(139,92,246,0.18)', borderRadius: '1.5rem', padding: '1rem 1.25rem' }}>
+                <button
+                    onClick={() => { if (typeof window !== 'undefined' && window.history.length > 1) router.back(); else router.push('/dashboard/services/ads/meta') }}
+                    className="w-9 h-9 shrink-0 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-all"
+                    title="Volver atrás">
                     <ArrowLeft size={15} />
-                </Link>
+                </button>
                 <div className="flex-1 min-w-0">
-                    <h1 className="text-lg font-black uppercase tracking-tighter truncate text-[#111827]">{strategy.name}</h1>
-                    <p className="text-[11px] text-[#6B7280] truncate">{brief?.name || 'Business Brief requerido'}</p>
-                </div>
-                <AIKeySelector compact />
-                {/* Step pills */}
-                <div className="hidden sm:flex items-center gap-1.5 shrink-0">
-                    {[
-                        { label: 'Config', done: configSaved, icon: Settings2 },
-                        { label: 'Creativos', done: creativesReady > 0, icon: ImageIcon },
-                        { label: 'Textos', done: copiesGenerated, icon: FileText },
-                    ].map((s, i) => (
-                        <span key={i} className={`flex items-center gap-1 text-[10px] font-bold px-2.5 py-1 rounded-full border transition-all ${s.done ? 'bg-green-500/15 border-green-500/30 text-green-600' : 'bg-[#F0F3F7] border-[#E4E9F0] text-[#9CA3AF]'}`}>
-                            {s.done ? <CheckCircle2 size={9} /> : <s.icon size={9} />}{s.label}
-                        </span>
-                    ))}
+                    <h1 className="text-lg font-black uppercase tracking-tighter truncate">{strategy.name}</h1>
+                    <p className="text-[11px] text-white/30 truncate">{brief?.name || 'Business Brief requerido'}</p>
                 </div>
             </div>
 
-            {/* Platform badges (sobre fondo perla → texto OSCURO) */}
-            <div className="flex flex-wrap items-center gap-2 mb-5 px-3 py-2.5 bg-white/70 border border-[#E4E9F0] border-l-2 border-l-[#233B8F]/40 rounded-2xl">
-                <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-[#233B8F]/10 border border-[#233B8F]/20 text-[#233B8F]">{strategy.platform}</span>
-                <span className="text-[11px] text-[#6B7280] flex items-center gap-1">
+            {/* Tabs del editor — Config / Creativos & Textos (el preview es el botón Publicar abajo) */}
+            <div className="flex items-center gap-1.5 mb-4 p-1 rounded-2xl bg-white/3 border border-white/8">
+                {[
+                    { id: 'config' as const, label: 'Configuración', done: configSaved, icon: Settings2, locked: false },
+                    { id: 'creativos' as const, label: 'Creativos & Textos', done: creativesReady > 0 && copiesGenerated, icon: LayoutGrid, locked: !configSaved },
+                ].map((t) => {
+                    const active = tab === t.id
+                    return (
+                        <button key={t.id}
+                            onClick={() => { if (!t.locked) setTab(t.id) }}
+                            disabled={t.locked}
+                            className={`flex-1 flex items-center justify-center gap-1.5 text-[11px] sm:text-xs font-bold px-3 py-2.5 rounded-xl transition-all ${active ? 'bg-gradient-to-br from-purple-600/90 to-blue-600/80 text-white shadow-[0_0_18px_rgba(124,58,237,0.3)]' : t.locked ? 'text-white/20 cursor-not-allowed' : 'text-white/45 hover:text-white/70 hover:bg-white/5'}`}>
+                            {t.done ? <CheckCircle2 size={12} className={active ? 'text-white' : 'text-green-400'} /> : <t.icon size={12} />}
+                            {t.label}
+                            {t.locked && <span className="text-[9px] opacity-60">🔒</span>}
+                        </button>
+                    )
+                })}
+            </div>
+
+            {/* Platform badges */}
+            <div className="flex flex-wrap items-center gap-2 mb-5 px-3 py-2.5 bg-white/2 border border-white/5 border-l-2 border-l-blue-500/40 rounded-2xl">
+                <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400">{strategy.platform}</span>
+                <span className="text-[11px] text-white/30 flex items-center gap-1">
                     {strategy.mediaType === 'video' ? <Video size={10} /> : <ImageIcon size={10} />}
                     {strategy.mediaCount} {strategy.mediaType === 'video' ? 'videos' : 'imágenes'}
                 </span>
-                <span className="text-[#9CA3AF]">·</span>
-                <span className="text-[11px] text-[#6B7280] capitalize">{strategy.destination}</span>
-                <span className="text-[#9CA3AF]">·</span>
-                <span className="text-[11px] text-[#6B7280]">desde ${strategy.minBudgetUSD}/día</span>
+                <span className="text-white/10">·</span>
+                <span className="text-[11px] text-white/30 capitalize">{strategy.destination}</span>
+                <span className="text-white/10">·</span>
+                <span className="text-[11px] text-white/30">desde ${strategy.minBudgetUSD}/día</span>
             </div>
 
             {/* Alerts */}
             {error && (
-                <div className="mb-4 p-3.5 bg-red-500/10 border border-red-500/20 rounded-2xl flex gap-3 text-red-400 text-sm">
-                    <AlertCircle size={15} className="shrink-0 mt-0.5" />
-                    <p className="flex-1 text-[13px]">{error}</p>
-                    <button onClick={() => setError(null)} className="text-xs font-bold shrink-0">✕</button>
+                <div className="mb-4 p-3.5 bg-red-500/10 border border-red-500/20 rounded-2xl text-red-400 text-sm">
+                    <div className="flex gap-3">
+                        <AlertCircle size={15} className="shrink-0 mt-0.5" />
+                        <p className="flex-1 text-[13px]">{error}</p>
+                        <button onClick={() => setError(null)} className="text-xs font-bold shrink-0">✕</button>
+                    </div>
+                    {/(cr[eé]dit|saldo|api\s*key|openai)/i.test(error) && (
+                        <div className="flex flex-wrap gap-2 mt-2.5 pl-[27px]">
+                            <Link href="/dashboard/services/ads/setup" className="text-[11px] font-bold px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/15 text-white transition-all">Configurar mi API Key</Link>
+                            <Link href="/dashboard/ai-credits" className="text-[11px] font-bold px-3 py-1.5 rounded-lg bg-purple-500/25 hover:bg-purple-500/35 text-purple-100 transition-all">Comprar créditos de IA</Link>
+                        </div>
+                    )}
                 </div>
             )}
             {success && (
@@ -783,13 +946,13 @@ function CampaignPageInner() {
             {/* ══════════════════════════════════════════════
                 SECCIÓN 1 — CONFIGURACIÓN
             ══════════════════════════════════════════════ */}
-            <div className={`mb-4 rounded-3xl border transition-all overflow-hidden ${configSaved ? 'border-green-500/25' : 'border-white/10'}`}
-                style={{ background: configSaved ? 'linear-gradient(180deg, rgba(16,185,129,0.10) 0%, #081624 60%, #050B14 100%)' : 'linear-gradient(180deg, #0B1B2B 0%, #081624 60%, #050B14 100%)' }}>
+            <div className={`mb-4 rounded-3xl border transition-all overflow-hidden ${tab !== 'config' ? 'hidden' : ''} ${configSaved ? 'border-green-500/20' : 'border-white/8'}`}
+                style={{ background: configSaved ? 'rgba(16,185,129,0.02)' : 'rgba(255,255,255,0.02)' }}>
 
                 {/* Section header */}
                 <div className="flex items-center gap-3 px-5 pt-5 pb-4 border-b border-white/5">
                     <div className="w-7 h-7 rounded-xl flex items-center justify-center text-[11px] font-black"
-                        style={{ background: configSaved ? 'rgba(16,185,129,0.15)' : 'rgba(125,211,252,0.15)', color: configSaved ? '#10b981' : '#7DD3FC' }}>1</div>
+                        style={{ background: configSaved ? 'rgba(16,185,129,0.15)' : 'rgba(139,92,246,0.15)', color: configSaved ? '#10b981' : '#a78bfa' }}>1</div>
                     <div className="flex-1">
                         <p className="text-[11px] font-bold uppercase tracking-widest text-white/50 flex items-center gap-1.5">
                             <Settings2 size={10} /> Configuración
@@ -805,7 +968,7 @@ function CampaignPageInner() {
                         <input
                             value={form.name}
                             onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
-                            className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-[#7DD3FC]/40 transition-colors"
+                            className="w-full bg-[#1c1d2e] border border-white/20 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-purple-500/50 transition-colors"
                         />
                     </div>
 
@@ -821,7 +984,7 @@ function CampaignPageInner() {
                                         setForm(f => ({ ...f, providerAccountId: e.target.value, providerAccountName: sel?.displayName || '', pixelId: '' }))
                                         if (strategy?.platform === 'META') fetchPixels(e.target.value)
                                     }}
-                                    className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-[#7DD3FC]/40 [&>option]:bg-[#0B1B2B]"
+                                    className="w-full bg-[#1c1d2e] border border-white/20 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-purple-500/50 [&>option]:bg-[#1c1d2e]"
                                 >
                                     {accounts.map((a: any) => (
                                         <option key={a.providerAccountId} value={a.providerAccountId}>{a.displayName}</option>
@@ -845,7 +1008,7 @@ function CampaignPageInner() {
                                         const saved = pid ? getWaPrefs()[pid] : ''
                                         setForm(f => ({ ...f, pageId: pid, whatsappNumber: selectedPage?.whatsappNumber || saved || '' }))
                                     }}
-                                    className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-[#7DD3FC]/40 [&>option]:bg-[#0B1B2B]"
+                                    className="w-full bg-[#1c1d2e] border border-white/20 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-purple-500/50 [&>option]:bg-[#1c1d2e]"
                                 >
                                     <option value="">Seleccionar página...</option>
                                     {pages.map((p: any) => (
@@ -885,7 +1048,7 @@ function CampaignPageInner() {
                                         if (nums.length > 0) return nums.map((n: any) => (
                                             <button key={n.id || n.displayPhone} type="button"
                                                 onClick={() => { setForm(f => ({ ...f, whatsappNumber: n.displayPhone })); if (form.pageId) saveWaPref(form.pageId, n.displayPhone) }}
-                                                className="w-full flex items-center justify-between px-3 py-2.5 bg-white/3 border border-[#B735B8]/20 hover:border-green-500/40 hover:bg-green-500/5 rounded-xl transition-all text-left">
+                                                className="w-full flex items-center justify-between px-3 py-2.5 bg-white/3 border border-white/8 hover:border-green-500/40 hover:bg-green-500/5 rounded-xl transition-all text-left">
                                                 <div className="flex items-center gap-2">
                                                     <Phone size={12} className="text-green-400/60" />
                                                     <span className="text-sm font-mono text-white/90">{n.displayPhone}</span>
@@ -901,7 +1064,7 @@ function CampaignPageInner() {
                                         onChange={e => setForm(f => ({ ...f, whatsappNumber: e.target.value }))}
                                         onBlur={e => { if (form.pageId && e.target.value) saveWaPref(form.pageId, e.target.value) }}
                                         placeholder="+573001234567"
-                                        className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-green-500/50 placeholder:text-white/35"
+                                        className="w-full bg-[#1c1d2e] border border-white/20 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-green-500/50 placeholder:text-white/20"
                                     />
                                 </div>
                             )}
@@ -911,42 +1074,49 @@ function CampaignPageInner() {
                     {/* WhatsApp chat editor */}
                     {needsWhatsApp && (
                         <div className="rounded-2xl border border-green-500/15 bg-green-500/3 p-4 space-y-3">
-                            <div className="flex items-center justify-between gap-2">
-                                <p className="text-[10px] font-bold uppercase tracking-widest text-green-400 flex items-center gap-1.5">
-                                    <Phone size={10} /> Editor de chat WhatsApp
-                                </p>
-                                <button type="button" onClick={generateWaChat} disabled={genWaChat || !campaign}
-                                    className="flex items-center gap-1.5 text-[10px] font-bold px-2.5 py-1.5 rounded-lg bg-green-500/15 border border-green-500/30 text-green-300 hover:bg-green-500/25 transition-all disabled:opacity-50">
-                                    {genWaChat ? <Loader2 size={11} className="animate-spin" /> : <Sparkles size={11} />}
-                                    {genWaChat ? 'Generando…' : 'Generar con IA'}
-                                </button>
-                            </div>
+                            <p className="text-[10px] font-bold uppercase tracking-widest text-green-400 flex items-center gap-1.5">
+                                <Phone size={10} /> Editor de chat WhatsApp
+                            </p>
                             <div>
-                                <label className="text-[10px] font-bold text-white/30 uppercase tracking-widest block mb-1.5">Saludo</label>
+                                <div className="flex items-center justify-between mb-1.5">
+                                    <label className="text-[10px] font-bold text-white/30 uppercase tracking-widest">Saludo</label>
+                                    <button type="button" onClick={() => fillChatWithAI('whatsappGreeting')} disabled={!!fillingChat}
+                                        className="flex items-center gap-1 text-[10px] font-bold text-purple-300 hover:text-purple-200 disabled:opacity-50 transition-colors">
+                                        {fillingChat === 'whatsappGreeting' ? <Loader2 size={10} className="animate-spin" /> : <Sparkles size={10} />}
+                                        Llenar con IA
+                                    </button>
+                                </div>
                                 <textarea
                                     value={form.welcomeMessage}
                                     onChange={e => setForm(f => ({ ...f, welcomeMessage: e.target.value.slice(0, 180) }))}
                                     placeholder="Ej: ¡Hola! ¿Cómo podemos ayudarte? 👋"
                                     rows={2}
                                     maxLength={180}
-                                    className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-green-500/50 placeholder:text-white/35 resize-none"
+                                    className="w-full bg-[#1c1d2e] border border-white/20 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-green-500/50 placeholder:text-white/20 resize-none"
                                 />
                                 <p className="text-[9px] text-white/15 mt-1">{180 - form.welcomeMessage.length} caracteres restantes</p>
                             </div>
                             <div>
-                                <label className="text-[10px] font-bold text-white/30 uppercase tracking-widest block mb-1.5">Botón de respuesta rápida</label>
+                                <div className="flex items-center justify-between mb-1.5">
+                                    <label className="text-[10px] font-bold text-white/30 uppercase tracking-widest">Botón de respuesta rápida</label>
+                                    <button type="button" onClick={() => fillChatWithAI('quickReply')} disabled={!!fillingChat}
+                                        className="flex items-center gap-1 text-[10px] font-bold text-purple-300 hover:text-purple-200 disabled:opacity-50 transition-colors">
+                                        {fillingChat === 'quickReply' ? <Loader2 size={10} className="animate-spin" /> : <Sparkles size={10} />}
+                                        Llenar con IA
+                                    </button>
+                                </div>
                                 <input
                                     type="text"
                                     value={form.whatsappQuestion}
                                     onChange={e => setForm(f => ({ ...f, whatsappQuestion: e.target.value.slice(0, 160) }))}
                                     placeholder="Ej: Quiero más información"
                                     maxLength={160}
-                                    className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-green-500/50 placeholder:text-white/35"
+                                    className="w-full bg-[#1c1d2e] border border-white/20 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-green-500/50 placeholder:text-white/20"
                                 />
                                 <p className="text-[9px] text-white/15 mt-1">{160 - form.whatsappQuestion.length} caracteres restantes</p>
                             </div>
                             {(form.welcomeMessage || form.whatsappQuestion) && (
-                                <div className="rounded-xl bg-green-900/20 border border-green-500/20 p-3 space-y-2">
+                                <div className="rounded-xl bg-[#0b2010] border border-green-500/20 p-3 space-y-2">
                                     <p className="text-[9px] font-bold text-green-400/60 uppercase tracking-widest mb-1">Vista previa</p>
                                     {form.welcomeMessage && (
                                         <div className="inline-block bg-white/10 rounded-xl rounded-tl-sm px-3 py-2 max-w-[85%]">
@@ -968,12 +1138,21 @@ function CampaignPageInner() {
                     {/* Pixel + URL */}
                     {needsPixel && pixels.length > 0 && (
                         <div>
-                            <label className="text-[10px] font-bold text-white/35 uppercase tracking-widest block mb-1.5">Pixel de seguimiento</label>
+                            <label className="text-[10px] font-bold text-white/35 uppercase tracking-widest block mb-1.5">Pixel de seguimiento <span className="text-purple-400/50 normal-case font-normal">· señal de conversión</span></label>
                             <select value={form.pixelId} onChange={e => setForm(f => ({ ...f, pixelId: e.target.value }))}
-                                className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-[#7DD3FC]/40 [&>option]:bg-[#0B1B2B]">
+                                className="w-full bg-[#1c1d2e] border border-white/20 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-purple-500/50 [&>option]:bg-[#1c1d2e]">
                                 <option value="">Sin pixel</option>
                                 {pixels.map((p: any) => <option key={p.id} value={p.id}>{p.name}</option>)}
                             </select>
+                        </div>
+                    )}
+                    {/* Aviso de SEÑAL (Andromeda): ventas sin píxel → Meta optimiza por clics, no por compras */}
+                    {(strategy?.objective === 'conversions' || form.objective === 'conversions') && !form.pixelId && (
+                        <div className="p-3 rounded-xl flex items-start gap-2" style={{ background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.22)' }}>
+                            <span className="text-amber-400 shrink-0">⚠️</span>
+                            <p className="text-[11px] text-amber-200/90 leading-relaxed">
+                                Para optimizar por <b>VENTAS</b> conviene seleccionar tu <b>Píxel</b>: es la <b>señal</b> que Andromeda usa para encontrar compradores. Sin píxel, Meta optimiza por <b>clics</b> (no por compras). {pixels.length === 0 && 'No encontramos píxeles — creá uno en el Administrador de Eventos de Meta y reconectá.'}
+                            </p>
                         </div>
                     )}
                     {needsUrl && (
@@ -981,7 +1160,7 @@ function CampaignPageInner() {
                             <label className="text-[10px] font-bold text-white/35 uppercase tracking-widest block mb-1.5">URL de destino</label>
                             <input value={form.destinationUrl} onChange={e => setForm(f => ({ ...f, destinationUrl: e.target.value }))}
                                 placeholder="https://tusitio.com"
-                                className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-[#7DD3FC]/40 placeholder:text-white/35" />
+                                className="w-full bg-[#1c1d2e] border border-white/20 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-purple-500/50 placeholder:text-white/20" />
                         </div>
                     )}
 
@@ -991,33 +1170,22 @@ function CampaignPageInner() {
                             <label className="text-[10px] font-bold text-white/35 uppercase tracking-widest flex items-center gap-1 mb-2">
                                 <DollarSign size={9} /> Presupuesto diario
                             </label>
-                            {(() => {
-                                const acct = accounts.find((a: any) => a.providerAccountId === form.providerAccountId)
-                                const cur = (acct?.currency || 'USD').toUpperCase()
-                                const ci = currencyInfo(cur)
-                                const min = Math.max(ci.min, cur === 'USD' ? (strategy.minBudgetUSD || 0) : 0)
-                                const max = Math.max(ci.max, min * 10)
-                                const val = Math.min(Math.max(parseFloat(form.dailyBudgetUSD || String(min)) || min, min), max)
-                                return (
-                                    <div className="space-y-2">
-                                        <div className="flex items-center justify-between">
-                                            <span className="text-2xl font-black text-white">{ci.symbol}{Number(form.dailyBudgetUSD || 0).toLocaleString()}</span>
-                                            <span className="text-xs text-white/25">{cur}/día</span>
-                                        </div>
-                                        <input type="range" min={min} max={max} step={ci.step}
-                                            value={val}
-                                            onChange={e => setForm(f => ({ ...f, dailyBudgetUSD: e.target.value }))}
-                                            className="w-full accent-[#B735B8]" />
-                                        <div className="flex justify-between text-[10px] text-white/15">
-                                            <span>Mín {ci.symbol}{min.toLocaleString()}</span>
-                                            <span>Máx {ci.symbol}{max.toLocaleString()}</span>
-                                        </div>
-                                        {cur !== 'USD' && (
-                                            <p className="text-[10px] text-white/25 leading-relaxed">💱 El monto está en <b className="text-white/45">{cur}</b>, la moneda de tu cuenta publicitaria.</p>
-                                        )}
-                                    </div>
-                                )
-                            })()}
+                            <div className="space-y-1.5">
+                                <div className="relative">
+                                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-white/40 text-lg font-black pointer-events-none">$</span>
+                                    <input
+                                        type="number"
+                                        min={strategy.minBudgetUSD}
+                                        step="0.5"
+                                        inputMode="decimal"
+                                        value={form.dailyBudgetUSD}
+                                        onChange={e => setForm(f => ({ ...f, dailyBudgetUSD: e.target.value }))}
+                                        className="w-full bg-[#1c1d2e] border border-white/20 rounded-xl pl-7 pr-20 py-2.5 text-xl font-black text-white focus:outline-none focus:border-purple-500/50"
+                                    />
+                                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-white/25 pointer-events-none">USD/día</span>
+                                </div>
+                                <p className="text-[10px] text-white/20">Mínimo recomendado: ${strategy.minBudgetUSD}/día</p>
+                            </div>
                         </div>
                         <div>
                             <label className="text-[10px] font-bold text-white/35 uppercase tracking-widest flex items-center gap-1 mb-2">
@@ -1042,8 +1210,8 @@ function CampaignPageInner() {
                     </button>
 
                     {showAdvanced && (
-                        <div className="rounded-2xl border border-[#B735B8]/15 bg-[#B735B8]/3 p-4 space-y-4">
-                            <p className="text-[10px] font-bold uppercase tracking-widest text-[#C9A7FF] flex items-center gap-1.5">
+                        <div className="rounded-2xl border border-purple-500/15 bg-purple-500/3 p-4 space-y-4">
+                            <p className="text-[10px] font-bold uppercase tracking-widest text-purple-400 flex items-center gap-1.5">
                                 <Bot size={10} /> Optimización IA
                             </p>
 
@@ -1057,45 +1225,15 @@ function CampaignPageInner() {
                                             { key: 'carousel', label: 'Carrusel', desc: 'Todas las variaciones en un carrusel', icon: Layers },
                                         ] as const).map(opt => (
                                             <button key={opt.key} onClick={() => setAdFormat(opt.key)}
-                                                className={`flex flex-col items-start gap-1 p-3 rounded-xl border text-left transition-all ${adFormat === opt.key ? 'bg-[#B735B8]/15 border-[#B735B8]/40' : 'bg-white/3 border-[#B735B8]/20 hover:border-[#B735B8]/40'}`}>
-                                                <opt.icon size={12} className={adFormat === opt.key ? 'text-[#C9A7FF]' : 'text-white/30'} />
-                                                <span className={`text-[11px] font-bold ${adFormat === opt.key ? 'text-[#C9A7FF]' : 'text-white/50'}`}>{opt.label}</span>
+                                                className={`flex flex-col items-start gap-1 p-3 rounded-xl border text-left transition-all ${adFormat === opt.key ? 'bg-purple-500/15 border-purple-500/40' : 'bg-white/3 border-white/8 hover:border-white/20'}`}>
+                                                <opt.icon size={12} className={adFormat === opt.key ? 'text-purple-400' : 'text-white/30'} />
+                                                <span className={`text-[11px] font-bold ${adFormat === opt.key ? 'text-purple-300' : 'text-white/50'}`}>{opt.label}</span>
                                                 <span className="text-[9px] text-white/25 leading-tight">{opt.desc}</span>
                                             </button>
                                         ))}
                                     </div>
                                 </div>
                             )}
-
-                            {/* Audiencia (IA) — edad, género e intereses desde el brief */}
-                            <div className="rounded-xl border border-[#B735B8]/20 bg-[#B735B8]/5 p-3.5">
-                                <div className="flex items-center justify-between gap-2 mb-2">
-                                    <p className="text-xs font-bold text-white/80 flex items-center gap-1.5"><Target size={12} className="text-[#C9A7FF]" /> Audiencia (IA)</p>
-                                    <button type="button" onClick={generateAudience} disabled={genAudience || !campaign}
-                                        className="flex items-center gap-1.5 text-[10px] font-bold px-2.5 py-1.5 rounded-lg bg-[#B735B8]/15 border border-[#B735B8]/30 text-[#C9A7FF] hover:bg-[#B735B8]/25 transition-all disabled:opacity-50">
-                                        {genAudience ? <Loader2 size={11} className="animate-spin" /> : <Sparkles size={11} />}
-                                        {genAudience ? 'Generando…' : audienceProfile ? 'Regenerar' : 'Sugerir con IA'}
-                                    </button>
-                                </div>
-                                {audienceProfile ? (
-                                    <div className="space-y-2">
-                                        <div className="flex flex-wrap gap-1.5">
-                                            <span className="text-[11px] font-medium px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-white/70">👤 {audienceProfile.gender === 'female' ? 'Mujeres' : audienceProfile.gender === 'male' ? 'Hombres' : 'Todos'}</span>
-                                            <span className="text-[11px] font-medium px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-white/70">🎂 {audienceProfile.ageMin}–{audienceProfile.ageMax} años</span>
-                                        </div>
-                                        {audienceProfile.interests?.length > 0 && (
-                                            <div className="flex flex-wrap gap-1.5">
-                                                {audienceProfile.interests.map((it: string, i: number) => (
-                                                    <span key={i} className="text-[11px] px-2.5 py-1 rounded-full bg-[#B735B8]/10 border border-[#B735B8]/20 text-[#C9A7FF]">{it}</span>
-                                                ))}
-                                            </div>
-                                        )}
-                                        <p className="text-[10px] text-white/30 leading-relaxed">Con Advantage+ activado, Meta usa esto como punto de partida y amplía para encontrar más compradores.</p>
-                                    </div>
-                                ) : (
-                                    <p className="text-[11px] text-white/35 leading-relaxed">La IA define edad, género e intereses ideales según tu negocio. Toca “Sugerir con IA”.</p>
-                                )}
-                            </div>
 
                             {/* Advantage+ Audience */}
                             <div className="flex items-start justify-between gap-4">
@@ -1105,7 +1243,7 @@ function CampaignPageInner() {
                                 </div>
                                 <button
                                     onClick={() => setAdvantageAudience(v => !v)}
-                                    className={`shrink-0 w-11 h-6 rounded-full border transition-all relative ${advantageAudience ? 'bg-[#B735B8] border-[#B735B8]' : 'bg-white/8 border-white/15'}`}
+                                    className={`shrink-0 w-11 h-6 rounded-full border transition-all relative ${advantageAudience ? 'bg-purple-500 border-purple-400' : 'bg-white/8 border-white/15'}`}
                                 >
                                     <span className={`absolute top-0.5 w-5 h-5 rounded-full bg-white transition-all shadow-sm ${advantageAudience ? 'left-5' : 'left-0.5'}`} />
                                 </button>
@@ -1119,7 +1257,7 @@ function CampaignPageInner() {
                                 </div>
                                 <button
                                     onClick={() => setAdvantageCreative(v => !v)}
-                                    className={`shrink-0 w-11 h-6 rounded-full border transition-all relative ${advantageCreative ? 'bg-[#233B8F] border-[#233B8F]' : 'bg-white/8 border-white/15'}`}
+                                    className={`shrink-0 w-11 h-6 rounded-full border transition-all relative ${advantageCreative ? 'bg-blue-500 border-blue-400' : 'bg-white/8 border-white/15'}`}
                                 >
                                     <span className={`absolute top-0.5 w-5 h-5 rounded-full bg-white transition-all shadow-sm ${advantageCreative ? 'left-5' : 'left-0.5'}`} />
                                 </button>
@@ -1135,9 +1273,9 @@ function CampaignPageInner() {
                                         { key: 'min_roas', label: 'ROAS mín.', desc: 'Retorno garantizado', icon: TrendingUp },
                                     ] as const).map(opt => (
                                         <button key={opt.key} onClick={() => setBidStrategy(opt.key)}
-                                            className={`flex flex-col items-start gap-1 p-3 rounded-xl border text-left transition-all ${bidStrategy === opt.key ? 'bg-[#B735B8]/15 border-[#B735B8]/40' : 'bg-white/3 border-[#B735B8]/20 hover:border-[#B735B8]/40'}`}>
-                                            <opt.icon size={12} className={bidStrategy === opt.key ? 'text-[#C9A7FF]' : 'text-white/30'} />
-                                            <span className={`text-[11px] font-bold ${bidStrategy === opt.key ? 'text-[#C9A7FF]' : 'text-white/50'}`}>{opt.label}</span>
+                                            className={`flex flex-col items-start gap-1 p-3 rounded-xl border text-left transition-all ${bidStrategy === opt.key ? 'bg-purple-500/15 border-purple-500/40' : 'bg-white/3 border-white/8 hover:border-white/20'}`}>
+                                            <opt.icon size={12} className={bidStrategy === opt.key ? 'text-purple-400' : 'text-white/30'} />
+                                            <span className={`text-[11px] font-bold ${bidStrategy === opt.key ? 'text-purple-300' : 'text-white/50'}`}>{opt.label}</span>
                                             <span className="text-[9px] text-white/25 leading-tight">{opt.desc}</span>
                                         </button>
                                     ))}
@@ -1149,7 +1287,7 @@ function CampaignPageInner() {
                                             <span className="text-xs text-white/40">$</span>
                                             <input type="number" value={bidCapAmount} onChange={e => setBidCapAmount(e.target.value)}
                                                 placeholder="5.00" min="0.5" step="0.5"
-                                                className="w-20 bg-white/5 border border-white/10 rounded-lg px-2 py-1.5 text-xs text-white focus:outline-none focus:border-[#7DD3FC]/40" />
+                                                className="w-20 bg-[#1c1d2e] border border-white/20 rounded-lg px-2 py-1.5 text-xs text-white focus:outline-none focus:border-purple-500/50" />
                                             <span className="text-xs text-white/25">USD</span>
                                         </div>
                                     </div>
@@ -1160,7 +1298,7 @@ function CampaignPageInner() {
                                         <div className="flex items-center gap-1">
                                             <input type="number" value={minRoasTarget} onChange={e => setMinRoasTarget(e.target.value)}
                                                 placeholder="2.0" min="1" step="0.1"
-                                                className="w-20 bg-white/5 border border-white/10 rounded-lg px-2 py-1.5 text-xs text-white focus:outline-none focus:border-[#7DD3FC]/40" />
+                                                className="w-20 bg-[#1c1d2e] border border-white/20 rounded-lg px-2 py-1.5 text-xs text-white focus:outline-none focus:border-purple-500/50" />
                                             <span className="text-xs text-white/25">x retorno</span>
                                         </div>
                                     </div>
@@ -1171,8 +1309,8 @@ function CampaignPageInner() {
 
                     {/* Save button */}
                     <button onClick={saveConfig} disabled={savingConfig || !form.providerAccountId || !form.name.trim()}
-                        className="w-full flex items-center justify-center gap-2 font-bold py-3.5 rounded-2xl text-white disabled:opacity-40 disabled:cursor-not-allowed transition-all"
-                        style={{ background: 'linear-gradient(135deg, #FF2D95 0%, #B735B8 48%, #233B8F 100%)', boxShadow: '0 0 24px rgba(255,255,255,0.15)' }}>
+                        className="w-full flex items-center justify-center gap-2 font-bold py-3.5 rounded-2xl disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                        style={{ background: 'linear-gradient(135deg,#7c3aed,#2563eb)', boxShadow: '0 0 24px rgba(124,58,237,0.3)' }}>
                         {savingConfig
                             ? <><Loader2 size={15} className="animate-spin" /> Guardando...</>
                             : configSaved
@@ -1186,12 +1324,12 @@ function CampaignPageInner() {
             {/* ══════════════════════════════════════════════
                 SECCIÓN 2 — CREATIVOS & TEXTOS
             ══════════════════════════════════════════════ */}
-            <div ref={creativesRef} className={`mb-4 rounded-3xl border transition-all overflow-hidden relative ${!configSaved ? 'border-white/10' : 'border-[#B735B8]/20'}`}
-                style={{ background: 'linear-gradient(180deg, #0B1B2B 0%, #081624 60%, #050B14 100%)' }}>
+            <div ref={creativesRef} className={`mb-4 rounded-3xl border transition-all overflow-hidden relative ${tab !== 'creativos' ? 'hidden' : ''} ${!configSaved ? 'border-white/5' : 'border-white/8'}`}
+                style={{ background: 'rgba(255,255,255,0.015)' }}>
 
                 {!configSaved && (
                     <div className="absolute inset-0 z-10 flex items-center justify-center rounded-3xl">
-                        <div className="px-4 py-2.5 rounded-xl bg-black/70 border border-[#B735B8]/25 backdrop-blur-sm flex items-center gap-2">
+                        <div className="px-4 py-2.5 rounded-xl bg-black/70 border border-white/10 backdrop-blur-sm flex items-center gap-2">
                             <Settings2 size={12} className="text-white/40" />
                             <span className="text-xs text-white/50 font-bold">Guarda la configuración primero</span>
                         </div>
@@ -1202,7 +1340,7 @@ function CampaignPageInner() {
                     {/* Section header */}
                     <div className="flex items-center gap-3 px-5 pt-5 pb-4 border-b border-white/5">
                         <div className="w-7 h-7 rounded-xl flex items-center justify-center text-[11px] font-black"
-                            style={{ background: 'rgba(125,211,252,0.15)', color: '#7DD3FC' }}>2</div>
+                            style={{ background: 'rgba(139,92,246,0.15)', color: '#a78bfa' }}>2</div>
                         <div className="flex-1">
                             <p className="text-[11px] font-bold uppercase tracking-widest text-white/50 flex items-center gap-1.5">
                                 <LayoutGrid size={10} /> Creativos & Textos
@@ -1217,40 +1355,44 @@ function CampaignPageInner() {
                             <div>
                                 {!showBulkPanel ? (
                                     <button onClick={() => setShowBulkPanel(true)}
-                                        className="w-full flex items-center justify-center gap-2.5 py-4 rounded-2xl font-bold text-sm text-white hover:opacity-90 transition-all"
-                                        style={{ background: 'linear-gradient(135deg, #FF2D95 0%, #B735B8 48%, #233B8F 100%)', boxShadow: '0 0 30px rgba(183,53,184,0.18)' }}>
-                                        <Sparkles size={16} className="text-white" />
+                                        className="btn-ai-glass w-full flex items-center justify-center gap-2.5 py-4 rounded-2xl font-black text-sm text-white">
+                                        <Sparkles size={16} />
                                         ✨ Generar todas las imágenes con IA
                                         <span className="text-[11px] font-normal text-white/70">({strategy.mediaCount} imágenes)</span>
                                     </button>
                                 ) : (
-                                    <div className="rounded-2xl border border-[#B735B8]/25 bg-[#B735B8]/5 p-4 space-y-4">
+                                    <div className="rounded-2xl border border-purple-500/25 bg-purple-500/5 p-4 space-y-4">
                                         <div className="flex items-center justify-between">
-                                            <p className="text-[11px] font-bold text-[#C9A7FF] uppercase tracking-widest flex items-center gap-1.5">
+                                            <p className="text-[11px] font-bold text-purple-300 uppercase tracking-widest flex items-center gap-1.5">
                                                 <Sparkles size={10} /> Generar {strategy.mediaCount} imágenes con IA
                                             </p>
                                             <button onClick={() => setShowBulkPanel(false)} className="text-white/30 hover:text-white"><X size={13} /></button>
                                         </div>
 
                                         {/* Auto style info */}
-                                        <div className="flex items-center gap-2 px-3 py-2 bg-[#B735B8]/8 border border-[#B735B8]/20 rounded-xl">
-                                            <Sparkles size={10} className="text-[#C9A7FF] shrink-0" />
-                                            <p className="text-[9px] text-[#C9A7FF]">La IA elige automáticamente el mejor estilo para cada imagen según la estrategia y el brief del negocio</p>
+                                        <div className="flex items-center gap-2 px-3 py-2 bg-purple-500/8 border border-purple-500/20 rounded-xl">
+                                            <Sparkles size={10} className="text-purple-400 shrink-0" />
+                                            <p className="text-[9px] text-purple-300">La IA elige automáticamente el mejor estilo para cada imagen según la estrategia y el brief del negocio</p>
                                         </div>
 
-                                        {/* Bulk product photo reference */}
+                                        {/* Bulk product photo reference (OBLIGATORIA) */}
                                         <div>
-                                            <p className="text-[9px] font-bold text-white/25 uppercase mb-2">Foto del producto (opcional)</p>
+                                            <p className="text-[9px] font-bold uppercase mb-2 flex items-center gap-1.5">
+                                                <span className="text-white/25">Foto del producto</span>
+                                                <span className="text-amber-400">· obligatoria</span>
+                                            </p>
                                             <input ref={bulkRefFileRef} type="file" accept="image/*" className="hidden"
                                                 onChange={e => { if (e.target.files?.[0]) handleBulkRefImageUpload(e.target.files[0]); e.currentTarget.value = '' }} />
                                             {bulkRefImageUrl ? (
-                                                <div className="flex items-center gap-2 p-2 rounded-xl border border-green-500/25 bg-green-500/5">
-                                                    <img src={bulkRefImageUrl} alt="ref" className="w-10 h-10 rounded-lg object-cover shrink-0 border border-[#B735B8]/25" />
-                                                    <div className="flex-1 min-w-0">
-                                                        <p className="text-[10px] text-green-400 font-bold">✓ Foto cargada para todos los slots</p>
-                                                        <p className="text-[9px] text-white/30">La IA usará esta imagen como referencia del producto</p>
+                                                <div className="flex flex-col gap-2 p-2.5 rounded-xl border border-green-500/25 bg-green-500/5">
+                                                    <img src={bulkRefImageUrl} alt="ref" className="w-full max-h-40 rounded-lg object-contain bg-black/20 border border-white/8" />
+                                                    <div className="flex items-center justify-between">
+                                                        <div className="min-w-0">
+                                                            <p className="text-[10px] text-green-400 font-bold">✓ Foto cargada para todos los slots</p>
+                                                            <p className="text-[9px] text-white/30">La IA usará esta imagen como referencia del producto</p>
+                                                        </div>
+                                                        <button onClick={() => { setBulkRefImageUrl(''); setRefImageUrls({}) }} className="text-white/20 hover:text-red-400 text-xs shrink-0 ml-2">✕</button>
                                                     </div>
-                                                    <button onClick={() => { setBulkRefImageUrl(''); setRefImageUrls({}) }} className="text-white/20 hover:text-red-400 text-xs shrink-0">✕</button>
                                                 </div>
                                             ) : (
                                                 <button onClick={() => bulkRefFileRef.current?.click()} disabled={uploadingBulkRef}
@@ -1260,62 +1402,75 @@ function CampaignPageInner() {
                                             )}
                                         </div>
 
-                                        {/* Quality + Format */}
-                                        <div className="grid grid-cols-2 gap-4">
-                                            <div>
-                                                <p className="text-[9px] font-bold text-white/25 uppercase mb-2">Calidad</p>
-                                                <div className="space-y-1.5">
-                                                    {([
-                                                        { key: 'fast', label: 'Rápida', icon: Gauge, color: 'text-green-400', border: 'border-green-500/30', bg: 'bg-green-500/10' },
-                                                        { key: 'standard', label: 'Estándar', icon: Star, color: 'text-[#7DD3FC]', border: 'border-[#7DD3FC]/30', bg: 'bg-[#7DD3FC]/10' },
-                                                        { key: 'premium', label: 'Premium HD', icon: Trophy, color: 'text-yellow-400', border: 'border-yellow-500/30', bg: 'bg-yellow-500/10' },
-                                                    ] as const).map(q => (
-                                                        <button key={q.key} onClick={() => setBulkQuality(q.key)}
-                                                            className={`w-full flex items-center gap-2 px-3 py-2 rounded-xl border text-[11px] font-bold transition-all ${bulkQuality === q.key ? `${q.bg} ${q.border} ${q.color}` : 'bg-white/3 border-[#B735B8]/20 text-white/30 hover:border-[#B735B8]/40'}`}>
-                                                            <q.icon size={11} />{q.label}
-                                                        </button>
-                                                    ))}
-                                                </div>
+                                        {/* Calidad fija: Rápida (sin selector) */}
+
+                                        {/* PASO 2: generar prompt (glass) + manual — lado a lado, también en teléfono.
+                                            Se desbloquean solo cuando hay foto subida. */}
+                                        <div>
+                                            <div className="flex items-stretch gap-2">
+                                                <button onClick={generateDiversePrompts} disabled={aiPromptLoading || !bulkRefImageUrl}
+                                                    title="Generar prompt según mi estrategia con IA"
+                                                    className="btn-ai-glass flex-1 min-w-0 flex items-center justify-center gap-2 px-3 py-3 rounded-2xl text-[12.5px] font-black text-white leading-tight text-center disabled:opacity-40 disabled:cursor-not-allowed">
+                                                    {aiPromptLoading ? <Loader2 size={15} className="shrink-0 animate-spin" /> : <Sparkles size={15} className="shrink-0" />}
+                                                    <span>{aiPromptLoading ? 'Creando…' : 'Generar prompt según mi estrategia con AI'}</span>
+                                                </button>
+                                                <button onClick={() => setShowManualPrompt(v => !v)} disabled={!bulkRefImageUrl}
+                                                    title="Escribir mi propio prompt (manual)"
+                                                    className={`shrink-0 flex items-center gap-1.5 px-3.5 py-3 rounded-2xl text-[12px] font-bold border transition-all disabled:opacity-40 disabled:cursor-not-allowed ${showManualPrompt ? 'bg-purple-500/25 border-purple-400/60 text-purple-100' : 'bg-purple-500/12 border-purple-500/35 text-purple-200 hover:bg-purple-500/20'}`}>
+                                                    <FileText size={14} /> <span>Manual</span>
+                                                </button>
                                             </div>
-                                            <div>
-                                                <p className="text-[9px] font-bold text-white/25 uppercase mb-2">Formato</p>
-                                                <div className="space-y-1.5">
-                                                    {([
-                                                        { key: 'square', label: 'Feed 1:1', w: 'w-4', h: 'h-4' },
-                                                        { key: 'vertical', label: 'Reels 9:16', w: 'w-3', h: 'h-5' },
-                                                        { key: 'horizontal', label: 'Banner 16:9', w: 'w-5', h: 'h-3' },
-                                                    ] as const).map(f => (
-                                                        <button key={f.key} onClick={() => setBulkFormat(f.key)}
-                                                            className={`w-full flex items-center gap-2 px-3 py-2 rounded-xl border text-[11px] font-bold transition-all ${bulkFormat === f.key ? 'bg-[#B735B8]/15 border-[#B735B8]/40 text-[#C9A7FF]' : 'bg-white/3 border-[#B735B8]/20 text-white/30 hover:border-[#B735B8]/40'}`}>
-                                                            <div className={`border-2 rounded-sm shrink-0 ${bulkFormat === f.key ? 'border-[#B735B8]' : 'border-white/20'} ${f.w} ${f.h}`} />
-                                                            {f.label}
+                                            <p className="text-[9px] text-white/35 mt-1.5 leading-snug">Cada anuncio con un <b className="text-purple-300/80">ángulo único</b> (problema · solución · producto · lifestyle) → más rendimiento en Meta <span className="text-white/25">(Andromeda)</span>.</p>
+
+                                            {showManualPrompt && (
+                                                <div className="mt-2.5">
+                                                    <div className="flex items-center justify-between mb-1">
+                                                        <p className="text-[8px] text-white/25 uppercase tracking-widest">Tu prompt manual</p>
+                                                        <button onClick={() => generateAiPrompt()} disabled={aiPromptLoading}
+                                                            className="text-[8px] text-white/30 hover:text-white/55 flex items-center gap-1 disabled:opacity-40">
+                                                            {aiPromptLoading ? <Loader2 size={8} className="animate-spin" /> : <Sparkles size={8} />} con IA
                                                         </button>
-                                                    ))}
+                                                    </div>
+                                                    <textarea value={bulkUserPrompt} onChange={e => setBulkUserPrompt(e.target.value)}
+                                                        rows={3} placeholder="Escribí qué imagen querés (se manda tal cual a gpt-image-2 con tu foto)."
+                                                        className="w-full bg-[#1c1d2e] border border-white/12 rounded-xl px-3 py-2 text-[10px] text-white/80 resize-none focus:outline-none focus:border-purple-500/30 leading-relaxed placeholder:text-white/15" />
                                                 </div>
-                                            </div>
+                                            )}
                                         </div>
 
                                         {bulkGenerating && (
-                                            <div className="flex items-center gap-3 p-3 bg-[#B735B8]/10 border border-[#B735B8]/20 rounded-xl">
-                                                <Loader2 size={14} className="animate-spin text-[#C9A7FF] shrink-0" />
+                                            <div className="flex items-center gap-3 p-3 bg-purple-500/10 border border-purple-500/20 rounded-xl">
+                                                <Loader2 size={14} className="animate-spin text-purple-400 shrink-0" />
                                                 <div className="flex-1">
                                                     <div className="flex items-center justify-between mb-1">
-                                                        <span className="text-[11px] text-[#C9A7FF] font-bold">Generando imágenes...</span>
-                                                        <span className="text-[11px] text-[#C9A7FF]">{bulkProgress}/{strategy.mediaCount}</span>
+                                                        <span className="text-[11px] text-purple-300 font-bold">Generando imágenes...</span>
+                                                        <span className="text-[11px] text-purple-400">{bulkProgress}/{strategy.mediaCount}</span>
                                                     </div>
                                                     <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
-                                                        <div className="h-full bg-[#B735B8] rounded-full transition-all" style={{ width: `${(bulkProgress / strategy.mediaCount) * 100}%` }} />
+                                                        <div className="h-full bg-purple-500 rounded-full transition-all" style={{ width: `${(bulkProgress / strategy.mediaCount) * 100}%` }} />
                                                     </div>
                                                 </div>
                                             </div>
                                         )}
 
-                                        <button onClick={generateAllImages} disabled={bulkGenerating}
-                                            className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl font-bold text-sm text-white disabled:opacity-40 disabled:cursor-not-allowed transition-all"
-                                            style={{ background: 'linear-gradient(135deg, #FF2D95 0%, #B735B8 48%, #233B8F 100%)', boxShadow: '0 0 20px rgba(255,255,255,0.15)' }}>
+                                        {/* Ayudas según el paso del flujo */}
+                                        {!bulkGenerating && !bulkRefImageUrl && (
+                                            <p className="text-[10px] text-amber-400/80 text-center flex items-center justify-center gap-1.5">
+                                                <Upload size={11} /> Paso 1: subí la foto de tu producto
+                                            </p>
+                                        )}
+                                        {!bulkGenerating && bulkRefImageUrl && Object.keys(imageCustomPrompts).length === 0 && !bulkUserPrompt.trim() && (
+                                            <p className="text-[10px] text-purple-300/80 text-center flex items-center justify-center gap-1.5">
+                                                <Sparkles size={11} /> Paso 2: generá el prompt (con AI o manual) para continuar
+                                            </p>
+                                        )}
+                                        {/* PASO 3: generar imágenes — se desbloquea con foto + prompt listo */}
+                                        <button onClick={generateAllImages}
+                                            disabled={bulkGenerating || !bulkRefImageUrl || (Object.keys(imageCustomPrompts).length === 0 && !bulkUserPrompt.trim())}
+                                            className="btn-ai-glass w-full flex items-center justify-center gap-2 py-3.5 rounded-2xl font-black text-sm text-white disabled:opacity-40 disabled:cursor-not-allowed">
                                             {bulkGenerating
-                                                ? <><Loader2 size={15} className="animate-spin" /> Generando...</>
-                                                : <><Sparkles size={15} /> Generar {strategy.mediaCount} imágenes</>
+                                                ? <><Loader2 size={16} className="animate-spin" /> Creando tus creativos…</>
+                                                : <><Sparkles size={16} /> Generar mis creativos publicitarios con AI</>
                                             }
                                         </button>
                                     </div>
@@ -1323,31 +1478,28 @@ function CampaignPageInner() {
                             </div>
                         )}
 
-                        {/* ── Creative cards grid ── */}
-                        <div className="space-y-4">
+                        {/* ── Creative cards grid (cuadros, como estrategias) ── */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 items-start">
                             {(configSaved ? creatives : Array.from({ length: strategy.mediaCount }, (_, i) => ({ slotIndex: i, mediaUrl: null, primaryText: '', headline: '', description: '', hook: '', hashtags: '' }))).map((creative: any, i: number) => (
                                 <div key={i} className="rounded-2xl border border-white/6 bg-white/2 overflow-hidden">
                                     {/* Card header */}
                                     <div className="flex items-center gap-2 px-4 py-2.5 border-b border-white/5">
                                         <span className="text-[10px] font-black text-white/30 uppercase">Anuncio #{i + 1}</span>
-                                        {creative.aiGenerated && <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-[#B735B8]/10 border border-[#B735B8]/20 text-[#C9A7FF]">IA</span>}
+                                        {creative.aiGenerated && <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-400">IA</span>}
                                         {creative.mediaUrl && <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-green-500/10 border border-green-500/20 text-green-400 flex items-center gap-1"><CheckCircle2 size={8} /> Imagen</span>}
-                                        {creative.primaryText && <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-[#7DD3FC]/10 border border-[#7DD3FC]/20 text-[#7DD3FC] flex items-center gap-1"><FileText size={8} /> Texto</span>}
+                                        {creative.primaryText && <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 flex items-center gap-1"><FileText size={8} /> Texto</span>}
                                     </div>
 
-                                    <div className="flex flex-col md:flex-row">
+                                    <div className="flex flex-col">
                                         {/* Image column */}
-                                        <div className="md:w-48 shrink-0 p-3">
+                                        <div className="p-3">
                                             <div className="aspect-square rounded-xl bg-white/3 border border-white/6 overflow-hidden relative group">
                                                 {generatingImages[i] ? (
-                                                    <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-[#0B1B2B]">
-                                                        <Loader2 size={20} className="animate-spin text-[#C9A7FF]" />
-                                                        <span className="text-[10px] text-[#C9A7FF] font-bold">Generando...</span>
-                                                    </div>
+                                                    <AiGeneratingOverlay />
                                                 ) : creative.mediaUrl ? (
                                                     <>
                                                         {creative.mediaType === 'video'
-                                                            ? <video src={creative.mediaUrl} className="w-full h-full object-cover" />
+                                                            ? <video key={creative.mediaUrl} src={creative.mediaUrl} className="w-full h-full object-cover" controls playsInline />
                                                             : <img src={creative.mediaUrl} alt="" className="w-full h-full object-cover" />
                                                         }
                                                         {creative.uploading && (
@@ -1355,16 +1507,37 @@ function CampaignPageInner() {
                                                                 <Loader2 size={18} className="animate-spin text-white/70" />
                                                             </div>
                                                         )}
+                                                        {/* Estado de pre-subida del VIDEO a Meta (para publicar rápido) */}
+                                                        {!creative.uploading && creative.mediaType === 'video' && creative.metaMediaStatus && (
+                                                            <div className="absolute top-1.5 left-1.5 z-10">
+                                                                {creative.metaMediaStatus === 'processing' && (
+                                                                    <span className="flex items-center gap-1 px-2 py-1 rounded-lg text-[9px] font-bold bg-amber-500/85 text-black">
+                                                                        <Loader2 size={9} className="animate-spin" /> Preparando video…
+                                                                    </span>
+                                                                )}
+                                                                {creative.metaMediaStatus === 'ready' && (
+                                                                    <span className="px-2 py-1 rounded-lg text-[9px] font-bold bg-emerald-500/90 text-black">✓ Listo para publicar</span>
+                                                                )}
+                                                                {creative.metaMediaStatus === 'error' && (
+                                                                    <span className="px-2 py-1 rounded-lg text-[9px] font-bold bg-red-500/90 text-white">⚠ Error al preparar</span>
+                                                                )}
+                                                            </div>
+                                                        )}
                                                         {!creative.uploading && (
                                                             <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-all flex items-center justify-center gap-2">
                                                                 <button onClick={() => fileRefs.current[i]?.click()} className="p-2 rounded-xl bg-white/20 hover:bg-white/40" title="Cambiar">
                                                                     <Upload size={12} />
                                                                 </button>
+                                                                {creative.mediaType !== 'video' && creative.mediaUrl?.startsWith('http') && (
+                                                                    <button onClick={() => downloadImage(creative.mediaUrl, `anuncio-${i + 1}.png`)} className="p-2 rounded-xl bg-white/20 hover:bg-white/40" title="Descargar imagen">
+                                                                        <Download size={12} />
+                                                                    </button>
+                                                                )}
                                                                 {strategy.mediaType !== 'video' && (
                                                                     <button onClick={() => {
                                                                         setImageGenPanel(imageGenPanel === i ? null : i)
-                                                                        if (imageGenPanel !== i) setImageCustomPrompts(prev => ({ ...prev, [i]: generateSmartPrompt(i, true) }))
-                                                                    }} className="p-2 rounded-xl bg-[#B735B8]/40 hover:bg-[#B735B8]/60" title="Regenerar con IA">
+                                                                        // tu prompt queda libre: no autocompletar
+                                                                    }} className="p-2 rounded-xl bg-purple-500/40 hover:bg-purple-500/60" title="Regenerar con IA">
                                                                         <Wand2 size={12} />
                                                                     </button>
                                                                 )}
@@ -1375,15 +1548,15 @@ function CampaignPageInner() {
                                                     <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
                                                         <div className="flex flex-col gap-1.5">
                                                             <button onClick={() => fileRefs.current[i]?.click()}
-                                                                className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white/5 border border-[#B735B8]/25 hover:bg-white/10 transition-all text-[10px] font-bold text-white/40">
+                                                                className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all text-[10px] font-bold text-white/40">
                                                                 <Upload size={11} /> Subir
                                                             </button>
                                                             {strategy.mediaType !== 'video' && configSaved && (
                                                                 <button onClick={() => {
                                                                     setImageGenPanel(imageGenPanel === i ? null : i)
-                                                                    if (imageGenPanel !== i) setImageCustomPrompts(prev => ({ ...prev, [i]: generateSmartPrompt(i, false) }))
+                                                                    // tu prompt queda libre: no autocompletar
                                                                 }}
-                                                                    className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#B735B8]/10 border border-[#B735B8]/20 hover:bg-[#B735B8]/20 transition-all text-[10px] font-bold text-[#C9A7FF]">
+                                                                    className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-purple-500/10 border border-purple-500/20 hover:bg-purple-500/20 transition-all text-[10px] font-bold text-purple-400">
                                                                     <Wand2 size={11} /> IA
                                                                 </button>
                                                             )}
@@ -1402,15 +1575,21 @@ function CampaignPageInner() {
                                             {creative.mediaUrl && !creative.uploading && configSaved && (
                                                 <div className="flex md:hidden gap-1.5 mt-2">
                                                     <button onClick={() => fileRefs.current[i]?.click()}
-                                                        className="flex-1 flex items-center justify-center gap-1 py-2 rounded-xl bg-white/5 border border-[#B735B8]/20 text-[10px] font-bold text-white/40">
+                                                        className="flex-1 flex items-center justify-center gap-1 py-2 rounded-xl bg-white/5 border border-white/8 text-[10px] font-bold text-white/40">
                                                         <Upload size={10} /> Cambiar
                                                     </button>
+                                                    {creative.mediaType !== 'video' && creative.mediaUrl?.startsWith('http') && (
+                                                        <button onClick={() => downloadImage(creative.mediaUrl, `anuncio-${i + 1}.png`)}
+                                                            className="flex-1 flex items-center justify-center gap-1 py-2 rounded-xl bg-white/5 border border-white/8 text-[10px] font-bold text-white/40">
+                                                            <Download size={10} /> Descargar
+                                                        </button>
+                                                    )}
                                                     {strategy.mediaType !== 'video' && (
                                                         <button onClick={() => {
                                                             setImageGenPanel(imageGenPanel === i ? null : i)
-                                                            if (imageGenPanel !== i) setImageCustomPrompts(prev => ({ ...prev, [i]: generateSmartPrompt(i, true) }))
+                                                            // tu prompt queda libre: no autocompletar
                                                         }}
-                                                            className="flex-1 flex items-center justify-center gap-1 py-2 rounded-xl bg-[#B735B8]/10 border border-[#B735B8]/20 text-[10px] font-bold text-[#C9A7FF]">
+                                                            className="flex-1 flex items-center justify-center gap-1 py-2 rounded-xl bg-purple-500/10 border border-purple-500/20 text-[10px] font-bold text-purple-400">
                                                             <Wand2 size={10} /> IA
                                                         </button>
                                                     )}
@@ -1422,8 +1601,8 @@ function CampaignPageInner() {
                                         <div className="flex-1 p-3 space-y-3 min-w-0">
                                             {/* Hook badge */}
                                             {creative.hook && (
-                                                <div className="px-3 py-2 bg-[#B735B8]/5 border border-[#B735B8]/15 rounded-xl">
-                                                    <p className="text-[9px] text-[#C9A7FF] font-bold uppercase mb-0.5">Hook</p>
+                                                <div className="px-3 py-2 bg-purple-500/5 border border-purple-500/15 rounded-xl">
+                                                    <p className="text-[9px] text-purple-400 font-bold uppercase mb-0.5">Hook</p>
                                                     <p className="text-xs text-white/50 italic leading-relaxed">"{creative.hook}"</p>
                                                 </div>
                                             )}
@@ -1436,7 +1615,7 @@ function CampaignPageInner() {
                                                         <button
                                                             onClick={() => suggestField(i, 'primaryText')}
                                                             disabled={suggestingField === `${i}-primaryText`}
-                                                            className="flex items-center gap-1 text-[9px] font-bold text-[#C9A7FF]/70 hover:text-[#C9A7FF] disabled:opacity-40 transition-colors"
+                                                            className="flex items-center gap-1 text-[9px] font-bold text-purple-400/70 hover:text-purple-300 disabled:opacity-40 transition-colors"
                                                         >
                                                             {suggestingField === `${i}-primaryText`
                                                                 ? <Loader2 size={9} className="animate-spin" />
@@ -1451,18 +1630,18 @@ function CampaignPageInner() {
                                                     onChange={e => setCreatives(prev => prev.map((c, j) => j === i ? { ...c, primaryText: e.target.value } : c))}
                                                     rows={4}
                                                     placeholder={copiesGenerated ? '' : 'Genera los textos con IA o escribe manualmente...'}
-                                                    className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-xs text-white resize-none focus:outline-none focus:border-[#7DD3FC]/40 leading-relaxed placeholder:text-white/35"
+                                                    className="w-full bg-[#1c1d2e] border border-white/20 rounded-xl px-3 py-2 text-xs text-white resize-none focus:outline-none focus:border-purple-500/40 leading-relaxed placeholder:text-white/20"
                                                 />
                                                 {/* Suggestions dropdown */}
                                                 {activeSuggestionKey === `${i}-primaryText` && suggestions[`${i}-primaryText`] && (
-                                                    <div className="mt-1.5 rounded-xl border border-[#B735B8]/20 bg-[#0B1B2B]/40 overflow-hidden">
+                                                    <div className="mt-1.5 rounded-xl border border-purple-500/20 bg-[#0d0818] overflow-hidden">
                                                         <div className="flex items-center justify-between px-3 py-2 border-b border-white/5">
-                                                            <p className="text-[9px] font-bold text-[#C9A7FF] uppercase">3 opciones — elige una</p>
+                                                            <p className="text-[9px] font-bold text-purple-400 uppercase">3 opciones — elige una</p>
                                                             <button onClick={() => setActiveSuggestionKey(null)} className="text-white/20 hover:text-white"><X size={10} /></button>
                                                         </div>
                                                         {suggestions[`${i}-primaryText`].map((s, si) => (
                                                             <button key={si} onClick={() => applySuggestion(i, 'primaryText', s)}
-                                                                className="w-full text-left px-3 py-2.5 hover:bg-[#B735B8]/10 border-b border-white/3 last:border-0 transition-colors">
+                                                                className="w-full text-left px-3 py-2.5 hover:bg-purple-500/10 border-b border-white/3 last:border-0 transition-colors">
                                                                 <p className="text-[11px] text-white/60 leading-relaxed line-clamp-3">{s}</p>
                                                             </button>
                                                         ))}
@@ -1477,7 +1656,7 @@ function CampaignPageInner() {
                                                         <label className="text-[9px] font-bold text-white/25 uppercase tracking-widest">Titular</label>
                                                         {configSaved && copiesGenerated && (
                                                             <button onClick={() => suggestField(i, 'headline')} disabled={suggestingField === `${i}-headline`}
-                                                                className="flex items-center gap-1 text-[9px] font-bold text-[#C9A7FF]/70 hover:text-[#C9A7FF] disabled:opacity-40 transition-colors">
+                                                                className="flex items-center gap-1 text-[9px] font-bold text-purple-400/70 hover:text-purple-300 disabled:opacity-40 transition-colors">
                                                                 {suggestingField === `${i}-headline` ? <Loader2 size={9} className="animate-spin" /> : <Sparkles size={9} />}
                                                                 ✨
                                                             </button>
@@ -1485,16 +1664,16 @@ function CampaignPageInner() {
                                                     </div>
                                                     <input value={creative.headline || ''}
                                                         onChange={e => setCreatives(prev => prev.map((c, j) => j === i ? { ...c, headline: e.target.value } : c))}
-                                                        className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-[#7DD3FC]/40" />
+                                                        className="w-full bg-[#1c1d2e] border border-white/20 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-purple-500/40" />
                                                     {activeSuggestionKey === `${i}-headline` && suggestions[`${i}-headline`] && (
-                                                        <div className="mt-1 rounded-xl border border-[#B735B8]/20 bg-[#0B1B2B]/40 overflow-hidden">
+                                                        <div className="mt-1 rounded-xl border border-purple-500/20 bg-[#0d0818] overflow-hidden">
                                                             <div className="flex items-center justify-between px-2.5 py-1.5 border-b border-white/5">
-                                                                <p className="text-[9px] font-bold text-[#C9A7FF] uppercase">Opciones</p>
+                                                                <p className="text-[9px] font-bold text-purple-400 uppercase">Opciones</p>
                                                                 <button onClick={() => setActiveSuggestionKey(null)} className="text-white/20 hover:text-white"><X size={9} /></button>
                                                             </div>
                                                             {suggestions[`${i}-headline`].map((s, si) => (
                                                                 <button key={si} onClick={() => applySuggestion(i, 'headline', s)}
-                                                                    className="w-full text-left px-2.5 py-2 hover:bg-[#B735B8]/10 border-b border-white/3 last:border-0 transition-colors">
+                                                                    className="w-full text-left px-2.5 py-2 hover:bg-purple-500/10 border-b border-white/3 last:border-0 transition-colors">
                                                                     <p className="text-[11px] text-white/60">{s}</p>
                                                                 </button>
                                                             ))}
@@ -1506,7 +1685,7 @@ function CampaignPageInner() {
                                                         <label className="text-[9px] font-bold text-white/25 uppercase tracking-widest">Descripción</label>
                                                         {configSaved && copiesGenerated && (
                                                             <button onClick={() => suggestField(i, 'description')} disabled={suggestingField === `${i}-description`}
-                                                                className="flex items-center gap-1 text-[9px] font-bold text-[#C9A7FF]/70 hover:text-[#C9A7FF] disabled:opacity-40 transition-colors">
+                                                                className="flex items-center gap-1 text-[9px] font-bold text-purple-400/70 hover:text-purple-300 disabled:opacity-40 transition-colors">
                                                                 {suggestingField === `${i}-description` ? <Loader2 size={9} className="animate-spin" /> : <Sparkles size={9} />}
                                                                 ✨
                                                             </button>
@@ -1514,16 +1693,16 @@ function CampaignPageInner() {
                                                     </div>
                                                     <input value={creative.description || ''}
                                                         onChange={e => setCreatives(prev => prev.map((c, j) => j === i ? { ...c, description: e.target.value } : c))}
-                                                        className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-[#7DD3FC]/40" />
+                                                        className="w-full bg-[#1c1d2e] border border-white/20 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-purple-500/40" />
                                                     {activeSuggestionKey === `${i}-description` && suggestions[`${i}-description`] && (
-                                                        <div className="mt-1 rounded-xl border border-[#B735B8]/20 bg-[#0B1B2B]/40 overflow-hidden">
+                                                        <div className="mt-1 rounded-xl border border-purple-500/20 bg-[#0d0818] overflow-hidden">
                                                             <div className="flex items-center justify-between px-2.5 py-1.5 border-b border-white/5">
-                                                                <p className="text-[9px] font-bold text-[#C9A7FF] uppercase">Opciones</p>
+                                                                <p className="text-[9px] font-bold text-purple-400 uppercase">Opciones</p>
                                                                 <button onClick={() => setActiveSuggestionKey(null)} className="text-white/20 hover:text-white"><X size={9} /></button>
                                                             </div>
                                                             {suggestions[`${i}-description`].map((s, si) => (
                                                                 <button key={si} onClick={() => applySuggestion(i, 'description', s)}
-                                                                    className="w-full text-left px-2.5 py-2 hover:bg-[#B735B8]/10 border-b border-white/3 last:border-0 transition-colors">
+                                                                    className="w-full text-left px-2.5 py-2 hover:bg-purple-500/10 border-b border-white/3 last:border-0 transition-colors">
                                                                     <p className="text-[11px] text-white/60">{s}</p>
                                                                 </button>
                                                             ))}
@@ -1537,9 +1716,9 @@ function CampaignPageInner() {
 
                                     {/* Per-slot AI image panel */}
                                     {imageGenPanel === i && configSaved && strategy.mediaType !== 'video' && (
-                                        <div className="border-t border-white/5 bg-[#0B1B2B]/40 p-4 space-y-3">
+                                        <div className="border-t border-white/5 bg-[#0a0818] p-4 space-y-3">
                                             <div className="flex items-center justify-between">
-                                                <p className="text-[10px] font-bold uppercase tracking-widest text-[#C9A7FF] flex items-center gap-1.5">
+                                                <p className="text-[10px] font-bold uppercase tracking-widest text-purple-400 flex items-center gap-1.5">
                                                     <Wand2 size={10} /> {creatives.find(c => c.slotIndex === i)?.mediaUrl ? 'Editar imagen con IA' : 'Generar imagen con IA'}
                                                 </p>
                                                 <button onClick={() => setImageGenPanel(null)} className="text-white/30 hover:text-white"><X size={12} /></button>
@@ -1547,21 +1726,23 @@ function CampaignPageInner() {
 
                                             {/* Reference product photo upload */}
                                             <div className="space-y-1.5">
-                                                <p className="text-[9px] text-white/30 uppercase font-bold tracking-widest">Foto del producto (referencia para la IA)</p>
+                                                <p className="text-[9px] uppercase font-bold tracking-widest"><span className="text-white/30">Foto del producto</span> <span className="text-amber-400">· obligatoria</span></p>
                                                 {refImageUrls[i] ? (
-                                                    <div className="flex items-center gap-2 px-2.5 py-2 bg-green-500/8 border border-green-500/20 rounded-xl">
-                                                        <img src={refImageUrls[i]} className="w-8 h-8 rounded-lg object-cover shrink-0" />
-                                                        <div className="flex-1 min-w-0">
-                                                            <p className="text-[9px] text-green-300 font-bold">Foto del producto cargada</p>
-                                                            <p className="text-[9px] text-green-400/60">La IA usará esta foto como referencia</p>
+                                                    <div className="flex flex-col gap-2 p-2.5 bg-green-500/8 border border-green-500/20 rounded-xl">
+                                                        <img src={refImageUrls[i]} className="w-full max-h-40 rounded-lg object-contain bg-black/20 border border-white/8" />
+                                                        <div className="flex items-center justify-between">
+                                                            <div>
+                                                                <p className="text-[9px] text-green-300 font-bold">Foto del producto cargada ✓</p>
+                                                                <p className="text-[9px] text-green-400/60">La IA usará esta foto como referencia</p>
+                                                            </div>
+                                                            <button onClick={() => setRefImageUrls(prev => { const n = { ...prev }; delete n[i]; return n })}
+                                                                className="text-white/30 hover:text-red-400 shrink-0"><X size={10} /></button>
                                                         </div>
-                                                        <button onClick={() => setRefImageUrls(prev => { const n = { ...prev }; delete n[i]; return n })}
-                                                            className="text-white/30 hover:text-red-400 shrink-0"><X size={10} /></button>
                                                     </div>
                                                 ) : (
                                                     <button onClick={() => refImageFileRefs.current[i]?.click()}
                                                         disabled={uploadingRefImage[i]}
-                                                        className="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl border border-dashed border-[#B735B8]/30 bg-[#B735B8]/5 hover:bg-[#B735B8]/10 hover:border-[#B735B8]/50 transition-all text-[10px] font-bold text-[#C9A7FF]/70 hover:text-[#C9A7FF]">
+                                                        className="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl border border-dashed border-purple-500/30 bg-purple-500/5 hover:bg-purple-500/10 hover:border-purple-500/50 transition-all text-[10px] font-bold text-purple-400/70 hover:text-purple-400">
                                                         {uploadingRefImage[i]
                                                             ? <><Loader2 size={10} className="animate-spin" /> Subiendo...</>
                                                             : <><Upload size={10} /> Subir foto del producto</>
@@ -1579,59 +1760,29 @@ function CampaignPageInner() {
                                             {(refImageUrls[i] || creatives.find(c => c.slotIndex === i)?.mediaUrl?.startsWith('http')) && (
                                                 <div className="flex items-center gap-2 px-2.5 py-1.5 bg-green-500/8 border border-green-500/20 rounded-xl">
                                                     <CheckCircle2 size={9} className="text-green-400 shrink-0" />
-                                                    <p className="text-[9px] text-green-300"><span className="font-bold">gpt-image-1</span> usará tu imagen como base para crear el anuncio</p>
+                                                    <p className="text-[9px] text-green-300"><span className="font-bold">gpt-image-2</span> usará tu imagen como base para crear el anuncio</p>
                                                 </div>
                                             )}
-                                            <div className="grid grid-cols-2 gap-3">
-                                                <div>
-                                                    <p className="text-[9px] text-white/20 uppercase font-bold mb-1.5">Calidad</p>
-                                                    <div className="space-y-1">
-                                                        {([
-                                                            { key: 'fast', label: 'Rápida', icon: Gauge },
-                                                            { key: 'standard', label: 'Estándar', icon: Star },
-                                                            { key: 'premium', label: 'Premium', icon: Trophy },
-                                                        ] as const).map(q => (
-                                                            <button key={q.key} onClick={() => setImageQuality(q.key)}
-                                                                className={`w-full flex items-center gap-2 px-2.5 py-1.5 rounded-xl border text-[10px] font-bold transition-all ${imageQuality === q.key ? 'bg-[#B735B8]/15 border-[#B735B8]/40 text-[#C9A7FF]' : 'bg-white/3 border-[#B735B8]/20 text-white/30'}`}>
-                                                                <q.icon size={10} />{q.label}
-                                                            </button>
-                                                        ))}
-                                                    </div>
-                                                </div>
-                                                <div>
-                                                    <p className="text-[9px] text-white/20 uppercase font-bold mb-1.5">Formato</p>
-                                                    <div className="space-y-1">
-                                                        {([
-                                                            { key: 'square', label: 'Feed 1:1', w: 'w-3.5', h: 'h-3.5' },
-                                                            { key: 'vertical', label: 'Reels 9:16', w: 'w-2.5', h: 'h-4' },
-                                                            { key: 'horizontal', label: 'Banner 16:9', w: 'w-4', h: 'h-2.5' },
-                                                        ] as const).map(f => (
-                                                            <button key={f.key} onClick={() => setImageFormat(f.key)}
-                                                                className={`w-full flex items-center gap-2 px-2.5 py-1.5 rounded-xl border text-[10px] font-bold transition-all ${imageFormat === f.key ? 'bg-[#B735B8]/15 border-[#B735B8]/40 text-[#C9A7FF]' : 'bg-white/3 border-[#B735B8]/20 text-white/30'}`}>
-                                                                <div className={`border-2 rounded-sm shrink-0 ${imageFormat === f.key ? 'border-[#B735B8]' : 'border-white/20'} ${f.w} ${f.h}`} />
-                                                                {f.label}
-                                                            </button>
-                                                        ))}
-                                                    </div>
-                                                </div>
-                                            </div>
+                                            {/* Calidad fija: Rápida (sin selector) */}
                                             <div>
                                                 <div className="flex items-center justify-between mb-1">
-                                                    <p className="text-[9px] text-white/20 uppercase font-bold flex items-center gap-1"><Sparkles size={8} className="text-[#C9A7FF]" /> Prompt IA</p>
-                                                    <button onClick={() => setImageCustomPrompts(prev => ({ ...prev, [i]: generateSmartPrompt(i, !!(refImageUrls[i] || creatives.find(c => c.slotIndex === i)?.mediaUrl?.startsWith('http'))) }))}
-                                                        className="text-[9px] text-[#C9A7FF]/60 hover:text-[#C9A7FF] flex items-center gap-1">
-                                                        <RefreshCw size={8} /> Nueva sugerencia
+                                                    <p className="text-[9px] text-white/30 uppercase font-bold">Tu prompt (libre)</p>
+                                                    <button onClick={() => generateAiPrompt(i)} disabled={aiPromptLoading}
+                                                        className="text-[9px] font-bold text-purple-300 hover:text-purple-200 flex items-center gap-1 disabled:opacity-40">
+                                                        {aiPromptLoading ? <Loader2 size={8} className="animate-spin" /> : <Sparkles size={8} />}
+                                                        {aiPromptLoading ? 'Escribiendo…' : 'Generar con IA'}
                                                     </button>
                                                 </div>
                                                 <textarea value={imageCustomPrompts[i] || ''} onChange={e => setImageCustomPrompts(prev => ({ ...prev, [i]: e.target.value }))}
-                                                    rows={3}
-                                                    className="w-full bg-white/[0.07] border border-[#B735B8]/25 rounded-xl px-2.5 py-2 text-[10px] text-white/85 resize-none focus:outline-none focus:border-[#7DD3FC]/40 leading-relaxed" />
+                                                    rows={3} placeholder="Escribí qué imagen querés (como el admin) o tocá 'Generar con IA'. Se manda tal cual a gpt-image-2."
+                                                    className="w-full bg-[#1c1d2e] border border-white/20 rounded-xl px-2.5 py-2 text-[10px] text-white resize-none focus:outline-none focus:border-purple-500/40 leading-relaxed placeholder:text-white/20" />
                                             </div>
                                             <button onClick={() => generateImage(i)}
-                                                className="w-full flex items-center justify-center gap-1.5 py-2.5 rounded-xl font-bold text-xs text-white transition-all"
-                                                style={{ background: 'linear-gradient(135deg, #FF2D95 0%, #B735B8 48%, #233B8F 100%)' }}>
+                                                disabled={!(refImageUrls[i] || creatives.find(c => c.slotIndex === i)?.mediaUrl?.startsWith('http'))}
+                                                className="w-full flex items-center justify-center gap-1.5 py-2.5 rounded-xl font-bold text-xs transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                                                style={{ background: 'linear-gradient(135deg,#7c3aed,#2563eb)' }}>
                                                 <Sparkles size={12} />
-                                                {(refImageUrls[i] || creatives.find(c => c.slotIndex === i)?.mediaUrl?.startsWith('http')) ? 'Editar con gpt-image-1' : 'Generar con DALL-E 3'}
+                                                {(refImageUrls[i] || creatives.find(c => c.slotIndex === i)?.mediaUrl?.startsWith('http')) ? 'Generar con tu producto (gpt-image-2)' : 'Subí la foto del producto primero'}
                                             </button>
                                         </div>
                                     )}
@@ -1643,7 +1794,7 @@ function CampaignPageInner() {
                         {configSaved && (
                             <button onClick={generateCopies} disabled={generatingCopies}
                                 className="w-full flex items-center justify-center gap-2 font-bold py-3.5 rounded-2xl disabled:opacity-40 disabled:cursor-not-allowed transition-all"
-                                style={{ background: copiesGenerated ? 'rgba(183,53,184,0.12)' : 'linear-gradient(135deg, #FF2D95 0%, #B735B8 48%, #233B8F 100%)', border: copiesGenerated ? '1px solid rgba(183,53,184,0.25)' : 'none', color: copiesGenerated ? '#C9A7FF' : '#fff', boxShadow: copiesGenerated ? 'none' : '0 0 24px rgba(255,255,255,0.15)' }}>
+                                style={{ background: copiesGenerated ? 'rgba(139,92,246,0.12)' : 'linear-gradient(135deg,#7c3aed,#2563eb)', border: copiesGenerated ? '1px solid rgba(139,92,246,0.25)' : 'none', color: copiesGenerated ? '#c4b5fd' : '#fff', boxShadow: copiesGenerated ? 'none' : '0 0 24px rgba(124,58,237,0.25)' }}>
                                 {generatingCopies
                                     ? <><Loader2 size={15} className="animate-spin" /> Generando textos con IA...</>
                                     : copiesGenerated
@@ -1658,9 +1809,10 @@ function CampaignPageInner() {
 
             {/* ── Floating publish bar ── */}
             {campaign && (
-                <div className="fixed bottom-[65px] left-0 right-0 z-[110] px-4 pb-3 pt-3 lg:bottom-0 lg:left-[240px]"
-                    style={{ background: 'rgba(5,11,20,0.97)', borderTop: '1px solid rgba(255,255,255,0.1)', backdropFilter: 'blur(20px)' }}>
-                    <div className="max-w-4xl xl:max-w-5xl 2xl:max-w-6xl mx-auto flex items-center gap-3">
+                <div className="fixed bottom-[65px] left-0 right-0 z-50 px-4 pb-3 pt-4 lg:bottom-0 lg:left-[240px]"
+                    style={{ background: 'linear-gradient(to top,rgba(6,6,16,1) 60%,transparent)' }}>
+                    <div className="max-w-4xl xl:max-w-5xl 2xl:max-w-6xl mx-auto flex items-center gap-3 px-4 py-3 rounded-2xl"
+                        style={{ background: 'rgba(8,8,20,0.92)', border: '1px solid rgba(139,92,246,0.15)', backdropFilter: 'blur(20px)', boxShadow: '0 -4px 30px rgba(0,0,0,0.5),0 0 20px rgba(139,92,246,0.06)' }}>
                         <div className="flex-1 min-w-0 hidden sm:block">
                             <p className="text-xs font-bold text-white/60 truncate">{form.name}</p>
                             <p className="text-[11px] text-white/25">
@@ -1695,7 +1847,7 @@ function CampaignPageInner() {
                                 <div className="bg-white rounded-2xl overflow-hidden shadow-2xl">
                                     <div className="flex items-center gap-2.5 px-3 pt-3 pb-2">
                                         <div className="w-9 h-9 rounded-full flex items-center justify-center text-white text-xs font-black shrink-0"
-                                            style={{ background: 'linear-gradient(135deg,#233B8F,#B735B8)' }}>
+                                            style={{ background: 'linear-gradient(135deg,#3b82f6,#7c3aed)' }}>
                                             {pageName.charAt(0).toUpperCase()}
                                         </div>
                                         <div className="flex-1 min-w-0">
@@ -1711,7 +1863,7 @@ function CampaignPageInner() {
                                     <div className="h-52 bg-gray-100 w-full overflow-hidden">
                                         {c?.mediaUrl
                                             ? c.mediaType === 'video'
-                                                ? <video src={c.mediaUrl} className="w-full h-full object-cover" controls />
+                                                ? <video key={c.mediaUrl} src={c.mediaUrl} className="w-full h-full object-cover" controls playsInline />
                                                 : <img src={c.mediaUrl} alt="" className="w-full h-full object-cover" />
                                             : <div className="w-full h-full flex flex-col items-center justify-center gap-2 text-gray-300">
                                                 <ImageIcon size={32} />
@@ -1736,12 +1888,12 @@ function CampaignPageInner() {
                                 {/* Advantage+ summary */}
                                 <div className="mt-3 flex flex-wrap items-center gap-2 justify-center">
                                     {advantageAudience && (
-                                        <span className="flex items-center gap-1 text-[10px] font-bold px-2.5 py-1 rounded-full bg-[#B735B8]/15 border border-[#B735B8]/25 text-[#C9A7FF]">
+                                        <span className="flex items-center gap-1 text-[10px] font-bold px-2.5 py-1 rounded-full bg-purple-500/15 border border-purple-500/25 text-purple-400">
                                             <Target size={9} /> Advantage+ Audience
                                         </span>
                                     )}
                                     {advantageCreative && (
-                                        <span className="flex items-center gap-1 text-[10px] font-bold px-2.5 py-1 rounded-full bg-[#233B8F]/15 border border-[#7DD3FC]/25 text-[#7DD3FC]">
+                                        <span className="flex items-center gap-1 text-[10px] font-bold px-2.5 py-1 rounded-full bg-blue-500/15 border border-blue-500/25 text-blue-400">
                                             <Sparkles size={9} /> Advantage+ Creative
                                         </span>
                                     )}
@@ -1750,7 +1902,7 @@ function CampaignPageInner() {
                                             <Layers size={9} /> Carrusel
                                         </span>
                                     )}
-                                    <span className="flex items-center gap-1 text-[10px] font-bold px-2.5 py-1 rounded-full bg-white/5 border border-[#B735B8]/25 text-white/30">
+                                    <span className="flex items-center gap-1 text-[10px] font-bold px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-white/30">
                                         <BarChart2 size={9} /> {bidStrategy === 'auto' ? 'Puja automática' : bidStrategy === 'cost_cap' ? `Costo máx. $${bidCapAmount}` : `ROAS mín. ${minRoasTarget}x`}
                                     </span>
                                 </div>
@@ -1758,17 +1910,17 @@ function CampaignPageInner() {
                                 {creatives.length > 1 && (
                                     <div className="flex items-center justify-between mt-3 mb-1">
                                         <button onClick={() => setPreviewIdx(i => (i - 1 + creatives.length) % creatives.length)}
-                                            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold transition-all">
+                                            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold transition-all">
                                             <ChevronLeft size={14} /> Anterior
                                         </button>
                                         <button onClick={() => setPreviewIdx(i => (i + 1) % creatives.length)}
-                                            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold transition-all">
+                                            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold transition-all">
                                             Siguiente <ChevronRight size={14} />
                                         </button>
                                     </div>
                                 )}
                                 <button onClick={() => { setShowPreview(false); publish() }} disabled={publishing}
-                                    className="mt-3 w-full flex items-center justify-center gap-2 px-5 py-3.5 rounded-2xl font-bold text-sm text-white disabled:opacity-50 transition-all"
+                                    className="mt-3 w-full flex items-center justify-center gap-2 px-5 py-3.5 rounded-2xl font-bold text-sm disabled:opacity-50 transition-all"
                                     style={{ background: 'linear-gradient(135deg,#10b981,#059669)', boxShadow: '0 0 25px rgba(16,185,129,0.4)' }}>
                                     {publishing ? <><Loader2 size={15} className="animate-spin" /> Publicando...</> : <><Rocket size={15} /> Publicar Campaña</>}
                                 </button>
@@ -1783,14 +1935,12 @@ function CampaignPageInner() {
 
 export default function CampaignPage() {
     return (
-    <div className="dm-page font-ui">
         <Suspense fallback={
             <div className="flex items-center justify-center min-h-[60vh]">
-                <Loader2 className="animate-spin text-[#C9A7FF]" size={32} />
+                <Loader2 className="animate-spin text-purple-400" size={32} />
             </div>
         }>
             <CampaignPageInner />
         </Suspense>
-    </div>
     )
 }

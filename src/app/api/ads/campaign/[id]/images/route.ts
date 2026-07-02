@@ -1,53 +1,40 @@
 export const dynamic = 'force-dynamic'
-export const maxDuration = 120 // vision (20s) + creative direction (15s) + text overlay (12s) + gpt-image-1 (60s) = ~107s
+export const maxDuration = 180 // vision (20s) + parallel direction+overlay (15s) + gpt-image-2 premium (90s) = ~125s
 import { NextResponse } from 'next/server'
 import { getAuthUser } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
-import { generateAdImage, editAdImageWithReference, analyzeProductImageForAd, generateCreativeDirection, generateTextOverlay, type ImageQuality, type ImageSize } from '@/lib/ads/openai-ads'
+import { decrypt } from '@/lib/ads/encryption'
+import { generateAdImage, editAdImageWithReference, analyzeProductImageForAd, generateCreativeDirection, generateTextOverlay, generateCleanAdImagePrompt, type ImageQuality, type ImageSize } from '@/lib/ads/openai-ads'
 import { supabaseAdmin } from '@/lib/supabase'
-import { resolveOpenAIKey, chargeForChatUsage, chargeForImage } from '@/lib/ai-credits'
+import { resolveAdsKey, logImageUsage } from '@/lib/ai-credits'
 
+const ENC_KEY = process.env.ADS_ENCRYPTION_KEY || ''
 const BUCKET = 'ad-creatives'
 
-const VALID_SIZES: ImageSize[] = ['1024x1024', '1024x1792', '1792x1024']
+// Tamaños que ACEPTA gpt-image-2 (1024x1792/1792x1024 son de DALL·E 3 y dan error).
+const VALID_SIZES: ImageSize[] = ['1024x1024', '1024x1536', '1536x1024']
 const VALID_QUALITIES: ImageQuality[] = ['fast', 'standard', 'premium']
 
-// Map DALL-E size → gpt-image-1 size (closest equivalent)
-function toEditSize(size: string): '1024x1024' | '1024x1536' | '1536x1024' {
-    if (size === '1024x1792') return '1024x1536'
-    if (size === '1792x1024') return '1536x1024'
-    return '1024x1024'
+function toEditSize(size: string): ImageSize {
+    return VALID_SIZES.includes(size as ImageSize) ? (size as ImageSize) : '1024x1024'
 }
 
 export async function POST(req: Request, { params }: { params: { id: string } }) {
     const user = await getAuthUser()
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
+    // Key propia (Configuración → IA) o la global del sistema si hay saldo
+    const resolvedKey = await resolveAdsKey(user.id)
+    if (!resolvedKey) {
+        return NextResponse.json({ error: 'Configura tu OpenAI API Key en Configuración → IA, o compra créditos de IA.' }, { status: 400 })
+    }
+    const apiKey = resolvedKey.key
+
     const campaign = await (prisma as any).adCampaignV2.findFirst({
         where: { id: params.id, userId: user.id },
         include: { brief: true, strategy: true }
     })
     if (!campaign) return NextResponse.json({ error: 'Campaña no encontrada' }, { status: 404 })
-
-    // Resolver key (NO cobra todavía — cobro por imagen + tokens reales después)
-    const resolved = await resolveOpenAIKey(user.id)
-    if (!resolved.ok) {
-        if (resolved.error === 'NO_CREDITS') {
-            return NextResponse.json({
-                error: 'Sin saldo de IA. Generar una imagen requiere ~$0.04 USD. Comprá saldo o configurá tu propia API Key.',
-                code: 'NO_CREDITS', balanceUsd: resolved.balanceUsd,
-            }, { status: 402 })
-        }
-        return NextResponse.json({ error: 'No hay API Key disponible.', code: resolved.error }, { status: 400 })
-    }
-    const apiKey = resolved.key
-
-    // Helper: cobra tokens si usamos admin key
-    const chargeChat = (model: string, u: { promptTokens: number; completionTokens: number }, reason: string) => {
-        if (resolved.source !== 'admin') return
-        chargeForChatUsage(user.id, model, u.promptTokens, u.completionTokens, reason, { campaignId: params.id })
-            .catch(e => console.error(`[GenerateImage] charge(${reason}) error:`, e))
-    }
 
     const body = await req.json()
     const {
@@ -57,7 +44,14 @@ export async function POST(req: Request, { params }: { params: { id: string } })
         quality = 'standard',
         size = '1024x1024',
         referenceImageUrl,
+        freePrompt = false, // modo "prompt libre": manda el prompt TAL CUAL a gpt-image-2
     } = body
+
+    // La foto del producto es OBLIGATORIA: todas las imágenes se generan a partir
+    // de ella (se mantiene el producto idéntico y solo cambia la escena del brief).
+    if (!referenceImageUrl || typeof referenceImageUrl !== 'string' || !referenceImageUrl.startsWith('http')) {
+        return NextResponse.json({ error: 'Subí una foto de tu producto: es obligatoria para generar la imagen.' }, { status: 400 })
+    }
 
     const brief = {
         name: campaign.brief.name,
@@ -81,86 +75,92 @@ export async function POST(req: Request, { params }: { params: { id: string } })
     try {
         let imageUrl: string
 
-        if (referenceImageUrl && typeof referenceImageUrl === 'string' && referenceImageUrl.startsWith('http')) {
-            // Step 1: Analyze the product with GPT-4o Vision to get an exact description.
-            // This prevents gpt-image-1 from "inventing" a different product.
-            let productDescription = ''
-            try {
-                let u: { promptTokens: number; completionTokens: number } | null = null
-                productDescription = await analyzeProductImageForAd({ imageUrl: referenceImageUrl, apiKey, onUsage: (x) => { u = x } })
-                if (u) chargeChat('gpt-4o', u, 'ads.images.analyze')
-            } catch { /* non-fatal — continue with generic prompt */ }
+        // ── MODO PROMPT LIBRE (como el generador admin) ──
+        // El prompt (escrito o auto-generado por gpt-5.1 según la estrategia) se manda
+        // TAL CUAL a gpt-image-2 con la foto del producto. Sin pipeline ni envoltorio.
+        if (freePrompt && referenceImageUrl && referenceImageUrl.startsWith('http')) {
+            let cleanPrompt = (customPrompt && customPrompt.trim()) ? customPrompt.trim() : ''
+            if (!cleanPrompt) {
+                cleanPrompt = await generateCleanAdImagePrompt({
+                    brief: brief as any,
+                    objective: (campaign.objective ?? campaign.strategy?.objective) || 'conversions',
+                    slotIndex,
+                    apiKey,
+                    model: 'gpt-5.1',
+                })
+            }
+            if (!cleanPrompt) cleanPrompt = `Professional single advertising photo of the product as the hero, centered, photorealistic, cinematic 4k, premium ${brief.industry} scene, no collage, minimal or no text.`
 
-            // Step 2: Use AI to generate a specific creative direction for this exact business
+            // Mapear calidad → gpt-image. Default 'low' para que sea RÁPIDO (varias en paralelo).
+            const gptQuality: 'low' | 'medium' | 'high' = quality === 'premium' ? 'high' : quality === 'standard' ? 'medium' : 'low'
+            const imgBuffer = await editAdImageWithReference({
+                imageUrl: referenceImageUrl,
+                prompt: cleanPrompt,
+                apiKey,
+                size: toEditSize(size),
+                quality: gptQuality,
+            })
+            const path = `ads/${user.id}/${params.id}/slot-${slotIndex}-free-${Date.now()}.png`
+            const { error: uploadErr } = await supabaseAdmin.storage.from(BUCKET).upload(path, imgBuffer, { contentType: 'image/png', upsert: true })
+            if (uploadErr) throw new Error(uploadErr.message)
+            imageUrl = supabaseAdmin.storage.from(BUCKET).getPublicUrl(path).data.publicUrl
+
+            if (creativeId) {
+                await (prisma as any).adCreative.update({ where: { id: creativeId }, data: { mediaUrl: imageUrl, mediaType: 'image', aiGenerated: true } })
+            }
+            if (resolvedKey.isGlobal) {
+                logImageUsage({ userId: user.id, service: 'ads-image', count: 1, quality: VALID_QUALITIES.includes(quality) ? quality : 'standard', size: VALID_SIZES.includes(size) ? size : '1024x1024' }).catch(() => {})
+            }
+            return NextResponse.json({ imageUrl, prompt: cleanPrompt })
+        }
+
+        if (referenceImageUrl && typeof referenceImageUrl === 'string' && referenceImageUrl.startsWith('http')) {
             const colors = ((brief.brandColors as string[]) || []).slice(0, 3).join(', ') || 'clean neutral tones'
             const style = ((brief.visualStyle as string[]) || []).slice(0, 3).join(', ') || 'modern, professional'
             const value = brief.valueProposition?.substring(0, 120) || ''
             const keyMessages = (brief.keyMessages as string[]) || []
             const keyMsg = keyMessages[slotIndex] || keyMessages[0] || ''
 
-            const productRef = productDescription
-                ? `IMPORTANT: The reference photo contains the EXACT product to feature. Keep the product 100% identical — same shape, label, packaging, colors, proportions. Do NOT redesign or alter the product itself. Only create a new background/scene around it.`
-                : 'Feature the product from the reference photo as the absolute hero. Keep it visually identical — only change the background and scene around it.'
-
-            // AI generates the creative direction tailored to this specific business/industry
-            let creativeScene = ''
-            try {
-                let u: { promptTokens: number; completionTokens: number } | null = null
-                creativeScene = await generateCreativeDirection({
-                    brief,
-                    productDescription,
-                    slotIndex,
+            // Step 1: analyze the product photo and generate creative direction + text overlay in parallel
+            const [productDescription, creativeSceneRaw, textOverlayRaw] = await Promise.allSettled([
+                analyzeProductImageForAd({ imageUrl: referenceImageUrl, apiKey }),
+                generateCreativeDirection({ brief, productDescription: '', slotIndex, apiKey }),
+                generateTextOverlay({
+                    brief, slotIndex,
+                    objective: (campaign.objective ?? campaign.strategy?.objective) || 'conversions',
+                    destination: (campaign.destination ?? campaign.strategy?.destination) || 'website',
                     apiKey,
-                    onUsage: (x) => { u = x },
-                })
-                if (u) chargeChat('gpt-4o-mini', u, 'ads.images.direction')
-            } catch { /* non-fatal — fallback below */ }
+                }),
+            ])
 
-            // Fallback if AI direction fails
+            const productDesc = productDescription.status === 'fulfilled' ? productDescription.value : ''
+            let creativeScene = creativeSceneRaw.status === 'fulfilled' ? creativeSceneRaw.value : ''
+            let textOverlay = textOverlayRaw.status === 'fulfilled' ? textOverlayRaw.value : ''
+
             if (!creativeScene) {
-                creativeScene = `The product placed as the hero in a professional, aspirational scene appropriate for the ${brief.industry} industry. Cinematic lighting, brand colors ${colors}, ${style} aesthetic.`
+                creativeScene = `the product as the absolute hero, placed in a stunning ${brief.industry} scene — cinematic lighting, ${colors} color palette, ${style} aesthetic`
             }
-
-            // AI generates a specific, attractive text overlay tailored to this exact business
-            let textOverlay = ''
-            try {
-                let u: { promptTokens: number; completionTokens: number } | null = null
-                textOverlay = await generateTextOverlay({
-                    brief,
-                    slotIndex,
-                    objective: campaign.strategy.objective || 'conversions',
-                    destination: campaign.strategy.destination || 'website',
-                    apiKey,
-                    onUsage: (x) => { u = x },
-                })
-                if (u) chargeChat('gpt-4o-mini', u, 'ads.images.overlay')
-            } catch { /* non-fatal */ }
             if (!textOverlay) {
-                textOverlay = `Add exactly ONE bold, short 3D text title: "${(keyMsg || value).substring(0, 20)}". Do NOT add any other text.`
+                textOverlay = `a single bold 3D text overlay that reads "${(keyMsg || value).substring(0, 20)}" in a prominent position`
             }
 
-            // When a customPrompt is provided, prepend the product reference so gpt-image-1
-            // still knows exactly which product to keep faithful from the reference photo.
-            const posterStyle = "Hyper-realistic Digital Graphic Design Poster. Cinematic, high-contrast. Dramatic background with intense VFX (fire, glowing energy, sparks). Bold 3D typography."
-            const basePrompt = customPrompt
-                ? `${productRef} ${customPrompt} ${textOverlay}`
-                : `${posterStyle} Brand: ${brief.name} (${brief.industry}). ${productRef} Scene: ${creativeScene} Colors: ${colors}. ${textOverlay} Masterpiece quality, advertising agency professional composition. No watermarks.`
-            const rawPrompt = basePrompt
+            // FIDELIDAD DEL PRODUCTO PRIMERO + enmarcar como "reemplazar solo el fondo".
+            // gpt-image-1 regenera toda la imagen; si la escena domina, redibuja el producto.
+            // Por eso lideramos con la instrucción de mantenerlo idéntico y lo tratamos como
+            // un recorte real pegado en la escena.
+            const productFidelity = `CRITICAL — PRESERVE THE PRODUCT: keep the product from the reference image EXACTLY as it is${productDesc ? ` (${productDesc.substring(0, 180)})` : ''}. Identical shape, packaging, label, logo, text, colors and proportions. Do NOT redraw, restyle, recolor, replace, crop out or duplicate the product. Treat it as a real photographed cut-out placed unchanged into the new scene.`
 
-            // gpt-image-1 has a ~4000 char prompt limit — cap at 3000 to be safe
-            const prompt = rawPrompt.length > 3000 ? rawPrompt.substring(0, 3000) : rawPrompt
+            const scene = (customPrompt && customPrompt.trim()) ? customPrompt.trim() : creativeScene
+
+            // La escena describe SOLO el entorno alrededor del producto (no el producto en sí).
+            const prompt = `${productFidelity} Replace ONLY the background and the environment around the product with: ${scene}. ${textOverlay ? `Add ${textOverlay}. ` : ''}Color palette ${colors}, ${style} aesthetic. Photorealistic professional advertising photo, cohesive lighting and shadows so the product looks naturally placed, high quality, no watermarks. Keep a SINGLE product exactly as given.`
 
             const imgBuffer = await editAdImageWithReference({
                 imageUrl: referenceImageUrl,
                 prompt,
                 apiKey,
-                size: toEditSize(VALID_SIZES.includes(size as ImageSize) ? size : '1024x1024'),
+                size: toEditSize(size),
             })
-            // Cobrar imagen (gpt-image-1, $0.04 standard)
-            if (resolved.source === 'admin') {
-                chargeForImage(user.id, 'gpt-image-1', 1, 'ads.images.edit', { campaignId: params.id, slotIndex })
-                    .catch(e => console.error('[GenerateImage] chargeForImage(edit) error:', e))
-            }
 
             // Upload the result to Supabase Storage
             const path = `ads/${user.id}/${params.id}/slot-${slotIndex}-edit-${Date.now()}.png`
@@ -172,26 +172,23 @@ export async function POST(req: Request, { params }: { params: { id: string } })
             const { data: urlData } = supabaseAdmin.storage.from(BUCKET).getPublicUrl(path)
             imageUrl = urlData.publicUrl
         } else {
-            // No reference image → use DALL-E 3 to generate from scratch
-            imageUrl = await generateAdImage({
+            // No reference image → use gpt-image-2 to generate from scratch
+            const imgBuffer = await generateAdImage({
                 brief,
-                mediaType: campaign.strategy.mediaType,
+                mediaType: campaign.mediaType ?? campaign.strategy?.mediaType,
                 slotIndex,
                 apiKey,
                 customPrompt: customPrompt || undefined,
                 quality: VALID_QUALITIES.includes(quality) ? quality : 'standard',
                 size: VALID_SIZES.includes(size) ? size : '1024x1024',
             })
-            // Cobrar imagen DALL-E 3 (HD si quality='premium', wide si size 1792×1024)
-            if (resolved.source === 'admin') {
-                const imageModel =
-                    (size === '1792x1024' || size === '1024x1792') && quality === 'premium' ? 'dall-e-3-wide-hd'
-                    : (size === '1792x1024' || size === '1024x1792') ? 'dall-e-3-wide'
-                    : quality === 'premium' ? 'dall-e-3-hd'
-                    : 'dall-e-3'
-                chargeForImage(user.id, imageModel, 1, 'ads.images.generate', { campaignId: params.id, slotIndex, quality, size })
-                    .catch(e => console.error('[GenerateImage] chargeForImage error:', e))
-            }
+            const path = `ads/${user.id}/${params.id}/slot-${slotIndex}-gen-${Date.now()}.png`
+            const { error: uploadErr } = await supabaseAdmin.storage
+                .from(BUCKET)
+                .upload(path, imgBuffer, { contentType: 'image/png', upsert: true })
+            if (uploadErr) throw new Error(uploadErr.message)
+            const { data: urlData } = supabaseAdmin.storage.from(BUCKET).getPublicUrl(path)
+            imageUrl = urlData.publicUrl
         }
 
         // Persist to DB if creativeId given
@@ -202,12 +199,17 @@ export async function POST(req: Request, { params }: { params: { id: string } })
             })
         }
 
+        // Descontar saldo si se usó la key global
+        if (resolvedKey.isGlobal) {
+            logImageUsage({
+                userId: user.id, service: 'ads-image', count: 1,
+                quality: VALID_QUALITIES.includes(quality) ? quality : 'standard',
+                size: VALID_SIZES.includes(size) ? size : '1024x1024',
+            }).catch(() => {})
+        }
+
         return NextResponse.json({ imageUrl })
     } catch (err: any) {
-        // Sin pre-cobro de imagen flat: si la generación falló, no se cobró (los charge*
-        // calls están adentro del try y solo corren tras éxito). Los cobros de chat
-        // intermedios (analyze/direction/overlay) son fire-and-forget y son aceptables
-        // como costo de intentar.
         console.error('[GenerateImage]', err)
         return NextResponse.json({ error: err.message || 'Error al generar la imagen' }, { status: 500 })
     }

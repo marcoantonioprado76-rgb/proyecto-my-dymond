@@ -55,14 +55,9 @@ export async function DELETE(_req: Request, { params }: { params: { strategyId: 
     })
     if (!strategy) return NextResponse.json({ error: 'Estrategia no encontrada' }, { status: 404 })
 
-    // Check if any campaign uses this strategy
-    const campaignCount = await (prisma as any).adCampaignV2.count({
-        where: { strategyId: params.strategyId }
-    })
-    if (campaignCount > 0) {
-        return NextResponse.json({ error: 'No puedes eliminar una estrategia que ya tiene campañas asociadas' }, { status: 400 })
-    }
-
+    // Las campañas son autónomas (guardan su propia "foto" de la estrategia), así que
+    // se puede borrar la estrategia: las campañas se desvinculan (strategy_id → NULL) y
+    // siguen funcionando con sus propios datos y métricas.
     await (prisma as any).adStrategy.delete({ where: { id: params.strategyId } })
 
     return NextResponse.json({ message: 'Estrategia eliminada' })

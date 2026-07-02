@@ -4,8 +4,11 @@ import { getAuthUser } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { AdPlatform } from '@prisma/client'
 import { supabaseAdmin } from '@/lib/supabase'
+import { decrypt } from '@/lib/ads/encryption'
+import { AdapterFactory } from '@/lib/ads/factory'
 
 const AD_BUCKET = 'ad-creatives'
+const ENC_KEY = process.env.ADS_ENCRYPTION_KEY
 
 export async function GET(_req: Request, { params }: { params: { id: string } }) {
     const user = await getAuthUser()
@@ -45,7 +48,7 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
     let connectedAccountId: string | null = campaign.connectedAccountId ?? null
     if (providerAccountId) {
         const integration = await prisma.adIntegration.findUnique({
-            where: { userId_platform: { userId: user.id, platform: campaign.strategy.platform as AdPlatform } }
+            where: { userId_platform: { userId: user.id, platform: campaign.platform as AdPlatform } }
         })
         if (integration) {
             const connectedAccount = await prisma.adConnectedAccount.upsert({
@@ -68,7 +71,7 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
         where: { id: params.id },
         data: {
             ...(name !== undefined && { name: name.trim() }),
-            ...(dailyBudgetUSD !== undefined && { dailyBudgetUSD: Math.max(0, parseFloat(dailyBudgetUSD) || 0) }),
+            ...(dailyBudgetUSD !== undefined && { dailyBudgetUSD: parseFloat(dailyBudgetUSD) }),
             ...(locations !== undefined && { locations }),
             ...(connectedAccountId !== null && { connectedAccountId }),
             ...(pageId !== undefined && { pageId: pageId || null }),
@@ -89,9 +92,27 @@ export async function DELETE(_req: Request, { params }: { params: { id: string }
 
     const campaign = await (prisma as any).adCampaignV2.findFirst({
         where: { id: params.id, userId: user.id },
-        include: { creatives: true }
+        include: {
+            creatives: true,
+            connectedAccount: { include: { integration: { include: { token: true } } } }
+        }
     })
     if (!campaign) return NextResponse.json({ error: 'Campaña no encontrada' }, { status: 404 })
+
+    // Si está publicada en Meta, eliminarla también allá (best-effort: si falla, igual la borramos de la app)
+    if (campaign.providerCampaignId && campaign.connectedAccount?.integration?.token && ENC_KEY) {
+        try {
+            const accessToken = decrypt(campaign.connectedAccount.integration.token.accessTokenEncrypted, ENC_KEY)
+            const adapter = AdapterFactory.getAdapter(campaign.platform)
+            if (adapter.deleteCampaign) {
+                await adapter.deleteCampaign(accessToken, campaign.connectedAccount.providerAccountId, campaign.providerCampaignId)
+            } else {
+                await adapter.pauseCampaign(accessToken, campaign.connectedAccount.providerAccountId, campaign.providerCampaignId)
+            }
+        } catch (err: any) {
+            console.error('[DeleteCampaign] No se pudo eliminar en Meta:', err?.message)
+        }
+    }
 
     // Delete media files from Supabase storage
     const marker = `/object/public/${AD_BUCKET}/`

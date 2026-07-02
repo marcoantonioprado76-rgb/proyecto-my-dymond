@@ -24,7 +24,7 @@ export async function POST(req: Request) {
             fb_exchange_token: accessToken
         })
 
-        const res = await fetch(`https://graph.facebook.com/v18.0/oauth/access_token?${params}`)
+        const res = await fetch(`https://graph.facebook.com/v21.0/oauth/access_token?${params}`)
         const data = await res.json()
 
         if (data.error) {

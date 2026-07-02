@@ -6,8 +6,9 @@ import { prisma } from '@/lib/prisma'
 import { decrypt } from '@/lib/ads/encryption'
 import { AdapterFactory } from '@/lib/ads/factory'
 import { supabaseAdmin } from '@/lib/supabase'
-import { generateAudienceInterests, filterAudienceInterests, generateAudienceProfile } from '@/lib/ads/openai-ads'
+import { generateAudienceInterests, filterAudienceInterests } from '@/lib/ads/openai-ads'
 import { MetaAdapter } from '@/lib/ads/adapters/meta'
+import { resolveAdsKey, logAiUsage } from '@/lib/ai-credits'
 
 const BUCKET = 'ad-creatives'
 
@@ -34,12 +35,24 @@ export async function POST(req: Request, { params }: { params: { id: string } })
     })
 
     if (!campaign) return NextResponse.json({ error: 'Campaña no encontrada' }, { status: 404 })
-    if (campaign.status === 'PUBLISHED') {
-        return NextResponse.json({ error: 'Esta campaña ya fue publicada' }, { status: 400 })
+
+    // Fusionar los campos nuevos del brief (ai_data) → la segmentación de intereses
+    // usa benefits, targetCustomer, offerType, category. Con guarda (no rompe si faltan).
+    if (campaign.brief?.id) {
+        try {
+            const rows: any[] = await prisma.$queryRawUnsafe(
+                'SELECT category, ai_data FROM business_briefs WHERE id = $1::uuid LIMIT 1', campaign.brief.id,
+            )
+            if (rows?.[0]) {
+                if (rows[0].category) campaign.brief.category = rows[0].category
+                let ai = rows[0].ai_data
+                if (typeof ai === 'string') { try { ai = JSON.parse(ai) } catch { ai = null } }
+                if (ai && typeof ai === 'object' && !Array.isArray(ai)) Object.assign(campaign.brief, ai)
+            }
+        } catch (e) { console.warn('[Publish] ai_data:', e instanceof Error ? e.message : e) }
     }
-    if (campaign.status === 'PUBLISHING') {
-        return NextResponse.json({ error: 'Esta campaña ya está siendo publicada. Espera unos segundos e intenta de nuevo.' }, { status: 400 })
-    }
+
+    // All field validations BEFORE acquiring the lock so we never leave status stuck in PUBLISHING
     if (!campaign.connectedAccount) {
         return NextResponse.json({ error: 'Selecciona una cuenta publicitaria primero' }, { status: 400 })
     }
@@ -47,8 +60,8 @@ export async function POST(req: Request, { params }: { params: { id: string } })
         return NextResponse.json({ error: 'Reconecta tu cuenta de Meta/TikTok/Google' }, { status: 400 })
     }
 
-    // Validate required fields per destination
-    const dest = campaign.strategy.destination
+    // Validate required fields per destination (foto de la campaña; respaldo a estrategia)
+    const dest = campaign.destination ?? campaign.strategy?.destination
     // All Meta campaigns require a Facebook page to create ad creatives
     if (campaign.platform === 'META' && !campaign.pageId) {
         return NextResponse.json({ error: 'Selecciona una Página de Facebook. Es obligatoria para todos los anuncios de Meta.' }, { status: 400 })
@@ -62,12 +75,31 @@ export async function POST(req: Request, { params }: { params: { id: string } })
     if (!campaign.dailyBudgetUSD || campaign.dailyBudgetUSD <= 0) {
         return NextResponse.json({ error: 'El presupuesto diario debe ser mayor a 0' }, { status: 400 })
     }
+    // Ubicación obligatoria: sin ella Meta targetea Estados Unidos por defecto (gasta mal).
+    if (!Array.isArray(campaign.locations) || campaign.locations.length === 0) {
+        return NextResponse.json({ error: 'Seleccioná dónde vendés (país o ciudades) antes de publicar. Lo podés ajustar en la campaña.' }, { status: 400 })
+    }
 
-    // Mark as publishing — all validations above must pass before this point
-    await (prisma as any).adCampaignV2.update({
-        where: { id: params.id },
+    // Atomic lock: only transition to PUBLISHING if current status is DRAFT, FAILED, PUBLISHED o READY.
+    // REAPER: también re-reclama una campaña COLGADA en PUBLISHING hace más de 5 minutos
+    // (si el proceso murió a mitad y quedó trabada) → así el usuario puede reintentar.
+    // updateMany returns count=0 if another concurrent request already claimed it.
+    const STALE_PUBLISHING = new Date(Date.now() - 5 * 60 * 1000)
+    const locked = await (prisma as any).adCampaignV2.updateMany({
+        where: {
+            id: params.id, userId: user.id,
+            OR: [
+                { status: { in: ['DRAFT', 'FAILED', 'PUBLISHED', 'READY'] } },
+                { status: 'PUBLISHING', updatedAt: { lt: STALE_PUBLISHING } },
+            ],
+        },
         data: { status: 'PUBLISHING' }
     })
+    if (locked.count === 0) {
+        const current = await (prisma as any).adCampaignV2.findUnique({ where: { id: params.id }, select: { status: true } })
+        if (current?.status === 'PUBLISHING') return NextResponse.json({ error: 'Esta campaña ya está siendo publicada. Espera unos segundos e intenta de nuevo.' }, { status: 400 })
+        return NextResponse.json({ error: `No se puede publicar la campaña (estado: ${current?.status || 'desconocido'}). Recarga la página e intenta de nuevo.` }, { status: 400 })
+    }
 
     try {
         const adapter = AdapterFactory.getAdapter(campaign.platform)
@@ -75,8 +107,17 @@ export async function POST(req: Request, { params }: { params: { id: string } })
         let accessToken: string
         try {
             accessToken = decrypt(campaign.connectedAccount.integration.token.accessTokenEncrypted, ENC_KEY!)
-        } catch {
+        } catch (e: any) {
+            console.error('[Publish] Token decryption failed:', e?.message)
             throw new Error('No se pudo leer el token de acceso. Reconecta tu cuenta desde Integraciones.')
+        }
+
+        // Instagram Direct requiere una cuenta de Instagram conectada a la Página → validar antes.
+        if (campaign.platform === 'META' && dest === 'instagram' && campaign.pageId) {
+            const igId = await (adapter as MetaAdapter).getPageInstagramId(accessToken, campaign.pageId)
+            if (!igId) {
+                throw new Error('Conectá una cuenta de Instagram a tu Página de Facebook para publicar anuncios de Instagram. Ve a Configuración de la Página → Cuentas vinculadas → Instagram.')
+            }
         }
 
         // FIX: Map all strategy objectives to correct Meta OUTCOME_* values
@@ -88,27 +129,22 @@ export async function POST(req: Request, { params }: { params: { id: string } })
             engagement: 'OUTCOME_ENGAGEMENT',
             app_promotion: 'OUTCOME_APP_PROMOTION',
         }
-        const metaObjective = objectiveMap[campaign.strategy.objective] || 'OUTCOME_TRAFFIC'
+        const metaObjective = objectiveMap[campaign.objective ?? campaign.strategy?.objective] || 'OUTCOME_TRAFFIC'
 
-        // Parse locations: "CO" → país | "city:KEY:Name" → ciudad | "region:KEY:Name" →
-        // departamento/región | "subcity:KEY:Name" → pueblo/subciudad. (Validado contra Meta:
-        // regions y subcities son tipos de targeting aceptados.)
+        // Parse locations: "CO" → país, "city:KEY:Name" → ciudad, "region:KEY:Name" → departamento, "cc:CO:Name" → legacy (país)
         const countries: string[] = []
         const cities: { key: string; radius: number; distance_unit: string }[] = []
         const regions: { key: string }[] = []
-        const subcities: { key: string }[] = []
         for (const loc of campaign.locations as string[]) {
             if (loc.startsWith('city:')) {
                 const key = loc.split(':')[1]
                 if (key) cities.push({ key, radius: 25, distance_unit: 'kilometer' })
             } else if (loc.startsWith('region:')) {
+                // Departamento/región — segmenta de verdad
                 const key = loc.split(':')[1]
-                if (key && !regions.some(r => r.key === key)) regions.push({ key })
-            } else if (loc.startsWith('subcity:')) {
-                const key = loc.split(':')[1]
-                if (key && !subcities.some(s => s.key === key)) subcities.push({ key })
+                if (key) regions.push({ key })
             } else if (loc.startsWith('cc:')) {
-                // Format: "cc:CO:Bogotá" — extract country code (legacy)
+                // Format legacy: "cc:CO:Bogotá" — colapsa al país
                 const countryCode = loc.split(':')[1]
                 if (countryCode?.length === 2 && !countries.includes(countryCode.toUpperCase())) {
                     countries.push(countryCode.toUpperCase())
@@ -117,32 +153,37 @@ export async function POST(req: Request, { params }: { params: { id: string } })
                 countries.push(loc.toUpperCase())
             }
         }
-        const geoLocations = (countries.length || cities.length || regions.length || subcities.length)
+        const geoLocations = (countries.length > 0 || cities.length > 0 || regions.length > 0)
             ? {
                 ...(countries.length > 0 ? { countries } : {}),
-                ...(cities.length > 0 ? { cities } : {}),
                 ...(regions.length > 0 ? { regions } : {}),
-                ...(subcities.length > 0 ? { subcities } : {})
+                ...(cities.length > 0 ? { cities } : {})
             }
             : undefined
 
         // FIX: pass all creative copies so the adapter creates one ad per variation
         // Only include mediaUrl if it's a real HTTP URL (never blob:// or null)
-        const isValidUrl = (url: string | null) => typeof url === 'string' && url.startsWith('http')
+        const isValidUrl = (url: string | null) => {
+            if (!url) return false
+            try { const u = new URL(url); return u.protocol === 'http:' || u.protocol === 'https:' } catch { return false }
+        }
         const creativeCopies = campaign.creatives
             .filter((c: any) => c.primaryText)
             .map((c: any) => ({
                 primaryText: c.primaryText || '',
                 headline: c.headline || '',
                 description: c.description || '',
-                imageUrl: isValidUrl(c.mediaUrl) ? c.mediaUrl : undefined
+                imageUrl: isValidUrl(c.mediaUrl) ? c.mediaUrl : undefined,
+                // Video pre-subido a Meta — va junto al imageUrl del MISMO creative (alineado)
+                ...(c.metaVideoId ? { metaVideoId: c.metaVideoId } : {}),
+                ...(c.metaMediaStatus ? { metaMediaStatus: c.metaMediaStatus } : {}),
             }))
 
         const messengerDestination = dest === 'whatsapp'
             ? 'WHATSAPP' as const
             : dest === 'messenger'
                 ? 'MESSENGER' as const
-                : dest === 'instagram' && campaign.strategy.objective === 'engagement'
+                : dest === 'instagram'
                     ? 'INSTAGRAM' as const
                     : undefined
 
@@ -150,40 +191,22 @@ export async function POST(req: Request, { params }: { params: { id: string } })
         // Generate interest keywords from the brief with OpenAI, then resolve
         // each keyword to a real Meta interest ID via the Targeting Search API.
         let audienceInterests: Array<{ id: string; name: string }> = []
-        let audienceProfile: { ageMin: number; ageMax: number; gender: 'all' | 'female' | 'male' } | null = null
         if (campaign.platform === 'META') {
             let audienceError = 'No se pudieron generar intereses de audiencia. Verifica tu API Key de OpenAI en Configuración → IA.'
             try {
-                const oaiConfig = await (prisma as any).openAIConfig.findUnique({ where: { userId: user.id } })
-                const audienceModel = oaiConfig?.model || 'gpt-4o'
-                const filterModel = oaiConfig?.model || 'gpt-4o-mini'
-                const { resolveOpenAIKey, chargeForChatUsage } = await import('@/lib/ai-credits')
-                const resolved = await resolveOpenAIKey(user.id)
-                if (!resolved.ok) {
-                    audienceError = resolved.error === 'NO_CREDITS'
-                        ? 'Sin saldo de IA para generar intereses de audiencia. Comprá saldo o configurá tu propia API Key.'
-                        : 'Configura tu API Key de OpenAI o pedile al admin que active la global.'
+                // Key personal del usuario o créditos globales del admin
+                const resolvedKey = await resolveAdsKey(user.id)
+                if (!resolvedKey) {
+                    audienceError = 'Configura tu API Key de OpenAI en Configuración → IA (o activá créditos de IA) para publicar campañas de Meta con segmentación de audiencia.'
                 } else {
-                    const oaiKey = resolved.key
-
-                    // Perfil de audiencia (edad/género) desde el brief — segmenta mejor.
-                    // En su propio try: si falla, se publica igual (edad/género amplios).
-                    try {
-                        let profUsage: { promptTokens: number; completionTokens: number } | null = null
-                        audienceProfile = await generateAudienceProfile({ brief: campaign.brief, apiKey: oaiKey, model: audienceModel, onUsage: (u) => { profUsage = u } })
-                        if (resolved.source === 'admin' && profUsage) {
-                            const u = profUsage as { promptTokens: number; completionTokens: number }
-                            chargeForChatUsage(user.id, audienceModel, u.promptTokens, u.completionTokens, 'ads.publish.audience.profile', { campaignId: params.id }).catch(() => { })
-                        }
-                    } catch (e) { console.warn('[Publish] audience profile failed (se publica con edad/genero amplios):', e) }
-
-                    let kwUsage: { promptTokens: number; completionTokens: number } | null = null
-                    const keywords = await generateAudienceInterests(campaign.brief, oaiKey, audienceModel, (u) => { kwUsage = u })
-                    if (resolved.source === 'admin' && kwUsage) {
-                        const u = kwUsage as { promptTokens: number; completionTokens: number }
-                        chargeForChatUsage(user.id, audienceModel, u.promptTokens, u.completionTokens, 'ads.publish.audience.keywords', { campaignId: params.id })
-                            .catch(e => console.error('[Publish] charge(keywords) error:', e))
+                    const oaiKey = resolvedKey.key
+                    const oaiCfg = await (prisma as any).openAIConfig.findUnique({ where: { userId: user.id }, select: { model: true } })
+                    const genModel = 'gpt-5.1' // intereses con gpt-5.1 (estilo Andromeda)
+                    const filterModel = oaiCfg?.model || 'gpt-4o-mini'
+                    const meterAudience = (model: string) => (p: number, c: number) => {
+                        if (resolvedKey.isGlobal) logAiUsage({ userId: resolvedKey.userId, service: 'ads-audience', model, promptTokens: p, completionTokens: c }).catch(() => {})
                     }
+                    const keywords = await generateAudienceInterests(campaign.brief, oaiKey, genModel, meterAudience(genModel))
                     console.log(`[Publish] AI generated ${keywords.length} interest keywords:`, keywords.join(', '))
 
                     const metaAdapter = adapter as MetaAdapter
@@ -206,13 +229,7 @@ export async function POST(req: Request, { params }: { params: { id: string } })
                     console.log(`[Publish] Resolved ${audienceInterests.length} raw Meta interest candidates`)
 
                     // AI filtering step — remove irrelevant results (e.g. "Acne Studios" for skincare)
-                    let filterUsage: { promptTokens: number; completionTokens: number } | null = null
-                    audienceInterests = await filterAudienceInterests(campaign.brief, audienceInterests, oaiKey, filterModel, (u) => { filterUsage = u })
-                    if (resolved.source === 'admin' && filterUsage) {
-                        const u = filterUsage as { promptTokens: number; completionTokens: number }
-                        chargeForChatUsage(user.id, filterModel, u.promptTokens, u.completionTokens, 'ads.publish.audience.filter', { campaignId: params.id })
-                            .catch(e => console.error('[Publish] charge(filter) error:', e))
-                    }
+                    audienceInterests = await filterAudienceInterests(campaign.brief, audienceInterests, oaiKey, filterModel, meterAudience(filterModel))
                     audienceInterests = audienceInterests.slice(0, 15)
                     console.log(`[Publish] After AI filter: ${audienceInterests.length} Meta interests:`, audienceInterests.map(i => i.name).join(', '))
                     if (audienceInterests.length === 0) {
@@ -231,6 +248,14 @@ export async function POST(req: Request, { params }: { params: { id: string } })
             }
         }
 
+        // Edad/género del brief (clamp a los límites de Meta: 18-65). Si no hay → undefined (amplio).
+        const briefSeg = campaign.brief as any
+        const segAgeMin = briefSeg.targetAgeMin ? Math.max(18, Math.min(65, Number(briefSeg.targetAgeMin))) : undefined
+        const segAgeMaxRaw = briefSeg.targetAgeMax ? Math.max(18, Math.min(65, Number(briefSeg.targetAgeMax))) : undefined
+        // Asegurar age_max >= age_min
+        const segAgeMax = (segAgeMin && segAgeMaxRaw && segAgeMaxRaw < segAgeMin) ? segAgeMin : segAgeMaxRaw
+        const segGender = briefSeg.targetGender === 'male' ? 'MALE' : briefSeg.targetGender === 'female' ? 'FEMALE' : undefined
+
         const result = await adapter.publishFromDraft(
             accessToken,
             campaign.connectedAccount.providerAccountId,
@@ -240,10 +265,14 @@ export async function POST(req: Request, { params }: { params: { id: string } })
                 budgetType: 'DAILY',
                 budgetAmount: campaign.dailyBudgetUSD,
                 geoLocations,
+                // Edad y género del cliente ideal del brief (segmentación real, no 18-65 fijo)
+                ...(segAgeMin ? { ageMin: segAgeMin } : {}),
+                ...(segAgeMax ? { ageMax: segAgeMax } : {}),
+                ...(segGender ? { gender: segGender } : {}),
                 // Fallback single-copy fields (used if copies array is empty)
-                primaryText: campaign.creatives[0]?.primaryText || campaign.brief.description,
-                headline: campaign.creatives[0]?.headline || campaign.brief.name,
-                description: campaign.creatives[0]?.description || campaign.brief.valueProposition,
+                primaryText: campaign.creatives[0]?.primaryText || campaign.brief?.description || campaign.brief?.name || 'Descubrí nuestro producto',
+                headline: campaign.creatives[0]?.headline || campaign.brief?.name || '',
+                description: campaign.creatives[0]?.description || campaign.brief?.valueProposition || '',
                 cta: (() => {
                     // Map brief CTA text → Meta CTA enum
                     const ctaMap: Record<string, string> = {
@@ -264,8 +293,8 @@ export async function POST(req: Request, { params }: { params: { id: string } })
                     const briefCta = campaign.brief.mainCTA as string | undefined
                     if (briefCta && ctaMap[briefCta]) return ctaMap[briefCta]
                     // Objective-based fallback
-                    const obj = campaign.strategy.objective as string
-                    const dest = campaign.strategy.destination as string
+                    const obj = (campaign.objective ?? campaign.strategy?.objective) as string
+                    const dest = (campaign.destination ?? campaign.strategy?.destination) as string
                     if (dest === 'whatsapp' || dest === 'messenger' || dest === 'instagram') return 'SEND_MESSAGE'
                     if (obj === 'leads') return 'SIGN_UP'
                     if (obj === 'conversions') return 'SHOP_NOW'
@@ -284,20 +313,18 @@ export async function POST(req: Request, { params }: { params: { id: string } })
                     .filter((c: any) => isValidUrl(c.mediaUrl))
                     .map((c: any) => ({
                         type: (c.mediaType?.toUpperCase() || 'IMAGE') as 'IMAGE' | 'VIDEO',
-                        storageUrl: c.mediaUrl!
+                        storageUrl: c.mediaUrl!,
+                        // Video pre-subido a Meta al cargar el archivo → publicar sin esperar
+                        ...(c.metaVideoId ? { metaVideoId: c.metaVideoId } : {}),
+                        ...(c.metaMediaStatus ? { metaMediaStatus: c.metaMediaStatus } : {}),
                     })),
                 // AI audience interests (Meta only — resolved from brief via OpenAI + Meta Targeting Search)
                 ...(audienceInterests.length > 0 ? { audienceInterests } : {}),
-                // Edad/género de la audiencia (IA, desde el brief). El adapter los aplica.
-                ...(audienceProfile ? {
-                    ageMin: audienceProfile.ageMin,
-                    ageMax: audienceProfile.ageMax,
-                    ...(audienceProfile.gender === 'female' ? { gender: 'FEMALE' } : audienceProfile.gender === 'male' ? { gender: 'MALE' } : {}),
-                } : {}),
                 // Pass advantageType so Google adapter knows Search/Display/PMax
-                ...(campaign.platform === 'GOOGLE_ADS' ? { advantageType: campaign.strategy.advantageType } : {}),
-                // Advantage+ Audience — from UI override
-                ...(bodyOverrides.advantageAudience !== undefined ? { advantageAudience: Boolean(bodyOverrides.advantageAudience) } : {}),
+                ...(campaign.platform === 'GOOGLE_ADS' ? { advantageType: campaign.strategy?.advantageType } : {}),
+                // Advantage+ Audience — INTELIGENTE: ON por defecto (Andromeda premia audiencia amplia
+                // que la IA expande). El usuario lo puede desactivar desde la UI.
+                advantageAudience: bodyOverrides.advantageAudience !== undefined ? Boolean(bodyOverrides.advantageAudience) : true,
                 // Advantage+ Creative — auto-enhances creatives via degrees_of_freedom_spec
                 ...(bodyOverrides.advantageCreative !== undefined ? { advantageCreative: Boolean(bodyOverrides.advantageCreative) } : {}),
                 // Ad format — single (default) or carousel (child_attachments)

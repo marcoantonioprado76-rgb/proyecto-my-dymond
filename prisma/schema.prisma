@@ -725,6 +725,12 @@ model AdCreative {
   hashtags    String?      @db.Text
   mediaUrl    String?      @map("media_url")
   mediaType   String?      @map("media_type")
+  // Pre-subida a Meta (para publicar rápido): el video se sube a Meta al cargar el
+  // archivo y se procesa en background; al publicar ya está listo (sin esperar).
+  metaVideoId      String? @map("meta_video_id")
+  metaImageHash    String? @map("meta_image_hash")
+  metaThumbnailUrl String? @map("meta_thumbnail_url")
+  metaMediaStatus  String? @map("meta_media_status") // processing | ready | error
   aiGenerated Boolean      @default(false) @map("ai_generated")
   isApproved  Boolean      @default(false) @map("is_approved")
   createdAt   DateTime     @default(now()) @map("created_at")

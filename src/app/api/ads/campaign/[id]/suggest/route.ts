@@ -2,15 +2,23 @@ export const dynamic = 'force-dynamic'
 import { NextResponse } from 'next/server'
 import { getAuthUser } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { decrypt } from '@/lib/ads/encryption'
 import { generateFieldSuggestions } from '@/lib/ads/openai-ads'
-import { resolveOpenAIKey, chargeForChatUsage } from '@/lib/ai-credits'
+import { resolveAdsKey, logAiUsage } from '@/lib/ai-credits'
+
+const ENC_KEY = process.env.ADS_ENCRYPTION_KEY || ''
 
 export async function POST(req: Request, { params }: { params: { id: string } }) {
     const user = await getAuthUser()
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
     const oaiConfig = await (prisma as any).openAIConfig.findUnique({ where: { userId: user.id } })
-    const model = oaiConfig?.model || 'gpt-4o'
+    const resolvedKey = await resolveAdsKey(user.id)
+    if (!resolvedKey) {
+        return NextResponse.json({ error: 'Configura tu OpenAI API Key en Configuración → IA, o compra créditos de IA.' }, { status: 400 })
+    }
+    const apiKey = resolvedKey.key
+    const aiModel = oaiConfig?.model || 'gpt-4o'
 
     const campaign = await (prisma as any).adCampaignV2.findFirst({
         where: { id: params.id, userId: user.id },
@@ -21,23 +29,11 @@ export async function POST(req: Request, { params }: { params: { id: string } })
     const body = await req.json()
     const { field, slotIndex = 0, currentContent = '' } = body
 
-    if (!['primaryText', 'headline', 'description'].includes(field)) {
+    if (!['primaryText', 'headline', 'description', 'whatsappGreeting', 'quickReply'].includes(field)) {
         return NextResponse.json({ error: 'Campo inválido' }, { status: 400 })
     }
 
-    const resolved = await resolveOpenAIKey(user.id)
-    if (!resolved.ok) {
-        if (resolved.error === 'NO_CREDITS') {
-            return NextResponse.json({
-                error: 'Sin saldo de IA. Comprá saldo o configurá tu propia API Key.',
-                code: 'NO_CREDITS', balanceUsd: resolved.balanceUsd,
-            }, { status: 402 })
-        }
-        return NextResponse.json({ error: 'No hay API Key disponible.', code: resolved.error }, { status: 400 })
-    }
-
     try {
-        let usage: { promptTokens: number; completionTokens: number } | null = null
         const suggestions = await generateFieldSuggestions({
             brief: {
                 name: campaign.brief.name,
@@ -59,18 +55,13 @@ export async function POST(req: Request, { params }: { params: { id: string } })
             },
             field,
             slotIndex,
-            platform: campaign.strategy.platform,
-            destination: campaign.strategy.destination,
+            platform: campaign.platform,
+            destination: campaign.destination ?? campaign.strategy?.destination,
             currentContent,
-            apiKey: resolved.key,
-            model,
-            onUsage: (u) => { usage = u },
+            apiKey,
+            model: aiModel,
+            onUsage: (p, c) => { if (resolvedKey.isGlobal) logAiUsage({ userId: user.id, service: 'ads-field', model: aiModel, promptTokens: p, completionTokens: c }).catch(() => {}) },
         })
-        if (resolved.source === 'admin' && usage) {
-            const u = usage as { promptTokens: number; completionTokens: number }
-            chargeForChatUsage(user.id, model, u.promptTokens, u.completionTokens, 'ads.field.suggest', { campaignId: params.id, field })
-                .catch(e => console.error('[SuggestField] charge error:', e))
-        }
 
         return NextResponse.json({ suggestions })
     } catch (err: any) {

@@ -1,56 +1,43 @@
 'use client'
 
 import { useState, useEffect, Suspense } from 'react'
+import AIKeySelector from '@/components/AIKeySelector'
 import {
-    Plus, ArrowRight, CheckCircle2,
+    Megaphone, Plus, ArrowRight, ArrowLeft, CheckCircle2,
     Sparkles, FileText, Zap, BarChart3, Settings2,
     AlertCircle, Loader2, Brain, Rocket, TrendingUp,
     Play, Pause, Clock, XCircle, RefreshCw, Target, ChevronRight,
-    Flame, Activity, Facebook
+    Flame, Activity, Trash2
 } from 'lucide-react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
-import AIKeySelector from '@/components/AIKeySelector'
-import { usePlanGuard } from '@/hooks/usePlanGuard'
 
-// ── PLATAFORMA: solo Meta ─────────────────────────────────────────────────
-const PLATFORM_ID = 'META'
-const PLATFORM = {
-    id: 'META',
-    label: 'Meta Ads',
-    sub: 'Facebook & Instagram',
-    color: '#233B8F',
-    accent: '#233B8F',
-    accentSoft: 'rgba(35,59,143,0.15)',
-    accentSoftBorder: 'rgba(35,59,143,0.30)',
-    glow: 'rgba(35,59,143,0.18)',
-    letter: 'f',
-    textColor: 'text-[#233B8F]',
-}
+const PLATFORMS = [
+    { id: 'META', label: 'Meta Ads', sub: 'Facebook & Instagram', color: '#0081FB', letter: 'f', textColor: 'text-blue-400', glow: 'rgba(0,129,251,0.15)', comingSoon: false },
+]
 
 const STATUS_LABELS: Record<string, { label: string; color: string; dot: string; bg: string }> = {
-    DRAFT:      { label: 'Borrador',   color: 'text-white/55',    dot: 'bg-white/25',                 bg: 'bg-white/5 border-white/10' },
-    READY:      { label: 'Listo',      color: 'text-[#7DD3FC]',   dot: 'bg-[#7DD3FC]',                 bg: 'bg-[#7DD3FC]/10 border-[#7DD3FC]/20' },
-    PUBLISHING: { label: 'Publicando', color: 'text-[#B735B8]', dot: 'bg-[#B735B8] animate-pulse', bg: 'bg-[#B735B8]/10 border-yellow-500/20' },
-    PUBLISHED:  { label: 'Publicado',  color: 'text-emerald-400',dot: 'bg-emerald-400',              bg: 'bg-emerald-500/10 border-emerald-500/20' },
-    FAILED:     { label: 'Fallido',    color: 'text-red-400',    dot: 'bg-red-400',                  bg: 'bg-red-500/10 border-red-500/20' },
-    PAUSED:     { label: 'Pausado',    color: 'text-orange-400', dot: 'bg-orange-400',               bg: 'bg-orange-500/10 border-orange-500/20' },
+    DRAFT:      { label: 'Borrador',   color: 'text-white/40',   dot: 'bg-white/25',              bg: 'bg-white/5 border-white/10' },
+    READY:      { label: 'Listo',      color: 'text-blue-400',   dot: 'bg-blue-400',              bg: 'bg-blue-500/10 border-blue-500/20' },
+    PUBLISHING: { label: 'Publicando', color: 'text-yellow-400', dot: 'bg-yellow-400 animate-pulse', bg: 'bg-yellow-500/10 border-yellow-500/20' },
+    PUBLISHED:  { label: 'Publicado',  color: 'text-emerald-400',dot: 'bg-emerald-400',           bg: 'bg-emerald-500/10 border-emerald-500/20' },
+    FAILED:     { label: 'Fallido',    color: 'text-red-400',    dot: 'bg-red-400',               bg: 'bg-red-500/10 border-red-500/20' },
+    PAUSED:     { label: 'Pausado',    color: 'text-orange-400', dot: 'bg-orange-400',            bg: 'bg-orange-500/10 border-orange-500/20' },
 }
 
-export default function MetaAdsDashboard() {
-    usePlanGuard()
+export default function AdsDashboard() {
     return (
         <Suspense fallback={
             <div className="flex items-center justify-center min-h-screen">
-                <div className="w-8 h-8 border-2 border-[#233B8F]/30 border-t-blue-400 rounded-full animate-spin" />
+                <div className="w-8 h-8 border-2 border-purple-400/30 border-t-purple-400 rounded-full animate-spin" />
             </div>
         }>
-            <MetaAdsDashboardInner />
+            <AdsDashboardInner />
         </Suspense>
     )
 }
 
-function MetaAdsDashboardInner() {
+function AdsDashboardInner() {
     const [integrations, setIntegrations] = useState<any[]>([])
     const [campaigns, setCampaigns] = useState<any[]>([])
     const [brief, setBrief] = useState<any>(null)
@@ -59,6 +46,11 @@ function MetaAdsDashboardInner() {
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
     const [actionLoading, setActionLoading] = useState<string | null>(null)
+    // Detalle de la conexión de Meta (páginas, IG, números, cuenta, business) — auto-carga
+    const [metaDetails, setMetaDetails] = useState<any>(null)
+    const [loadingMetaDetails, setLoadingMetaDetails] = useState(false)
+    // Negocio seleccionado → filtra las campañas mostradas (null = todas)
+    const [selectedBriefId, setSelectedBriefId] = useState<string | null>(null)
     const searchParams = useSearchParams()
 
     useEffect(() => {
@@ -69,40 +61,47 @@ function MetaAdsDashboardInner() {
 
     async function fetchAll() {
         setLoading(true)
-        // Promise.allSettled + parseo aislado por request: si una falla (rate-limit,
-        // 500, network blip, deploy en curso), las demás siguen poblando su state.
-        // ANTES: cualquier .json() roto rechazaba todo y se "perdían" los 4 states.
-        const [intRes, campaignRes, briefRes, oaiRes] = await Promise.allSettled([
-            fetch('/api/ads/integrations/status'),
-            fetch('/api/ads/campaign'),
-            fetch('/api/ads/brief'),
-            fetch('/api/ads/config/openai')
-        ])
-        if (intRes.status === 'fulfilled' && intRes.value.ok) {
-            try { const d = await intRes.value.json(); setIntegrations(d.integrations || []) } catch { /* keep prev */ }
+        try {
+            const [intRes, campaignRes, briefRes, oaiRes] = await Promise.all([
+                fetch('/api/ads/integrations/status', { signal: AbortSignal.timeout(15000) }),
+                fetch('/api/ads/campaign', { signal: AbortSignal.timeout(15000) }),
+                fetch('/api/ads/brief', { signal: AbortSignal.timeout(15000) }),
+                fetch('/api/ads/config/openai', { signal: AbortSignal.timeout(15000) })
+            ])
+            const [iData, cData, bData, oData] = await Promise.all([
+                intRes.json(), campaignRes.json(), briefRes.json(), oaiRes.json()
+            ])
+            setIntegrations(iData.integrations || [])
+            setCampaigns(cData.campaigns || [])
+            setBrief(bData.brief || null)
+            setAllBriefs(bData.briefs || [])
+            setOpenaiConfig(oData.config || null)
+            // Auto-cargar detalles de Meta (páginas/IG/WhatsApp/cuenta/business) si está conectado
+            const metaConn = (iData.integrations || []).some((i: any) => i.platform === 'META' && i.status === 'CONNECTED')
+            if (metaConn) loadMetaDetails()
+        } catch (e) {
+            console.error(e)
+        } finally {
+            setLoading(false)
         }
-        if (campaignRes.status === 'fulfilled' && campaignRes.value.ok) {
-            try { const d = await campaignRes.value.json(); setCampaigns(d.campaigns || []) } catch { /* keep prev */ }
-        }
-        if (briefRes.status === 'fulfilled' && briefRes.value.ok) {
-            try {
-                const d = await briefRes.value.json()
-                setBrief(d.brief || null)
-                setAllBriefs(d.briefs || [])
-            } catch { /* keep prev */ }
-        }
-        if (oaiRes.status === 'fulfilled' && oaiRes.value.ok) {
-            try { const d = await oaiRes.value.json(); setOpenaiConfig(d.config || null) } catch { /* keep prev */ }
-        }
-        setLoading(false)
     }
 
-    const handleConnect = async () => {
+    async function loadMetaDetails() {
+        setLoadingMetaDetails(true)
         try {
-            const res = await fetch(`/api/ads/integrations/${PLATFORM_ID.toLowerCase()}/connect/start`, { method: 'POST' })
+            const res = await fetch('/api/ads/integrations/meta/details', { signal: AbortSignal.timeout(15000) })
+            const data = await res.json().catch(() => ({}))
+            if (res.ok) setMetaDetails(data)
+        } catch { /* sin detalles */ }
+        finally { setLoadingMetaDetails(false) }
+    }
+
+    const handleConnect = async (platformId: string) => {
+        try {
+            const res = await fetch(`/api/ads/integrations/${platformId.toLowerCase()}/connect/start`, { method: 'POST' })
             const { authUrl } = await res.json()
             if (authUrl) window.location.href = authUrl
-        } catch { alert('Error al conectar Meta') }
+        } catch { alert('Error al conectar plataforma') }
     }
 
     const handlePause = async (campaignId: string) => {
@@ -127,38 +126,56 @@ function MetaAdsDashboardInner() {
         finally { setActionLoading(null) }
     }
 
-    // Filtros — sólo Meta
-    const metaIntegration = integrations.find(i => i.platform === PLATFORM_ID)
-    const isConnected = metaIntegration?.status === 'CONNECTED'
-    const metaCampaigns = campaigns.filter((c: any) => c.platform === PLATFORM_ID)
+    const handleDeleteCampaign = async (campaignId: string) => {
+        if (!confirm('¿Eliminar esta campaña? Si está publicada, también se eliminará de Meta. Esta acción no se puede deshacer.')) return
+        setActionLoading(campaignId + '-delete')
+        try {
+            const res = await fetch(`/api/ads/campaign/${campaignId}`, { method: 'DELETE' })
+            const data = await res.json().catch(() => ({}))
+            if (!res.ok) { setError(data.error || 'Error al eliminar'); return }
+            setCampaigns(prev => prev.filter(c => c.id !== campaignId))
+        } catch { setError('Error al eliminar campaña') }
+        finally { setActionLoading(null) }
+    }
 
     const hasOpenAI = openaiConfig?.isValid
     const hasBrief = !!brief
-    const hasIntegration = isConnected
+    const hasIntegration = integrations.some(i => i.status === 'CONNECTED')
     const allReady = hasOpenAI && hasBrief && hasIntegration
     const stepsCompleted = [hasOpenAI, hasBrief, hasIntegration].filter(Boolean).length
 
-    const published = metaCampaigns.filter((c: any) => c.status === 'PUBLISHED').length
-    const drafts = metaCampaigns.filter((c: any) => ['DRAFT', 'READY'].includes(c.status)).length
-    const failed = metaCampaigns.filter((c: any) => c.status === 'FAILED').length
+    const published = campaigns.filter(c => c.status === 'PUBLISHED').length
+    const drafts = campaigns.filter(c => ['DRAFT', 'READY'].includes(c.status)).length
+    const failed = campaigns.filter(c => c.status === 'FAILED').length
+
+    // Campañas filtradas por el negocio seleccionado (null = todas)
+    const selectedBriefName = allBriefs.find((b: any) => b.id === selectedBriefId)?.name
+    const visibleCampaigns = selectedBriefId ? campaigns.filter((c: any) => c.briefId === selectedBriefId) : campaigns
 
     return (
-        <div className="dm-page font-ui">
-        <div className="px-4 md:px-6 xl:px-10 pt-6 pb-28 max-w-screen-2xl mx-auto text-[#111827]">
+        <div className="px-4 md:px-6 xl:px-10 pt-6 pb-28 max-w-screen-2xl mx-auto text-white">
+
+            <div className="mb-4 flex justify-end"><AIKeySelector compact /></div>
 
             {/* ── HEADER ─────────────────────────────── */}
             <div className="relative rounded-3xl overflow-hidden mb-7 p-6 md:p-8"
-                style={{ background: `linear-gradient(135deg, ${PLATFORM.glow} 0%, rgba(35,59,143,0.06) 50%, rgba(0,0,0,0) 100%)`, border: `1px solid ${PLATFORM.accentSoftBorder}` }}>
+                style={{ background: 'linear-gradient(135deg, rgba(139,92,246,0.12) 0%, rgba(59,130,246,0.06) 50%, rgba(0,0,0,0) 100%)', border: '1px solid rgba(139,92,246,0.2)' }}>
 
                 {/* glow orbs */}
-                <div className="pointer-events-none absolute -top-10 -left-10 w-56 h-56 rounded-full blur-[80px]" style={{ background: 'rgba(35,59,143,0.22)' }} />
-                <div className="pointer-events-none absolute -bottom-10 right-20 w-40 h-40 rounded-full blur-[70px]" style={{ background: 'rgba(35,59,143,0.14)' }} />
+                <div className="pointer-events-none absolute -top-10 -left-10 w-56 h-56 rounded-full blur-[80px]" style={{ background: 'rgba(139,92,246,0.18)' }} />
+                <div className="pointer-events-none absolute -bottom-10 right-20 w-40 h-40 rounded-full blur-[70px]" style={{ background: 'rgba(59,130,246,0.12)' }} />
 
                 <div className="relative flex flex-col sm:flex-row sm:items-center justify-between gap-5">
                     <div className="flex items-center gap-4">
-                        <div className="rounded-2xl flex items-center justify-center shrink-0"
-                            style={{ background: `linear-gradient(135deg, #FF2D95 0%, #B735B8 48%, #233B8F 100%)`, border: `1px solid ${PLATFORM.accentSoftBorder}`, width: 52, height: 52 }}>
-                            <Facebook className="text-white" size={22} />
+                        <Link href="/dashboard/services/ads"
+                            className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 hover:bg-white/10 transition-all"
+                            style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}
+                            title="Volver a plataformas">
+                            <ArrowLeft size={16} className="text-white/50" />
+                        </Link>
+                        <div className="w-13 h-13 rounded-2xl flex items-center justify-center shrink-0"
+                            style={{ background: 'linear-gradient(135deg, rgba(0,129,251,0.3), rgba(59,130,246,0.2))', border: '1px solid rgba(0,129,251,0.35)', width: 52, height: 52 }}>
+                            <span className="text-white font-black text-xl">f</span>
                         </div>
                         <div>
                             <div className="flex items-center gap-2 mb-0.5">
@@ -166,37 +183,46 @@ function MetaAdsDashboardInner() {
                                     Meta Ads
                                 </h1>
                                 <span className="text-2xl md:text-3xl font-black tracking-tight leading-none text-transparent bg-clip-text"
-                                    style={{ backgroundImage: 'linear-gradient(90deg, #60a5fa, #B735B8)' }}>
+                                    style={{ backgroundImage: 'linear-gradient(90deg, #60a5fa, #a78bfa)' }}>
                                     AI
                                 </span>
                             </div>
-                            <p className="text-xs text-[#6B7280] font-medium">Facebook &amp; Instagram · Impulsado por IA</p>
+                            <p className="text-xs text-white/35 font-medium">Facebook & Instagram · Impulsado por IA</p>
                         </div>
                     </div>
 
-                    <div className="flex items-center gap-2 flex-wrap">
-                        <AIKeySelector compact />
-                        <Link href={`/dashboard/services/ads/wizard?platform=${PLATFORM_ID}`}
-                            className="flex items-center gap-2 text-white text-sm font-bold px-5 py-2.5 rounded-xl transition-all active:scale-[0.97] shadow-[0_0_30px_rgba(35,59,143,0.35)]"
-                            style={{ background: `linear-gradient(135deg, #FF2D95 0%, #B735B8 48%, #233B8F 100%)` }}>
+                    <div className="flex items-center gap-2 flex-nowrap overflow-x-auto scrollbar-hide -mx-1 px-1">
+                        <Link href="/dashboard/services/ads/wizard"
+                            className="shrink-0 flex items-center gap-2 text-white text-sm font-bold px-3 sm:px-5 py-2.5 rounded-xl transition-all active:scale-[0.97] shadow-[0_0_30px_rgba(139,92,246,0.35)]"
+                            style={{ background: 'linear-gradient(135deg, #7c3aed, #3b82f6)' }}>
                             <Plus size={15} />
-                            Nueva Campaña
+                            <span className="hidden sm:inline">Nueva&nbsp;</span>Campaña
+                        </Link>
+                        <Link href="/dashboard/services/ads/brief?new=1"
+                            className="group relative shrink-0 flex items-center gap-2 text-white text-sm font-black px-3 sm:px-5 py-2.5 rounded-xl transition-all active:scale-[0.97] overflow-hidden animate-pulse-glow"
+                            style={{ background: 'linear-gradient(135deg, #ec4899, #8b5cf6 55%, #6366f1)' }}>
+                            {/* brillo que cruza */}
+                            <span className="pointer-events-none absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700"
+                                style={{ background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent)' }} />
+                            <Sparkles size={15} className="relative animate-pulse" />
+                            <span className="relative"><span className="hidden sm:inline">Crear&nbsp;</span>Negocio</span>
+                            <span className="relative text-[8px] font-black px-1.5 py-0.5 rounded-full bg-white/25 leading-none">IA</span>
                         </Link>
                         <Link href="/dashboard/services/ads/analytics"
-                            className="flex items-center gap-2 text-[#6B7280] text-sm font-bold px-4 py-2.5 rounded-xl hover:bg-[#EEF2F7] transition-all"
-                            style={{ background: '#F0F3F7', border: '1px solid #E4E9F0' }}>
+                            className="shrink-0 flex items-center gap-2 text-white/60 text-sm font-bold px-3 sm:px-4 py-2.5 rounded-xl hover:bg-white/10 transition-all"
+                            style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}>
                             <Activity size={14} />
                             <span className="hidden sm:inline">Analytics</span>
                         </Link>
                         <Link href="/dashboard/services/ads/history"
-                            className="flex items-center gap-2 text-[#6B7280] text-sm font-bold px-4 py-2.5 rounded-xl hover:bg-[#EEF2F7] transition-all"
-                            style={{ background: '#F0F3F7', border: '1px solid #E4E9F0' }}>
+                            className="shrink-0 flex items-center gap-2 text-white/60 text-sm font-bold px-3 sm:px-4 py-2.5 rounded-xl hover:bg-white/10 transition-all"
+                            style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}>
                             <BarChart3 size={14} />
                             <span className="hidden sm:inline">Historial</span>
                         </Link>
                         <button onClick={fetchAll}
-                            className="w-10 h-10 rounded-xl flex items-center justify-center text-[#6B7280] hover:text-[#111827] transition-all"
-                            style={{ background: '#F0F3F7', border: '1px solid #E4E9F0' }}>
+                            className="shrink-0 w-10 h-10 rounded-xl flex items-center justify-center text-white/40 hover:text-white transition-all"
+                            style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}>
                             <RefreshCw size={14} />
                         </button>
                     </div>
@@ -216,53 +242,53 @@ function MetaAdsDashboardInner() {
             {loading ? (
                 <div className="flex flex-col items-center justify-center py-36 gap-4">
                     <div className="relative">
-                        <div className="w-12 h-12 rounded-full border-2 border-[#233B8F]/20 border-t-blue-400 animate-spin" />
-                        <div className="absolute inset-0 rounded-full blur-md" style={{ background: 'rgba(35,59,143,0.14)' }} />
+                        <div className="w-12 h-12 rounded-full border-2 border-purple-500/20 border-t-purple-400 animate-spin" />
+                        <div className="absolute inset-0 rounded-full blur-md" style={{ background: 'rgba(139,92,246,0.1)' }} />
                     </div>
-                    <p className="text-[#9CA3AF] text-xs font-medium tracking-widest uppercase">Cargando</p>
+                    <p className="text-white/25 text-xs font-medium tracking-widest uppercase">Cargando</p>
                 </div>
             ) : (
                 <div className="space-y-6">
 
                     {/* ── SETUP ───────────────────────────── */}
                     {!allReady && (
-                        <div className="rounded-3xl p-5 md:p-6" style={{ background: `linear-gradient(180deg, #0B1B2B 0%, #081624 60%, #050B14 100%)`, border: '1px solid rgba(255,255,255,0.1)' }}>
+                        <div className="rounded-3xl p-5 md:p-6" style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.07)' }}>
                             <div className="flex items-center justify-between mb-4">
                                 <div className="flex items-center gap-2.5">
-                                    <Rocket size={15} className="text-[#7DD3FC]" />
-                                    <span className="font-bold text-sm text-white">Configura Meta Ads</span>
+                                    <Rocket size={15} className="text-purple-400" />
+                                    <span className="font-bold text-sm">Configura para empezar</span>
                                 </div>
                                 <div className="flex items-center gap-2">
                                     <div className="flex gap-1">
                                         {[0,1,2].map(i => (
-                                            <div key={i} className={`h-1 w-8 rounded-full transition-all duration-500 ${i < stepsCompleted ? 'bg-[#7DD3FC]' : 'bg-white/8'}`} />
+                                            <div key={i} className={`h-1 w-8 rounded-full transition-all duration-500 ${i < stepsCompleted ? 'bg-purple-400' : 'bg-white/8'}`} />
                                         ))}
                                     </div>
-                                    <span className="text-[10px] text-white/55 font-bold tabular-nums">{stepsCompleted}/3</span>
+                                    <span className="text-[10px] text-white/30 font-bold tabular-nums">{stepsCompleted}/3</span>
                                 </div>
                             </div>
                             <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
                                 {[
                                     { label: 'API Key de OpenAI', done: hasOpenAI, href: '/dashboard/services/ads/setup', icon: Brain, desc: 'Genera copies con IA' },
                                     { label: 'Perfil de Negocio', done: hasBrief, href: '/dashboard/services/ads/brief', icon: FileText, desc: 'Info de tu negocio' },
-                                    { label: 'Conectar Meta', done: hasIntegration, href: '/dashboard/services/ads/setup', icon: Zap, desc: 'Cuenta de Meta Ads' },
+                                    { label: 'Plataforma', done: hasIntegration, href: '/dashboard/services/ads/setup', icon: Zap, desc: 'Conecta Meta Ads' },
                                 ].map((step, idx) => {
                                     const Icon = step.icon
                                     return (
                                         <Link key={idx} href={step.href}
                                             className={`group flex items-center gap-3 p-3.5 rounded-2xl border transition-all active:scale-[0.98] ${step.done
                                                 ? 'bg-emerald-500/5 border-emerald-500/15'
-                                                : 'bg-white/5 border-white/10 hover:border-[#7DD3FC]/30 hover:bg-[#7DD3FC]/5'}`}>
-                                            <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${step.done ? 'bg-emerald-500/15' : 'bg-white/4 group-hover:bg-[#7DD3FC]/12'}`}>
+                                                : 'bg-white/2 border-white/6 hover:border-purple-500/30 hover:bg-purple-500/5'}`}>
+                                            <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${step.done ? 'bg-emerald-500/15' : 'bg-white/4 group-hover:bg-purple-500/12'}`}>
                                                 {step.done
                                                     ? <CheckCircle2 size={15} className="text-emerald-400" />
-                                                    : <Icon size={15} className="text-white/55 group-hover:text-[#7DD3FC] transition-colors" />}
+                                                    : <Icon size={15} className="text-white/35 group-hover:text-purple-400 transition-colors" />}
                                             </div>
                                             <div className="flex-1 min-w-0">
-                                                <p className="text-xs font-bold truncate text-white">{step.label}</p>
-                                                <p className="text-[10px] text-white/40 truncate">{step.done ? '✓ Completado' : step.desc}</p>
+                                                <p className="text-xs font-bold truncate">{step.label}</p>
+                                                <p className="text-[10px] text-white/25 truncate">{step.done ? '✓ Completado' : step.desc}</p>
                                             </div>
-                                            {!step.done && <ChevronRight size={12} className="text-white/20 group-hover:text-[#7DD3FC] shrink-0 transition-colors" />}
+                                            {!step.done && <ChevronRight size={12} className="text-white/15 group-hover:text-purple-400 shrink-0 transition-colors" />}
                                         </Link>
                                     )
                                 })}
@@ -270,26 +296,49 @@ function MetaAdsDashboardInner() {
                         </div>
                     )}
 
+                    {/* ── API KEY (acceso rápido, siempre visible) ── */}
+                    <Link href="/dashboard/services/ads/setup"
+                        className="flex items-center gap-3 p-3.5 rounded-2xl transition-all hover:bg-white/[0.04] active:scale-[0.995]"
+                        style={{ background: 'rgba(255,255,255,0.02)', border: `1px solid ${hasOpenAI ? 'rgba(52,211,153,0.2)' : 'rgba(251,146,60,0.28)'}` }}>
+                        <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
+                            style={{ background: hasOpenAI ? 'rgba(52,211,153,0.12)' : 'rgba(251,146,60,0.12)' }}>
+                            <Brain size={16} className={hasOpenAI ? 'text-emerald-400' : 'text-orange-400'} />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                            <p className="text-xs font-bold flex items-center gap-1.5">
+                                API Key de OpenAI
+                                {hasOpenAI && <CheckCircle2 size={12} className="text-emerald-400" />}
+                            </p>
+                            <p className="text-[10px] text-white/30 truncate">
+                                {hasOpenAI ? '✓ Configurada — genera textos e imágenes con IA' : 'Falta configurar — necesaria para generar con IA'}
+                            </p>
+                        </div>
+                        <span className="text-[10px] font-bold px-3 py-1.5 rounded-xl shrink-0"
+                            style={{ background: 'rgba(139,92,246,0.15)', border: '1px solid rgba(139,92,246,0.3)', color: '#c4b5fd' }}>
+                            {hasOpenAI ? 'Reconfigurar' : 'Configurar'}
+                        </span>
+                    </Link>
+
                     {/* ── STATS ───────────────────────────── */}
-                    {metaCampaigns.length > 0 && (
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    {campaigns.length > 0 && (
+                        <div className="grid grid-cols-4 gap-2 sm:gap-3">
                             {[
-                                { label: 'Total', value: metaCampaigns.length, icon: Target, color: 'text-white', accent: 'linear-gradient(180deg, #0B1B2B 0%, #081624 60%, #050B14 100%)', border: 'rgba(255,255,255,0.1)', iconColor: 'text-[#7DD3FC]' },
-                                { label: 'Publicadas', value: published, icon: Flame, color: 'text-emerald-400', accent: 'linear-gradient(180deg, #0B1B2B 0%, #081624 60%, #050B14 100%)', border: 'rgba(52,211,153,0.18)', iconColor: 'text-emerald-400' },
-                                { label: 'Borradores', value: drafts, icon: Clock, color: 'text-[#7DD3FC]', accent: 'linear-gradient(180deg, #0B1B2B 0%, #081624 60%, #050B14 100%)', border: 'rgba(125,211,252,0.18)', iconColor: 'text-[#7DD3FC]' },
-                                { label: 'Fallidas', value: failed, icon: XCircle, color: 'text-red-400', accent: 'linear-gradient(180deg, #0B1B2B 0%, #081624 60%, #050B14 100%)', border: 'rgba(248,113,113,0.18)', iconColor: 'text-red-400' },
+                                { label: 'Total', value: campaigns.length, icon: Target, color: 'text-white', accent: 'rgba(139,92,246,0.12)', border: 'rgba(139,92,246,0.2)', iconColor: 'text-purple-400' },
+                                { label: 'Publicadas', value: published, icon: Flame, color: 'text-emerald-400', accent: 'rgba(52,211,153,0.08)', border: 'rgba(52,211,153,0.18)', iconColor: 'text-emerald-400' },
+                                { label: 'Borradores', value: drafts, icon: Clock, color: 'text-blue-400', accent: 'rgba(96,165,250,0.08)', border: 'rgba(96,165,250,0.18)', iconColor: 'text-blue-400' },
+                                { label: 'Fallidas', value: failed, icon: XCircle, color: 'text-red-400', accent: 'rgba(248,113,113,0.08)', border: 'rgba(248,113,113,0.18)', iconColor: 'text-red-400' },
                             ].map(stat => {
                                 const Icon = stat.icon
                                 return (
-                                    <div key={stat.label} className="relative overflow-hidden rounded-2xl p-4 flex items-center gap-3"
+                                    <div key={stat.label} className="relative overflow-hidden rounded-2xl p-2.5 sm:p-4 flex flex-col sm:flex-row items-center gap-1 sm:gap-3 text-center sm:text-left"
                                         style={{ background: stat.accent, border: `1px solid ${stat.border}` }}>
-                                        <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
+                                        <div className="w-10 h-10 rounded-xl hidden sm:flex items-center justify-center shrink-0"
                                             style={{ background: 'rgba(255,255,255,0.04)' }}>
                                             <Icon size={17} className={stat.iconColor} />
                                         </div>
                                         <div>
-                                            <p className={`text-2xl font-black leading-none tabular-nums ${stat.color}`}>{stat.value}</p>
-                                            <p className="text-[10px] text-white/55 font-medium mt-0.5">{stat.label}</p>
+                                            <p className={`text-xl sm:text-2xl font-black leading-none tabular-nums ${stat.color}`}>{stat.value}</p>
+                                            <p className="text-[9px] sm:text-[10px] text-white/30 font-medium mt-0.5 leading-tight">{stat.label}</p>
                                         </div>
                                     </div>
                                 )
@@ -297,65 +346,123 @@ function MetaAdsDashboardInner() {
                         </div>
                     )}
 
-                    {/* ── CONEXIÓN + NEGOCIOS + CAMPAÑAS ──────────── */}
-                    <div className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-5">
-
-                        {/* Conexión Meta */}
+                    {/* ── PLATAFORMAS (barra de ancho completo) ── */}
+                    {/* Plataformas */}
                         <div>
                             <div className="flex items-center justify-between mb-3">
-                                <span className="text-[10px] font-bold uppercase tracking-widest text-[#9CA3AF]">Conexión</span>
-                                <Link href="/dashboard/services/ads/setup" className="flex items-center gap-1 text-[10px] text-[#233B8F] hover:underline">
+                                <span className="text-[10px] font-bold uppercase tracking-widest text-white/25">Plataformas</span>
+                                <Link href="/dashboard/services/ads/setup" className="flex items-center gap-1 text-[10px] text-purple-400 hover:underline">
                                     <Settings2 size={10} /> Configurar
                                 </Link>
                             </div>
-                            <div className="relative overflow-hidden rounded-2xl flex items-center gap-3 p-3.5"
-                                style={{
-                                    background: isConnected
-                                        ? `linear-gradient(180deg, #0B1B2B 0%, #081624 60%, #050B14 100%)`
-                                        : `linear-gradient(180deg, #0B1B2B 0%, #081624 60%, #050B14 100%)`,
-                                    border: isConnected ? '1px solid rgba(255,255,255,0.1)' : '1px dashed rgba(255,255,255,0.1)',
-                                }}>
-                                <div className="pointer-events-none absolute -top-6 -right-6 w-20 h-20 rounded-full blur-[40px]"
-                                    style={{ background: isConnected ? PLATFORM.glow : 'transparent' }} />
+                            <div className="space-y-2">
+                                {PLATFORMS.map(platform => {
+                                    const integration = integrations.find(i => i.platform === platform.id)
+                                    const isConnected = integration?.status === 'CONNECTED'
+                                    return (
+                                        <div key={platform.id}
+                                            className="relative overflow-hidden rounded-2xl p-3.5"
+                                            style={{
+                                                background: platform.comingSoon ? 'rgba(255,255,255,0.01)' : isConnected ? 'rgba(255,255,255,0.03)' : 'rgba(255,255,255,0.015)',
+                                                border: platform.comingSoon ? '1px dashed rgba(255,255,255,0.05)' : isConnected ? '1px solid rgba(255,255,255,0.1)' : '1px dashed rgba(255,255,255,0.07)',
+                                                opacity: platform.comingSoon ? 0.5 : 1,
+                                            }}>
+                                            <div className="pointer-events-none absolute -top-6 -right-6 w-20 h-20 rounded-full blur-[40px]"
+                                                style={{ background: isConnected && !platform.comingSoon ? platform.glow : 'transparent' }} />
 
-                                <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
-                                    style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)' }}>
-                                    <span className="font-black text-sm text-[#7DD3FC]">{PLATFORM.letter}</span>
-                                </div>
+                                            <div className="relative flex items-center gap-3">
+                                            <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
+                                                style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)' }}>
+                                                <span className={`font-black text-sm ${platform.textColor}`}>{platform.letter}</span>
+                                            </div>
 
-                                <div className="flex-1 min-w-0">
-                                    <p className="font-bold text-xs leading-tight text-white">{PLATFORM.label}</p>
-                                    {isConnected && metaIntegration?.connectedAccount
-                                        ? <p className="text-[10px] text-white/55 truncate">↳ {metaIntegration.connectedAccount.displayName}</p>
-                                        : <p className="text-[10px] text-white/40 truncate">{PLATFORM.sub}</p>
-                                    }
-                                </div>
+                                            <div className="flex-1 min-w-0">
+                                                <p className="font-bold text-xs leading-tight">{platform.label}</p>
+                                                {isConnected && !platform.comingSoon && integration?.connectedAccount
+                                                    ? <p className="text-[10px] text-white/30 truncate">↳ {integration.connectedAccount.displayName}</p>
+                                                    : <p className="text-[10px] text-white/20 truncate">{platform.sub}</p>
+                                                }
+                                            </div>
 
-                                {isConnected && (
-                                    <span className="flex items-center gap-1 text-[9px] font-black px-2 py-1 rounded-full shrink-0"
-                                        style={{ background: 'rgba(52,211,153,0.1)', border: '1px solid rgba(52,211,153,0.2)', color: '#34d399' }}>
-                                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block" />
-                                        ACTIVA
-                                    </span>
-                                )}
+                                            {platform.comingSoon
+                                                ? <span className="flex items-center gap-1 text-[9px] font-black px-2 py-1 rounded-full shrink-0"
+                                                    style={{ background: 'rgba(251,146,60,0.12)', border: '1px solid rgba(251,146,60,0.25)', color: '#fb923c' }}>
+                                                    PRÓXIMAMENTE
+                                                  </span>
+                                                : isConnected
+                                                    ? <span className="flex items-center gap-1 text-[9px] font-black px-2 py-1 rounded-full shrink-0"
+                                                        style={{ background: 'rgba(52,211,153,0.1)', border: '1px solid rgba(52,211,153,0.2)', color: '#34d399' }}>
+                                                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block" />
+                                                        ACTIVA
+                                                      </span>
+                                                    : null
+                                            }
 
-                                <button onClick={handleConnect}
-                                    className="text-[10px] font-bold py-1.5 px-3 rounded-xl shrink-0 transition-all active:scale-[0.97]"
-                                    style={{
-                                        background: isConnected ? 'rgba(255,255,255,0.06)' : 'rgba(255,9,108,0.1)',
-                                        border: isConnected ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(255,9,108,0.25)',
-                                        color: isConnected ? 'rgba(255,255,255,0.55)' : '#FF096C'
-                                    }}>
-                                    {isConnected ? 'Reconf.' : '+ Conectar'}
-                                </button>
+                                            {platform.comingSoon
+                                                ? <span className="text-[10px] font-bold py-1.5 px-3 rounded-xl shrink-0 cursor-not-allowed"
+                                                    style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', color: 'rgba(255,255,255,0.2)' }}>
+                                                    Próximamente
+                                                  </span>
+                                                : <button onClick={() => handleConnect(platform.id)}
+                                                    className="text-[10px] font-bold py-1.5 px-3 rounded-xl shrink-0 transition-all active:scale-[0.97]"
+                                                    style={{
+                                                        background: isConnected ? 'rgba(255,255,255,0.05)' : 'rgba(139,92,246,0.15)',
+                                                        border: isConnected ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(139,92,246,0.3)',
+                                                        color: isConnected ? 'rgba(255,255,255,0.4)' : '#c4b5fd'
+                                                    }}>
+                                                    {isConnected ? 'Reconf.' : '+ Conectar'}
+                                                  </button>
+                                            }
+                                            </div>
+
+                                            {/* Panel de detalles SIEMPRE visible (cada categoría con su flechita) */}
+                                            {isConnected && platform.id === 'META' && (loadingMetaDetails || metaDetails) && (
+                                                <div className="relative mt-3 pt-3 border-t border-white/8">
+                                                    {loadingMetaDetails && !metaDetails ? (
+                                                        <div className="flex items-center gap-2 text-[11px] text-white/35 py-2">
+                                                            <Loader2 size={12} className="animate-spin" /> Cargando datos de tu cuenta de Meta…
+                                                        </div>
+                                                    ) : metaDetails?.needsReconnect ? (
+                                                        <div className="flex flex-col sm:flex-row sm:items-center gap-2 p-2.5 rounded-xl"
+                                                            style={{ background: 'rgba(251,146,60,0.08)', border: '1px solid rgba(251,146,60,0.25)' }}>
+                                                            <p className="flex-1 text-[11px] text-orange-300/90 font-medium">
+                                                                ⚠ {metaDetails.error || 'Tu sesión de Meta expiró.'} Reconectá para ver páginas, Instagram y WhatsApp.
+                                                            </p>
+                                                            <button onClick={() => handleConnect('META')}
+                                                                className="text-[10px] font-bold px-3 py-1.5 rounded-lg shrink-0 self-start sm:self-auto"
+                                                                style={{ background: 'rgba(251,146,60,0.2)', border: '1px solid rgba(251,146,60,0.4)', color: '#fdba74' }}>
+                                                                Reconectar Meta
+                                                            </button>
+                                                        </div>
+                                                    ) : metaDetails ? (
+                                                        <div className="grid grid-cols-5 gap-1.5 sm:gap-2.5">
+                                                            <DetailBlock title="Cuenta publicitaria" emoji="🏢" items={
+                                                                metaDetails.connectedAdAccount
+                                                                    ? [`${metaDetails.connectedAdAccount.name || metaDetails.connectedAdAccount.id}${metaDetails.connectedAdAccount.currency ? ` · ${metaDetails.connectedAdAccount.currency}` : ''}`, ...(metaDetails.adAccounts || []).filter((a: any) => a.id !== metaDetails.connectedAdAccount.id).map((a: any) => `${a.name || a.id}${a.currency ? ` · ${a.currency}` : ''}`)]
+                                                                    : (metaDetails.adAccounts || []).map((a: any) => `${a.name || a.id}${a.currency ? ` · ${a.currency}` : ''}`)
+                                                            } />
+                                                            <DetailBlock title="Páginas" emoji="📄" items={(metaDetails.pages || []).map((p: any) => p.name)} />
+                                                            <DetailBlock title="Instagram" emoji="📸" items={metaDetails.instagrams || []} />
+                                                            <DetailBlock title="WhatsApp" emoji="💬" items={metaDetails.whatsappNumbers || []} />
+                                                            <DetailBlock title="Admin comercial" emoji="🏬" items={(metaDetails.businesses || []).map((b: any) => b.name)} />
+                                                        </div>
+                                                    ) : null}
+                                                </div>
+                                            )}
+                                        </div>
+                                    )
+                                })}
                             </div>
                         </div>
+
+                    {/* ── NEGOCIOS | CAMPAÑAS (2 columnas) ── */}
+                    <div className="grid grid-cols-2 gap-3 lg:gap-5 items-start">
 
                         {/* Mis Negocios */}
                         <div>
                             <div className="flex items-center justify-between mb-3">
-                                <span className="text-[10px] font-bold uppercase tracking-widest text-[#9CA3AF]">Mis Negocios</span>
-                                <Link href="/dashboard/services/ads/brief" className="flex items-center gap-1 text-[10px] text-[#233B8F] hover:underline">
+                                <span className="text-[10px] font-bold uppercase tracking-widest text-white/25">Mis Negocios</span>
+                                <Link href="/dashboard/services/ads/brief" className="flex items-center gap-1 text-[10px] text-purple-400 hover:underline">
                                     Gestionar <ArrowRight size={10} />
                                 </Link>
                             </div>
@@ -363,158 +470,232 @@ function MetaAdsDashboardInner() {
                             {allBriefs.length === 0 ? (
                                 <Link href="/dashboard/services/ads/brief"
                                     className="flex flex-col items-center justify-center rounded-2xl py-10 gap-3 group transition-all"
-                                    style={{ background: 'linear-gradient(180deg, #0B1B2B 0%, #081624 60%, #050B14 100%)', border: '1px dashed rgba(255,255,255,0.1)' }}>
+                                    style={{ background: 'rgba(255,255,255,0.015)', border: '1px dashed rgba(255,255,255,0.07)' }}>
                                     <div className="w-10 h-10 rounded-xl flex items-center justify-center"
-                                        style={{ background: 'rgba(125,211,252,0.10)', border: '1px solid rgba(125,211,252,0.20)' }}>
-                                        <FileText size={16} className="text-[#7DD3FC]" />
+                                        style={{ background: 'rgba(139,92,246,0.1)', border: '1px solid rgba(139,92,246,0.2)' }}>
+                                        <FileText size={16} className="text-purple-400" />
                                     </div>
-                                    <p className="text-xs text-white/55 font-medium">Crear perfil de negocio</p>
+                                    <p className="text-xs text-white/30 font-medium">Crear perfil de negocio</p>
                                 </Link>
                             ) : (
                                 <div className="space-y-2">
-                                    {allBriefs.slice(0, 3).map((b: any) => (
-                                        <div key={b.id}
-                                            className="flex items-center gap-3 rounded-2xl px-3.5 py-3 group"
-                                            style={{ background: `linear-gradient(180deg, #0B1B2B 0%, #081624 60%, #050B14 100%)`, border: '1px solid rgba(255,255,255,0.1)' }}>
-                                            <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0"
-                                                style={{ background: 'rgba(125,211,252,0.12)', border: '1px solid rgba(125,211,252,0.20)' }}>
-                                                <FileText size={13} className="text-[#7DD3FC]" />
-                                            </div>
-                                            <div className="flex-1 min-w-0">
-                                                <p className="text-xs font-bold truncate text-white">{b.name}</p>
-                                                <p className="text-[10px] text-white/40 truncate">{b.industry}</p>
-                                            </div>
-                                            <Link href={`/dashboard/services/ads/wizard?briefId=${b.id}&platform=${PLATFORM_ID}`}
-                                                className="flex items-center gap-1 text-[10px] font-bold px-3 py-1.5 rounded-xl shrink-0 transition-all active:scale-[0.97] text-white bg-gradient-to-r from-[#FF2D95] via-[#B735B8] to-[#233B8F] hover:opacity-90">
-                                                Campaña <ArrowRight size={9} />
-                                            </Link>
-                                        </div>
-                                    ))}
-                                    {allBriefs.length > 3 && (
-                                        <Link href="/dashboard/services/ads/brief"
-                                            className="flex items-center justify-center py-2 text-[10px] text-[#9CA3AF] hover:text-[#6B7280] transition-all font-medium">
-                                            +{allBriefs.length - 3} más
-                                        </Link>
+                                    {selectedBriefId && (
+                                        <button onClick={() => setSelectedBriefId(null)}
+                                            className="w-full flex items-center justify-center gap-1.5 py-2 rounded-xl text-[10px] font-bold text-blue-300 bg-blue-500/10 border border-blue-500/25 hover:bg-blue-500/15 transition-all">
+                                            ✕ Quitar filtro · ver todas las campañas
+                                        </button>
                                     )}
+                                    {allBriefs.map((b: any) => {
+                                        const sel = selectedBriefId === b.id
+                                        return (
+                                        <div key={b.id}
+                                            onClick={() => setSelectedBriefId(sel ? null : b.id)}
+                                            className="flex flex-wrap lg:flex-nowrap items-center gap-2 lg:gap-3 rounded-2xl px-3 py-2.5 lg:px-3.5 lg:py-3 group cursor-pointer transition-all"
+                                            style={{ background: sel ? 'rgba(124,58,237,0.14)' : 'rgba(255,255,255,0.03)', border: sel ? '1px solid rgba(139,92,246,0.5)' : '1px solid rgba(255,255,255,0.07)' }}>
+                                            <div className="flex items-center gap-2 min-w-0 w-full lg:w-auto lg:flex-1">
+                                                <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0"
+                                                    style={{ background: sel ? 'rgba(139,92,246,0.25)' : 'rgba(139,92,246,0.12)', border: '1px solid rgba(139,92,246,0.2)' }}>
+                                                    <FileText size={13} className="text-purple-400" />
+                                                </div>
+                                                <div className="flex-1 min-w-0">
+                                                    <p className="text-xs font-bold truncate">{b.name}</p>
+                                                    <p className="text-[10px] text-white/25 truncate">{b.industry}</p>
+                                                </div>
+                                                {sel && <span className="text-[9px] font-black px-2 py-0.5 rounded-full shrink-0 bg-purple-500/20 text-purple-300 border border-purple-500/30">FILTRANDO</span>}
+                                            </div>
+                                            <div className="flex items-center gap-1.5 w-full lg:w-auto shrink-0">
+                                                <Link href={`/dashboard/services/ads/brief?edit=${b.id}`}
+                                                    onClick={e => e.stopPropagation()}
+                                                    className="flex items-center justify-center gap-1 text-[10px] font-bold px-2.5 py-1.5 rounded-xl flex-1 lg:flex-none transition-all active:scale-[0.97] text-white/50 hover:text-white"
+                                                    style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.12)' }}
+                                                    title="Editar negocio">
+                                                    <Settings2 size={10} /> Editar
+                                                </Link>
+                                                <Link href={`/dashboard/services/ads/wizard?briefId=${b.id}`}
+                                                    onClick={e => e.stopPropagation()}
+                                                    className="flex items-center justify-center gap-1 text-[10px] font-bold px-3 py-1.5 rounded-xl flex-1 lg:flex-none transition-all active:scale-[0.97]"
+                                                    style={{ background: 'rgba(124,58,237,0.7)', color: '#e9d5ff', border: '1px solid rgba(139,92,246,0.4)' }}>
+                                                    Campaña <ArrowRight size={9} />
+                                                </Link>
+                                            </div>
+                                        </div>
+                                        )
+                                    })}
                                 </div>
                             )}
                         </div>
 
-                        {/* Campañas recientes (sólo Meta) */}
-                        <div className="lg:col-span-2 2xl:col-span-1">
-                            <div className="flex items-center justify-between mb-3">
-                                <div className="flex items-center gap-2">
-                                    <TrendingUp size={12} className="text-[#6B7280]" />
-                                    <span className="text-[10px] font-bold uppercase tracking-widest text-[#9CA3AF]">Campañas Meta</span>
-                                </div>
-                                {metaCampaigns.length > 0 && (
-                                    <Link href="/dashboard/services/ads/history" className="text-[10px] text-[#233B8F] hover:underline">Ver todas →</Link>
+                    {/* ── CAMPAÑAS RECIENTES (columna derecha) ── */}
+                    <div>
+                        <div className="flex items-center justify-between mb-3">
+                            <div className="flex items-center gap-2 min-w-0">
+                                <TrendingUp size={12} className="text-white/30 shrink-0" />
+                                <span className="text-[10px] font-bold uppercase tracking-widest text-white/25 shrink-0">Campañas</span>
+                                {selectedBriefName && (
+                                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-500/15 border border-purple-500/25 text-purple-300 truncate">
+                                        {selectedBriefName}
+                                    </span>
                                 )}
                             </div>
+                            {selectedBriefId
+                                ? <button onClick={() => setSelectedBriefId(null)} className="text-[10px] text-blue-300 hover:underline shrink-0">Ver todas ✕</button>
+                                : campaigns.length > 0 && <Link href="/dashboard/services/ads/history" className="text-[10px] text-purple-400 hover:underline shrink-0">Ver todas →</Link>
+                            }
+                        </div>
 
-                            {metaCampaigns.length === 0 ? (
-                                <div className="flex flex-col items-center justify-center py-20 gap-4 rounded-3xl text-center px-4"
-                                    style={{ background: 'linear-gradient(180deg, #0B1B2B 0%, #081624 60%, #050B14 100%)', border: '1px dashed rgba(255,255,255,0.1)' }}>
-                                    <div className="w-14 h-14 rounded-full flex items-center justify-center"
-                                        style={{ background: 'rgba(125,211,252,0.10)', border: '1px solid rgba(125,211,252,0.20)' }}>
-                                        <Sparkles className="text-[#7DD3FC]" size={22} />
-                                    </div>
-                                    <div>
-                                        <p className="text-white text-sm font-bold mb-1">Sin campañas todavía</p>
-                                        <p className="text-white/55 text-xs">Crea tu primera campaña Meta impulsada por IA</p>
-                                    </div>
-                                    <Link href={`/dashboard/services/ads/wizard?platform=${PLATFORM_ID}`}
-                                        className="flex items-center gap-2 text-white text-sm font-bold px-5 py-2.5 rounded-xl transition-all"
-                                        style={{ background: `linear-gradient(135deg, #FF2D95 0%, #B735B8 48%, #233B8F 100%)` }}>
-                                        <Plus size={14} /> Crear campaña
-                                    </Link>
+                        {visibleCampaigns.length === 0 ? (
+                            <div className="flex flex-col items-center justify-center py-20 gap-4 rounded-3xl text-center px-4"
+                                style={{ background: 'rgba(255,255,255,0.015)', border: '1px dashed rgba(255,255,255,0.07)' }}>
+                                <div className="w-14 h-14 rounded-full flex items-center justify-center"
+                                    style={{ background: 'rgba(139,92,246,0.1)', border: '1px solid rgba(139,92,246,0.2)' }}>
+                                    <Sparkles className="text-purple-400" size={22} />
                                 </div>
-                            ) : (
-                                <div className="space-y-2">
-                                    {metaCampaigns.slice(0, 5).map((campaign: any) => {
-                                        const status = STATUS_LABELS[campaign.status] || STATUS_LABELS['DRAFT']
-                                        return (
-                                            <div key={campaign.id}
-                                                className="group rounded-2xl p-4 flex items-center gap-3 transition-all"
-                                                style={{ background: 'linear-gradient(180deg, #0B1B2B 0%, #081624 60%, #050B14 100%)', border: '1px solid rgba(255,255,255,0.1)' }}
-                                                onMouseEnter={e => (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.18)')}
-                                                onMouseLeave={e => (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)')}>
+                                <div>
+                                    <p className="text-white/40 text-sm font-bold mb-1">{selectedBriefName ? `Sin campañas para ${selectedBriefName}` : 'Sin campañas todavía'}</p>
+                                    <p className="text-white/20 text-xs">Crea tu primera campaña impulsada por IA</p>
+                                </div>
+                                <Link href={selectedBriefId ? `/dashboard/services/ads/wizard?briefId=${selectedBriefId}` : '/dashboard/services/ads/wizard'}
+                                    className="flex items-center gap-2 text-white text-sm font-bold px-5 py-2.5 rounded-xl transition-all"
+                                    style={{ background: 'linear-gradient(135deg, #7c3aed, #3b82f6)' }}>
+                                    <Plus size={14} /> Crear campaña
+                                </Link>
+                            </div>
+                        ) : (
+                            <div className="space-y-2">
+                                {visibleCampaigns.slice(0, 5).map((campaign: any) => {
+                                    const status = STATUS_LABELS[campaign.status] || STATUS_LABELS['DRAFT']
+                                    const platform = PLATFORMS.find(p => p.id === campaign.platform)
+                                    return (
+                                        <div key={campaign.id}
+                                            className="group rounded-2xl p-3 lg:p-4 flex flex-wrap lg:flex-nowrap items-center gap-2 lg:gap-3 transition-all"
+                                            style={{ background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.07)' }}
+                                            onMouseEnter={e => (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)')}
+                                            onMouseLeave={e => (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.07)')}>
 
+                                            <div className="flex items-center gap-2.5 min-w-0 w-full lg:w-auto lg:flex-1">
                                                 {/* platform icon */}
                                                 <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
-                                                    style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)' }}>
-                                                    <span className="font-black text-sm text-[#7DD3FC]">{PLATFORM.letter}</span>
+                                                    style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}>
+                                                    {platform && <span className={`font-black text-sm ${platform.textColor}`}>{platform.letter}</span>}
                                                 </div>
 
                                                 {/* info */}
                                                 <div className="flex-1 min-w-0">
-                                                    <p className="font-bold text-sm leading-tight truncate text-white">{campaign.name}</p>
-                                                    <p className="text-[10px] text-white/40 truncate mt-0.5">{campaign.strategy?.name || campaign.brief?.name}</p>
-                                                </div>
-
-                                                {/* status + action */}
-                                                <div className="flex items-center gap-2 shrink-0">
-                                                    <span className={`flex items-center gap-1 text-[9px] font-black uppercase px-2 py-1 rounded-full border ${status.bg} ${status.color}`}>
-                                                        <span className={`w-1.5 h-1.5 rounded-full ${status.dot}`} />
-                                                        {status.label}
-                                                    </span>
-                                                    {campaign.status === 'READY' && (
-                                                        <Link href={`/dashboard/services/ads/preview/${campaign.id}`}
-                                                            className="text-[10px] font-bold px-3 py-1.5 rounded-xl transition-all text-white bg-gradient-to-r from-[#FF2D95] via-[#B735B8] to-[#233B8F] hover:opacity-90">
-                                                            Publicar →
-                                                        </Link>
-                                                    )}
-                                                    {campaign.status === 'DRAFT' && (
-                                                        <Link href={`/dashboard/services/ads/campaign/${campaign.strategyId}?edit=${campaign.id}`}
-                                                            className="text-[10px] font-bold px-3 py-1.5 rounded-xl transition-all"
-                                                            style={{ background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.55)', border: '1px solid rgba(255,255,255,0.1)' }}>
-                                                            Continuar
-                                                        </Link>
-                                                    )}
-                                                    {campaign.status === 'FAILED' && (
-                                                        <Link href={`/dashboard/services/ads/preview/${campaign.id}`}
-                                                            className="text-[10px] font-bold px-3 py-1.5 rounded-xl transition-all"
-                                                            style={{ background: 'rgba(239,68,68,0.1)', color: '#f87171', border: '1px solid rgba(239,68,68,0.25)' }}>
-                                                            Reintentar
-                                                        </Link>
-                                                    )}
-                                                    {campaign.status === 'PUBLISHED' && (
-                                                        <button
-                                                            onClick={() => handlePause(campaign.id)}
-                                                            disabled={actionLoading === campaign.id + '-pause'}
-                                                            className="flex items-center gap-1 text-[10px] font-bold px-3 py-1.5 rounded-xl transition-all disabled:opacity-40"
-                                                            style={{ background: 'rgba(251,146,60,0.1)', color: '#fb923c', border: '1px solid rgba(251,146,60,0.25)' }}>
-                                                            {actionLoading === campaign.id + '-pause' ? <Loader2 size={10} className="animate-spin" /> : <Pause size={10} />}
-                                                            Pausar
-                                                        </button>
-                                                    )}
-                                                    {campaign.status === 'PAUSED' && (
-                                                        <button
-                                                            onClick={() => handleResume(campaign.id)}
-                                                            disabled={actionLoading === campaign.id + '-resume'}
-                                                            className="flex items-center gap-1 text-[10px] font-bold px-3 py-1.5 rounded-xl transition-all disabled:opacity-40"
-                                                            style={{ background: 'rgba(52,211,153,0.1)', color: '#34d399', border: '1px solid rgba(52,211,153,0.25)' }}>
-                                                            {actionLoading === campaign.id + '-resume' ? <Loader2 size={10} className="animate-spin" /> : <Play size={10} />}
-                                                            Reanudar
-                                                        </button>
-                                                    )}
+                                                    <p className="font-bold text-sm leading-tight truncate">{campaign.name}</p>
+                                                    <p className="text-[10px] text-white/25 truncate mt-0.5">{campaign.strategy?.name || campaign.brief?.name}</p>
                                                 </div>
                                             </div>
-                                        )
-                                    })}
 
-                                    <Link href="/dashboard/services/ads/history"
-                                        className="flex items-center justify-center gap-2 py-3 rounded-2xl text-xs text-white/55 font-bold hover:text-white/75 transition-all"
-                                        style={{ background: `linear-gradient(180deg, #0B1B2B 0%, #081624 60%, #050B14 100%)`, border: '1px solid rgba(255,255,255,0.1)' }}>
-                                        Ver todas las campañas <ArrowRight size={11} />
-                                    </Link>
-                                </div>
-                            )}
-                        </div>
+                                            {/* status + action */}
+                                            <div className="flex flex-wrap items-center gap-2 w-full lg:w-auto shrink-0">
+                                                <span className={`flex items-center gap-1 text-[9px] font-black uppercase px-2 py-1 rounded-full border ${status.bg} ${status.color}`}>
+                                                    <span className={`w-1.5 h-1.5 rounded-full ${status.dot}`} />
+                                                    {status.label}
+                                                </span>
+                                                {campaign.status === 'READY' && (
+                                                    <Link href={`/dashboard/services/ads/preview/${campaign.id}`}
+                                                        className="text-[10px] font-bold px-3 py-1.5 rounded-xl transition-all"
+                                                        style={{ background: 'rgba(124,58,237,0.7)', color: '#e9d5ff', border: '1px solid rgba(139,92,246,0.4)' }}>
+                                                        Publicar →
+                                                    </Link>
+                                                )}
+                                                {campaign.status === 'DRAFT' && (
+                                                    <Link href={`/dashboard/services/ads/campaign/${campaign.strategyId || campaign.id}?edit=${campaign.id}`}
+                                                        className="text-[10px] font-bold px-3 py-1.5 rounded-xl transition-all"
+                                                        style={{ background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.5)', border: '1px solid rgba(255,255,255,0.1)' }}>
+                                                        Continuar
+                                                    </Link>
+                                                )}
+                                                {campaign.status === 'FAILED' && (
+                                                    <Link href={`/dashboard/services/ads/preview/${campaign.id}`}
+                                                        className="text-[10px] font-bold px-3 py-1.5 rounded-xl transition-all"
+                                                        style={{ background: 'rgba(239,68,68,0.1)', color: '#f87171', border: '1px solid rgba(239,68,68,0.25)' }}>
+                                                        Reintentar
+                                                    </Link>
+                                                )}
+                                                {campaign.status === 'PUBLISHED' && (
+                                                    <button
+                                                        onClick={() => handlePause(campaign.id)}
+                                                        disabled={actionLoading === campaign.id + '-pause'}
+                                                        className="flex items-center gap-1 text-[10px] font-bold px-3 py-1.5 rounded-xl transition-all disabled:opacity-40"
+                                                        style={{ background: 'rgba(251,146,60,0.1)', color: '#fb923c', border: '1px solid rgba(251,146,60,0.25)' }}>
+                                                        {actionLoading === campaign.id + '-pause' ? <Loader2 size={10} className="animate-spin" /> : <Pause size={10} />}
+                                                        Pausar
+                                                    </button>
+                                                )}
+                                                {campaign.status === 'PAUSED' && (
+                                                    <button
+                                                        onClick={() => handleResume(campaign.id)}
+                                                        disabled={actionLoading === campaign.id + '-resume'}
+                                                        className="flex items-center gap-1 text-[10px] font-bold px-3 py-1.5 rounded-xl transition-all disabled:opacity-40"
+                                                        style={{ background: 'rgba(52,211,153,0.1)', color: '#34d399', border: '1px solid rgba(52,211,153,0.25)' }}>
+                                                        {actionLoading === campaign.id + '-resume' ? <Loader2 size={10} className="animate-spin" /> : <Play size={10} />}
+                                                        Reanudar
+                                                    </button>
+                                                )}
+                                                {(campaign.status === 'PUBLISHED' || campaign.status === 'PAUSED') && (
+                                                    <Link href={`/dashboard/services/ads/campaign/${campaign.strategyId || campaign.id}?edit=${campaign.id}`}
+                                                        className="text-[10px] font-bold px-3 py-1.5 rounded-xl transition-all"
+                                                        style={{ background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.5)', border: '1px solid rgba(255,255,255,0.1)' }}>
+                                                        Editar
+                                                    </Link>
+                                                )}
+                                                <button
+                                                    onClick={() => handleDeleteCampaign(campaign.id)}
+                                                    disabled={actionLoading === campaign.id + '-delete'}
+                                                    title="Eliminar campaña"
+                                                    className="flex items-center gap-1 text-[10px] font-bold px-3 py-1.5 rounded-xl transition-all disabled:opacity-40"
+                                                    style={{ background: 'rgba(239,68,68,0.1)', color: '#f87171', border: '1px solid rgba(239,68,68,0.25)' }}>
+                                                    {actionLoading === campaign.id + '-delete' ? <Loader2 size={10} className="animate-spin" /> : <Trash2 size={10} />}
+                                                    Eliminar
+                                                </button>
+                                            </div>
+                                        </div>
+                                    )
+                                })}
+
+                                <Link href="/dashboard/services/ads/history"
+                                    className="flex items-center justify-center gap-2 py-3 rounded-2xl text-xs text-white/30 font-bold hover:text-white/60 transition-all"
+                                    style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)' }}>
+                                    Ver todas las campañas <ArrowRight size={11} />
+                                </Link>
+                            </div>
+                        )}
                     </div>
+                    {/* end grid */}
+                </div>
+
                 </div>
             )}
         </div>
+    )
+}
+
+/** Bloque de detalle con flechita: colapsado muestra 1, expandido muestra todos. */
+function DetailBlock({ title, emoji, items }: { title: string; emoji: string; items: string[] }) {
+    const [open, setOpen] = useState(false)
+    const list = items || []
+    const multiple = list.length > 1
+    return (
+        <div className="rounded-lg sm:rounded-xl p-1.5 sm:p-2.5" style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)' }}>
+            <button onClick={() => multiple && setOpen(o => !o)}
+                className={`w-full flex items-center gap-0.5 sm:gap-1 ${multiple ? 'cursor-pointer' : 'cursor-default'}`}>
+                <span className="text-[7px] sm:text-[9px] font-bold uppercase tracking-wide sm:tracking-widest text-white/30 flex-1 text-left truncate leading-tight">{emoji} {title}</span>
+                {list.length > 0 && <span className="text-[8px] sm:text-[9px] font-black text-white/40 tabular-nums">{list.length}</span>}
+                {multiple && <span className="text-white/45 text-[9px] sm:text-[10px] leading-none">{open ? '▴' : '▾'}</span>}
+            </button>
+            {list.length === 0 ? (
+                <p className="text-[9px] sm:text-[11px] text-white/20 mt-0.5 sm:mt-1">—</p>
+            ) : (
+                <ul className="mt-0.5 sm:mt-1 space-y-0.5">
+                    {(open ? list : list.slice(0, 1)).map((it, i) => (
+                        <li key={i} className="text-[9px] sm:text-[11px] font-semibold text-white/70 truncate leading-tight" title={it}>{it}</li>
+                    ))}
+                    {!open && multiple && (
+                        <li onClick={() => setOpen(true)} className="text-[8px] sm:text-[10px] font-bold text-blue-300/70 hover:text-blue-300 cursor-pointer">+{list.length - 1} más ▾</li>
+                    )}
+                </ul>
+            )}
         </div>
     )
 }

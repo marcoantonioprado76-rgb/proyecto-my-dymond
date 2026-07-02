@@ -12,8 +12,21 @@ export interface MetricRow {
     providerCampaignId: string
     spend: number
     impressions: number
-    clicks: number
-    conversions: number
+    clicks: number           // all clicks (engagement)
+    linkClicks: number       // inline_link_clicks — real link clicks only
+    reach: number
+    frequency?: number       // impressions / reach
+    conversions: number      // purchases + leads (pixel)
+    leads: number            // pixel leads only
+    purchases: number        // pixel purchases only
+    addToCart: number        // add to cart events
+    viewContent: number      // view content events
+    initiateCheckout: number // initiate checkout events
+    conversations: number    // WhatsApp + Messenger conversations started
+    messagingReplies: number // first replies in messaging
+    postEngagement: number   // likes + comments + shares + reactions
+    videoViews: number       // 3-second video views
+    landingPageViews: number // landing page views (after click)
     ctr?: number
     cpc?: number
     cpa?: number
@@ -27,9 +40,8 @@ export interface CampaignDraftPayload {
     budgetAmount: number
     geoLocations?: {
         countries?: string[]
-        regions?: Array<{ key: string; name?: string }>
-        cities?: Array<{ key: string; name?: string; radius?: number; distance_unit?: string }>
-        subcities?: Array<{ key: string; name?: string }>
+        regions?: Array<{ key: string; name: string }>
+        cities?: Array<{ key: string; name: string; radius?: number; distance_unit?: string }>
         custom_locations?: Array<{ lat: number; lng: number; radius: number; distance_unit: string; name?: string }>
     }
     ageMin?: number
@@ -51,12 +63,16 @@ export interface CampaignDraftPayload {
     assets?: Array<{
         type: 'IMAGE' | 'VIDEO'
         storageUrl: string
+        metaVideoId?: string       // video pre-subido a Meta (publicar sin esperar)
+        metaMediaStatus?: string   // processing | ready | error
     }>
     copies?: Array<{
         primaryText?: string
         headline?: string
         description?: string
         imageUrl?: string
+        metaVideoId?: string       // video pre-subido a Meta, alineado con imageUrl
+        metaMediaStatus?: string   // processing | ready | error
     }>
     // AI-generated audience interests resolved to Meta IDs
     audienceInterests?: Array<{ id: string; name: string }>
@@ -106,6 +122,7 @@ export interface IAdsAdapter {
 
     pauseCampaign(accessToken: string, adAccountId: string, providerCampaignId: string): Promise<boolean>
     resumeCampaign(accessToken: string, adAccountId: string, providerCampaignId: string): Promise<boolean>
+    deleteCampaign?(accessToken: string, adAccountId: string, providerCampaignId: string): Promise<boolean>
 
     fetchDailyMetrics(accessToken: string, adAccountId: string, from: Date, to: Date): Promise<MetricRow[]>
 }

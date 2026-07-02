@@ -7,10 +7,10 @@ import {
     CheckCircle2, AlertCircle, Plus, Target, Globe,
     MessageCircle, Eye, ShoppingCart, DollarSign,
     Brain, RefreshCw, Pencil, X, Save, Bookmark, Trash2,
-    Smartphone, Heart, BookMarked, Image as ImageIcon, Video
+    Smartphone, Heart, BookMarked, Clock, Image as ImageIcon, Video
 } from 'lucide-react'
+import { AiThinking } from '@/components/ads/AiThinking'
 import Link from 'next/link'
-import AIKeySelector from '@/components/AIKeySelector'
 
 interface Brief { id: string; name: string; industry: string; description: string }
 interface Strategy {
@@ -20,7 +20,7 @@ interface Strategy {
 }
 
 const PLATFORM_LABELS: Record<string, { label: string; letter: string; color: string; bg: string }> = {
-    META: { label: 'Meta Ads', letter: 'f', color: 'text-[#7DD3FC]', bg: 'bg-[#233B8F]/15 border-[#233B8F]/25' },
+    META: { label: 'Meta Ads', letter: 'f', color: 'text-blue-400', bg: 'bg-blue-500/15 border-blue-500/25' },
     TIKTOK: { label: 'TikTok Ads', letter: 'T', color: 'text-pink-400', bg: 'bg-pink-500/15 border-pink-500/25' },
     GOOGLE_ADS: { label: 'Google Ads', letter: 'G', color: 'text-yellow-400', bg: 'bg-yellow-500/15 border-yellow-500/25' },
 }
@@ -45,9 +45,9 @@ const OBJECTIVE_LABELS: Record<string, string> = {
 
 const OBJECTIVE_COLORS: Record<string, string> = {
     conversions: 'text-green-400',
-    leads: 'text-[#7DD3FC]',
-    traffic: 'text-[#B735B8]',
-    awareness: 'text-[#C9A7FF]',
+    leads: 'text-blue-400',
+    traffic: 'text-cyan-400',
+    awareness: 'text-purple-400',
     engagement: 'text-pink-400',
     app_promotion: 'text-orange-400',
 }
@@ -64,16 +64,6 @@ function WizardContent() {
     const router = useRouter()
     const searchParams = useSearchParams()
     const initialBriefId = searchParams.get('briefId')
-    // Si entran desde un dashboard de plataforma específica (Meta/TikTok/Google),
-    // saltamos el picker de plataforma. Sólo se respeta META por ahora (TikTok/Google
-    // están en construcción y el wizard quedaría sin estrategias).
-    const platformFromUrl = searchParams.get('platform')
-    const forcedPlatform = platformFromUrl === 'META' ? 'META' : null
-
-    // Hoy sólo Meta está activo → no mostramos el selector de plataforma:
-    // entramos directo como si el usuario ya hubiera elegido Meta.
-    // Cuando sumes TikTok/Google, poné esto en true y el selector vuelve solo.
-    const MULTI_PLATFORM = false
 
     const [step, setStep] = useState<1 | 2>(initialBriefId ? 2 : 1)
     const [briefs, setBriefs] = useState<Brief[]>([])
@@ -92,7 +82,7 @@ function WizardContent() {
     const [loadingAI, setLoadingAI] = useState(false)
     const [loadingSaved, setLoadingSaved] = useState(false)
     const [creating, setCreating] = useState(false)
-    const [creatingAndromeda, setCreatingAndromeda] = useState(false)
+    const [creatingId, setCreatingId] = useState<string | null>(null)
     const [error, setError] = useState<string | null>(null)
     const [aiError, setAiError] = useState<string | null>(null)
 
@@ -109,36 +99,34 @@ function WizardContent() {
         fetch('/api/ads/brief').then(r => r.json()).then(data => {
             const allBriefs: Brief[] = data.briefs || []
             setBriefs(allBriefs)
+            // Flujo unificado: si hay al menos un negocio, entrar DIRECTO a estrategias
+            // (con selector de negocio arriba). El paso 1 solo aparece si NO hay negocios.
             if (initialBriefId) {
                 const found = allBriefs.find(b => b.id === initialBriefId)
-                if (found) { setSelectedBrief(found); enterPlatformPicker() }
+                enterStrategies(found || allBriefs[0])
+            } else if (allBriefs.length >= 1) {
+                enterStrategies(allBriefs[0])
             }
             setLoadingBriefs(false)
         }).catch(() => setLoadingBriefs(false))
     }, [initialBriefId])
 
-    function enterPlatformPicker() {
+    // Como solo existe Meta Ads, saltamos el selector de plataforma y vamos directo
+    // a las estrategias del negocio (con la opción de generar con IA).
+    function enterStrategies(brief: Brief) {
         setStep(2)
-        // Con una sola plataforma activa (Meta) saltamos el selector y vamos
-        // directo al tipo de anuncio, como si Meta ya estuviera seleccionado.
-        // Sólo mostramos el selector si hay varias plataformas disponibles.
-        if (forcedPlatform || !MULTI_PLATFORM) {
-            setShowPlatformPicker(false)
-            setShowAdTypePicker(true)
-            setSelectedPlatform(forcedPlatform || 'META')
-        } else {
-            setShowPlatformPicker(true)
-            setShowAdTypePicker(false)
-            setSelectedPlatform(null)
-        }
-        setAiStrategies([])
-        setSavedStrategies([])
+        setSelectedBrief(brief)
+        setSelectedPlatform('META')
+        setShowPlatformPicker(false)
+        setShowAdTypePicker(false)
         setSelectedStrategy(null)
         setSelectedObjective(null)
         setSelectedDestination(null)
         setSelectedMediaPref(null)
+        setAiStrategies([])
         setAiError(null)
         setEditingId(null)
+        loadSavedStrategies(brief, 'META')
     }
 
     function pickPlatform(platform: string) {
@@ -154,19 +142,18 @@ function WizardContent() {
         setAiError(null)
     }
 
-    async function confirmAdType() {
-        if (!selectedPlatform) return
+    // Carga las estrategias guardadas del negocio (filtradas por negocio + plataforma).
+    function loadSavedStrategies(brief: Brief | null, platform: string, objective?: string | null, destination?: string | null) {
         setShowAdTypePicker(false)
         setSelectedStrategy(null)
         setAiStrategies([])
         setSavedStrategies([])
         setAiError(null)
-
-        // Load saved strategies (free). AI triggered on demand.
         setLoadingSaved(true)
-        const params = new URLSearchParams({ savedOnly: 'true', platform: selectedPlatform })
-        if (selectedObjective) params.set('objective', selectedObjective)
-        if (selectedDestination) params.set('destination', selectedDestination)
+        const params = new URLSearchParams({ savedOnly: 'true', platform })
+        if (brief) params.set('briefId', brief.id)
+        if (objective) params.set('objective', objective)
+        if (destination) params.set('destination', destination)
         fetch(`/api/ads/strategies?${params}`)
             .then(r => r.json())
             .then(data => {
@@ -181,6 +168,14 @@ function WizardContent() {
             })
             .catch(() => { setSavedStrategies([]); setActiveTab('ai') })
             .finally(() => setLoadingSaved(false))
+    }
+
+    // Genera con IA usando las opciones elegidas (objetivo/destino/creativo) y muestra el resultado
+    async function confirmAdType() {
+        if (!selectedPlatform) return
+        setShowAdTypePicker(false)
+        setActiveTab('ai')
+        await retryAI()
     }
 
     async function retryAI() {
@@ -276,64 +271,28 @@ function WizardContent() {
         finally { setDeletingId(null) }
     }
 
-    async function createCampaign() {
-        if (!selectedBrief || !selectedStrategy) return
-        setCreating(true); setError(null)
+    // Crea la campaña directo desde una estrategia (sin paso de "seleccionar")
+    async function createCampaign(strategyArg?: Strategy) {
+        const strat = strategyArg || selectedStrategy
+        if (!selectedBrief || !strat) return
+        setCreating(true); setCreatingId(strat.id); setError(null)
         try {
-            const name = `${selectedBrief.name} · ${selectedStrategy.name}`
+            const name = `${selectedBrief.name} · ${strat.name}`
             const res = await fetch('/api/ads/campaign', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     briefId: selectedBrief.id,
-                    strategyId: selectedStrategy.id,
+                    strategyId: strat.id,
                     name,
-                    dailyBudgetUSD: selectedStrategy.minBudgetUSD || 5,
+                    dailyBudgetUSD: strat.minBudgetUSD || 5,
                 })
             })
             const data = await res.json()
-            if (!res.ok) { setError(data.error || 'Error al crear campaña'); setCreating(false); return }
-            router.push(`/dashboard/services/ads/campaign/${selectedStrategy.id}?edit=${data.campaign.id}`)
+            if (!res.ok) { setError(data.error || 'Error al crear campaña'); setCreating(false); setCreatingId(null); return }
+            router.push(`/dashboard/services/ads/campaign/${strat.id}?edit=${data.campaign.id}`)
         } catch {
-            setError('Error de conexión'); setCreating(false)
-        }
-    }
-
-    // ── Método Andromeda (un toque): crea la estrategia y la campaña, y va al editor ──
-    async function useAndromeda() {
-        if (!selectedBrief) return
-        setCreatingAndromeda(true); setError(null)
-        try {
-            const r1 = await fetch('/api/ads/strategies/from-template', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    briefId: selectedBrief.id,
-                    method: 'andromeda',
-                    platform: selectedPlatform || 'META',
-                    objective: selectedObjective || undefined,
-                    destination: selectedDestination || undefined,
-                    mediaType: selectedMediaPref || undefined,
-                }),
-            })
-            const d1 = await r1.json()
-            if (!r1.ok) { setError(d1.error || 'No se pudo preparar la estrategia'); setCreatingAndromeda(false); return }
-            const strat = d1.strategy
-            const r2 = await fetch('/api/ads/campaign', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    briefId: selectedBrief.id,
-                    strategyId: strat.id,
-                    name: `${selectedBrief.name} · ${strat.name}`,
-                    dailyBudgetUSD: strat.minBudgetUSD || 8,
-                }),
-            })
-            const d2 = await r2.json()
-            if (!r2.ok) { setError(d2.error || 'Error al crear campaña'); setCreatingAndromeda(false); return }
-            router.push(`/dashboard/services/ads/campaign/${strat.id}?edit=${d2.campaign.id}`)
-        } catch {
-            setError('Error de conexión'); setCreatingAndromeda(false)
+            setError('Error de conexión'); setCreating(false); setCreatingId(null)
         }
     }
 
@@ -343,35 +302,28 @@ function WizardContent() {
     return (
         <div className="px-4 md:px-6 xl:px-8 pt-6 max-w-3xl xl:max-w-4xl mx-auto pb-24 text-white">
 
+            {/* Overlay animado al crear el anuncio (antes de ir al editor) */}
+            {creating && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[#08060f]/90 backdrop-blur-sm">
+                    <AiThinking messages={[
+                        'Creando tu anuncio…',
+                        'Preparando los creativos…',
+                        'Configurando la campaña…',
+                        'Aplicando tu estrategia…',
+                        'Casi listo…',
+                    ]} />
+                </div>
+            )}
+
             {/* Header */}
             <div className="flex items-center gap-4 mb-8">
-                <Link href="/dashboard/services/ads" className="w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-all">
+                <Link href="/dashboard/services/ads/meta" className="w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-all">
                     <ArrowLeft size={16} />
                 </Link>
                 <div className="flex-1">
                     <h1 className="text-xl font-black uppercase tracking-tighter">Nueva Campaña</h1>
-                    <p className="text-xs text-white/30">2 pasos para lanzar tu anuncio</p>
+                    <p className="text-xs text-white/30">Negocio → Estrategia → Publicar</p>
                 </div>
-                <AIKeySelector compact />
-            </div>
-
-            {/* Step indicators */}
-            <div className="flex items-center gap-2 mb-8">
-                {([1, 2] as const).map((s, i) => (
-                    <div key={s} className="flex items-center gap-2 flex-1">
-                        <div className={`flex items-center gap-2 ${step === s ? 'flex-1' : ''}`}>
-                            <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-black transition-all ${step > s ? 'bg-green-500 text-white' : step === s ? 'bg-gradient-to-r from-[#FF2D95] via-[#B735B8] to-[#233B8F] text-white shadow-[0_0_15px_rgba(183,53,184,0.5)]' : 'bg-white/5 border border-white/10 text-white/30'}`}>
-                                {step > s ? <CheckCircle2 size={14} /> : s}
-                            </div>
-                            {step === s && (
-                                <span className="text-xs font-bold text-white/70 whitespace-nowrap hidden sm:block">
-                                    {s === 1 ? 'Negocio' : 'Estrategia'}
-                                </span>
-                            )}
-                        </div>
-                        {i < 1 && <div className={`flex-1 h-px transition-all ${step > s ? 'bg-green-500/40' : 'bg-white/8'}`} />}
-                    </div>
-                ))}
             </div>
 
             {error && (
@@ -391,30 +343,30 @@ function WizardContent() {
                     </div>
 
                     {loadingBriefs ? (
-                        <div className="flex items-center justify-center py-16"><Loader2 className="animate-spin text-[#C9A7FF]" size={24} /></div>
+                        <div className="flex items-center justify-center py-16"><Loader2 className="animate-spin text-purple-400" size={24} /></div>
                     ) : briefs.length === 0 ? (
                         <div className="text-center py-16 bg-white/[0.015] border border-dashed border-white/10 rounded-3xl">
                             <Building2 size={28} className="text-white/20 mx-auto mb-3" />
                             <p className="text-white/40 font-bold mb-1">Sin negocios</p>
                             <p className="text-white/20 text-xs mb-5">Crea primero el perfil de tu negocio</p>
-                            <Link href="/dashboard/services/ads/brief" className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-[#FF2D95] via-[#B735B8] to-[#233B8F] text-white text-sm font-bold rounded-xl hover:opacity-90 transition-all">
+                            <Link href="/dashboard/services/ads/brief" className="inline-flex items-center gap-2 px-5 py-2.5 bg-purple-600 text-white text-sm font-bold rounded-xl hover:bg-purple-500 transition-all">
                                 <Plus size={14} /> Crear negocio
                             </Link>
                         </div>
                     ) : (
                         <div className="space-y-3">
                             {briefs.map(brief => (
-                                <button key={brief.id} onClick={() => { setSelectedBrief(brief); enterPlatformPicker() }}
-                                    className="w-full text-left bg-white/3 border border-white/8 rounded-2xl p-4 hover:border-[#B735B8]/40 hover:bg-[#B735B8]/5 transition-all group">
+                                <button key={brief.id} onClick={() => enterStrategies(brief)}
+                                    className="w-full text-left bg-white/3 border border-white/8 rounded-2xl p-4 hover:border-purple-500/40 hover:bg-purple-500/5 transition-all group">
                                     <div className="flex items-center gap-3">
-                                        <div className="w-10 h-10 rounded-xl bg-[#B735B8]/15 border border-[#B735B8]/20 flex items-center justify-center shrink-0">
-                                            <Building2 size={18} className="text-[#C9A7FF]" />
+                                        <div className="w-10 h-10 rounded-xl bg-purple-500/15 border border-purple-500/20 flex items-center justify-center shrink-0">
+                                            <Building2 size={18} className="text-purple-400" />
                                         </div>
                                         <div className="flex-1 min-w-0">
                                             <p className="font-bold text-sm">{brief.name}</p>
                                             <p className="text-xs text-white/40">{brief.industry}</p>
                                         </div>
-                                        <ArrowRight size={16} className="text-white/20 group-hover:text-[#C9A7FF] transition-all" />
+                                        <ArrowRight size={16} className="text-white/20 group-hover:text-purple-400 transition-all" />
                                     </div>
                                 </button>
                             ))}
@@ -431,27 +383,31 @@ function WizardContent() {
             {step === 2 && (
                 <div>
                     <div className="flex items-center gap-3 mb-6">
-                        <button onClick={() => setStep(1)} className="w-8 h-8 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-all">
+                        <button onClick={() => router.push('/dashboard/services/ads/meta')} className="w-8 h-8 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-all" title="Volver">
                             <ArrowLeft size={14} />
                         </button>
                         <div className="flex-1">
                             <div className="flex items-center gap-2 flex-wrap">
                                 <h2 className="text-lg font-black">
-                                    {showPlatformPicker ? 'Elige la plataforma' : showAdTypePicker ? 'Tipo de anuncio' : 'Estrategias recomendadas'}
+                                    {showAdTypePicker ? 'Configura tu anuncio' : 'Estrategias'}
                                 </h2>
-                                {plat && !showPlatformPicker && (
+                                {plat && !showAdTypePicker && (
                                     <span className={`text-[10px] font-black px-2 py-0.5 rounded-full border ${plat.bg} ${plat.color}`}>
                                         {plat.label}
                                     </span>
                                 )}
                             </div>
-                            {selectedBrief && <p className="text-xs text-white/30 mt-0.5">Para: <span className="text-[#C9A7FF]">{selectedBrief.name}</span></p>}
+                            {selectedBrief && <p className="text-xs text-white/30 mt-0.5">Para: <span className="text-purple-400">{selectedBrief.name}</span></p>}
                         </div>
-                        {MULTI_PLATFORM && !showPlatformPicker && !showAdTypePicker && !forcedPlatform && (
-                            <button onClick={() => { setShowPlatformPicker(true); setSelectedStrategy(null) }}
-                                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 text-xs text-white/40 hover:text-white/70 hover:bg-white/10 transition-all">
-                                <RefreshCw size={12} /> Cambiar
-                            </button>
+                        {/* Selector de negocio integrado (merge del paso 1): cambiar de negocio sin salir */}
+                        {!showAdTypePicker && briefs.length > 1 && (
+                            <select
+                                value={selectedBrief?.id || ''}
+                                onChange={e => { const b = briefs.find(x => x.id === e.target.value); if (b) { setSelectedStrategy(null); enterStrategies(b) } }}
+                                className="shrink-0 max-w-[40%] bg-white/5 border border-white/10 text-xs text-white/70 rounded-xl px-3 py-2 hover:bg-white/10 focus:outline-none focus:border-purple-500/40 transition-all cursor-pointer"
+                                title="Cambiar de negocio">
+                                {briefs.map(b => <option key={b.id} value={b.id} className="bg-[#0b0e1a]">{b.name}</option>)}
+                            </select>
                         )}
                     </div>
 
@@ -459,44 +415,93 @@ function WizardContent() {
                     {showPlatformPicker && (
                         <div>
                             <p className="text-xs text-white/30 mb-5 text-center">Selecciona la plataforma</p>
-                            {/* Solo Meta es seleccionable hoy: una sola acción clara, sin botones falsos */}
                             <div className="grid grid-cols-1 gap-3">
-                                <button onClick={() => pickPlatform('META')}
-                                    className="w-full flex items-center gap-4 p-5 rounded-2xl border text-left transition-all active:scale-[0.98] group border-[#233B8F]/25 hover:border-[#233B8F]/50 bg-[#233B8F]/5 hover:bg-[#233B8F]/10">
-                                    <div className="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 border bg-[#233B8F]/15 border-[#233B8F]/25">
-                                        <span className="font-black text-xl text-[#7DD3FC]">f</span>
-                                    </div>
-                                    <div className="flex-1 min-w-0">
-                                        <div className="flex items-center gap-2 mb-0.5">
-                                            <p className="font-black text-sm text-white">Meta Ads</p>
-                                            <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-white/5 border border-white/10 text-[#7DD3FC]">Facebook & Instagram</span>
-                                            <span className="text-[9px] font-black px-2 py-0.5 rounded-full"
-                                                style={{ background: 'rgba(34,197,94,0.12)', border: '1px solid rgba(34,197,94,0.25)', color: '#4ade80' }}>
-                                                DISPONIBLE
-                                            </span>
+                                {[
+                                    {
+                                        id: 'META', label: 'Meta Ads', sub: 'Facebook & Instagram', letter: 'f',
+                                        desc: 'Ideal para ventas directas por WhatsApp, leads, branding y audiencias amplias.',
+                                        color: 'text-blue-400', border: 'border-blue-500/25 hover:border-blue-500/50',
+                                        bg: 'bg-blue-500/5 hover:bg-blue-500/10', iconBg: 'bg-blue-500/15 border-blue-500/25',
+                                        comingSoon: false,
+                                    },
+                                ].map(p => p.comingSoon ? (
+                                    <div key={p.id}
+                                        className={`w-full flex items-center gap-4 p-5 rounded-2xl border text-left opacity-50 cursor-not-allowed ${p.border} ${p.bg}`}>
+                                        <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 border ${p.iconBg}`}>
+                                            <span className={`font-black text-xl ${p.color}`}>{p.letter}</span>
                                         </div>
-                                        <p className="text-xs text-white/35 leading-relaxed">Ideal para ventas directas por WhatsApp, leads, branding y audiencias amplias.</p>
+                                        <div className="flex-1 min-w-0">
+                                            <div className="flex items-center gap-2 mb-0.5">
+                                                <p className="font-black text-sm text-white">{p.label}</p>
+                                                <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-white/5 border border-white/10 ${p.color}`}>{p.sub}</span>
+                                                <span className="text-[9px] font-black px-2 py-0.5 rounded-full"
+                                                    style={{ background: 'rgba(251,146,60,0.15)', border: '1px solid rgba(251,146,60,0.3)', color: '#fb923c' }}>
+                                                    PRÓXIMAMENTE
+                                                </span>
+                                            </div>
+                                            <p className="text-xs text-white/35 leading-relaxed">{p.desc}</p>
+                                        </div>
+                                        <Clock size={16} className="text-white/20 shrink-0" />
                                     </div>
-                                    <ArrowRight size={16} className="text-[#7DD3FC] opacity-40 group-hover:opacity-100 shrink-0 transition-all" />
-                                </button>
+                                ) : (
+                                    <button key={p.id} onClick={() => pickPlatform(p.id)}
+                                        className={`w-full flex items-center gap-4 p-5 rounded-2xl border text-left transition-all active:scale-[0.98] group ${p.border} ${p.bg}`}>
+                                        <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 border ${p.iconBg}`}>
+                                            <span className={`font-black text-xl ${p.color}`}>{p.letter}</span>
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                            <div className="flex items-center gap-2 mb-0.5">
+                                                <p className="font-black text-sm text-white">{p.label}</p>
+                                                <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-white/5 border border-white/10 ${p.color}`}>{p.sub}</span>
+                                                <span className="text-[9px] font-black px-2 py-0.5 rounded-full"
+                                                    style={{ background: 'rgba(34,197,94,0.12)', border: '1px solid rgba(34,197,94,0.25)', color: '#4ade80' }}>
+                                                    DISPONIBLE
+                                                </span>
+                                            </div>
+                                            <p className="text-xs text-white/35 leading-relaxed">{p.desc}</p>
+                                        </div>
+                                        <ArrowRight size={16} className={`${p.color} opacity-40 group-hover:opacity-100 shrink-0 transition-all`} />
+                                    </button>
+                                ))}
                             </div>
                         </div>
                     )}
 
                     {/* ── Ad Type Picker ── */}
                     {showAdTypePicker && (
-                        <div className="space-y-6">
-                            <p className="text-xs text-white/30 text-center">Selecciona el tipo de anuncio que quieres crear. La IA generará estrategias enfocadas en lo que elijas.</p>
+                        <div className="space-y-4">
 
-                            {/* Objective */}
-                            <div>
-                                <p className="text-[10px] font-black uppercase tracking-widest text-white/40 mb-3">¿Cuál es tu objetivo?</p>
+                            {/* Business context */}
+                            {selectedBrief && (
+                                <div className="flex items-center gap-3 p-3.5 rounded-2xl border border-purple-500/20"
+                                    style={{ background: 'linear-gradient(135deg,rgba(124,58,237,0.12),rgba(37,99,235,0.05))' }}>
+                                    <div className="w-9 h-9 rounded-xl bg-purple-500/15 border border-purple-500/25 flex items-center justify-center shrink-0">
+                                        <Building2 size={16} className="text-purple-300" />
+                                    </div>
+                                    <div className="min-w-0">
+                                        <p className="text-[9px] font-black uppercase tracking-widest text-purple-300/60">Negocio</p>
+                                        <p className="text-sm font-bold text-white truncate">{selectedBrief.name}</p>
+                                    </div>
+                                </div>
+                            )}
+
+                            <div className="text-center pt-1">
+                                <h2 className="text-base font-black text-white">Configura tu anuncio</h2>
+                                <p className="text-xs text-white/35 mt-1">Elige el enfoque y la IA generará estrategias a medida. <span className="text-white/25">Todo es opcional.</span></p>
+                            </div>
+
+                            {/* Step 1 · Objective */}
+                            <div className="rounded-2xl border border-white/8 bg-white/[0.02] p-4">
+                                <div className="flex items-center gap-2 mb-3">
+                                    <span className="w-5 h-5 rounded-full bg-purple-600 text-white text-[10px] font-black flex items-center justify-center shrink-0">1</span>
+                                    <p className="text-xs font-bold text-white/80">¿Cuál es tu objetivo?</p>
+                                </div>
                                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                                     {[
                                         { id: 'conversions', label: 'Ventas', desc: 'Compras directas', icon: ShoppingCart, color: 'text-green-400', bg: 'bg-green-500/10 border-green-500/25' },
-                                        { id: 'leads', label: 'Clientes potenciales', desc: 'Captación de contactos', icon: MessageCircle, color: 'text-[#7DD3FC]', bg: 'bg-[#233B8F]/10 border-[#233B8F]/25' },
-                                        { id: 'traffic', label: 'Tráfico', desc: 'Visitas a tu sitio', icon: Globe, color: 'text-[#B735B8]', bg: 'bg-[#B735B8]/10 border-[#B735B8]/25' },
-                                        { id: 'awareness', label: 'Reconocimiento', desc: 'Dar a conocer tu marca', icon: Eye, color: 'text-[#C9A7FF]', bg: 'bg-[#B735B8]/10 border-[#B735B8]/25' },
+                                        { id: 'leads', label: 'Clientes potenciales', desc: 'Captación de contactos', icon: MessageCircle, color: 'text-blue-400', bg: 'bg-blue-500/10 border-blue-500/25' },
+                                        { id: 'traffic', label: 'Tráfico', desc: 'Visitas a tu sitio', icon: Globe, color: 'text-cyan-400', bg: 'bg-cyan-500/10 border-cyan-500/25' },
+                                        { id: 'awareness', label: 'Reconocimiento', desc: 'Dar a conocer tu marca', icon: Eye, color: 'text-purple-400', bg: 'bg-purple-500/10 border-purple-500/25' },
                                         { id: 'engagement', label: 'Interacción', desc: 'Likes, mensajes, chat', icon: Heart, color: 'text-pink-400', bg: 'bg-pink-500/10 border-pink-500/25' },
                                     ].map(obj => (
                                         <button key={obj.id} onClick={() => setSelectedObjective(selectedObjective === obj.id ? null : obj.id)}
@@ -509,16 +514,19 @@ function WizardContent() {
                                 </div>
                             </div>
 
-                            {/* Destination — only for META */}
+                            {/* Step 2 · Destination — only for META */}
                             {selectedPlatform === 'META' && (
-                                <div>
-                                    <p className="text-[10px] font-black uppercase tracking-widest text-white/40 mb-3">¿A dónde llevas al cliente?</p>
+                                <div className="rounded-2xl border border-white/8 bg-white/[0.02] p-4">
+                                    <div className="flex items-center gap-2 mb-3">
+                                        <span className="w-5 h-5 rounded-full bg-purple-600 text-white text-[10px] font-black flex items-center justify-center shrink-0">2</span>
+                                        <p className="text-xs font-bold text-white/80">¿A dónde llevas al cliente?</p>
+                                    </div>
                                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                                         {[
                                             { id: 'whatsapp', label: 'WhatsApp', icon: '💬', color: 'text-green-400', bg: 'bg-green-500/10 border-green-500/25', hidden: selectedObjective === 'traffic' || selectedObjective === 'awareness' },
-                                            { id: 'website', label: 'Sitio Web', icon: '🌐', color: 'text-[#7DD3FC]', bg: 'bg-[#233B8F]/10 border-[#233B8F]/25', hidden: selectedObjective === 'engagement' },
+                                            { id: 'website', label: 'Sitio Web', icon: '🌐', color: 'text-blue-400', bg: 'bg-blue-500/10 border-blue-500/25', hidden: selectedObjective === 'engagement' },
                                             { id: 'instagram', label: 'Instagram', icon: '📷', color: 'text-pink-400', bg: 'bg-pink-500/10 border-pink-500/25', hidden: false },
-                                            { id: 'messenger', label: 'Messenger', icon: '💬', color: 'text-[#C9A7FF]', bg: 'bg-[#B735B8]/10 border-[#B735B8]/25', hidden: selectedObjective === 'traffic' || selectedObjective === 'awareness' },
+                                            { id: 'messenger', label: 'Messenger', icon: '💬', color: 'text-purple-400', bg: 'bg-purple-500/10 border-purple-500/25', hidden: selectedObjective === 'traffic' || selectedObjective === 'awareness' },
                                         ].filter(d => !d.hidden).map(dest => (
                                             <button key={dest.id} onClick={() => setSelectedDestination(selectedDestination === dest.id ? null : dest.id)}
                                                 className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border text-left transition-all ${selectedDestination === dest.id ? `${dest.bg}` : 'bg-white/3 border-white/8 hover:border-white/20'}`}>
@@ -530,16 +538,19 @@ function WizardContent() {
                                 </div>
                             )}
 
-                            {/* Media type */}
-                            <div>
-                                <p className="text-[10px] font-black uppercase tracking-widest text-white/40 mb-3">¿Tipo de creativo?</p>
+                            {/* Step 3 · Media type */}
+                            <div className="rounded-2xl border border-white/8 bg-white/[0.02] p-4">
+                                <div className="flex items-center gap-2 mb-3">
+                                    <span className="w-5 h-5 rounded-full bg-purple-600 text-white text-[10px] font-black flex items-center justify-center shrink-0">{selectedPlatform === 'META' ? '3' : '2'}</span>
+                                    <p className="text-xs font-bold text-white/80">¿Tipo de creativo?</p>
+                                </div>
                                 <div className="flex gap-2">
                                     {[
                                         { id: 'image', label: 'Imagen', icon: ImageIcon },
                                         { id: 'video', label: 'Video', icon: Video },
                                     ].map(m => (
                                         <button key={m.id} onClick={() => setSelectedMediaPref(selectedMediaPref === m.id ? null : m.id)}
-                                            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border text-sm font-bold transition-all ${selectedMediaPref === m.id ? 'bg-[#B735B8]/15 border-[#B735B8]/40 text-[#C9A7FF]' : 'bg-white/3 border-white/8 text-white/40 hover:border-white/20'}`}>
+                                            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border text-sm font-bold transition-all ${selectedMediaPref === m.id ? 'bg-purple-500/15 border-purple-500/40 text-purple-300' : 'bg-white/3 border-white/8 text-white/40 hover:border-white/20'}`}>
                                             <m.icon size={14} /> {m.label}
                                         </button>
                                     ))}
@@ -552,93 +563,78 @@ function WizardContent() {
 
                             {/* Selected summary */}
                             {(selectedObjective || selectedDestination || selectedMediaPref) && (
-                                <div className="flex flex-wrap gap-2 p-3 bg-[#B735B8]/5 border border-[#B735B8]/15 rounded-xl">
-                                    <span className="text-[10px] text-[#C9A7FF]/60 font-bold uppercase tracking-widest w-full mb-0.5">La IA generará estrategias para:</span>
-                                    {selectedObjective && <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-[#B735B8]/15 border border-[#B735B8]/25 text-[#C9A7FF]">{OBJECTIVE_LABELS[selectedObjective]}</span>}
-                                    {selectedDestination && <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-white/8 border border-white/15 text-white/60">{selectedDestination}</span>}
+                                <div className="flex flex-wrap gap-2 p-3 bg-purple-500/5 border border-purple-500/15 rounded-xl">
+                                    <span className="text-[10px] text-purple-400/60 font-bold uppercase tracking-widest w-full mb-0.5">La IA generará estrategias para:</span>
+                                    {selectedObjective && <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-purple-500/15 border border-purple-500/25 text-purple-300">{OBJECTIVE_LABELS[selectedObjective]}</span>}
+                                    {selectedDestination && <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-white/8 border border-white/15 text-white/60">{DESTINATION_LABELS[selectedDestination] || selectedDestination}</span>}
                                     {selectedMediaPref && <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-white/8 border border-white/15 text-white/60">{selectedMediaPref === 'image' ? 'Imagen' : 'Video'}</span>}
                                 </div>
                             )}
 
                             <button onClick={confirmAdType}
-                                className="w-full flex items-center justify-center gap-2 py-4 rounded-2xl font-bold text-sm transition-all"
-                                style={{ background: 'linear-gradient(135deg, #FF2D95 0%, #B735B8 48%, #233B8F 100%)', boxShadow: '0 0 24px rgba(255,255,255,0.15)' }}>
+                                className="btn-ai-glass w-full flex items-center justify-center gap-2 py-4 rounded-2xl font-black text-sm text-white transition-all active:scale-[0.99]">
                                 <Brain size={16} /> Generar estrategias con IA
                             </button>
-                            <p className="text-center text-[10px] text-white/20">Las selecciones son opcionales — puedes continuar sin elegir nada y la IA sugerirá lo mejor para tu negocio</p>
+                            <p className="text-center text-[10px] text-white/20">Puedes continuar sin elegir nada — la IA sugerirá lo mejor para tu negocio.</p>
                         </div>
                     )}
 
                     {/* ── Strategies view ── */}
                     {!showPlatformPicker && !showAdTypePicker && (
                         <>
-                            {/* ⭐ Método Andromeda — recomendado (un toque) */}
-                            {selectedBrief && (
-                                <div className="mb-5 rounded-2xl p-4 sm:p-5 relative overflow-hidden"
-                                    style={{ background: 'linear-gradient(135deg, rgba(35,59,143,0.16), rgba(183,53,184,0.14))', border: '1px solid rgba(35,59,143,0.35)' }}>
-                                    <span className="inline-block text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full mb-2.5"
-                                        style={{ background: 'rgba(250,204,21,0.15)', color: '#facc15', border: '1px solid rgba(250,204,21,0.3)' }}>
-                                        ⭐ Recomendado · Lo más fácil
-                                    </span>
-                                    <div className="flex items-start gap-3">
-                                        <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 text-lg"
-                                            style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.12)' }}>🚀</div>
-                                        <div className="flex-1 min-w-0">
-                                            <h3 className="font-black text-sm sm:text-base">Método Andromeda</h3>
-                                            <p className="text-xs text-white/55 mt-1 leading-relaxed">
-                                                La IA crea tus anuncios y Meta encuentra solo a tus compradores
-                                                {selectedDestination === 'website' ? ' en tu página web' : selectedDestination === 'instagram' ? ' en Instagram' : ' por WhatsApp'}. Tú solo eliges cuánto invertir.
-                                            </p>
-                                            <p className="text-[11px] text-white/35 mt-1.5">✓ La IA hace casi todo · Desde $8/día · Listo en 2 min</p>
-                                        </div>
-                                    </div>
-                                    <button onClick={useAndromeda} disabled={creatingAndromeda}
-                                        className="mt-3 w-full flex items-center justify-center gap-2 py-3 rounded-xl font-black text-sm text-white transition-all active:scale-[0.98] disabled:opacity-60"
-                                        style={{ background: 'linear-gradient(135deg, #FF2D95 0%, #B735B8 48%, #233B8F 100%)' }}>
-                                        {creatingAndromeda
-                                            ? <><Loader2 size={16} className="animate-spin" /> Preparando tu campaña…</>
-                                            : <><Sparkles size={16} /> Usar este método →</>}
-                                    </button>
+                            {/* Acción principal: generar con IA */}
+                            <button onClick={() => { setShowAdTypePicker(true); setSelectedStrategy(null) }}
+                                className="btn-ai-glass w-full flex items-center justify-center gap-2 mb-4 py-3.5 rounded-2xl font-black text-sm text-white transition-all active:scale-[0.99]">
+                                <Sparkles size={16} /> Generar estrategias con IA
+                            </button>
+
+                            {/* Chip: con qué opciones se generó */}
+                            {activeTab === 'ai' && aiStrategies.length > 0 && (selectedObjective || selectedDestination || selectedMediaPref) && (
+                                <div className="flex flex-wrap items-center gap-1.5 mb-4">
+                                    <span className="text-[10px] text-white/30 font-bold uppercase tracking-widest">Generado para:</span>
+                                    {selectedObjective && <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-500/15 border border-purple-500/25 text-purple-300">{OBJECTIVE_LABELS[selectedObjective] || selectedObjective}</span>}
+                                    {selectedDestination && <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-white/8 border border-white/15 text-white/60">{DESTINATION_LABELS[selectedDestination] || selectedDestination}</span>}
+                                    {selectedMediaPref && <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-white/8 border border-white/15 text-white/60">{selectedMediaPref === 'image' ? 'Imagen' : 'Video'}</span>}
                                 </div>
                             )}
 
-                            {/* Tabs */}
-                            <div className="flex gap-1 p-1 bg-white/4 border border-white/8 rounded-xl mb-5">
-                                <button
-                                    onClick={() => { setActiveTab('ai'); if (aiStrategies.length === 0 && !loadingAI && !aiError) retryAI() }}
-                                    className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-xs font-bold transition-all ${activeTab === 'ai' ? 'bg-gradient-to-r from-[#FF2D95] via-[#B735B8] to-[#233B8F] text-white shadow-[0_0_12px_rgba(183,53,184,0.3)]' : 'text-white/40 hover:text-white/60'}`}
-                                >
-                                    {loadingAI
-                                        ? <Loader2 size={12} className="animate-spin" />
-                                        : <Brain size={12} />
+                            {/* Encabezado de la vista actual + acceso a Guardadas */}
+                            <div className="flex items-center justify-between mb-4">
+                                <p className="text-xs font-black uppercase tracking-widest text-white/40 flex items-center gap-1.5">
+                                    {activeTab === 'ai'
+                                        ? <><Brain size={12} className="text-purple-400" /> Sugerencias{aiStrategies.length > 0 ? ` (${aiStrategies.length})` : ''}</>
+                                        : <><BookMarked size={12} className="text-green-400" /> Guardadas{savedStrategies.length > 0 ? ` (${savedStrategies.length})` : ''}</>
                                     }
-                                    IA {!loadingAI && aiStrategies.length > 0 && <span className="opacity-60">({aiStrategies.length})</span>}
-                                </button>
+                                </p>
                                 <button
-                                    onClick={() => setActiveTab('saved')}
-                                    className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-xs font-bold transition-all ${activeTab === 'saved' ? 'bg-green-600 text-white shadow-[0_0_12px_rgba(34,197,94,0.3)]' : 'text-white/40 hover:text-white/60'}`}
+                                    onClick={() => setActiveTab(activeTab === 'ai' ? 'saved' : 'ai')}
+                                    className="flex items-center gap-1.5 text-[11px] font-bold px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 text-white/60 hover:text-white hover:border-white/20 transition-all shrink-0"
                                 >
-                                    {loadingSaved
-                                        ? <Loader2 size={12} className="animate-spin" />
-                                        : <BookMarked size={12} />
+                                    {activeTab === 'ai'
+                                        ? <><BookMarked size={12} /> Guardadas{savedStrategies.length > 0 ? ` (${savedStrategies.length})` : ''}</>
+                                        : <><Brain size={12} /> Sugerencias{aiStrategies.length > 0 ? ` (${aiStrategies.length})` : ''}</>
                                     }
-                                    Guardadas {!loadingSaved && savedStrategies.length > 0 && <span className="opacity-60">({savedStrategies.length})</span>}
                                 </button>
                             </div>
 
                             {/* Loading */}
-                            {isLoadingStrategies && (
+                            {isLoadingStrategies && activeTab === 'ai' && (
+                                <AiThinking messages={[
+                                    'Analizando tu negocio…',
+                                    'Diseñando estrategias a medida…',
+                                    'Eligiendo objetivos y audiencias…',
+                                    'Aplicando las mejores prácticas (Andromeda)…',
+                                    'Definiendo presupuesto y formato…',
+                                    'Casi listo…',
+                                ]} className="py-16" />
+                            )}
+                            {isLoadingStrategies && activeTab === 'saved' && (
                                 <div className="flex flex-col items-center justify-center py-20 gap-4">
                                     <div className="relative">
-                                        <div className={`w-14 h-14 border-2 rounded-full animate-spin ${activeTab === 'ai' ? 'border-[#B735B8]/20 border-t-[#B735B8]' : 'border-green-500/20 border-t-green-500'}`} />
-                                        {activeTab === 'ai'
-                                            ? <Brain size={20} className="text-[#C9A7FF] absolute inset-0 m-auto" />
-                                            : <BookMarked size={20} className="text-green-400 absolute inset-0 m-auto" />
-                                        }
+                                        <div className="w-14 h-14 border-2 rounded-full animate-spin border-green-500/20 border-t-green-500" />
+                                        <BookMarked size={20} className="text-green-400 absolute inset-0 m-auto" />
                                     </div>
-                                    <p className="text-white/60 font-bold text-sm">
-                                        {activeTab === 'ai' ? 'La IA está analizando tu negocio...' : 'Cargando estrategias guardadas...'}
-                                    </p>
+                                    <p className="text-white/60 font-bold text-sm">Cargando estrategias guardadas...</p>
                                 </div>
                             )}
 
@@ -649,8 +645,23 @@ function WizardContent() {
                                     <p className="text-red-400 font-bold text-sm mb-1">Error al generar estrategias</p>
                                     <p className="text-xs text-white/30 mb-5">{aiError}</p>
                                     <button onClick={retryAI}
-                                        className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#FF2D95] via-[#B735B8] to-[#233B8F] text-white rounded-xl text-sm font-bold hover:opacity-90 transition-all">
+                                        className="inline-flex items-center gap-2 px-4 py-2 bg-purple-600 rounded-xl text-sm font-bold hover:bg-purple-500 transition-all">
                                         <RefreshCw size={14} /> Reintentar
+                                    </button>
+                                </div>
+                            )}
+
+                            {/* AI empty — opción de generar con IA */}
+                            {!isLoadingStrategies && activeTab === 'ai' && !aiError && aiStrategies.length === 0 && (
+                                <div className="py-12 text-center">
+                                    <div className="w-12 h-12 rounded-2xl bg-purple-500/10 border border-purple-500/25 flex items-center justify-center mx-auto mb-3">
+                                        <Brain size={22} className="text-purple-400" />
+                                    </div>
+                                    <p className="text-white/70 font-bold text-sm mb-1">Genera estrategias con IA</p>
+                                    <p className="text-xs text-white/30 mb-5">La IA analizará tu negocio y creará estrategias de anuncios a medida.</p>
+                                    <button onClick={() => setShowAdTypePicker(true)}
+                                        className="btn-ai-glass inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-black text-white transition-all active:scale-[0.98]">
+                                        <Brain size={14} /> Generar estrategias con IA
                                     </button>
                                 </div>
                             )}
@@ -661,8 +672,8 @@ function WizardContent() {
                                     <BookMarked size={28} className="text-white/15 mx-auto mb-3" />
                                     <p className="text-white/40 font-bold text-sm mb-1">Sin estrategias guardadas</p>
                                     <p className="text-xs text-white/25 mb-4">Guarda una estrategia de IA para reutilizarla aquí</p>
-                                    <button onClick={() => { setActiveTab('ai'); if (aiStrategies.length === 0 && !loadingAI && !aiError) retryAI() }}
-                                        className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#FF2D95] via-[#B735B8] to-[#233B8F] text-white rounded-xl text-sm font-bold hover:opacity-90 transition-all">
+                                    <button onClick={() => setShowAdTypePicker(true)}
+                                        className="inline-flex items-center gap-2 px-4 py-2 bg-purple-600/80 rounded-xl text-sm font-bold hover:bg-purple-600 transition-all">
                                         <Brain size={14} /> Generar con IA
                                     </button>
                                 </div>
@@ -671,14 +682,15 @@ function WizardContent() {
                             {/* Strategy cards */}
                             {!isLoadingStrategies && strategies.length > 0 && (
                                 <>
-                                    <div className="space-y-3 mb-6">
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3 mb-6 items-start">
                                         {strategies.map(strategy => {
                                             const isSelected = selectedStrategy?.id === strategy.id
                                             const isEditing = editingId === strategy.id
                                             const stratPlat = PLATFORM_LABELS[strategy.platform]
                                             return (
                                                 <div key={strategy.id}
-                                                    className={`rounded-2xl border transition-all ${isSelected ? 'border-[#B735B8]/60 bg-[#B735B8]/10 shadow-[0_0_20px_rgba(183,53,184,0.15)]' : 'border-white/8 bg-white/3 hover:border-white/20'}`}>
+                                                    className={`rounded-2xl border transition-all ${isSelected ? 'border-purple-500/70 shadow-[0_0_24px_rgba(139,92,246,0.22)]' : 'border-white/12 hover:border-purple-500/40'}`}
+                                                    style={{ background: isSelected ? 'linear-gradient(160deg, rgba(139,92,246,0.16), rgba(37,99,235,0.06))' : 'linear-gradient(160deg, rgba(255,255,255,0.055), rgba(255,255,255,0.015))' }}>
 
                                                     <div className="p-4">
                                                         <div className="flex items-start gap-3">
@@ -688,26 +700,26 @@ function WizardContent() {
                                                             <div className="flex-1 min-w-0">
                                                                 <div className="flex items-start gap-2">
                                                                     <p className="font-bold text-sm flex-1 leading-snug">{strategy.name}</p>
-                                                                    {isSelected && !isEditing && <CheckCircle2 size={16} className="text-[#C9A7FF] shrink-0 mt-0.5" />}
+                                                                    {isSelected && !isEditing && <CheckCircle2 size={16} className="text-purple-400 shrink-0 mt-0.5" />}
                                                                 </div>
                                                                 {!isEditing && (
                                                                     <>
-                                                                        <p className="text-xs text-white/40 mt-1 leading-relaxed">{strategy.description}</p>
+                                                                        <p className="text-xs text-white/70 mt-1.5 leading-relaxed">{strategy.description}</p>
                                                                         {strategy.reason && (
-                                                                            <div className="mt-2 flex items-start gap-1.5 px-2.5 py-1.5 rounded-lg"
-                                                                                style={{ background: 'rgba(183,53,184,0.08)', border: '1px solid rgba(183,53,184,0.15)' }}>
-                                                                                <Sparkles size={10} className="text-[#C9A7FF] shrink-0 mt-0.5" />
-                                                                                <p className="text-[10px] text-[#C9A7FF]/80 leading-relaxed">{strategy.reason}</p>
+                                                                            <div className="mt-2.5 flex items-start gap-1.5 px-3 py-2 rounded-lg"
+                                                                                style={{ background: 'rgba(139,92,246,0.12)', border: '1px solid rgba(139,92,246,0.28)' }}>
+                                                                                <Sparkles size={11} className="text-purple-300 shrink-0 mt-0.5" />
+                                                                                <p className="text-[11px] text-purple-100/90 leading-relaxed">{strategy.reason}</p>
                                                                             </div>
                                                                         )}
-                                                                        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-2.5">
-                                                                            <span className={`flex items-center gap-1 text-[10px] font-bold ${OBJECTIVE_COLORS[strategy.objective] || 'text-white/35'}`}>
+                                                                        <div className="flex flex-wrap items-center gap-1.5 mt-3">
+                                                                            <span className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded-full bg-white/8 border border-white/10 ${OBJECTIVE_COLORS[strategy.objective] || 'text-white/55'}`}>
                                                                                 {OBJECTIVE_ICONS[strategy.objective] || <Target size={10} />}
                                                                                 {OBJECTIVE_LABELS[strategy.objective] || strategy.objective}
                                                                             </span>
-                                                                            <span className="text-[10px] text-white/25">{DESTINATION_LABELS[strategy.destination] || strategy.destination}</span>
-                                                                            <span className="text-[10px] text-white/25">{strategy.mediaCount} {strategy.mediaType === 'video' ? 'videos' : 'imágenes'}</span>
-                                                                            <span className="flex items-center gap-0.5 text-[10px] text-white/25">
+                                                                            <span className="inline-flex items-center text-[10px] font-semibold px-2 py-1 rounded-full bg-white/6 border border-white/10 text-white/60">{DESTINATION_LABELS[strategy.destination] || strategy.destination}</span>
+                                                                            <span className="inline-flex items-center text-[10px] font-semibold px-2 py-1 rounded-full bg-white/6 border border-white/10 text-white/60">{strategy.mediaCount} {strategy.mediaType === 'video' ? 'videos' : 'imágenes'}</span>
+                                                                            <span className="inline-flex items-center gap-0.5 text-[10px] font-bold px-2 py-1 rounded-full bg-emerald-500/12 border border-emerald-500/25 text-emerald-300">
                                                                                 <DollarSign size={9} /> desde ${strategy.minBudgetUSD}/día
                                                                             </span>
                                                                         </div>
@@ -731,7 +743,7 @@ function WizardContent() {
                                                                     <input
                                                                         value={editForm.name || ''}
                                                                         onChange={e => setEditForm(f => ({ ...f, name: e.target.value }))}
-                                                                        className="w-full bg-white/5 border border-white/20 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-[#B735B8]/50"
+                                                                        className="w-full bg-[#1c1d2e] border border-white/20 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-500/50"
                                                                     />
                                                                 </div>
                                                                 <div>
@@ -740,14 +752,14 @@ function WizardContent() {
                                                                         value={editForm.description || ''}
                                                                         onChange={e => setEditForm(f => ({ ...f, description: e.target.value }))}
                                                                         rows={2}
-                                                                        className="w-full bg-white/5 border border-white/20 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-[#B735B8]/50 resize-none"
+                                                                        className="w-full bg-[#1c1d2e] border border-white/20 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-500/50 resize-none"
                                                                     />
                                                                 </div>
                                                                 <div className="grid grid-cols-2 gap-3">
                                                                     <div>
                                                                         <label className="text-[10px] font-bold text-white/30 uppercase tracking-widest block mb-1">Objetivo</label>
                                                                         <select value={editForm.objective || ''} onChange={e => setEditForm(f => ({ ...f, objective: e.target.value }))}
-                                                                            className="w-full bg-white/5 border border-white/20 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-[#B735B8]/50 [&>option]:bg-[#081624]">
+                                                                            className="w-full bg-[#1c1d2e] border border-white/20 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-500/50 [&>option]:bg-[#1c1d2e]">
                                                                             <option value="conversions">Ventas</option>
                                                                             <option value="leads">Clientes potenciales</option>
                                                                             <option value="traffic">Tráfico</option>
@@ -759,18 +771,17 @@ function WizardContent() {
                                                                     <div>
                                                                         <label className="text-[10px] font-bold text-white/30 uppercase tracking-widest block mb-1">Destino</label>
                                                                         <select value={editForm.destination || ''} onChange={e => setEditForm(f => ({ ...f, destination: e.target.value }))}
-                                                                            className="w-full bg-white/5 border border-white/20 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-[#B735B8]/50 [&>option]:bg-[#081624]">
+                                                                            className="w-full bg-[#1c1d2e] border border-white/20 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-500/50 [&>option]:bg-[#1c1d2e]">
                                                                             <option value="whatsapp">WhatsApp</option>
                                                                             <option value="instagram">Instagram</option>
                                                                             <option value="website">Sitio web</option>
                                                                             <option value="messenger">Messenger</option>
-                                                                            <option value="tiktok">TikTok</option>
                                                                         </select>
                                                                     </div>
                                                                     <div>
                                                                         <label className="text-[10px] font-bold text-white/30 uppercase tracking-widest block mb-1">Tipo media</label>
                                                                         <select value={editForm.mediaType || ''} onChange={e => setEditForm(f => ({ ...f, mediaType: e.target.value }))}
-                                                                            className="w-full bg-white/5 border border-white/20 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-[#B735B8]/50 [&>option]:bg-[#081624]">
+                                                                            className="w-full bg-[#1c1d2e] border border-white/20 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-500/50 [&>option]:bg-[#1c1d2e]">
                                                                             <option value="image">Imagen</option>
                                                                             <option value="video">Video</option>
                                                                             <option value="carousel">Carrusel</option>
@@ -781,7 +792,7 @@ function WizardContent() {
                                                                         <input type="number" min={1} max={20}
                                                                             value={editForm.mediaCount || 5}
                                                                             onChange={e => setEditForm(f => ({ ...f, mediaCount: parseInt(e.target.value) || 5 }))}
-                                                                            className="w-full bg-white/5 border border-white/20 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-[#B735B8]/50"
+                                                                            className="w-full bg-[#1c1d2e] border border-white/20 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-500/50"
                                                                         />
                                                                     </div>
                                                                     <div className="col-span-2">
@@ -789,12 +800,12 @@ function WizardContent() {
                                                                         <input type="number" min={1}
                                                                             value={editForm.minBudgetUSD || 5}
                                                                             onChange={e => setEditForm(f => ({ ...f, minBudgetUSD: parseFloat(e.target.value) || 5 }))}
-                                                                            className="w-full bg-white/5 border border-white/20 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-[#B735B8]/50"
+                                                                            className="w-full bg-[#1c1d2e] border border-white/20 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-500/50"
                                                                         />
                                                                     </div>
                                                                 </div>
                                                                 <button onClick={() => saveEdit(strategy.id)} disabled={saving}
-                                                                    className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-gradient-to-r from-[#FF2D95] via-[#B735B8] to-[#233B8F] hover:opacity-90 disabled:opacity-50 text-white text-sm font-bold transition-all">
+                                                                    className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 disabled:opacity-50 text-white text-sm font-bold transition-all">
                                                                     {saving ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
                                                                     Guardar cambios
                                                                 </button>
@@ -805,15 +816,13 @@ function WizardContent() {
                                                         {!isEditing && (
                                                             <div className="mt-3 space-y-2">
                                                                 <button
-                                                                    onClick={() => setSelectedStrategy(isSelected ? null : strategy)}
-                                                                    className={`w-full py-2 rounded-xl text-xs font-bold transition-all ${isSelected
-                                                                        ? 'bg-[#B735B8]/20 border border-[#B735B8]/40 text-[#C9A7FF]'
-                                                                        : 'bg-white/5 border border-white/10 text-white/50 hover:bg-white/10'
-                                                                    }`}
+                                                                    onClick={() => createCampaign(strategy)}
+                                                                    disabled={creating}
+                                                                    className="w-full flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-purple-600 to-blue-600 hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-[0_0_18px_rgba(139,92,246,0.18)]"
                                                                 >
-                                                                    {isSelected
-                                                                        ? <span className="flex items-center justify-center gap-1.5"><CheckCircle2 size={12} /> Seleccionada</span>
-                                                                        : 'Seleccionar esta estrategia'
+                                                                    {creatingId === strategy.id
+                                                                        ? <><Loader2 size={13} className="animate-spin" /> Creando anuncio…</>
+                                                                        : <><Sparkles size={13} /> Crear anuncio</>
                                                                     }
                                                                 </button>
                                                                 <div className="flex gap-2">
@@ -850,15 +859,6 @@ function WizardContent() {
                                             )
                                         })}
                                     </div>
-
-                                    {/* Create button */}
-                                    <button onClick={createCampaign} disabled={!selectedStrategy || creating}
-                                        className="w-full flex items-center justify-center gap-2 py-4 rounded-2xl bg-gradient-to-r from-[#FF2D95] via-[#B735B8] to-[#233B8F] text-white font-bold hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-[0_0_30px_rgba(183,53,184,0.2)]">
-                                        {creating
-                                            ? <><Loader2 size={18} className="animate-spin" /> Creando campaña...</>
-                                            : <><Sparkles size={18} /> {selectedStrategy ? 'Crear campaña y continuar' : 'Selecciona una estrategia'}</>
-                                        }
-                                    </button>
                                 </>
                             )}
                         </>
@@ -871,14 +871,12 @@ function WizardContent() {
 
 export default function WizardPage() {
     return (
-    <div className="font-ui" style={{ minHeight: '100vh', color: '#fff', background: 'radial-gradient(circle at top right, rgba(255,9,108,0.07), transparent 30%), radial-gradient(circle at bottom left, rgba(106,53,217,0.10), transparent 32%), linear-gradient(180deg, #0B1B2B 0%, #081624 55%, #050B14 100%)' }}>
         <Suspense fallback={
             <div className="flex items-center justify-center min-h-screen">
-                <Loader2 className="animate-spin text-[#C9A7FF]" size={28} />
+                <Loader2 className="animate-spin text-purple-400" size={28} />
             </div>
         }>
             <WizardContent />
         </Suspense>
-    </div>
     )
 }

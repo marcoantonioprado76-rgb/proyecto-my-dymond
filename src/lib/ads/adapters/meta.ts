@@ -90,6 +90,30 @@ export class MetaAdapter implements IAdsAdapter {
         }))
     }
 
+    /** Business Managers (administrador comercial) a los que pertenece el usuario. Best-effort. */
+    async listBusinesses(accessToken: string): Promise<Array<{ id: string; name: string }>> {
+        try {
+            const data = await this.api.get<any>(`/${this.apiVersion}/me/businesses`, {
+                params: { access_token: accessToken, fields: 'id,name' },
+            })
+            return (data.data || []).map((b: any) => ({ id: String(b.id), name: String(b.name || b.id) }))
+        } catch {
+            return [] // sin permiso business_management → simplemente no se muestra
+        }
+    }
+
+    /** Devuelve el id de la cuenta de Instagram conectada a la página, o null si no hay. */
+    async getPageInstagramId(accessToken: string, pageId: string): Promise<string | null> {
+        try {
+            const data = await this.api.get<any>(`/${this.apiVersion}/${pageId}`, {
+                params: { access_token: accessToken, fields: 'connected_instagram_account{id}' }
+            })
+            return data?.connected_instagram_account?.id || null
+        } catch {
+            return null
+        }
+    }
+
     async listPages(accessToken: string): Promise<any[]> {
         const data = await this.api.get<any>(`/${this.apiVersion}/me/accounts`, {
             params: {
@@ -104,14 +128,20 @@ export class MetaAdapter implements IAdsAdapter {
             let whatsappNumbers: string[] = []
 
             try {
+                // v21.0 with page token — tries whatsapp_number + whatsapp_accounts edge
                 const wpRes = await this.api.get<any>(`/v21.0/${page.id}`, {
                     params: {
                         access_token: pageToken,
-                        fields: 'whatsapp_number'
+                        fields: 'whatsapp_number,whatsapp_accounts{phone_number,default_whatsapp_number}'
                     }
                 })
+                console.log(`[listPages] Page "${page.name}" — whatsapp:`, wpRes.whatsapp_number || 'none')
                 whatsappNumber = wpRes.whatsapp_number || null
-                if (whatsappNumber) whatsappNumbers = [whatsappNumber]
+                const waAccounts = wpRes.whatsapp_accounts?.data || []
+                if (waAccounts.length > 0) {
+                    whatsappNumbers = waAccounts.map((a: any) => a.phone_number || a.default_whatsapp_number).filter(Boolean)
+                    if (!whatsappNumber) whatsappNumber = whatsappNumbers[0] || null
+                }
             } catch (e) { console.log(`[listPages] Page "${page.name}" error:`, e) }
 
             return {
@@ -202,6 +232,28 @@ export class MetaAdapter implements IAdsAdapter {
         }
     }
 
+    /**
+     * Sube un video a Meta por URL y devuelve el video_id de inmediato.
+     * Meta descarga y procesa (transcodifica) en background — NO espera aquí.
+     * Se usa al CARGAR el archivo para que al publicar ya esté procesado.
+     */
+    async uploadVideoByUrl(accessToken: string, adAccountId: string, fileUrl: string): Promise<string> {
+        const res = await this.api.post<any>(`/${this.apiVersion}/${adAccountId}/advideos`, {
+            file_url: fileUrl,
+            access_token: accessToken,
+        })
+        if (!res?.id) throw new Error('Meta no devolvió un video_id al subir el video')
+        return res.id
+    }
+
+    /** Consulta el estado de procesamiento de un video en Meta (+ thumbnail si está listo). */
+    async getVideoStatus(accessToken: string, videoId: string): Promise<{ status: string; thumbnailUrl?: string }> {
+        const res = await this.api.get<any>(`/${this.apiVersion}/${videoId}`, {
+            params: { fields: 'status,picture', access_token: accessToken },
+        })
+        return { status: res?.status?.video_status || 'unknown', thumbnailUrl: res?.picture }
+    }
+
     async publishFromDraft(accessToken: string, adAccountId: string, draft: CampaignDraftPayload): Promise<PublishResult> {
         console.log(`[Meta] Starting publication for: ${draft.name}`)
 
@@ -210,25 +262,23 @@ export class MetaAdapter implements IAdsAdapter {
             throw new Error('Se requiere una Página de Facebook para publicar en Meta. Selecciónala en la configuración de la campaña.')
         }
 
-        // DSA (beneficiario/pagador): Meta exige declarar quién se promociona y quién paga.
-        // Lo rellenamos automáticamente con el nombre de la Página (la entidad promocionada),
-        // así el usuario no tiene que cargar nada. Si no se puede leer, usamos el nombre de la campaña.
-        let dsaName = draft.name
-        try {
-            const pageInfo = await this.api.get<any>(`/${this.apiVersion}/${draft.providerPageId}`, {
-                params: { access_token: accessToken, fields: 'name' }
-            })
-            if (pageInfo?.name) dsaName = pageInfo.name
-        } catch (e) {
-            console.warn('[Meta] No se pudo leer el nombre de la Página para DSA; uso el nombre de la campaña')
-        }
-
         const messagingDest = draft.messengerDestination
         const isMessagingAd = messagingDest === 'WHATSAPP' || messagingDest === 'MESSENGER' || messagingDest === 'INSTAGRAM'
 
         // Messaging campaigns (click-to-WhatsApp/Messenger/Instagram) MUST use OUTCOME_ENGAGEMENT.
         // Using OUTCOME_LEADS + QUALITY_LEAD with a messaging destination causes "incompatible objective" error.
-        const baseObjective = draft.objective || 'OUTCOME_TRAFFIC'
+        let baseObjective = draft.objective || 'OUTCOME_TRAFFIC'
+        // Ventas/Conversiones SIN píxel no es una combinación válida en Meta (rechaza el ad set).
+        // Caemos a tráfico (clics) para que el anuncio se publique igual. Con píxel sí optimiza por compras.
+        if (baseObjective === 'OUTCOME_SALES' && !draft.pixelId) {
+            console.warn('[Meta] OUTCOME_SALES sin píxel → se publica como OUTCOME_TRAFFIC (clics). Agregá un píxel para optimizar por compras.')
+            baseObjective = 'OUTCOME_TRAFFIC'
+        }
+        // App promotion no está soportado (no recolectamos app/store) → tráfico, así no falla.
+        if (baseObjective === 'OUTCOME_APP_PROMOTION') {
+            console.warn('[Meta] OUTCOME_APP_PROMOTION no soportado → se publica como OUTCOME_TRAFFIC.')
+            baseObjective = 'OUTCOME_TRAFFIC'
+        }
         const effectiveObjective = isMessagingAd ? 'OUTCOME_ENGAGEMENT' : baseObjective
 
         // 1. Create Campaign
@@ -288,26 +338,15 @@ export class MetaAdapter implements IAdsAdapter {
             // Meta requires ENGAGED_USERS optimization for non-messaging engagement objective
             optimizationGoal = 'ENGAGED_USERS'
             // No destination_type needed — Meta delivers to all placements
-        } else if (effectiveObjective === 'OUTCOME_APP_PROMOTION') {
-            // App promotion — requires app installs optimization
-            optimizationGoal = 'APP_INSTALLS'
-            destinationType = 'APP'
         }
 
-        // Targeting.
-        // Con Advantage+ Audience ON, Meta toma edad/género como SUGERENCIA y RECHAZA una
-        // edad máxima fija (<65) o géneros restrictivos. Por eso: con ON solo fijamos la
-        // edad MÍNIMA (piso, que Meta sí respeta) y dejamos el resto amplio; con OFF
-        // aplicamos edad y género exactos.
-        const advAudience = draft.advantageAudience !== false
+        // Targeting
         const targeting: any = {
             age_min: draft.ageMin || 18,
-            age_max: advAudience ? 65 : (draft.ageMax || 65),
+            age_max: draft.ageMax || 65,
         }
-        if (!advAudience) {
-            if (draft.gender === 'MALE') targeting.genders = [1]
-            else if (draft.gender === 'FEMALE') targeting.genders = [2]
-        }
+        if (draft.gender === 'MALE') targeting.genders = [1]
+        else if (draft.gender === 'FEMALE') targeting.genders = [2]
 
         // AI-generated audience interests → flexible_spec
         if (draft.audienceInterests && draft.audienceInterests.length > 0) {
@@ -320,19 +359,23 @@ export class MetaAdapter implements IAdsAdapter {
             if (draft.geoLocations.countries?.length) targeting.geo_locations.countries = draft.geoLocations.countries
             if (draft.geoLocations.regions?.length) targeting.geo_locations.regions = draft.geoLocations.regions.map(r => ({ key: r.key }))
             if (draft.geoLocations.cities?.length) targeting.geo_locations.cities = draft.geoLocations.cities.map(c => ({ key: c.key, radius: c.radius, distance_unit: c.distance_unit }))
-            if (draft.geoLocations.subcities?.length) targeting.geo_locations.subcities = draft.geoLocations.subcities.map(s => ({ key: s.key }))
             if (draft.geoLocations.custom_locations?.length) targeting.geo_locations.custom_locations = draft.geoLocations.custom_locations
             // Ensure at least one geo is set
-            if (!targeting.geo_locations.countries && !targeting.geo_locations.regions && !targeting.geo_locations.cities && !targeting.geo_locations.subcities && !targeting.geo_locations.custom_locations) {
+            if (!targeting.geo_locations.countries && !targeting.geo_locations.regions && !targeting.geo_locations.cities && !targeting.geo_locations.custom_locations) {
                 targeting.geo_locations = { countries: ['US'] }
             }
         } else {
             targeting.geo_locations = { countries: ['US'] }
         }
 
-        // Advantage+ Audience — Meta EXIGE el flag explícito (0 o 1). ON = expande más allá
-        // del targeting definido; OFF = respeta el targeting exacto.
-        targeting.targeting_automation = { advantage_audience: advAudience ? 1 : 0 }
+        // Advantage+ Audience — Meta expands beyond defined targeting if it finds better results
+        if (draft.advantageAudience) {
+            targeting.targeting_automation = { advantage_audience: 1 }
+            // Con Advantage+ audience, Meta NO permite age_max < 65 como límite duro
+            // (la edad menor solo se acepta como "sugerencia"). Forzamos 65 para evitar
+            // el error 1870189 ("la edad máxima no se puede establecer en menos de 65").
+            targeting.age_max = 65
+        }
 
         // Bid strategy
         let metaBidStrategy = 'LOWEST_COST_WITHOUT_CAP'
@@ -355,9 +398,6 @@ export class MetaAdapter implements IAdsAdapter {
             daily_budget: Math.round(draft.budgetAmount * 100),
             targeting,
             status: 'ACTIVE',
-            // DSA — beneficiario y pagador (Meta lo exige por transparencia)
-            dsa_beneficiary: dsaName,
-            dsa_payor: dsaName,
             access_token: accessToken,
             ...adSetExtra
         }
@@ -390,14 +430,22 @@ export class MetaAdapter implements IAdsAdapter {
         const isInstagram = messagingDest === 'INSTAGRAM'
         const copies = draft.copies?.length
             ? draft.copies
-            : [{ primaryText: draft.primaryText, headline: draft.headline, description: draft.description, imageUrl: draft.assets?.[0]?.storageUrl }]
+            : [{ primaryText: draft.primaryText, headline: draft.headline, description: draft.description, imageUrl: draft.assets?.[0]?.storageUrl, metaVideoId: draft.assets?.[0]?.metaVideoId }]
 
         let firstAdId: string | undefined
         let adsCreated = 0
         const adErrors: string[] = []
 
+        // El carousel SOLO soporta imágenes. Si hay algún video, caemos a anuncios
+        // individuales (single) para no mandar un video como si fuera imagen (roto).
+        const hasVideo = copies.some((c: any) => c.metaVideoId)
+            || (draft.assets || []).some((a: any) => a.type === 'VIDEO' || a.metaVideoId)
+        if (draft.adFormat === 'carousel' && hasVideo) {
+            console.warn('[Meta] Carousel con video no soportado → se publica como anuncios individuales (single).')
+        }
+
         // ── CAROUSEL FORMAT ────────────────────────────────────────────────────
-        if (draft.adFormat === 'carousel' && !isMessagingAd) {
+        if (draft.adFormat === 'carousel' && !isMessagingAd && !hasVideo) {
             try {
                 const pageFallbackUrl = `https://www.facebook.com/${draft.providerPageId}`
                 const cardUrl = draft.destinationUrl || pageFallbackUrl
@@ -436,9 +484,7 @@ export class MetaAdapter implements IAdsAdapter {
                 if (draft.advantageCreative) {
                     carouselCreativePayload.degrees_of_freedom_spec = {
                         creative_features_spec: {
-                            image_enhancement: { enroll_status: 'OPT_IN' },
-                            text_optimizations: { enroll_status: 'OPT_IN' },
-                            adapt_to_placement: { enroll_status: 'OPT_IN' }
+                            standard_enhancements: { enroll_status: 'OPT_IN' }
                         }
                     }
                 }
@@ -488,20 +534,31 @@ export class MetaAdapter implements IAdsAdapter {
                         access_token: accessToken
                     }
                 } else if (isVideo && assetUrl) {
-                    // Video ad flow: upload video to Meta first, then poll until ready, then use video_data
-                    console.log(`[Meta] Uploading video to Meta for ad ${i + 1}:`, assetUrl)
-                    const videoUpload = await this.api.post<any>(`/${this.apiVersion}/${adAccountId}/advideos`, {
-                        file_url: assetUrl,
-                        access_token: accessToken
-                    })
-                    const metaVideoId = videoUpload.id
-                    if (!metaVideoId) throw new Error('Meta no devolvió un video_id al subir el video')
+                    // Usar el video PRE-SUBIDO (subido a Meta al cargar el archivo) si está disponible:
+                    // evita re-subir y esperar el procesamiento al publicar → publicación casi instantánea.
+                    // El metaVideoId va en el copy (alineado con imageUrl del mismo creative); assets es fallback.
+                    let metaVideoId: string | undefined = copy.metaVideoId || draft.assets?.[i]?.metaVideoId
+                    if (metaVideoId) {
+                        console.log(`[Meta] Usando video pre-subido ${metaVideoId} para ad ${i + 1} (sin re-subir)`)
+                    } else {
+                        // Fallback: no se pre-subió → subir ahora (flujo anterior)
+                        console.log(`[Meta] Uploading video to Meta for ad ${i + 1}:`, assetUrl)
+                        const videoUpload = await this.api.post<any>(`/${this.apiVersion}/${adAccountId}/advideos`, {
+                            file_url: assetUrl,
+                            access_token: accessToken
+                        })
+                        metaVideoId = videoUpload.id
+                        if (!metaVideoId) throw new Error('Meta no devolvió un video_id al subir el video')
+                    }
 
-                    // Poll until video is ready (Meta processes async — max 90s)
+                    // Poll until video is ready (Meta processes async — max 90s).
+                    // Chequea ANTES de dormir: si se pre-subió y ya está listo → sale al instante.
                     console.log(`[Meta] Waiting for video ${metaVideoId} to be ready...`)
                     const deadline = Date.now() + 90_000
+                    let firstCheck = true
                     while (Date.now() < deadline) {
-                        await new Promise(r => setTimeout(r, 4000))
+                        if (!firstCheck) await new Promise(r => setTimeout(r, 4000))
+                        firstCheck = false
                         const statusRes = await this.api.get<any>(`/${this.apiVersion}/${metaVideoId}`, {
                             params: { fields: 'status', access_token: accessToken }
                         })
@@ -598,9 +655,7 @@ export class MetaAdapter implements IAdsAdapter {
                 if (draft.advantageCreative && !isMessagingAd && !draft.providerPostId) {
                     creativePayload.degrees_of_freedom_spec = {
                         creative_features_spec: {
-                            image_enhancement: { enroll_status: 'OPT_IN' },
-                            text_optimizations: { enroll_status: 'OPT_IN' },
-                            adapt_to_placement: { enroll_status: 'OPT_IN' }
+                            standard_enhancements: { enroll_status: 'OPT_IN' }
                         }
                     }
                 }
@@ -659,38 +714,106 @@ export class MetaAdapter implements IAdsAdapter {
         return true
     }
 
+    async deleteCampaign(accessToken: string, adAccountId: string, providerCampaignId: string): Promise<boolean> {
+        // En Meta, poner la campaña en estado DELETED la elimina.
+        const res = await this.api.post<any>(`/${this.apiVersion}/${providerCampaignId}`, {
+            status: 'DELETED',
+            access_token: accessToken
+        })
+        if (res.success === false) throw new Error('Meta no pudo eliminar la campaña. Verifica que exista y tengas permisos.')
+        return true
+    }
+
     async fetchDailyMetrics(accessToken: string, adAccountId: string, from: Date, to: Date): Promise<MetricRow[]> {
+        // Use yesterday as upper bound — Meta insights for today are usually incomplete
+        const yesterday = new Date()
+        yesterday.setDate(yesterday.getDate() - 1)
+        const untilDate = to > yesterday ? yesterday : to
+
         const data = await this.api.get<any>(`/${this.apiVersion}/${adAccountId}/insights`, {
             params: {
                 time_range: JSON.stringify({
                     since: from.toISOString().split('T')[0],
-                    until: to.toISOString().split('T')[0]
+                    until: untilDate.toISOString().split('T')[0]
                 }),
-                // Meta returns conversions inside the `actions` array, not as a top-level field.
-                // We request `actions` and extract `offsite_conversion.fb_pixel_purchase` or `purchase` action types.
-                fields: 'campaign_id,spend,impressions,clicks,actions,date_start',
+                fields: [
+                    'campaign_id',
+                    'spend',
+                    'impressions',
+                    'clicks',
+                    'inline_link_clicks',
+                    'reach',
+                    'frequency',
+                    'actions',
+                    'video_thruplay_watched_actions',
+                    'date_start',
+                ].join(','),
                 level: 'campaign',
-                time_increment: '1', // one row per day
+                time_increment: '1',
                 access_token: accessToken
             }
         })
 
         return (data.data || []).map((row: any) => {
-            // Extract purchase/conversion actions from the `actions` array
             const actions: Array<{ action_type: string; value: string }> = row.actions || []
-            // Exact match — avoids false positives from partial string matches
-            const conversionTypes = new Set(['offsite_conversion.fb_pixel_purchase', 'purchase', 'offsite_conversion.fb_pixel_lead', 'lead'])
-            const conversions = actions
-                .filter(a => conversionTypes.has(a.action_type))
-                .reduce((sum, a) => sum + (parseInt(a.value) || 0), 0)
+
+            const getAction = (...types: string[]) =>
+                actions.filter(a => types.includes(a.action_type))
+                       .reduce((sum, a) => sum + (parseInt(a.value) || 0), 0)
+
+            const purchases     = getAction('offsite_conversion.fb_pixel_purchase', 'purchase')
+            const leads         = getAction('offsite_conversion.fb_pixel_lead', 'lead')
+            const addToCart     = getAction('offsite_conversion.fb_pixel_add_to_cart')
+            const viewContent   = getAction('offsite_conversion.fb_pixel_view_content')
+            const initiateCheckout = getAction('offsite_conversion.fb_pixel_initiate_checkout')
+
+            // WhatsApp + Messenger conversations
+            const conversations = getAction(
+                'onsite_conversion.messaging_conversation_started_7d',
+                'onsite_conversion.messaging_conversation_started_1d',
+            )
+            const messagingReplies = getAction('onsite_conversion.messaging_first_reply')
+
+            // Post engagement: likes, comments, shares, reactions
+            const postEngagement = getAction(
+                'post_engagement',
+                'post_reaction',
+                'comment',
+                'like',
+                'post',
+            )
+
+            // Landing page views (tracked after link click)
+            const landingPageViews = getAction('landing_page_view')
+
+            // Video 3-second views
+            const videoThruplay = (row.video_thruplay_watched_actions || []) as Array<{ action_type: string; value: string }>
+            const videoViews = getAction('video_view') +
+                videoThruplay.reduce((sum: number, a: { value: string }) => sum + (parseInt(a.value) || 0), 0)
+
+            const impressions = parseInt(row.impressions) || 0
+            const reach       = parseInt(row.reach) || 0
 
             return {
                 providerCampaignId: row.campaign_id,
                 date: new Date(row.date_start),
                 spend: parseFloat(row.spend) || 0,
-                impressions: parseInt(row.impressions) || 0,
+                impressions,
                 clicks: parseInt(row.clicks) || 0,
-                conversions
+                linkClicks: parseInt(row.inline_link_clicks) || 0,
+                reach,
+                frequency: reach > 0 ? parseFloat((impressions / reach).toFixed(2)) : 0,
+                conversions: purchases + leads,
+                purchases,
+                leads,
+                addToCart,
+                viewContent,
+                initiateCheckout,
+                conversations,
+                messagingReplies,
+                postEngagement,
+                videoViews,
+                landingPageViews,
             }
         })
     }
@@ -700,6 +823,9 @@ export class MetaAdapter implements IAdsAdapter {
             params: {
                 type: type,
                 q: query,
+                // Solo regiones/departamentos (no ciudades): en Bolivia = los 9 departamentos,
+                // en México/Argentina = estados, etc. Es el nivel que segmenta bien en Meta.
+                location_types: JSON.stringify(['region']),
                 access_token: accessToken
             }
         })

@@ -1,64 +1,48 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Search, X, MapPin, Globe, Loader2 } from 'lucide-react'
+import { Search, X, MapPin, Globe, Loader2, Building2 } from 'lucide-react'
 
-// ── Formato de almacenamiento ───────────────────────────────────────────────
-//   País:   "CO"  (ISO-2)              → Meta countries: ["CO"]
-//   Ciudad: "city:KEY:Nombre"          → Meta cities: [{ key, radius 25km }]  ← targeting REAL de ciudad
-//   (compat) "cc:CO:Nombre" de campañas viejas → el publish lo trata como país; lo seguimos mostrando.
-//
-// Las ciudades usan la CLAVE REAL de Meta (de la búsqueda dinámica), así "Cochabamba"
-// targetea Cochabamba y no todo el país. Cubre TODA Latinoamérica (y el mundo).
+// Storage format:
+//   Countries: "CO" (ISO-2)                        → Meta: countries: ["CO"]
+//   Cities (live):  "city:KEY:Bogotá"              → Meta: cities: [{ key }]   (segmenta REAL)
+//   Regions (live): "region:KEY:Santa Cruz"        → Meta: regions: [{ key }]  (departamento, REAL)
+//   Cities (legacy):"cc:CO:Bogotá"                 → Meta: countries: ["CO"]   (colapsa al país)
 
-const LATAM: { code: string; name: string }[] = [
-    { code: 'MX', name: 'México' }, { code: 'CO', name: 'Colombia' },
-    { code: 'AR', name: 'Argentina' }, { code: 'PE', name: 'Perú' },
-    { code: 'CL', name: 'Chile' }, { code: 'BO', name: 'Bolivia' },
-    { code: 'EC', name: 'Ecuador' }, { code: 'VE', name: 'Venezuela' },
-    { code: 'GT', name: 'Guatemala' }, { code: 'CU', name: 'Cuba' },
-    { code: 'DO', name: 'Rep. Dominicana' }, { code: 'HN', name: 'Honduras' },
-    { code: 'PY', name: 'Paraguay' }, { code: 'NI', name: 'Nicaragua' },
-    { code: 'SV', name: 'El Salvador' }, { code: 'CR', name: 'Costa Rica' },
-    { code: 'PA', name: 'Panamá' }, { code: 'UY', name: 'Uruguay' },
-    { code: 'PR', name: 'Puerto Rico' }, { code: 'BR', name: 'Brasil' },
+
+
+export const COUNTRIES: { code: string; name: string }[] = [
+    { code: 'AR', name: 'Argentina' }, { code: 'BO', name: 'Bolivia' },
+    { code: 'BR', name: 'Brasil' }, { code: 'CA', name: 'Canadá' },
+    { code: 'CL', name: 'Chile' }, { code: 'CO', name: 'Colombia' },
+    { code: 'CR', name: 'Costa Rica' }, { code: 'CU', name: 'Cuba' },
+    { code: 'DO', name: 'República Dominicana' }, { code: 'EC', name: 'Ecuador' },
+    { code: 'SV', name: 'El Salvador' }, { code: 'ES', name: 'España' },
+    { code: 'US', name: 'Estados Unidos' }, { code: 'GT', name: 'Guatemala' },
+    { code: 'HN', name: 'Honduras' }, { code: 'MX', name: 'México' },
+    { code: 'NI', name: 'Nicaragua' }, { code: 'PA', name: 'Panamá' },
+    { code: 'PY', name: 'Paraguay' }, { code: 'PE', name: 'Perú' },
+    { code: 'PR', name: 'Puerto Rico' }, { code: 'UY', name: 'Uruguay' },
+    { code: 'VE', name: 'Venezuela' }, { code: 'DE', name: 'Alemania' },
+    { code: 'FR', name: 'Francia' }, { code: 'GB', name: 'Reino Unido' },
+    { code: 'IT', name: 'Italia' }, { code: 'PT', name: 'Portugal' },
+    { code: 'AU', name: 'Australia' }, { code: 'JP', name: 'Japón' },
 ]
-const LATAM_CODES = LATAM.map(c => c.code)
-const QUICK = ['MX', 'CO', 'AR', 'PE', 'CL', 'BO', 'EC'].map(code => LATAM.find(c => c.code === code)!)
 
-const COUNTRY_NAMES: Record<string, string> = {
-    ...Object.fromEntries(LATAM.map(c => [c.code, c.name])),
-    ES: 'España', US: 'Estados Unidos', CA: 'Canadá',
+
+// Resultado de la búsqueda en vivo de Meta (adgeolocation)
+interface LiveLoc { key: string; name: string; type: string; countryCode?: string; countryName?: string; region?: string }
+function encodeLive(item: LiveLoc): string {
+    if (item.type === 'region') return `region:${item.key}:${item.name}`
+    return `city:${item.key}:${item.name}`
 }
 
-type LocType = 'country' | 'region' | 'city' | 'subcity'
-const TYPE_LABEL: Record<LocType, string> = { country: 'país', region: 'departamento', city: 'ciudad', subcity: 'pueblo' }
-
-export function parseLocation(loc: string): { type: LocType; key: string; name: string } {
-    if (loc.startsWith('region:')) { const p = loc.split(':'); return { type: 'region', key: p[1], name: p.slice(2).join(':') } }
-    if (loc.startsWith('subcity:')) { const p = loc.split(':'); return { type: 'subcity', key: p[1], name: p.slice(2).join(':') } }
-    if (loc.startsWith('city:') || loc.startsWith('cc:')) {
-        const p = loc.split(':')
-        return { type: 'city', key: p[1], name: p.slice(2).join(':') }
-    }
-    return { type: 'country', key: loc.toUpperCase(), name: COUNTRY_NAMES[loc.toUpperCase()] || loc.toUpperCase() }
-}
-
-// Respaldo si Meta no responde: resuelve PAÍSES conocidos del texto libre del brief.
-export function resolveBriefLocations(texts: string[]): string[] {
-    const strip = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '')
-    const norm = (s: string) => strip(String(s).toLowerCase()).trim()
-    const out: string[] = []
-    const add = (v: string) => { if (v && !out.includes(v)) out.push(v) }
-    for (const raw of texts || []) {
-        for (const piece of String(raw).split(/[,/;|\n]+/)) {
-            const t = norm(piece)
-            if (!t) continue
-            const hit = Object.entries(COUNTRY_NAMES).find(([code, name]) => norm(name) === t || code.toLowerCase() === t)
-            if (hit) add(hit[0])
-        }
-    }
-    return out
+export function parseLocation(loc: string): { type: 'country' | 'city' | 'region'; code: string; name: string } {
+    if (loc.startsWith('city:')) { const p = loc.split(':'); return { type: 'city', code: p[1], name: p.slice(2).join(':') } }
+    if (loc.startsWith('region:')) { const p = loc.split(':'); return { type: 'region', code: p[1], name: p.slice(2).join(':') } }
+    if (loc.startsWith('cc:')) { const p = loc.split(':'); return { type: 'city', code: p[1], name: p.slice(2).join(':') } }
+    const country = COUNTRIES.find(c => c.code === loc.toUpperCase())
+    return { type: 'country', code: loc.toUpperCase(), name: country?.name || loc }
 }
 
 interface Props {
@@ -67,118 +51,191 @@ interface Props {
     platform?: string
 }
 
-export default function LocationSelector({ selected, onChange }: Props) {
-    const [query, setQuery] = useState('')
-    const [results, setResults] = useState<any[]>([])
-    const [loading, setLoading] = useState(false)
+const isCityLoc = (l: string) => l.startsWith('cc:') || l.startsWith('city:') || l.startsWith('region:')
 
-    // Búsqueda dinámica en Meta (con debounce). Cubre toda LatAm: cualquier país/ciudad.
+export default function LocationSelector({ selected, onChange, platform = 'meta' }: Props) {
+    const [tab, setTab] = useState<'country' | 'city'>('country')
+    const [search, setSearch] = useState('')
+    const [live, setLive] = useState<LiveLoc[]>([])
+    const [searching, setSearching] = useState(false)
+    const [liveError, setLiveError] = useState(false)
+
+    const selectedCountries = selected.filter(l => !isCityLoc(l))
+    const selectedCities = selected.filter(isCityLoc)
+
+    const q = search.toLowerCase().trim()
+
+    const filteredCountries = q
+        ? COUNTRIES.filter(c => c.name.toLowerCase().includes(q) || c.code.toLowerCase().includes(q))
+        : COUNTRIES
+
+
+    // Búsqueda en vivo en la base geo de Meta (ciudades + departamentos/regiones reales)
     useEffect(() => {
-        const q = query.trim()
-        if (q.length < 2) { setResults([]); setLoading(false); return }
-        setLoading(true)
+        if (tab !== 'city' || q.length < 2) { setLive([]); setLiveError(false); return }
+        let alive = true
+        setSearching(true)
         const t = setTimeout(async () => {
             try {
-                const res = await fetch(`/api/ads/integrations/meta/locations?q=${encodeURIComponent(q)}`)
-                const data = res.ok ? await res.json() : { locations: [] }
-                // País, departamento (region), ciudad y pueblo (subcity): todos válidos en Meta.
-                setResults((data.locations || []).filter((l: any) => ['country', 'region', 'city', 'subcity'].includes(l.type)).slice(0, 15))
-            } catch { setResults([]) }
-            finally { setLoading(false) }
+                const r = await fetch(`/api/ads/integrations/${platform}/locations?q=${encodeURIComponent(search.trim())}`)
+                const d = await r.json()
+                if (!alive) return
+                if (r.ok && Array.isArray(d.locations)) {
+                    setLive(d.locations.filter((l: LiveLoc) => l.type === 'region'))
+                    setLiveError(false)
+                } else { setLive([]); setLiveError(true) }
+            } catch { if (alive) { setLive([]); setLiveError(true) } }
+            finally { if (alive) setSearching(false) }
         }, 350)
-        return () => clearTimeout(t)
-    }, [query])
+        return () => { alive = false; clearTimeout(t) }
+    }, [q, tab, platform, search])
 
-    const has = (v: string) => selected.includes(v)
-    const add = (v: string) => { if (v && !selected.includes(v)) onChange([...selected, v]) }
-    const remove = (v: string) => onChange(selected.filter(l => l !== v))
-
-    function pickResult(r: any) {
-        if (r.type === 'country' && r.countryCode) add(String(r.countryCode).toUpperCase())
-        else if (r.type === 'region' && r.key) add(`region:${r.key}:${r.name}`)
-        else if (r.type === 'subcity' && r.key) add(`subcity:${r.key}:${r.name}`)
-        else if (r.key) add(`city:${r.key}:${r.name}`)
-        setQuery(''); setResults([])
+    function toggleCountry(code: string) {
+        selectedCountries.includes(code)
+            ? onChange(selected.filter(l => l !== code))
+            : onChange([...selected, code])
     }
 
-    function addAllLatam() {
-        const merged = [...selected]
-        for (const code of LATAM_CODES) if (!merged.includes(code)) merged.push(code)
-        onChange(merged)
+
+    function toggleLive(item: LiveLoc) {
+        const val = encodeLive(item)
+        selected.includes(val)
+            ? onChange(selected.filter(l => l !== val))
+            : onChange([...selected, val])
+    }
+
+    function removeLocation(loc: string) {
+        onChange(selected.filter(l => l !== loc))
     }
 
     return (
         <div className="bg-dark-900/60 border border-white/10 rounded-2xl overflow-hidden">
-            {/* Chips seleccionados */}
+            {/* Selected chips */}
             {selected.length > 0 && (
                 <div className="px-4 pt-3 pb-2 flex flex-wrap gap-1.5 border-b border-white/5">
                     {selected.map(loc => {
-                        const p = parseLocation(loc)
-                        const broad = p.type === 'country' || p.type === 'region'
+                        const parsed = parseLocation(loc)
                         return (
-                            <span key={loc} className={`flex items-center gap-1.5 text-[11px] font-medium px-2.5 py-1 rounded-full border ${broad
+                            <span key={loc} className={`flex items-center gap-1.5 text-[11px] font-medium px-2.5 py-1 rounded-full border ${parsed.type === 'country'
                                 ? 'bg-purple-500/10 border-purple-500/20 text-purple-300'
                                 : 'bg-blue-500/10 border-blue-500/20 text-blue-300'}`}>
-                                {broad ? <Globe size={10} /> : <MapPin size={10} />}
-                                {p.name} <span className="opacity-40">· {TYPE_LABEL[p.type]}</span>
-                                <button onClick={() => remove(loc)} className="text-white/30 hover:text-red-400 ml-0.5"><X size={10} /></button>
+                                {parsed.type === 'country' ? <Globe size={10} /> : parsed.type === 'region' ? <Building2 size={10} /> : <MapPin size={10} />}
+                                {parsed.name}
+                                <button onClick={() => removeLocation(loc)} className="text-white/30 hover:text-red-400 transition-all ml-0.5">
+                                    <X size={10} />
+                                </button>
                             </span>
                         )
                     })}
-                    <button onClick={() => onChange([])} className="text-[10px] text-white/20 hover:text-red-400 px-1">Limpiar todo</button>
+                    <button onClick={() => onChange([])} className="text-[10px] text-white/20 hover:text-red-400 transition-all px-1">
+                        Limpiar todo
+                    </button>
                 </div>
             )}
 
-            {/* Buscador dinámico */}
-            <div className="px-3 pt-3 pb-2 relative">
+            {/* Tabs */}
+            <div className="flex border-b border-white/8">
+                {([
+                    ['country', 'Países', <Globe size={12} />, selectedCountries.length],
+                    ['city', 'Departamentos', <Building2 size={12} />, selectedCities.length],
+                ] as const).map(([key, label, icon, count]) => (
+                    <button key={key} onClick={() => { setTab(key); setSearch('') }}
+                        className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs font-bold transition-all ${tab === key ? 'text-white border-b-2 border-purple-500' : 'text-white/30 hover:text-white/60'}`}>
+                        {icon} {label}
+                        {count > 0 && (
+                            <span className={`text-[9px] px-1.5 py-0.5 rounded-full ${tab === key ? 'bg-purple-500/30 text-purple-200' : 'bg-white/8 text-white/40'}`}>{count}</span>
+                        )}
+                    </button>
+                ))}
+            </div>
+
+            {/* Search */}
+            <div className="px-3 pt-3 pb-2">
                 <div className="relative">
                     <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/30" />
                     <input
-                        value={query}
-                        onChange={e => setQuery(e.target.value)}
-                        placeholder="Busca tu ciudad o país… (ej: Cochabamba, México)"
-                        className="w-full bg-white/5 border border-white/10 rounded-xl pl-8 pr-8 py-2.5 text-xs text-white focus:outline-none focus:border-purple-500/50 placeholder:text-white/20"
+                        value={search}
+                        onChange={e => setSearch(e.target.value)}
+                        placeholder={tab === 'country' ? 'Buscar país...' : 'Buscar departamento / región...'}
+                        className="w-full bg-white/5 border border-white/10 rounded-xl pl-8 pr-3 py-2 text-xs text-white focus:outline-none focus:border-purple-500/50 placeholder:text-white/20"
                     />
-                    {loading && <Loader2 size={13} className="absolute right-3 top-1/2 -translate-y-1/2 text-white/30 animate-spin" />}
                 </div>
+            </div>
 
-                {results.length > 0 && (
-                    <div className="absolute left-3 right-3 mt-1 bg-[#15162a] border border-white/15 rounded-xl overflow-hidden z-20 shadow-xl">
-                        {results.map((r, i) => (
-                            <button key={`${r.key}-${i}`} onClick={() => pickResult(r)}
-                                className="w-full flex items-center gap-2.5 px-3 py-2.5 hover:bg-white/8 text-left transition-colors">
-                                {(r.type === 'country' || r.type === 'region')
-                                    ? <Globe size={13} className="text-purple-400 shrink-0" />
-                                    : <MapPin size={13} className="text-blue-400 shrink-0" />}
-                                <span className="flex-1 min-w-0 flex items-baseline gap-1.5">
-                                    <span className="text-xs text-white/90 truncate">{r.name}</span>
-                                    <span className="text-[10px] text-white/35">{r.type === 'country' ? 'país' : `${TYPE_LABEL[r.type as LocType] || r.type}${r.countryName || r.countryCode ? ' · ' + (r.countryName || r.countryCode) : ''}`}</span>
-                                </span>
-                            </button>
-                        ))}
+            {/* Country list */}
+            {tab === 'country' && (
+                <div className="px-3 pb-3">
+                    <div className="grid grid-cols-2 gap-1.5 max-h-52 overflow-y-auto pr-0.5">
+                        {filteredCountries.map(c => {
+                            const isSelected = selectedCountries.includes(c.code)
+                            return (
+                                <button key={c.code} onClick={() => toggleCountry(c.code)}
+                                    className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-medium text-left transition-all ${isSelected
+                                        ? 'bg-purple-500/20 border border-purple-500/40 text-purple-200'
+                                        : 'bg-white/3 border border-white/8 text-white/60 hover:bg-white/8 hover:text-white/90'}`}>
+                                    <span className="font-black text-[10px] text-white/30 w-5 shrink-0">{c.code}</span>
+                                    <span className="truncate flex-1">{c.name}</span>
+                                    {isSelected && <X size={10} className="shrink-0 text-purple-400" />}
+                                </button>
+                            )
+                        })}
+                        {filteredCountries.length === 0 && (
+                            <p className="col-span-2 text-center text-xs text-white/20 py-6">Sin resultados</p>
+                        )}
                     </div>
-                )}
-            </div>
-
-            {/* Atajos para LatAm */}
-            <div className="px-3 pb-3 pt-1">
-                <p className="text-[9px] font-bold uppercase tracking-widest text-white/25 mb-1.5">Atajos rápidos</p>
-                <div className="flex flex-wrap gap-1.5">
-                    <button onClick={addAllLatam}
-                        className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-purple-500/15 border border-purple-500/30 text-purple-200 hover:bg-purple-500/25 transition-all">
-                        🌎 Toda Latinoamérica
-                    </button>
-                    {QUICK.map(c => (
-                        <button key={c.code} onClick={() => add(c.code)} disabled={has(c.code)}
-                            className={`text-[10px] font-medium px-2.5 py-1 rounded-full border transition-all ${has(c.code)
-                                ? 'bg-white/5 border-white/8 text-white/25'
-                                : 'bg-white/3 border-white/10 text-white/60 hover:border-purple-500/40 hover:text-white/90'}`}>
-                            {c.name}
-                        </button>
-                    ))}
                 </div>
-                <p className="text-[10px] text-white/20 mt-2">📍 Tus anuncios se mostrarán en los lugares que elijas.</p>
-            </div>
+            )}
+
+            {/* City list */}
+            {tab === 'city' && (
+                <div className="px-3 pb-3">
+                    <div className="space-y-1 max-h-52 overflow-y-auto pr-0.5">
+                        {/* Buscando en vivo */}
+                        {searching && (
+                            <div className="flex items-center justify-center gap-2 py-6 text-xs text-white/30">
+                                <Loader2 size={13} className="animate-spin" /> Buscando departamentos / regiones…
+                            </div>
+                        )}
+
+                        {/* Resultados REALES de Meta (ciudades + departamentos) */}
+                        {!searching && live.length > 0 && live.map((item) => {
+                            const val = encodeLive(item)
+                            const isSelected = selected.includes(val)
+                            const isRegion = item.type === 'region'
+                            return (
+                                <button key={val} onClick={() => toggleLive(item)}
+                                    className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs text-left transition-all ${isSelected
+                                        ? 'bg-blue-500/15 border border-blue-500/30 text-blue-200'
+                                        : 'bg-white/3 border border-white/8 text-white/60 hover:bg-white/8 hover:text-white/90'}`}>
+                                    {isRegion
+                                        ? <Building2 size={11} className={`shrink-0 ${isSelected ? 'text-blue-400' : 'text-white/20'}`} />
+                                        : <MapPin size={11} className={`shrink-0 ${isSelected ? 'text-blue-400' : 'text-white/20'}`} />}
+                                    <div className="flex-1 min-w-0">
+                                        <p className="font-medium truncate">{item.name} {isRegion && <span className="text-[9px] text-white/30">· depto/región</span>}</p>
+                                        <p className="text-[10px] text-white/30 truncate">{[item.region, item.countryName].filter(Boolean).join(', ') || item.countryCode}</p>
+                                    </div>
+                                    {isSelected && <X size={10} className="shrink-0 text-blue-400" />}
+                                </button>
+                            )
+                        })}
+
+                        {!searching && live.length === 0 && (
+                            <p className="text-center text-xs text-white/20 py-6">
+                                {liveError && q.length >= 2
+                                    ? 'Conectá tu cuenta de Meta para buscar departamentos.'
+                                    : q.length >= 2
+                                        ? `Sin departamentos para "${search}"`
+                                        : 'Escribí el nombre de tu departamento (ej: Santa Cruz, La Paz, Cochabamba)'}
+                            </p>
+                        )}
+                    </div>
+                    <p className="text-[10px] text-white/15 mt-2 text-center">
+                        {live.length > 0
+                            ? 'Departamentos / regiones reales de Meta — segmentan correctamente'
+                            : 'Segmentá por departamento (no por ciudad). Buscá el nombre y seleccionalo.'}
+                    </p>
+                </div>
+            )}
         </div>
     )
 }

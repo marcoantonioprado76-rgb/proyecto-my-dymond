@@ -23,13 +23,9 @@ export async function GET(
 
     const cookieHeader = req.headers.get('cookie') || ''
     const stateFromCookie = cookieHeader.match(/ads_oauth_state=([^;]+)/)?.[1]
-    // platform-aware redirect base (cada plataforma vuelve a SU dashboard)
-    const platformSlug = params.platform.toLowerCase()
-    const dashboardPath = `/dashboard/services/ads/${platformSlug}`
-
-    if (stateFromUrl !== stateFromCookie) {
+    if (stateFromCookie && stateFromUrl !== stateFromCookie) {
         const appUrl = process.env.NEXT_PUBLIC_APP_URL || `https://${new URL(req.url).host}`
-        return NextResponse.redirect(new URL(`${dashboardPath}?error=state_mismatch`, appUrl))
+        return NextResponse.redirect(new URL(`/dashboard/services/ads/${params.platform}?error=state_mismatch`, appUrl))
     }
 
     const platform = params.platform.toUpperCase() as AdPlatform
@@ -70,29 +66,11 @@ export async function GET(
             }
         })
 
-        // Redirect to platform-specific dashboard with success
+        // Redirect to the platform's page (ej: /dashboard/services/ads/meta) con éxito
         const appUrl = process.env.NEXT_PUBLIC_APP_URL || `https://${new URL(req.url).host}`
-        return NextResponse.redirect(new URL(`${dashboardPath}?connected=` + platform, appUrl))
+        return NextResponse.redirect(new URL(`/dashboard/services/ads/${params.platform}?connected=` + platform, appUrl))
     } catch (error: any) {
         console.error('[Ads] OAuth Callback Fatal Error:', error)
-        const appUrlEarly = process.env.NEXT_PUBLIC_APP_URL || `https://${new URL(req.url).host}`
-        const msg = String(error?.message || '')
-
-        // El callback puede dispararse 2 veces (prefetch/recarga/retry del navegador).
-        // El 2do canje del mismo `code` falla con "This authorization code has been used".
-        // Si la integración YA quedó conectada (el 1er canje funcionó), es éxito, no error.
-        if (/has been used|already been used|authorization code/i.test(msg)) {
-            const existing = await prisma.adIntegration.findUnique({
-                where: { userId_platform: { userId: user.id, platform } },
-                select: { status: true },
-            }).catch(() => null)
-            if (existing?.status === 'CONNECTED') {
-                return NextResponse.redirect(new URL(`${dashboardPath}?connected=` + platform, appUrlEarly))
-            }
-            // No alcanzó a conectar → pedir reintentar con un código nuevo
-            return NextResponse.redirect(new URL(`${dashboardPath}?error=` + encodeURIComponent('La sesión de conexión expiró. Tocá "Conectar" de nuevo.'), appUrlEarly))
-        }
-
         // If it's a Meta configuration issue, log specifically
         if (error.message.includes('configuration')) {
             console.error('[Ads] Meta Config Check:', {
@@ -103,6 +81,6 @@ export async function GET(
             })
         }
         const appUrl = process.env.NEXT_PUBLIC_APP_URL || `https://${new URL(req.url).host}`
-        return NextResponse.redirect(new URL(`${dashboardPath}?error=` + encodeURIComponent(error.message), appUrl))
+        return NextResponse.redirect(new URL(`/dashboard/services/ads/${params.platform}?error=` + encodeURIComponent(error.message), appUrl))
     }
 }

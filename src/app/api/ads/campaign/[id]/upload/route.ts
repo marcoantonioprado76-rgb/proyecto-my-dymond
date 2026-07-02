@@ -1,13 +1,15 @@
 export const dynamic = 'force-dynamic'
-export const maxDuration = 300 // 5 min para uploads pesados (videos)
+export const maxDuration = 60
+export const runtime = 'nodejs'
+
 import { NextResponse } from 'next/server'
 import { getAuthUser } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { supabaseAdmin } from '@/lib/supabase'
+import { decrypt } from '@/lib/ads/encryption'
+import { MetaAdapter } from '@/lib/ads/adapters/meta'
 
 const BUCKET = 'ad-creatives'
-const MAX_IMAGE_SIZE = 10 * 1024 * 1024  // 10 MB
-const MAX_VIDEO_SIZE = 100 * 1024 * 1024 // 100 MB
 
 export async function POST(
     req: Request,
@@ -19,92 +21,111 @@ export async function POST(
 
         const campaignId = params.id
 
-        // Verify campaign belongs to user
         const campaign = await (prisma as any).adCampaignV2.findFirst({
-            where: { id: campaignId, userId: user.id }
+            where: { id: campaignId, userId: user.id },
+            include: {
+                connectedAccount: { include: { integration: { include: { token: true } } } }
+            }
         })
         if (!campaign) return NextResponse.json({ error: 'Campaña no encontrada' }, { status: 404 })
 
-        const formData = await req.formData()
+        let formData: FormData
+        try {
+            formData = await req.formData()
+        } catch (e: any) {
+            console.error('[Upload] formData parse error:', e?.message)
+            return NextResponse.json({ error: `Error al leer el archivo: ${e?.message}` }, { status: 400 })
+        }
+
         const file = formData.get('file') as File | null
         const slotIndex = parseInt(formData.get('slotIndex') as string || '0')
         const creativeId = formData.get('creativeId') as string | null
 
-        if (!file) return NextResponse.json({ error: 'No se recibió archivo' }, { status: 400 })
+        if (!file) return NextResponse.json({ error: 'No se recibió ningún archivo' }, { status: 400 })
 
-        // Validar tamaño antes de leer en memoria
-        const isVideo = file.type.startsWith('video')
-        const maxSize = isVideo ? MAX_VIDEO_SIZE : MAX_IMAGE_SIZE
-        if (file.size > maxSize) {
-            const limitMB = Math.floor(maxSize / (1024 * 1024))
-            const sizeMB = (file.size / (1024 * 1024)).toFixed(1)
-            return NextResponse.json({
-                error: `El ${isVideo ? 'video' : 'archivo'} pesa ${sizeMB} MB y supera el límite de ${limitMB} MB. Comprímelo o usa un archivo más liviano.`
-            }, { status: 413 })
-        }
+        console.log(`[Upload] file: ${file.name}, type: ${file.type}, size: ${(file.size / 1024 / 1024).toFixed(2)}MB`)
 
-        // Validate Supabase config
+        // Validate env vars
         if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
-            console.error('[Upload] Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY in environment variables')
-            return NextResponse.json({
-                error: 'Almacenamiento no configurado. Agrega SUPABASE_URL y SUPABASE_SERVICE_ROLE_KEY al archivo .env'
-            }, { status: 500 })
+            return NextResponse.json({ error: 'Supabase no configurado en .env' }, { status: 500 })
         }
 
-        // Ensure bucket exists
-        const { data: buckets, error: listErr } = await supabaseAdmin.storage.listBuckets()
+        // Ensure bucket exists — create silently if missing
+        const { error: listErr } = await supabaseAdmin.storage.listBuckets()
         if (listErr) {
-            console.error('[Upload] listBuckets error:', listErr.message)
-            return NextResponse.json({ error: `Error de almacenamiento: ${listErr.message}` }, { status: 500 })
-        }
-        const bucketExists = buckets?.some(b => b.name === BUCKET)
-        if (!bucketExists) {
-            const { error: createErr } = await supabaseAdmin.storage.createBucket(BUCKET, { public: true })
-            if (createErr) {
-                console.error('[Upload] createBucket error:', createErr.message)
-                return NextResponse.json({ error: `No se pudo crear el bucket: ${createErr.message}` }, { status: 500 })
+            console.warn('[Upload] listBuckets failed, attempting upload anyway:', listErr.message)
+        } else {
+            const { data: buckets } = await supabaseAdmin.storage.listBuckets()
+            const exists = buckets?.some(b => b.name === BUCKET)
+            if (!exists) {
+                console.log('[Upload] Bucket not found, creating...')
+                const { error: createErr } = await supabaseAdmin.storage.createBucket(BUCKET, {
+                    public: true,
+                    fileSizeLimit: 52428800, // 50MB
+                    allowedMimeTypes: ['image/*', 'video/*']
+                })
+                if (createErr) {
+                    console.error('[Upload] createBucket error:', createErr.message)
+                    // Don't fail — bucket might already exist in a race, try upload anyway
+                }
             }
         }
 
-        // Upload to Supabase Storage
+        // Convert file to buffer
+        let buffer: Buffer
+        try {
+            buffer = Buffer.from(await file.arrayBuffer())
+        } catch (e: any) {
+            console.error('[Upload] arrayBuffer error:', e?.message)
+            return NextResponse.json({ error: `No se pudo leer el archivo: ${e?.message}` }, { status: 400 })
+        }
+
         const ext = file.name.split('.').pop()?.toLowerCase() || 'jpg'
         const path = `ads/${user.id}/${campaignId}/slot-${slotIndex}-${Date.now()}.${ext}`
-        const buffer = Buffer.from(await file.arrayBuffer())
+
+        console.log(`[Upload] Uploading to Supabase path: ${path}`)
 
         const { error: uploadError } = await supabaseAdmin.storage
             .from(BUCKET)
             .upload(path, buffer, {
-                contentType: file.type,
+                contentType: file.type || 'application/octet-stream',
                 upsert: true
             })
 
         if (uploadError) {
-            console.error('[Upload] upload error:', uploadError.message)
-            return NextResponse.json({ error: `Error al subir: ${uploadError.message}` }, { status: 500 })
+            console.error('[Upload] Supabase upload error:', uploadError.message, uploadError)
+            return NextResponse.json({
+                error: `Error al subir a Supabase: ${uploadError.message}`
+            }, { status: 500 })
         }
 
-        // Get public URL
         const { data: urlData } = supabaseAdmin.storage.from(BUCKET).getPublicUrl(path)
         const publicUrl = urlData.publicUrl
+        console.log('[Upload] Success, public URL:', publicUrl)
 
         const mType = file.type.startsWith('video') ? 'video' : 'image'
+        // Nuevo archivo → resetear cualquier pre-subida anterior a Meta (quedó obsoleta)
+        const resetMeta = { metaVideoId: null, metaImageHash: null, metaThumbnailUrl: null, metaMediaStatus: null }
+
+        let savedCreativeId: string | null = creativeId || null
 
         if (creativeId) {
             await (prisma as any).adCreative.update({
                 where: { id: creativeId },
-                data: { mediaUrl: publicUrl, mediaType: mType }
+                data: { mediaUrl: publicUrl, mediaType: mType, ...resetMeta }
             })
         } else {
             const existing = await (prisma as any).adCreative.findFirst({
                 where: { campaignId, slotIndex }
             })
             if (existing) {
+                savedCreativeId = existing.id
                 await (prisma as any).adCreative.update({
                     where: { id: existing.id },
-                    data: { mediaUrl: publicUrl, mediaType: mType }
+                    data: { mediaUrl: publicUrl, mediaType: mType, ...resetMeta }
                 })
             } else {
-                await (prisma as any).adCreative.create({
+                const created = await (prisma as any).adCreative.create({
                     data: {
                         campaignId,
                         slotIndex,
@@ -116,13 +137,40 @@ export async function POST(
                         isApproved: false
                     }
                 })
+                savedCreativeId = created.id
             }
         }
 
-        return NextResponse.json({ mediaUrl: publicUrl })
+        // ── Pre-subir el VIDEO a Meta YA (al cargar), para que al publicar esté listo ──
+        // La llamada a /advideos devuelve el video_id al instante; Meta procesa en background.
+        // Es best-effort: si falla, no rompe la subida (al publicar se sube como fallback).
+        let metaMediaStatus: string | undefined
+        if (mType === 'video' && savedCreativeId && campaign.platform === 'META') {
+            try {
+                const acc = campaign.connectedAccount
+                const enc = acc?.integration?.token?.accessTokenEncrypted
+                const encKey = process.env.ADS_ENCRYPTION_KEY
+                if (acc?.providerAccountId && enc && encKey) {
+                    const token = decrypt(enc, encKey)
+                    const videoId = await new MetaAdapter().uploadVideoByUrl(token, acc.providerAccountId, publicUrl)
+                    await (prisma as any).adCreative.update({
+                        where: { id: savedCreativeId },
+                        data: { metaVideoId: videoId, metaMediaStatus: 'processing' }
+                    })
+                    metaMediaStatus = 'processing'
+                    console.log(`[Upload] Video pre-subido a Meta: ${videoId} (procesando en background)`)
+                }
+            } catch (e: any) {
+                console.warn('[Upload] Pre-subida a Meta falló (no fatal):', e?.message)
+            }
+        }
+
+        return NextResponse.json({ mediaUrl: publicUrl, creativeId: savedCreativeId, metaMediaStatus })
 
     } catch (err: any) {
         console.error('[Upload] Unhandled error:', err)
-        return NextResponse.json({ error: err.message || 'Error interno al subir archivo' }, { status: 500 })
+        return NextResponse.json({
+            error: err.message || 'Error interno al subir archivo'
+        }, { status: 500 })
     }
 }

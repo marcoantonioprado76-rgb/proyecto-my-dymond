@@ -507,3 +507,72 @@ export async function chargeUserForAI(
         remainingUsd: chargeRes.remainingUsd,
     }
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// COMPAT — API de facturación del módulo de Anuncios (portado desde JD).
+// El código de Ads llama a resolveAdsKey/logAiUsage/logImageUsage/logWhisperUsage.
+// Aquí se mapean al modelo de créditos de ESTE proyecto (resolveOpenAIKey +
+// chargeFor…). El código de Ads ya guarda cada cobro con `if (resolvedKey.isGlobal)`,
+// así que estos log* SOLO se invocan cuando se usa la key global (admin) — igual
+// que la semántica nativa (key propia = gratis; global = se cobra al saldo USD).
+// ─────────────────────────────────────────────────────────────────────────────
+
+/** Forma que espera el módulo de Ads (compat con JD). */
+export interface ResolvedAdsKey {
+    key: string
+    isGlobal: boolean
+    userId: string
+}
+
+/**
+ * Resuelve la key de OpenAI para Anuncios/Landing/Social.
+ * Delega en resolveOpenAIKey(userId) y adapta la forma de retorno:
+ *   source 'own'   → isGlobal false (no se cobra)
+ *   source 'admin' → isGlobal true  (se cobra vía log*Usage)
+ * Devuelve null si no hay key/saldo (compat: el módulo de Ads espera `| null`).
+ */
+export async function resolveAdsKey(userId: string): Promise<ResolvedAdsKey | null> {
+    const r = await resolveOpenAIKey(userId)
+    if (!r.ok) return null
+    return { key: r.key, isGlobal: r.source === 'admin', userId }
+}
+
+/** Registra+cobra uso de chat (tokens). Solo se llama con key global. */
+export async function logAiUsage(opts: {
+    userId: string
+    service: string
+    model: string
+    promptTokens: number
+    completionTokens: number
+}): Promise<number> {
+    const res = await chargeForChatUsage(
+        opts.userId, opts.model, opts.promptTokens, opts.completionTokens, opts.service,
+    )
+    return res.ok ? res.chargedUsd : 0
+}
+
+/** Registra+cobra generación de imágenes. Solo se llama con key global. */
+export async function logImageUsage(opts: {
+    userId: string
+    service: string
+    count: number
+    quality: string
+    size: string
+}): Promise<number> {
+    // Mapear quality/size al modelo de precios de este proyecto.
+    const isWide = opts.size === '1792x1024' || opts.size === '1536x1024'
+    const isHd = opts.quality === 'premium' || opts.quality === 'hd'
+    const model = `dall-e-3${isWide ? '-wide' : ''}${isHd ? '-hd' : ''}`
+    const res = await chargeForImage(opts.userId, model, opts.count, opts.service)
+    return res.ok ? res.chargedUsd : 0
+}
+
+/** Registra+cobra transcripción Whisper. Solo se llama con key global. */
+export async function logWhisperUsage(opts: {
+    userId: string
+    service: string
+    durationSec: number
+}): Promise<number> {
+    const res = await chargeForWhisperSeconds(opts.userId, opts.durationSec, opts.service)
+    return res.ok ? res.chargedUsd : 0
+}

@@ -10,7 +10,7 @@ import Link from 'next/link'
 
 const STATUS_LABELS: Record<string, { label: string; color: string; dot: string }> = {
     DRAFT: { label: 'Borrador', color: 'text-white/50 bg-white/5 border-white/10', dot: 'bg-white/30' },
-    READY: { label: 'Listo', color: 'text-[#7DD3FC] bg-[#7DD3FC]/10 border-[#7DD3FC]/20', dot: 'bg-[#7DD3FC]' },
+    READY: { label: 'Listo', color: 'text-blue-400 bg-blue-500/10 border-blue-500/20', dot: 'bg-blue-400' },
     PUBLISHING: { label: 'Publicando', color: 'text-yellow-400 bg-yellow-500/10 border-yellow-500/20', dot: 'bg-yellow-400 animate-pulse' },
     PUBLISHED: { label: 'Publicado', color: 'text-green-400 bg-green-500/10 border-green-500/20', dot: 'bg-green-400' },
     FAILED: { label: 'Error', color: 'text-red-400 bg-red-500/10 border-red-500/20', dot: 'bg-red-400' },
@@ -18,7 +18,7 @@ const STATUS_LABELS: Record<string, { label: string; color: string; dot: string 
 }
 
 const PLATFORM_MAP: Record<string, { letter: string; color: string }> = {
-    META: { letter: 'f', color: 'text-[#7DD3FC]' },
+    META: { letter: 'f', color: 'text-blue-400' },
     TIKTOK: { letter: 'T', color: 'text-red-400' },
     GOOGLE_ADS: { letter: 'G', color: 'text-yellow-400' },
 }
@@ -71,12 +71,26 @@ export default function HistoryPage() {
     }
 
     async function fetchMetrics(ids: string[]) {
+        if (ids.length === 0) return
         setLoadingMetrics(true)
         try {
-            const res = await fetch(`/api/ads/metrics?campaignIds=${ids.join(',')}`)
+            const res = await fetch(`/api/ads/metrics?days=7`)
             if (!res.ok) return
             const data = await res.json()
-            setMetrics(prev => ({ ...prev, ...data.metrics }))
+            // API returns { totals: [{ campaignId, spend, impressions, clicks, conversions, ctr, cpc }] }
+            const map: Record<string, Metric> = {}
+            for (const t of (data.totals || [])) {
+                if (!ids.includes(t.campaignId)) continue
+                map[t.campaignId] = {
+                    impressions: t.impressions || 0,
+                    clicks: t.clicks || 0,
+                    spend: parseFloat(t.spend) || 0,
+                    reach: 0,
+                    ctr: parseFloat(t.ctr) || 0,
+                    cpm: t.impressions > 0 ? parseFloat(t.spend) / t.impressions * 1000 : 0,
+                }
+            }
+            setMetrics(prev => ({ ...prev, ...map }))
         } catch { /* metrics are optional */ } finally {
             setLoadingMetrics(false)
         }
@@ -104,27 +118,26 @@ export default function HistoryPage() {
     const totalReach = metricValues.reduce((s, m) => s + (m.reach || 0), 0)
 
     return (
-    <div className="dm-page font-ui">
-        <div className="px-4 md:px-6 pt-6 max-w-screen-2xl mx-auto pb-24 text-[#111827]">
+        <div className="px-4 md:px-6 pt-6 max-w-screen-2xl mx-auto pb-24 text-white">
 
             {/* Header */}
             <div className="flex items-center gap-3 mb-7">
-                <Link href="/dashboard/services/ads"
-                    className="w-9 h-9 rounded-xl bg-[#F4F6FA] border border-[#E4E9F0] flex items-center justify-center hover:bg-[#EEF2F7] transition-all shrink-0">
+                <Link href="/dashboard/services/ads/meta"
+                    className="w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-all shrink-0">
                     <ArrowLeft size={15} />
                 </Link>
                 <div className="flex-1 min-w-0">
                     <h1 className="text-lg md:text-xl font-black uppercase tracking-tighter">Historial de Campañas</h1>
-                    <p className="text-[11px] text-[#111827]/30">{campaigns.length} campañas · {totalPublished} activas</p>
+                    <p className="text-[11px] text-white/30">{campaigns.length} campañas · {totalPublished} activas</p>
                 </div>
                 <div className="flex items-center gap-2">
                     <Link href="/dashboard/services/ads/wizard"
-                        className="hidden sm:flex items-center gap-1.5 text-xs font-bold px-3 py-2 rounded-xl bg-gradient-to-r from-[#FF2D95] via-[#B735B8] to-[#233B8F] text-white hover:opacity-90 transition-all">
+                        className="hidden sm:flex items-center gap-1.5 text-xs font-bold px-3 py-2 rounded-xl bg-purple-600 text-white hover:bg-purple-500 transition-all">
                         <Plus size={13} /> Nueva
                     </Link>
                     <button onClick={() => fetchCampaigns(true)}
-                        className="w-9 h-9 rounded-xl bg-[#F4F6FA] border border-[#E4E9F0] flex items-center justify-center hover:bg-[#EEF2F7] transition-all shrink-0">
-                        <RefreshCw size={14} className={refreshing ? 'animate-spin text-[#B735B8]' : ''} />
+                        className="w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-all shrink-0">
+                        <RefreshCw size={14} className={refreshing ? 'animate-spin text-purple-400' : ''} />
                     </button>
                 </div>
             </div>
@@ -132,19 +145,19 @@ export default function HistoryPage() {
             {/* Global metrics summary — last 30 days */}
             {totalPublished > 0 && (
                 <div className="mb-2">
-                    <p className="text-[10px] text-[#6B7280] font-bold uppercase tracking-widest mb-2">Últimos 30 días</p>
+                    <p className="text-[10px] text-white/25 font-bold uppercase tracking-widest mb-2">Últimos 30 días</p>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
                     {[
-                        { icon: <Eye size={14} />, label: 'Impresiones', value: fmt(totalImpressions), color: 'text-[#7DD3FC]' },
-                        { icon: <MousePointerClick size={14} />, label: 'Clics', value: fmt(totalClicks), color: 'text-[#C9A7FF]' },
+                        { icon: <Eye size={14} />, label: 'Impresiones', value: fmt(totalImpressions), color: 'text-blue-400' },
+                        { icon: <MousePointerClick size={14} />, label: 'Clics', value: fmt(totalClicks), color: 'text-purple-400' },
                         { icon: <DollarSign size={14} />, label: 'Gasto', value: `$${totalSpend.toFixed(2)}`, color: 'text-green-400' },
                         { icon: <Users size={14} />, label: 'Alcance', value: fmt(totalReach), color: 'text-orange-400' },
                     ].map(({ icon, label, value, color }) => (
-                        <div key={label} className="rounded-2xl p-4 border border-white/10" style={{ background: 'linear-gradient(180deg, #0B1B2B 0%, #081624 60%, #050B14 100%)' }}>
+                        <div key={label} className="bg-white/3 border border-white/8 rounded-2xl p-4">
                             <div className={`flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest mb-2 ${color}`}>
                                 {icon} {label}
                             </div>
-                            <p className="text-lg font-black text-white">
+                            <p className="text-lg font-black">
                                 {loadingMetrics ? <span className="w-12 h-4 bg-white/5 rounded animate-pulse inline-block" /> : value}
                             </p>
                         </div>
@@ -160,11 +173,11 @@ export default function HistoryPage() {
                     return (
                         <button key={s} onClick={() => setFilter(s)}
                             className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold transition-all border whitespace-nowrap shrink-0 ${filter === s
-                                ? 'bg-gradient-to-r from-[#FF2D95] via-[#B735B8] to-[#233B8F] text-white border-transparent'
-                                : 'bg-[#F4F6FA] border-[#E4E9F0] text-[#6B7280] hover:border-[#FF096C]/30 hover:text-[#111827]'
+                                ? 'bg-white text-black border-white'
+                                : 'bg-white/5 border-white/10 text-white/40 hover:border-white/25 hover:text-white/70'
                             }`}>
                             {FILTER_LABELS[s]}
-                            <span className={`text-[10px] font-black px-1.5 py-0.5 rounded-md ${filter === s ? 'bg-white/20' : 'bg-black/5'}`}>
+                            <span className={`text-[10px] font-black px-1.5 py-0.5 rounded-md ${filter === s ? 'bg-black/10' : 'bg-white/8'}`}>
                                 {count}
                             </span>
                         </button>
@@ -174,16 +187,16 @@ export default function HistoryPage() {
 
             {loading ? (
                 <div className="flex flex-col items-center justify-center py-24 gap-3">
-                    <Loader2 className="animate-spin text-[#B735B8]" size={28} />
-                    <p className="text-[#6B7280] text-sm">Cargando campañas...</p>
+                    <Loader2 className="animate-spin text-purple-400" size={28} />
+                    <p className="text-white/30 text-sm">Cargando campañas...</p>
                 </div>
             ) : filtered.length === 0 ? (
-                <div className="text-center py-20 border border-dashed border-white/10 rounded-3xl" style={{ background: 'linear-gradient(180deg, #0B1B2B 0%, #081624 60%, #050B14 100%)' }}>
-                    <BarChart3 size={28} className="text-white/40 mx-auto mb-3" />
-                    <p className="text-white/75 text-sm font-bold">Sin campañas</p>
-                    <p className="text-white/40 text-xs mt-1 mb-6">No hay campañas con este filtro</p>
+                <div className="text-center py-20 bg-white/[0.015] border border-dashed border-white/8 rounded-3xl">
+                    <BarChart3 size={28} className="text-white/20 mx-auto mb-3" />
+                    <p className="text-white/30 text-sm font-bold">Sin campañas</p>
+                    <p className="text-white/20 text-xs mt-1 mb-6">No hay campañas con este filtro</p>
                     <Link href="/dashboard/services/ads/wizard"
-                        className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-[#FF2D95] via-[#B735B8] to-[#233B8F] text-white text-sm font-bold rounded-xl hover:opacity-90 transition-all">
+                        className="inline-flex items-center gap-2 px-5 py-2.5 bg-purple-600 text-white text-sm font-bold rounded-xl hover:bg-purple-500 transition-all">
                         <Sparkles size={14} /> Crear primera campaña
                     </Link>
                 </div>
@@ -199,7 +212,7 @@ export default function HistoryPage() {
 
                         return (
                             <div key={campaign.id}
-                                className="border border-white/10 rounded-2xl p-4 md:p-5 hover:border-white/20 transition-all" style={{ background: 'linear-gradient(180deg, #0B1B2B 0%, #081624 60%, #050B14 100%)' }}>
+                                className="bg-white/3 border border-white/8 rounded-2xl p-4 md:p-5 hover:border-white/15 transition-all">
 
                                 {/* Top row */}
                                 <div className="flex items-start gap-3">
@@ -209,8 +222,8 @@ export default function HistoryPage() {
                                     <div className="flex-1 min-w-0">
                                         <div className="flex items-start gap-2 justify-between">
                                             <div className="flex-1 min-w-0">
-                                                <h4 className="font-bold text-sm leading-tight line-clamp-1 text-white">{campaign.name}</h4>
-                                                <p className="text-[11px] text-white/55 truncate mt-0.5">
+                                                <h4 className="font-bold text-sm leading-tight line-clamp-1">{campaign.name}</h4>
+                                                <p className="text-[11px] text-white/30 truncate mt-0.5">
                                                     {campaign.strategy?.name}{campaign.brief?.name ? ` · ${campaign.brief.name}` : ''}
                                                 </p>
                                             </div>
@@ -223,11 +236,11 @@ export default function HistoryPage() {
                                         {/* Meta info chips */}
                                         <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-2">
                                             {campaign.dailyBudgetUSD > 0 && (
-                                                <span className="text-[10px] text-white/55 font-medium">${campaign.dailyBudgetUSD}/día</span>
+                                                <span className="text-[10px] text-white/25 font-medium">${campaign.dailyBudgetUSD}/día</span>
                                             )}
-                                            <span className="text-[10px] text-white/55">{campaign.creatives?.length || 0} anuncios · {creativesWithMedia} con creativo</span>
+                                            <span className="text-[10px] text-white/25">{campaign.creatives?.length || 0} anuncios · {creativesWithMedia} con creativo</span>
                                             {campaign.publishedAt && (
-                                                <span className="text-[10px] text-white/40">
+                                                <span className="text-[10px] text-white/20">
                                                     {new Date(campaign.publishedAt).toLocaleDateString('es', { day: 'numeric', month: 'short', year: '2-digit' })}
                                                 </span>
                                             )}
@@ -241,39 +254,39 @@ export default function HistoryPage() {
                                         {loadingMetrics && !campaignMetrics ? (
                                             <div className="mt-3 grid grid-cols-4 gap-2">
                                                 {[0, 1, 2, 3].map(i => (
-                                                    <div key={i} className="h-12 bg-white/5 rounded-xl animate-pulse" />
+                                                    <div key={i} className="h-12 bg-white/3 rounded-xl animate-pulse" />
                                                 ))}
                                             </div>
                                         ) : hasMetrics ? (
                                             <div className="mt-3">
                                                 <div className="grid grid-cols-4 gap-2">
                                                     {[
-                                                        { label: 'Impresiones', value: fmt(campaignMetrics!.impressions), color: 'text-[#7DD3FC]' },
-                                                        { label: 'Clics', value: fmt(campaignMetrics!.clicks), color: 'text-[#C9A7FF]' },
+                                                        { label: 'Impresiones', value: fmt(campaignMetrics!.impressions), color: 'text-blue-400' },
+                                                        { label: 'Clics', value: fmt(campaignMetrics!.clicks), color: 'text-purple-400' },
                                                         { label: 'Gasto', value: `$${campaignMetrics!.spend.toFixed(2)}`, color: 'text-green-400' },
                                                         { label: 'Alcance', value: fmt(campaignMetrics!.reach), color: 'text-orange-400' },
                                                     ].map(({ label, value, color }) => (
-                                                        <div key={label} className="bg-white/5 rounded-xl p-2.5 text-center">
+                                                        <div key={label} className="bg-white/3 rounded-xl p-2.5 text-center">
                                                             <p className={`text-sm font-black ${color}`}>{value}</p>
-                                                            <p className="text-[9px] text-white/55 mt-0.5">{label}</p>
+                                                            <p className="text-[9px] text-white/25 mt-0.5">{label}</p>
                                                         </div>
                                                     ))}
                                                 </div>
                                                 {/* CTR / CPM row */}
                                                 {metricsExpanded && (
                                                     <div className="grid grid-cols-2 gap-2 mt-2">
-                                                        <div className="bg-white/5 rounded-xl p-2.5 flex items-center gap-2">
-                                                            <TrendingUp size={13} className="text-white/55" />
+                                                        <div className="bg-white/3 rounded-xl p-2.5 flex items-center gap-2">
+                                                            <TrendingUp size={13} className="text-white/30" />
                                                             <div>
-                                                                <p className="text-xs font-bold text-white">{campaignMetrics!.ctr.toFixed(2)}%</p>
-                                                                <p className="text-[9px] text-white/55">CTR</p>
+                                                                <p className="text-xs font-bold">{campaignMetrics!.ctr.toFixed(2)}%</p>
+                                                                <p className="text-[9px] text-white/25">CTR</p>
                                                             </div>
                                                         </div>
-                                                        <div className="bg-white/5 rounded-xl p-2.5 flex items-center gap-2">
-                                                            <DollarSign size={13} className="text-white/55" />
+                                                        <div className="bg-white/3 rounded-xl p-2.5 flex items-center gap-2">
+                                                            <DollarSign size={13} className="text-white/30" />
                                                             <div>
-                                                                <p className="text-xs font-bold text-white">${campaignMetrics!.cpm.toFixed(2)}</p>
-                                                                <p className="text-[9px] text-white/55">CPM</p>
+                                                                <p className="text-xs font-bold">${campaignMetrics!.cpm.toFixed(2)}</p>
+                                                                <p className="text-[9px] text-white/25">CPM</p>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -284,14 +297,14 @@ export default function HistoryPage() {
                                                         next.has(campaign.id) ? next.delete(campaign.id) : next.add(campaign.id)
                                                         return next
                                                     })}
-                                                    className="w-full flex items-center justify-center gap-1 text-[10px] text-white/40 hover:text-white/70 mt-1.5 transition-all">
+                                                    className="w-full flex items-center justify-center gap-1 text-[10px] text-white/20 hover:text-white/40 mt-1.5 transition-all">
                                                     {metricsExpanded ? <><ChevronUp size={11} /> Menos métricas</> : <><ChevronDown size={11} /> CTR y CPM</>}
                                                 </button>
                                             </div>
                                         ) : campaignMetrics?.error ? (
-                                            <div className="mt-3 p-2.5 bg-white/5 rounded-xl flex items-center gap-2">
-                                                <AlertCircle size={12} className="text-white/40 shrink-0" />
-                                                <p className="text-[10px] text-white/55">{campaignMetrics.error}</p>
+                                            <div className="mt-3 p-2.5 bg-white/3 rounded-xl flex items-center gap-2">
+                                                <AlertCircle size={12} className="text-white/20 shrink-0" />
+                                                <p className="text-[10px] text-white/25">{campaignMetrics.error}</p>
                                             </div>
                                         ) : null}
                                     </>
@@ -306,16 +319,16 @@ export default function HistoryPage() {
                                 )}
 
                                 {/* Actions */}
-                                <div className="flex items-center gap-2 mt-3 pt-3 border-t border-white/10">
+                                <div className="flex items-center gap-2 mt-3 pt-3 border-t border-white/5">
                                     {campaign.status === 'READY' && (
                                         <Link href={`/dashboard/services/ads/preview/${campaign.id}`}
-                                            className="flex-1 sm:flex-none text-center text-xs font-bold px-4 py-2 rounded-xl bg-gradient-to-r from-[#FF2D95] via-[#B735B8] to-[#233B8F] text-white hover:opacity-90 transition-all">
+                                            className="flex-1 sm:flex-none text-center text-xs font-bold px-4 py-2 rounded-xl bg-purple-600 text-white hover:bg-purple-500 transition-all">
                                             Publicar →
                                         </Link>
                                     )}
                                     {campaign.status === 'DRAFT' && (
-                                        <Link href={`/dashboard/services/ads/campaign/${campaign.strategyId}?edit=${campaign.id}`}
-                                            className="flex-1 sm:flex-none text-center text-xs font-bold px-4 py-2 rounded-xl bg-white/8 text-white/75 hover:bg-white/15 transition-all">
+                                        <Link href={`/dashboard/services/ads/campaign/${campaign.strategyId || campaign.id}?edit=${campaign.id}`}
+                                            className="flex-1 sm:flex-none text-center text-xs font-bold px-4 py-2 rounded-xl bg-white/8 text-white/60 hover:bg-white/15 transition-all">
                                             Continuar editando →
                                         </Link>
                                     )}
@@ -327,14 +340,14 @@ export default function HistoryPage() {
                                     )}
                                     {campaign.status === 'PUBLISHED' && campaign.providerCampaignId && (
                                         <a href="https://business.facebook.com/adsmanager" target="_blank" rel="noopener noreferrer"
-                                            className="flex items-center gap-1.5 text-xs font-bold px-4 py-2 rounded-xl bg-[#7DD3FC]/10 border border-[#7DD3FC]/20 text-[#7DD3FC] hover:bg-[#7DD3FC]/20 transition-all">
+                                            className="flex items-center gap-1.5 text-xs font-bold px-4 py-2 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400 hover:bg-blue-500/20 transition-all">
                                             <ExternalLink size={12} /> Ads Manager
                                         </a>
                                     )}
 
                                     <div className="ml-auto flex items-center gap-2">
                                         {campaign.status === 'PUBLISHED' && campaign.providerCampaignId && (
-                                            <button onClick={() => fetchMetrics([campaign.id])} className="text-white/40 hover:text-white/70 transition-all">
+                                            <button onClick={() => fetchMetrics([campaign.id])} className="text-white/20 hover:text-white/50 transition-all">
                                                 <RefreshCw size={12} className={loadingMetrics ? 'animate-spin' : ''} />
                                             </button>
                                         )}
@@ -342,7 +355,7 @@ export default function HistoryPage() {
                                         {/* Delete */}
                                         {confirmDelete === campaign.id ? (
                                             <div className="flex items-center gap-1.5">
-                                                <span className="text-[10px] text-white/55">¿Eliminar?</span>
+                                                <span className="text-[10px] text-white/40">¿Eliminar?</span>
                                                 <button
                                                     onClick={() => deleteCampaign(campaign.id)}
                                                     disabled={deleting === campaign.id}
@@ -352,7 +365,7 @@ export default function HistoryPage() {
                                                 </button>
                                                 <button
                                                     onClick={() => setConfirmDelete(null)}
-                                                    className="text-[10px] font-bold px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-white/55 hover:bg-white/10 transition-all"
+                                                    className="text-[10px] font-bold px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-white/40 hover:bg-white/10 transition-all"
                                                 >
                                                     Cancelar
                                                 </button>
@@ -360,7 +373,7 @@ export default function HistoryPage() {
                                         ) : (
                                             <button
                                                 onClick={() => setConfirmDelete(campaign.id)}
-                                                className="text-white/40 hover:text-red-400 transition-all"
+                                                className="text-white/20 hover:text-red-400 transition-all"
                                                 title="Eliminar campaña"
                                             >
                                                 <Trash2 size={13} />
@@ -374,6 +387,5 @@ export default function HistoryPage() {
                 </div>
             )}
         </div>
-    </div>
     )
 }
