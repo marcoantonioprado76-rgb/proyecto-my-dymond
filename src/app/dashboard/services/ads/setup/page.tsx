@@ -5,7 +5,7 @@ import { Brain, Zap, CheckCircle2, AlertCircle, Loader2, Eye, EyeOff, ArrowLeft,
 import Link from 'next/link'
 
 const PLATFORMS = [
-    { id: 'META', label: 'Meta Ads', sub: 'Facebook & Instagram', color: '#0081FB', letter: 'f', textColor: 'text-blue-400' },
+    { id: 'META', label: 'Meta Ads', sub: 'Facebook & Instagram', color: '#0081FB', letter: 'f', textColor: 'text-[#233B8F]' },
 ]
 
 export default function SetupPage() {
@@ -90,14 +90,14 @@ export default function SetupPage() {
 
             {/* Alerts */}
             {error && (
-                <div className="mb-5 p-4 bg-red-500/10 border border-red-500/20 rounded-2xl flex items-start gap-3 text-red-400 text-sm">
+                <div className="mb-5 p-4 bg-[#DC2626]/10 border border-[#DC2626]/20 rounded-2xl flex items-start gap-3 text-[#DC2626] text-sm">
                     <AlertCircle size={15} className="shrink-0 mt-0.5" />
                     <p className="flex-1 text-xs md:text-sm">{error}</p>
                     <button onClick={() => setError(null)} className="font-bold text-xs shrink-0">✕</button>
                 </div>
             )}
             {success && (
-                <div className="mb-5 p-4 bg-green-500/10 border border-green-500/20 rounded-2xl flex items-start gap-3 text-green-400 text-sm">
+                <div className="mb-5 p-4 bg-[#059669]/10 border border-[#059669]/20 rounded-2xl flex items-start gap-3 text-[#059669] text-sm">
                     <CheckCircle2 size={15} className="shrink-0 mt-0.5" />
                     <p className="flex-1 text-xs md:text-sm">{success}</p>
                     <button onClick={() => setSuccess(null)} className="font-bold text-xs shrink-0">✕</button>
@@ -105,7 +105,7 @@ export default function SetupPage() {
             )}
 
             {/* Tab switcher */}
-            <div className="flex gap-1.5 mb-7 bg-white/4 p-1.5 rounded-2xl border border-[#E4E9F0]">
+            <div className="flex gap-1.5 mb-7 bg-[#F4F6FA] p-1.5 rounded-2xl border border-[#E4E9F0]">
                 {[
                     { id: 'openai' as const, label: 'OpenAI', icon: Brain },
                     { id: 'platforms' as const, label: 'Plataformas', icon: Zap }
@@ -128,20 +128,20 @@ export default function SetupPage() {
                     {/* Current config */}
                     {config && (
                         <div className={`p-4 rounded-2xl border flex items-center gap-3 ${config.isValid
-                            ? 'bg-green-500/5 border-green-500/20'
-                            : 'bg-yellow-500/5 border-yellow-500/20'
+                            ? 'bg-[#059669]/5 border-[#059669]/20'
+                            : 'bg-[#D97706]/5 border-[#D97706]/20'
                         }`}>
-                            <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${config.isValid ? 'bg-green-500/15' : 'bg-yellow-500/15'}`}>
+                            <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${config.isValid ? 'bg-[#059669]/15' : 'bg-[#D97706]/15'}`}>
                                 {config.isValid
-                                    ? <CheckCircle2 size={17} className="text-green-400" />
-                                    : <AlertCircle size={17} className="text-yellow-400" />
+                                    ? <CheckCircle2 size={17} className="text-[#059669]" />
+                                    : <AlertCircle size={17} className="text-[#D97706]" />
                                 }
                             </div>
                             <div className="flex-1 min-w-0">
                                 <p className="font-bold text-sm">{config.isValid ? 'API Key activa' : 'API Key no validada'}</p>
                                 <p className="text-[11px] text-[#9CA3AF] font-mono truncate">{config.apiKeyMasked} · {config.model}</p>
                             </div>
-                            <button onClick={handleDeleteOpenAI} className="text-xs text-red-400 hover:text-red-300 font-bold shrink-0">Eliminar</button>
+                            <button onClick={handleDeleteOpenAI} className="text-xs text-[#DC2626] hover:text-[#DC2626] font-bold shrink-0">Eliminar</button>
                         </div>
                     )}
 
@@ -149,25 +149,25 @@ export default function SetupPage() {
                     {credits.enabled && (
                         <Link href="/dashboard/ai-credits"
                             className="flex items-center gap-3 p-4 rounded-2xl transition-all hover:brightness-110"
-                            style={{ background: 'linear-gradient(135deg,rgba(124,58,237,0.14),rgba(37,99,235,0.06))', border: '1px solid rgba(139,92,246,0.3)' }}>
-                            <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style={{ background: 'rgba(139,92,246,0.18)', border: '1px solid rgba(139,92,246,0.3)' }}>
-                                <Sparkles size={18} className="text-purple-300" />
+                            style={{ background: 'linear-gradient(135deg,rgba(106,53,217,0.14),rgba(35,59,143,0.06))', border: '1px solid rgba(106,53,217,0.3)' }}>
+                            <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style={{ background: 'rgba(106,53,217,0.18)', border: '1px solid rgba(106,53,217,0.3)' }}>
+                                <Sparkles size={18} className="text-[#6A35D9]" />
                             </div>
                             <div className="flex-1 min-w-0">
                                 <p className="text-sm font-black text-[#111827]">¿No querés usar tu propia API Key?</p>
-                                <p className="text-[11px] text-[#9CA3AF]">Comprá créditos de IA y usá nuestra clave. Saldo: <b className="text-purple-300">${credits.balance.toFixed(2)}</b></p>
+                                <p className="text-[11px] text-[#9CA3AF]">Comprá créditos de IA y usá nuestra clave. Saldo: <b className="text-[#6A35D9]">${credits.balance.toFixed(2)}</b></p>
                             </div>
-                            <span className="shrink-0 text-xs font-black px-3 py-1.5 rounded-xl" style={{ background: 'rgba(139,92,246,0.22)', border: '1px solid rgba(139,92,246,0.38)', color: '#d6c8ff' }}>
+                            <span className="shrink-0 text-xs font-black px-3 py-1.5 rounded-xl" style={{ background: 'rgba(106,53,217,0.22)', border: '1px solid rgba(106,53,217,0.38)', color: '#6A35D9' }}>
                                 Comprar
                             </span>
                         </Link>
                     )}
 
                     {/* Info */}
-                    <div className="bg-blue-500/5 border border-blue-500/15 rounded-2xl p-4">
+                    <div className="bg-[#233B8F]/5 border border-[#E4E9F0] rounded-2xl p-4">
                         <div className="flex items-center gap-2 mb-2">
-                            <Sparkles size={13} className="text-blue-400" />
-                            <p className="text-xs font-bold text-blue-400 uppercase tracking-widest">¿Por qué tu propia API Key?</p>
+                            <Sparkles size={13} className="text-[#233B8F]" />
+                            <p className="text-xs font-bold text-[#233B8F] uppercase tracking-widest">¿Por qué tu propia API Key?</p>
                         </div>
                         <ul className="text-xs text-[#9CA3AF] space-y-1">
                             <li>• Control total de costos — pagas directamente a OpenAI</li>
@@ -176,13 +176,13 @@ export default function SetupPage() {
                             <li>• Tu clave se guarda cifrada con AES-256-GCM</li>
                         </ul>
                         <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1 mt-3 text-xs text-blue-400 font-bold hover:underline">
+                            className="inline-flex items-center gap-1 mt-3 text-xs text-[#233B8F] font-bold hover:underline">
                             Obtener API Key en OpenAI →
                         </a>
                     </div>
 
                     {/* Form */}
-                    <form onSubmit={handleSaveOpenAI} className="bg-white/3 border border-[#E4E9F0] rounded-2xl p-5 space-y-4">
+                    <form onSubmit={handleSaveOpenAI} className="bg-[#F4F6FA] border border-[#E4E9F0] rounded-2xl p-5 space-y-4">
                         <div className="flex items-center gap-2 mb-1">
                             <Key size={14} className="text-[#9CA3AF]" />
                             <h3 className="font-bold text-sm">{config ? 'Actualizar API Key' : 'Configurar API Key'}</h3>
@@ -198,7 +198,7 @@ export default function SetupPage() {
                                     value={apiKey}
                                     onChange={e => setApiKey(e.target.value)}
                                     placeholder="sk-proj-..."
-                                    className="w-full bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-4 py-3 text-sm font-mono text-[#111827] pr-12 focus:outline-none focus:border-purple-500/50 placeholder:text-[#9CA3AF] transition-colors"
+                                    className="w-full bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-4 py-3 text-sm font-mono text-[#111827] pr-12 focus:outline-none focus:border-[#E4E9F0] placeholder:text-[#9CA3AF] transition-colors"
                                 />
                                 <button type="button" onClick={() => setShowKey(!showKey)}
                                     className="absolute right-3 top-1/2 -translate-y-1/2 text-[#9CA3AF] hover:text-[#6B7280] transition-colors">
@@ -210,7 +210,7 @@ export default function SetupPage() {
                         <div>
                             <label className="text-[11px] font-bold text-[#9CA3AF] uppercase tracking-widest block mb-2">Modelo de IA</label>
                             <select value={model} onChange={e => setModel(e.target.value)}
-                                className="w-full bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-4 py-3 text-sm text-[#111827] focus:outline-none focus:border-purple-500/50 transition-colors [&>option]:bg-white">
+                                className="w-full bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-4 py-3 text-sm text-[#111827] focus:outline-none focus:border-[#E4E9F0] transition-colors [&>option]:bg-white">
                                 <option value="gpt-5.2">GPT-5.2 ⚡ Última generación — ⚠ Mayor costo</option>
                                 <option value="gpt-5.1">GPT-5.1 ⚡ Más inteligente — ⚠ Mayor costo</option>
                                 <option value="gpt-4.1">GPT-4.1 — Alta calidad</option>
@@ -221,7 +221,7 @@ export default function SetupPage() {
                         </div>
 
                         <button type="submit" disabled={saving || !apiKey.trim()}
-                            className="w-full bg-purple-600 hover:bg-purple-500 disabled:opacity-40 disabled:cursor-not-allowed text-white font-bold py-3 rounded-xl transition-all flex items-center justify-center gap-2 active:scale-[0.98]">
+                            className="w-full bg-[#6A35D9] hover:bg-[#5A2BC0] disabled:opacity-40 disabled:cursor-not-allowed text-white font-bold py-3 rounded-xl transition-all flex items-center justify-center gap-2 active:scale-[0.98]">
                             {saving ? <><Loader2 size={15} className="animate-spin" /> Validando...</> : 'Guardar y validar API Key'}
                         </button>
                     </form>
@@ -236,21 +236,21 @@ export default function SetupPage() {
                         const integration = integrations.find(i => i.platform === platform.id)
                         const isConnected = integration?.status === 'CONNECTED'
                         return (
-                            <div key={platform.id} className="bg-white/3 border border-[#E4E9F0] rounded-2xl p-4 md:p-5 hover:border-[#E4E9F0] transition-all">
+                            <div key={platform.id} className="bg-[#F4F6FA] border border-[#E4E9F0] rounded-2xl p-4 md:p-5 hover:border-[#E4E9F0] transition-all">
                                 <div className="flex items-center gap-3">
                                     <div className="relative">
                                         <div className="w-11 h-11 rounded-2xl bg-[#F4F6FA] border border-[#E4E9F0] flex items-center justify-center shrink-0">
                                             <span className={`font-black text-xl ${platform.textColor}`}>{platform.letter}</span>
                                         </div>
                                         {isConnected && (
-                                            <div className="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full bg-green-400 border-2 border-black" />
+                                            <div className="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full bg-[#059669] border-2 border-black" />
                                         )}
                                     </div>
                                     <div className="flex-1 min-w-0">
                                         <h3 className="font-bold text-sm">{platform.label}</h3>
                                         <p className="text-[11px] text-[#9CA3AF]">{platform.sub}</p>
                                         {isConnected && integration?.connectedAccount && (
-                                            <p className="text-[11px] text-green-400 mt-0.5 truncate">✓ {integration.connectedAccount.displayName}</p>
+                                            <p className="text-[11px] text-[#059669] mt-0.5 truncate">✓ {integration.connectedAccount.displayName}</p>
                                         )}
                                     </div>
                                     <button

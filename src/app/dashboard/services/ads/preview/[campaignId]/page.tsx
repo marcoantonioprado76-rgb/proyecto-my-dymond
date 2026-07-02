@@ -11,11 +11,11 @@ import { useRouter, useParams } from 'next/navigation'
 
 const STATUS_INFO: Record<string, { label: string; color: string; desc: string }> = {
     DRAFT: { label: 'Borrador', color: 'text-[#9CA3AF]', desc: 'Completa la configuración' },
-    READY: { label: 'Listo para publicar', color: 'text-blue-400', desc: 'Todo configurado correctamente' },
-    PUBLISHING: { label: 'Publicando...', color: 'text-yellow-400', desc: 'Enviando a Meta Ads Manager' },
-    PUBLISHED: { label: 'Publicado', color: 'text-green-400', desc: 'Activo en Meta Ads (estado inicial: pausado)' },
-    FAILED: { label: 'Error al publicar', color: 'text-red-400', desc: 'Revisa los detalles del error' },
-    PAUSED: { label: 'Pausado', color: 'text-orange-400', desc: 'Campaña pausada' }
+    READY: { label: 'Listo para publicar', color: 'text-[#233B8F]', desc: 'Todo configurado correctamente' },
+    PUBLISHING: { label: 'Publicando...', color: 'text-[#D97706]', desc: 'Enviando a Meta Ads Manager' },
+    PUBLISHED: { label: 'Publicado', color: 'text-[#059669]', desc: 'Activo en Meta Ads (estado inicial: pausado)' },
+    FAILED: { label: 'Error al publicar', color: 'text-[#DC2626]', desc: 'Revisa los detalles del error' },
+    PAUSED: { label: 'Pausado', color: 'text-[#EA580C]', desc: 'Campaña pausada' }
 }
 
 export default function PreviewPage() {
@@ -84,7 +84,7 @@ export default function PreviewPage() {
     }
 
     if (loading) {
-        return <div className="flex items-center justify-center min-h-[60vh]"><Loader2 className="animate-spin text-purple-400" size={32} /></div>
+        return <div className="flex items-center justify-center min-h-[60vh]"><Loader2 className="animate-spin text-[#6A35D9]" size={32} /></div>
     }
 
     if (!campaign) return null
@@ -111,7 +111,7 @@ export default function PreviewPage() {
                     <button
                         onClick={publish}
                         disabled={publishing || campaign.status === 'PUBLISHING'}
-                        className="flex items-center gap-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-bold px-5 py-2.5 rounded-xl hover:opacity-90 disabled:opacity-50 transition-all text-sm shadow-[0_0_30px_rgba(139,92,246,0.3)]"
+                        className="flex items-center gap-2 bg-gradient-to-r from-[#6A35D9] to-[#233B8F] text-white font-bold px-5 py-2.5 rounded-xl hover:opacity-90 disabled:opacity-50 transition-all text-sm shadow-[0_0_30px_rgba(106,53,217,0.3)]"
                     >
                         {publishing ? <><Loader2 size={15} className="animate-spin" /> Publicando...</> : <><Rocket size={15} /> Publicar Campaña</>}
                     </button>
@@ -119,24 +119,24 @@ export default function PreviewPage() {
             </div>
 
             {error && (
-                <div className="mb-5 p-4 bg-red-500/10 border border-red-500/20 rounded-2xl flex gap-3 text-red-400 text-sm">
+                <div className="mb-5 p-4 bg-[#DC2626]/10 border border-[#DC2626]/20 rounded-2xl flex gap-3 text-[#DC2626] text-sm">
                     <AlertCircle size={16} className="shrink-0" />
                     <p>{error}</p>
                     <button onClick={() => setError(null)} className="ml-auto text-xs font-bold">✕</button>
                 </div>
             )}
             {success && (
-                <div className="mb-5 p-4 bg-green-500/10 border border-green-500/20 rounded-2xl flex gap-3 text-green-400 text-sm">
+                <div className="mb-5 p-4 bg-[#059669]/10 border border-[#059669]/20 rounded-2xl flex gap-3 text-[#059669] text-sm">
                     <CheckCircle2 size={16} className="shrink-0" />
                     <p>{success}</p>
                 </div>
             )}
 
             {isPublished && campaign.providerCampaignId && (
-                <div className="mb-6 p-5 bg-green-500/5 border border-green-500/20 rounded-2xl">
+                <div className="mb-6 p-5 bg-[#059669]/5 border border-[#059669]/20 rounded-2xl">
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-sm font-bold text-green-400 mb-1">✓ Campaña publicada exitosamente</p>
+                            <p className="text-sm font-bold text-[#059669] mb-1">✓ Campaña publicada exitosamente</p>
                             <p className="text-xs text-[#9CA3AF]">ID de campaña: <span className="font-mono">{campaign.providerCampaignId}</span></p>
                             <p className="text-xs text-[#9CA3AF] mt-1">Estado inicial: PAUSADO. Actívala desde tu Ads Manager.</p>
                         </div>
@@ -144,7 +144,7 @@ export default function PreviewPage() {
                             href="https://business.facebook.com/adsmanager"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="flex items-center gap-2 text-xs font-bold px-4 py-2 rounded-xl bg-blue-600 text-white hover:bg-blue-500 transition-all"
+                            className="flex items-center gap-2 text-xs font-bold px-4 py-2 rounded-xl bg-[#233B8F] text-white hover:bg-[#1B2E6C] transition-all"
                         >
                             Abrir Ads Manager <ExternalLink size={12} />
                         </a>
@@ -157,7 +157,7 @@ export default function PreviewPage() {
                     <p className="text-[#9CA3AF] text-sm mb-4">No hay anuncios generados todavía</p>
                     <Link
                         href={`/dashboard/services/ads/campaign/${campaign.strategy?.id || campaign.strategyId}`}
-                        className="text-purple-400 text-sm font-bold hover:underline"
+                        className="text-[#6A35D9] text-sm font-bold hover:underline"
                     >
                         Volver a generar copies →
                     </Link>
@@ -191,7 +191,7 @@ export default function PreviewPage() {
                         <div className="bg-white rounded-2xl overflow-hidden border border-[#E4E9F0]">
                             {/* Post header */}
                             <div className="flex items-center gap-3 p-3 border-b border-[#E4E9F0]">
-                                <div className="w-9 h-9 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-xs font-black">
+                                <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#6A35D9] to-[#233B8F] flex items-center justify-center text-xs font-black">
                                     {campaign.brief?.name?.[0] || 'N'}
                                 </div>
                                 <div className="flex-1">
@@ -234,7 +234,7 @@ export default function PreviewPage() {
                                     <p className="text-[10px] text-[#9CA3AF] mt-0.5">{currentCreative.description}</p>
                                 )}
                                 <div className="mt-2">
-                                    <div className="w-full py-2 rounded-lg bg-blue-600 text-center text-xs font-bold text-white">
+                                    <div className="w-full py-2 rounded-lg bg-[#233B8F] text-center text-xs font-bold text-white">
                                         {campaign.brief?.mainCTA || 'Más información'}
                                     </div>
                                 </div>
@@ -254,7 +254,7 @@ export default function PreviewPage() {
                                 <button
                                     key={i}
                                     onClick={() => setActiveSlot(i)}
-                                    className={`w-10 h-10 rounded-xl overflow-hidden border-2 transition-all ${i === activeSlot ? 'border-purple-500' : 'border-[#E4E9F0] hover:border-[#E4E9F0]'}`}
+                                    className={`w-10 h-10 rounded-xl overflow-hidden border-2 transition-all ${i === activeSlot ? 'border-[#E4E9F0]' : 'border-[#E4E9F0] hover:border-[#E4E9F0]'}`}
                                 >
                                     {c.mediaUrl
                                         ? <img src={c.mediaUrl} alt="" className="w-full h-full object-cover" />
@@ -272,13 +272,13 @@ export default function PreviewPage() {
                             <div
                                 key={i}
                                 onClick={() => setActiveSlot(i)}
-                                className={`bg-dark-900/40 border rounded-2xl p-4 cursor-pointer transition-all ${i === activeSlot ? 'border-purple-500/40 bg-purple-500/5' : 'border-[#E4E9F0] hover:border-[#E4E9F0]'}`}
+                                className={`bg-dark-900/40 border rounded-2xl p-4 cursor-pointer transition-all ${i === activeSlot ? 'border-[#E4E9F0] bg-[#6A35D9]/5' : 'border-[#E4E9F0] hover:border-[#E4E9F0]'}`}
                             >
                                 <div className="flex items-center justify-between mb-2">
                                     <span className="text-[10px] font-black uppercase text-[#9CA3AF]">Anuncio #{i + 1}</span>
                                     <button
                                         onClick={e => { e.stopPropagation(); setEditingSlot(editingSlot === i ? null : i) }}
-                                        className="text-[10px] font-bold text-purple-400 hover:underline flex items-center gap-1"
+                                        className="text-[10px] font-bold text-[#6A35D9] hover:underline flex items-center gap-1"
                                     >
                                         <Edit3 size={10} /> Editar
                                     </button>
@@ -290,20 +290,20 @@ export default function PreviewPage() {
                                             value={creative.primaryText}
                                             onChange={e => setCreatives(prev => prev.map((c, j) => j === i ? { ...c, primaryText: e.target.value } : c))}
                                             rows={4}
-                                            className="w-full bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-3 py-2 text-xs text-[#111827] resize-none focus:outline-none focus:border-purple-500/50 leading-relaxed"
+                                            className="w-full bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-3 py-2 text-xs text-[#111827] resize-none focus:outline-none focus:border-[#E4E9F0] leading-relaxed"
                                         />
                                         <div className="grid grid-cols-2 gap-2">
                                             <input
                                                 value={creative.headline}
                                                 onChange={e => setCreatives(prev => prev.map((c, j) => j === i ? { ...c, headline: e.target.value } : c))}
                                                 placeholder="Titular"
-                                                className="bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-3 py-2 text-xs text-[#111827] focus:outline-none focus:border-purple-500/50 placeholder:text-[#9CA3AF]"
+                                                className="bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-3 py-2 text-xs text-[#111827] focus:outline-none focus:border-[#E4E9F0] placeholder:text-[#9CA3AF]"
                                             />
                                             <input
                                                 value={creative.description || ''}
                                                 onChange={e => setCreatives(prev => prev.map((c, j) => j === i ? { ...c, description: e.target.value } : c))}
                                                 placeholder="Descripción"
-                                                className="bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-3 py-2 text-xs text-[#111827] focus:outline-none focus:border-purple-500/50 placeholder:text-[#9CA3AF]"
+                                                className="bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-3 py-2 text-xs text-[#111827] focus:outline-none focus:border-[#E4E9F0] placeholder:text-[#9CA3AF]"
                                             />
                                         </div>
                                         <div className="flex gap-2">
@@ -311,7 +311,7 @@ export default function PreviewPage() {
                                             <button
                                                 onClick={() => saveCreative(i)}
                                                 disabled={saving}
-                                                className="flex-1 py-2 rounded-xl bg-purple-600 text-white text-xs font-bold hover:bg-purple-500 disabled:opacity-50"
+                                                className="flex-1 py-2 rounded-xl bg-[#6A35D9] text-white text-xs font-bold hover:bg-[#5A2BC0] disabled:opacity-50"
                                             >
                                                 {saving ? 'Guardando...' : 'Guardar'}
                                             </button>
@@ -330,7 +330,7 @@ export default function PreviewPage() {
                             <button
                                 onClick={publish}
                                 disabled={publishing || campaign.status === 'PUBLISHING'}
-                                className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-bold py-4 rounded-2xl hover:opacity-90 disabled:opacity-50 transition-all mt-4 shadow-[0_0_30px_rgba(139,92,246,0.3)]"
+                                className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-[#6A35D9] to-[#233B8F] text-white font-bold py-4 rounded-2xl hover:opacity-90 disabled:opacity-50 transition-all mt-4 shadow-[0_0_30px_rgba(106,53,217,0.3)]"
                             >
                                 {publishing
                                     ? <><Loader2 size={18} className="animate-spin" /> Publicando en Meta Ads...</>

@@ -7,12 +7,13 @@ import { useEffect, useState } from 'react'
  * degradado + shimmer + transición suave, puntos animados y barra indeterminada.
  * variant="full" para overlays; variant="compact" para slots (imágenes).
  */
+// Degradados de marca MY DIAMOND (familia rosa → morado → azul del diamond-gradient)
 const GRADIENTS = [
-    'linear-gradient(90deg,#f0abfc,#67e8f9,#f0abfc)',
-    'linear-gradient(90deg,#67e8f9,#93c5fd,#67e8f9)',
-    'linear-gradient(90deg,#fdba74,#fb7185,#fdba74)',
-    'linear-gradient(90deg,#6ee7b7,#67e8f9,#6ee7b7)',
-    'linear-gradient(90deg,#d8b4fe,#f0abfc,#d8b4fe)',
+    'linear-gradient(90deg,#FF096C,#6A35D9,#233B8F)',
+    'linear-gradient(90deg,#6A35D9,#B735B8,#FF096C)',
+    'linear-gradient(90deg,#233B8F,#6A35D9,#B735B8)',
+    'linear-gradient(90deg,#B735B8,#9B70E7,#233B8F)',
+    'linear-gradient(90deg,#FF096C,#B735B8,#6A35D9)',
 ]
 
 export function AiThinking({ messages, className = '', variant = 'full' }:

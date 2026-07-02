@@ -67,7 +67,7 @@ function PublishProgress({ active, failed }: { active: boolean; failed: boolean 
             <div className="text-5xl" style={{ transform: `translateY(${(1 - pct / 100) * 14}px)`, transition: 'transform .3s ease' }}>🚀</div>
             <div className="w-full max-w-sm">
                 <div className="flex items-end justify-between mb-2.5 gap-3">
-                    <span className="ai-grad-text text-sm font-extrabold leading-tight" style={{ backgroundImage: 'linear-gradient(90deg,#f0abfc,#67e8f9,#f0abfc)' }}>
+                    <span className="ai-grad-text text-sm font-extrabold leading-tight" style={{ backgroundImage: 'linear-gradient(90deg,#B735B8,#9B70E7,#B735B8)' }}>
                         {pct >= 100 ? '¡Publicado!' : PUBLISH_STAGES[stage]}
                     </span>
                     <span className="text-base font-black text-[#111827] shrink-0">{Math.round(pct)}%</span>
@@ -75,7 +75,7 @@ function PublishProgress({ active, failed }: { active: boolean; failed: boolean 
                 <div className="relative h-3 rounded-full bg-[#F0F3F7] overflow-hidden border border-[#E4E9F0]">
                     <div className="h-full rounded-full" style={{
                         width: `${pct}%`, transition: 'width .3s ease-out',
-                        background: 'linear-gradient(90deg,#a855f7,#ec4899,#f59e0b,#22d3ee,#a855f7)',
+                        background: 'linear-gradient(90deg,#6A35D9,#FF096C,#D97706,#233B8F,#6A35D9)',
                         backgroundSize: '300% 100%', animation: 'ai-liquid 3s ease infinite',
                     }} />
                 </div>
@@ -850,7 +850,7 @@ function CampaignPageInner() {
     if (loading) {
         return (
             <div className="flex items-center justify-center min-h-[60vh]">
-                <Loader2 className="animate-spin text-purple-400" size={32} />
+                <Loader2 className="animate-spin text-[#6A35D9]" size={32} />
             </div>
         )
     }
@@ -874,7 +874,7 @@ function CampaignPageInner() {
 
             {/* ── Header ── */}
             <div className="flex items-center gap-3 mb-6"
-                style={{ background: 'linear-gradient(135deg,rgba(139,92,246,0.1) 0%,rgba(59,130,246,0.05) 100%)', border: '1px solid rgba(139,92,246,0.18)', borderRadius: '1.5rem', padding: '1rem 1.25rem' }}>
+                style={{ background: 'linear-gradient(135deg,rgba(106,53,217,0.1) 0%,rgba(35,59,143,0.05) 100%)', border: '1px solid rgba(106,53,217,0.18)', borderRadius: '1.5rem', padding: '1rem 1.25rem' }}>
                 <button
                     onClick={() => { if (typeof window !== 'undefined' && window.history.length > 1) router.back(); else router.push('/dashboard/services/ads/meta') }}
                     className="w-9 h-9 shrink-0 rounded-xl bg-[#F4F6FA] border border-[#E4E9F0] flex items-center justify-center hover:bg-[#F0F3F7] transition-all"
@@ -888,7 +888,7 @@ function CampaignPageInner() {
             </div>
 
             {/* Tabs del editor — Config / Creativos & Textos (el preview es el botón Publicar abajo) */}
-            <div className="flex items-center gap-1.5 mb-4 p-1 rounded-2xl bg-white/3 border border-[#E4E9F0]">
+            <div className="flex items-center gap-1.5 mb-4 p-1 rounded-2xl bg-[#F4F6FA] border border-[#E4E9F0]">
                 {[
                     { id: 'config' as const, label: 'Configuración', done: configSaved, icon: Settings2, locked: false },
                     { id: 'creativos' as const, label: 'Creativos & Textos', done: creativesReady > 0 && copiesGenerated, icon: LayoutGrid, locked: !configSaved },
@@ -898,8 +898,8 @@ function CampaignPageInner() {
                         <button key={t.id}
                             onClick={() => { if (!t.locked) setTab(t.id) }}
                             disabled={t.locked}
-                            className={`flex-1 flex items-center justify-center gap-1.5 text-[11px] sm:text-xs font-bold px-3 py-2.5 rounded-xl transition-all ${active ? 'bg-gradient-to-br from-purple-600/90 to-blue-600/80 text-white shadow-[0_0_18px_rgba(124,58,237,0.3)]' : t.locked ? 'text-[#9CA3AF] cursor-not-allowed' : 'text-[#9CA3AF] hover:text-[#6B7280] hover:bg-[#F4F6FA]'}`}>
-                            {t.done ? <CheckCircle2 size={12} className={active ? 'text-[#111827]' : 'text-green-400'} /> : <t.icon size={12} />}
+                            className={`flex-1 flex items-center justify-center gap-1.5 text-[11px] sm:text-xs font-bold px-3 py-2.5 rounded-xl transition-all ${active ? 'bg-gradient-to-br from-[#6A35D9]/90 to-[#233B8F]/80 text-white shadow-[0_0_18px_rgba(106,53,217,0.3)]' : t.locked ? 'text-[#9CA3AF] cursor-not-allowed' : 'text-[#9CA3AF] hover:text-[#6B7280] hover:bg-[#F4F6FA]'}`}>
+                            {t.done ? <CheckCircle2 size={12} className={active ? 'text-[#111827]' : 'text-[#059669]'} /> : <t.icon size={12} />}
                             {t.label}
                             {t.locked && <span className="text-[9px] opacity-60">🔒</span>}
                         </button>
@@ -908,8 +908,8 @@ function CampaignPageInner() {
             </div>
 
             {/* Platform badges */}
-            <div className="flex flex-wrap items-center gap-2 mb-5 px-3 py-2.5 bg-white/2 border border-[#E4E9F0] border-l-2 border-l-blue-500/40 rounded-2xl">
-                <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400">{strategy.platform}</span>
+            <div className="flex flex-wrap items-center gap-2 mb-5 px-3 py-2.5 bg-[#F4F6FA] border border-[#E4E9F0] border-l-2 border-l-[#233B8F]/40 rounded-2xl">
+                <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-[#233B8F]/10 border border-[#E4E9F0] text-[#233B8F]">{strategy.platform}</span>
                 <span className="text-[11px] text-[#9CA3AF] flex items-center gap-1">
                     {strategy.mediaType === 'video' ? <Video size={10} /> : <ImageIcon size={10} />}
                     {strategy.mediaCount} {strategy.mediaType === 'video' ? 'videos' : 'imágenes'}
@@ -922,7 +922,7 @@ function CampaignPageInner() {
 
             {/* Alerts */}
             {error && (
-                <div className="mb-4 p-3.5 bg-red-500/10 border border-red-500/20 rounded-2xl text-red-400 text-sm">
+                <div className="mb-4 p-3.5 bg-[#DC2626]/10 border border-[#DC2626]/20 rounded-2xl text-[#DC2626] text-sm">
                     <div className="flex gap-3">
                         <AlertCircle size={15} className="shrink-0 mt-0.5" />
                         <p className="flex-1 text-[13px]">{error}</p>
@@ -931,13 +931,13 @@ function CampaignPageInner() {
                     {/(cr[eé]dit|saldo|api\s*key|openai)/i.test(error) && (
                         <div className="flex flex-wrap gap-2 mt-2.5 pl-[27px]">
                             <Link href="/dashboard/services/ads/setup" className="text-[11px] font-bold px-3 py-1.5 rounded-lg bg-[#F0F3F7] hover:bg-[#F0F3F7] text-[#111827] transition-all">Configurar mi API Key</Link>
-                            <Link href="/dashboard/ai-credits" className="text-[11px] font-bold px-3 py-1.5 rounded-lg bg-purple-500/25 hover:bg-purple-500/35 text-purple-100 transition-all">Comprar créditos de IA</Link>
+                            <Link href="/dashboard/ai-credits" className="text-[11px] font-bold px-3 py-1.5 rounded-lg bg-[#6A35D9]/25 hover:bg-[#5A2BC0]/35 text-purple-100 transition-all">Comprar créditos de IA</Link>
                         </div>
                     )}
                 </div>
             )}
             {success && (
-                <div className="mb-4 p-3.5 bg-green-500/10 border border-green-500/20 rounded-2xl flex gap-3 text-green-400 text-sm">
+                <div className="mb-4 p-3.5 bg-[#059669]/10 border border-[#059669]/20 rounded-2xl flex gap-3 text-[#059669] text-sm">
                     <CheckCircle2 size={15} className="shrink-0 mt-0.5" />
                     <p className="flex-1 text-[13px]">{success}</p>
                 </div>
@@ -946,17 +946,17 @@ function CampaignPageInner() {
             {/* ══════════════════════════════════════════════
                 SECCIÓN 1 — CONFIGURACIÓN
             ══════════════════════════════════════════════ */}
-            <div className={`mb-4 rounded-3xl border transition-all overflow-hidden ${tab !== 'config' ? 'hidden' : ''} ${configSaved ? 'border-green-500/20' : 'border-[#E4E9F0]'}`}
-                style={{ background: configSaved ? 'rgba(16,185,129,0.02)' : 'rgba(15,23,42,0.08)' }}>
+            <div className={`mb-4 rounded-3xl border transition-all overflow-hidden ${tab !== 'config' ? 'hidden' : ''} ${configSaved ? 'border-[#059669]/20' : 'border-[#E4E9F0]'}`}
+                style={{ background: configSaved ? 'rgba(5,150,105,0.02)' : 'rgba(15,23,42,0.08)' }}>
 
                 {/* Section header */}
                 <div className="flex items-center gap-3 px-5 pt-5 pb-4 border-b border-[#E4E9F0]">
                     <div className="w-7 h-7 rounded-xl flex items-center justify-center text-[11px] font-black"
-                        style={{ background: configSaved ? 'rgba(16,185,129,0.15)' : 'rgba(139,92,246,0.15)', color: configSaved ? '#10b981' : '#a78bfa' }}>1</div>
+                        style={{ background: configSaved ? 'rgba(5,150,105,0.15)' : 'rgba(106,53,217,0.15)', color: configSaved ? '#059669' : '#9B70E7' }}>1</div>
                     <div className="flex-1">
                         <p className="text-[11px] font-bold uppercase tracking-widest text-[#9CA3AF] flex items-center gap-1.5">
                             <Settings2 size={10} /> Configuración
-                            {configSaved && <span className="text-green-400 font-bold flex items-center gap-1"><CheckCircle2 size={9} /> Guardada</span>}
+                            {configSaved && <span className="text-[#059669] font-bold flex items-center gap-1"><CheckCircle2 size={9} /> Guardada</span>}
                         </p>
                     </div>
                 </div>
@@ -968,7 +968,7 @@ function CampaignPageInner() {
                         <input
                             value={form.name}
                             onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
-                            className="w-full bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-3 py-2.5 text-sm text-[#111827] focus:outline-none focus:border-purple-500/50 transition-colors"
+                            className="w-full bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-3 py-2.5 text-sm text-[#111827] focus:outline-none focus:border-[#E4E9F0] transition-colors"
                         />
                     </div>
 
@@ -984,7 +984,7 @@ function CampaignPageInner() {
                                         setForm(f => ({ ...f, providerAccountId: e.target.value, providerAccountName: sel?.displayName || '', pixelId: '' }))
                                         if (strategy?.platform === 'META') fetchPixels(e.target.value)
                                     }}
-                                    className="w-full bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-3 py-2.5 text-sm text-[#111827] focus:outline-none focus:border-purple-500/50 [&>option]:bg-white"
+                                    className="w-full bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-3 py-2.5 text-sm text-[#111827] focus:outline-none focus:border-[#E4E9F0] [&>option]:bg-white"
                                 >
                                     {accounts.map((a: any) => (
                                         <option key={a.providerAccountId} value={a.providerAccountId}>{a.displayName}</option>
@@ -992,7 +992,7 @@ function CampaignPageInner() {
                                 </select>
                             </div>
                         ) : (
-                            <div className="p-3 bg-yellow-500/10 border border-yellow-500/20 rounded-xl text-xs text-yellow-400">
+                            <div className="p-3 bg-[#D97706]/10 border border-[#D97706]/20 rounded-xl text-xs text-[#D97706]">
                                 Sin cuenta conectada. <Link href="/dashboard/services/ads/setup?tab=platforms" className="underline font-bold">Conectar</Link>
                             </div>
                         )}
@@ -1008,7 +1008,7 @@ function CampaignPageInner() {
                                         const saved = pid ? getWaPrefs()[pid] : ''
                                         setForm(f => ({ ...f, pageId: pid, whatsappNumber: selectedPage?.whatsappNumber || saved || '' }))
                                     }}
-                                    className="w-full bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-3 py-2.5 text-sm text-[#111827] focus:outline-none focus:border-purple-500/50 [&>option]:bg-white"
+                                    className="w-full bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-3 py-2.5 text-sm text-[#111827] focus:outline-none focus:border-[#E4E9F0] [&>option]:bg-white"
                                 >
                                     <option value="">Seleccionar página...</option>
                                     {pages.map((p: any) => (
@@ -1016,8 +1016,8 @@ function CampaignPageInner() {
                                     ))}
                                 </select>
                                 {form.pageId && pages.find((p: any) => p.id === form.pageId)?.instagramUsername && (
-                                    <div className="mt-1.5 flex items-center gap-2 px-2.5 py-1.5 bg-pink-500/5 border border-pink-500/15 rounded-xl">
-                                        <span className="text-[10px] font-bold text-pink-400">IG</span>
+                                    <div className="mt-1.5 flex items-center gap-2 px-2.5 py-1.5 bg-[#FF096C]/5 border border-[#E4E9F0] rounded-xl">
+                                        <span className="text-[10px] font-bold text-[#FF096C]">IG</span>
                                         <span className="text-xs text-[#9CA3AF]">@{pages.find((p: any) => p.id === form.pageId)?.instagramUsername}</span>
                                     </div>
                                 )}
@@ -1032,10 +1032,10 @@ function CampaignPageInner() {
                                 <Phone size={9} /> WhatsApp Business
                             </label>
                             {form.whatsappNumber ? (
-                                <div className="flex items-center justify-between px-3 py-2.5 bg-green-500/5 border border-green-500/20 rounded-xl">
+                                <div className="flex items-center justify-between px-3 py-2.5 bg-[#059669]/5 border border-[#059669]/20 rounded-xl">
                                     <div className="flex items-center gap-2">
-                                        <Phone size={12} className="text-green-400" />
-                                        <span className="text-sm text-green-300 font-mono">{form.whatsappNumber}</span>
+                                        <Phone size={12} className="text-[#059669]" />
+                                        <span className="text-sm text-[#059669] font-mono">{form.whatsappNumber}</span>
                                     </div>
                                     <button onClick={() => setForm(f => ({ ...f, whatsappNumber: '' }))} className="text-[11px] text-[#9CA3AF] hover:text-[#111827]">Cambiar</button>
                                 </div>
@@ -1048,13 +1048,13 @@ function CampaignPageInner() {
                                         if (nums.length > 0) return nums.map((n: any) => (
                                             <button key={n.id || n.displayPhone} type="button"
                                                 onClick={() => { setForm(f => ({ ...f, whatsappNumber: n.displayPhone })); if (form.pageId) saveWaPref(form.pageId, n.displayPhone) }}
-                                                className="w-full flex items-center justify-between px-3 py-2.5 bg-white/3 border border-[#E4E9F0] hover:border-green-500/40 hover:bg-green-500/5 rounded-xl transition-all text-left">
+                                                className="w-full flex items-center justify-between px-3 py-2.5 bg-[#F4F6FA] border border-[#E4E9F0] hover:border-[#059669]/40 hover:bg-[#047857]/5 rounded-xl transition-all text-left">
                                                 <div className="flex items-center gap-2">
-                                                    <Phone size={12} className="text-green-400/60" />
+                                                    <Phone size={12} className="text-[#059669]/60" />
                                                     <span className="text-sm font-mono text-[#6B7280]">{n.displayPhone}</span>
                                                     {n.name && <span className="text-[11px] text-[#9CA3AF]">{n.name}</span>}
                                                 </div>
-                                                {n.status && <span className={`text-[10px] font-bold uppercase ${n.status === 'CONNECTED' ? 'text-green-400' : 'text-yellow-400'}`}>{n.status}</span>}
+                                                {n.status && <span className={`text-[10px] font-bold uppercase ${n.status === 'CONNECTED' ? 'text-[#059669]' : 'text-[#D97706]'}`}>{n.status}</span>}
                                             </button>
                                         ))
                                         return null
@@ -1064,7 +1064,7 @@ function CampaignPageInner() {
                                         onChange={e => setForm(f => ({ ...f, whatsappNumber: e.target.value }))}
                                         onBlur={e => { if (form.pageId && e.target.value) saveWaPref(form.pageId, e.target.value) }}
                                         placeholder="+573001234567"
-                                        className="w-full bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-3 py-2.5 text-sm text-[#111827] focus:outline-none focus:border-green-500/50 placeholder:text-[#9CA3AF]"
+                                        className="w-full bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-3 py-2.5 text-sm text-[#111827] focus:outline-none focus:border-[#059669]/50 placeholder:text-[#9CA3AF]"
                                     />
                                 </div>
                             )}
@@ -1073,15 +1073,15 @@ function CampaignPageInner() {
 
                     {/* WhatsApp chat editor */}
                     {needsWhatsApp && (
-                        <div className="rounded-2xl border border-green-500/15 bg-green-500/3 p-4 space-y-3">
-                            <p className="text-[10px] font-bold uppercase tracking-widest text-green-400 flex items-center gap-1.5">
+                        <div className="rounded-2xl border border-[#059669]/15 bg-[#059669]/3 p-4 space-y-3">
+                            <p className="text-[10px] font-bold uppercase tracking-widest text-[#059669] flex items-center gap-1.5">
                                 <Phone size={10} /> Editor de chat WhatsApp
                             </p>
                             <div>
                                 <div className="flex items-center justify-between mb-1.5">
                                     <label className="text-[10px] font-bold text-[#9CA3AF] uppercase tracking-widest">Saludo</label>
                                     <button type="button" onClick={() => fillChatWithAI('whatsappGreeting')} disabled={!!fillingChat}
-                                        className="flex items-center gap-1 text-[10px] font-bold text-purple-300 hover:text-purple-200 disabled:opacity-50 transition-colors">
+                                        className="flex items-center gap-1 text-[10px] font-bold text-[#6A35D9] hover:text-purple-200 disabled:opacity-50 transition-colors">
                                         {fillingChat === 'whatsappGreeting' ? <Loader2 size={10} className="animate-spin" /> : <Sparkles size={10} />}
                                         Llenar con IA
                                     </button>
@@ -1092,7 +1092,7 @@ function CampaignPageInner() {
                                     placeholder="Ej: ¡Hola! ¿Cómo podemos ayudarte? 👋"
                                     rows={2}
                                     maxLength={180}
-                                    className="w-full bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-3 py-2.5 text-sm text-[#111827] focus:outline-none focus:border-green-500/50 placeholder:text-[#9CA3AF] resize-none"
+                                    className="w-full bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-3 py-2.5 text-sm text-[#111827] focus:outline-none focus:border-[#059669]/50 placeholder:text-[#9CA3AF] resize-none"
                                 />
                                 <p className="text-[9px] text-[#9CA3AF] mt-1">{180 - form.welcomeMessage.length} caracteres restantes</p>
                             </div>
@@ -1100,7 +1100,7 @@ function CampaignPageInner() {
                                 <div className="flex items-center justify-between mb-1.5">
                                     <label className="text-[10px] font-bold text-[#9CA3AF] uppercase tracking-widest">Botón de respuesta rápida</label>
                                     <button type="button" onClick={() => fillChatWithAI('quickReply')} disabled={!!fillingChat}
-                                        className="flex items-center gap-1 text-[10px] font-bold text-purple-300 hover:text-purple-200 disabled:opacity-50 transition-colors">
+                                        className="flex items-center gap-1 text-[10px] font-bold text-[#6A35D9] hover:text-purple-200 disabled:opacity-50 transition-colors">
                                         {fillingChat === 'quickReply' ? <Loader2 size={10} className="animate-spin" /> : <Sparkles size={10} />}
                                         Llenar con IA
                                     </button>
@@ -1111,13 +1111,13 @@ function CampaignPageInner() {
                                     onChange={e => setForm(f => ({ ...f, whatsappQuestion: e.target.value.slice(0, 160) }))}
                                     placeholder="Ej: Quiero más información"
                                     maxLength={160}
-                                    className="w-full bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-3 py-2.5 text-sm text-[#111827] focus:outline-none focus:border-green-500/50 placeholder:text-[#9CA3AF]"
+                                    className="w-full bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-3 py-2.5 text-sm text-[#111827] focus:outline-none focus:border-[#059669]/50 placeholder:text-[#9CA3AF]"
                                 />
                                 <p className="text-[9px] text-[#9CA3AF] mt-1">{160 - form.whatsappQuestion.length} caracteres restantes</p>
                             </div>
                             {(form.welcomeMessage || form.whatsappQuestion) && (
-                                <div className="rounded-xl bg-white border border-green-500/20 p-3 space-y-2">
-                                    <p className="text-[9px] font-bold text-green-400/60 uppercase tracking-widest mb-1">Vista previa</p>
+                                <div className="rounded-xl bg-white border border-[#059669]/20 p-3 space-y-2">
+                                    <p className="text-[9px] font-bold text-[#059669]/60 uppercase tracking-widest mb-1">Vista previa</p>
                                     {form.welcomeMessage && (
                                         <div className="inline-block bg-[#F0F3F7] rounded-xl rounded-tl-sm px-3 py-2 max-w-[85%]">
                                             <p className="text-xs text-[#6B7280] leading-relaxed">{form.welcomeMessage}</p>
@@ -1125,7 +1125,7 @@ function CampaignPageInner() {
                                     )}
                                     {form.whatsappQuestion && (
                                         <div className="flex">
-                                            <span className="text-[11px] font-bold px-3 py-1.5 rounded-full border border-green-500/40 text-green-300 bg-green-500/10">
+                                            <span className="text-[11px] font-bold px-3 py-1.5 rounded-full border border-[#059669]/40 text-[#059669] bg-[#059669]/10">
                                                 {form.whatsappQuestion}
                                             </span>
                                         </div>
@@ -1138,9 +1138,9 @@ function CampaignPageInner() {
                     {/* Pixel + URL */}
                     {needsPixel && pixels.length > 0 && (
                         <div>
-                            <label className="text-[10px] font-bold text-[#9CA3AF] uppercase tracking-widest block mb-1.5">Pixel de seguimiento <span className="text-purple-400/50 normal-case font-normal">· señal de conversión</span></label>
+                            <label className="text-[10px] font-bold text-[#9CA3AF] uppercase tracking-widest block mb-1.5">Pixel de seguimiento <span className="text-[#6A35D9]/50 normal-case font-normal">· señal de conversión</span></label>
                             <select value={form.pixelId} onChange={e => setForm(f => ({ ...f, pixelId: e.target.value }))}
-                                className="w-full bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-3 py-2.5 text-sm text-[#111827] focus:outline-none focus:border-purple-500/50 [&>option]:bg-white">
+                                className="w-full bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-3 py-2.5 text-sm text-[#111827] focus:outline-none focus:border-[#E4E9F0] [&>option]:bg-white">
                                 <option value="">Sin pixel</option>
                                 {pixels.map((p: any) => <option key={p.id} value={p.id}>{p.name}</option>)}
                             </select>
@@ -1148,8 +1148,8 @@ function CampaignPageInner() {
                     )}
                     {/* Aviso de SEÑAL (Andromeda): ventas sin píxel → Meta optimiza por clics, no por compras */}
                     {(strategy?.objective === 'conversions' || form.objective === 'conversions') && !form.pixelId && (
-                        <div className="p-3 rounded-xl flex items-start gap-2" style={{ background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.22)' }}>
-                            <span className="text-amber-400 shrink-0">⚠️</span>
+                        <div className="p-3 rounded-xl flex items-start gap-2" style={{ background: 'rgba(217,119,6,0.08)', border: '1px solid rgba(217,119,6,0.22)' }}>
+                            <span className="text-[#D97706] shrink-0">⚠️</span>
                             <p className="text-[11px] text-amber-200/90 leading-relaxed">
                                 Para optimizar por <b>VENTAS</b> conviene seleccionar tu <b>Píxel</b>: es la <b>señal</b> que Andromeda usa para encontrar compradores. Sin píxel, Meta optimiza por <b>clics</b> (no por compras). {pixels.length === 0 && 'No encontramos píxeles — creá uno en el Administrador de Eventos de Meta y reconectá.'}
                             </p>
@@ -1160,7 +1160,7 @@ function CampaignPageInner() {
                             <label className="text-[10px] font-bold text-[#9CA3AF] uppercase tracking-widest block mb-1.5">URL de destino</label>
                             <input value={form.destinationUrl} onChange={e => setForm(f => ({ ...f, destinationUrl: e.target.value }))}
                                 placeholder="https://tusitio.com"
-                                className="w-full bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-3 py-2.5 text-sm text-[#111827] focus:outline-none focus:border-purple-500/50 placeholder:text-[#9CA3AF]" />
+                                className="w-full bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-3 py-2.5 text-sm text-[#111827] focus:outline-none focus:border-[#E4E9F0] placeholder:text-[#9CA3AF]" />
                         </div>
                     )}
 
@@ -1180,7 +1180,7 @@ function CampaignPageInner() {
                                         inputMode="decimal"
                                         value={form.dailyBudgetUSD}
                                         onChange={e => setForm(f => ({ ...f, dailyBudgetUSD: e.target.value }))}
-                                        className="w-full bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl pl-7 pr-20 py-2.5 text-xl font-black text-[#111827] focus:outline-none focus:border-purple-500/50"
+                                        className="w-full bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl pl-7 pr-20 py-2.5 text-xl font-black text-[#111827] focus:outline-none focus:border-[#E4E9F0]"
                                     />
                                     <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-[#9CA3AF] pointer-events-none">USD/día</span>
                                 </div>
@@ -1210,8 +1210,8 @@ function CampaignPageInner() {
                     </button>
 
                     {showAdvanced && (
-                        <div className="rounded-2xl border border-purple-500/15 bg-purple-500/3 p-4 space-y-4">
-                            <p className="text-[10px] font-bold uppercase tracking-widest text-purple-400 flex items-center gap-1.5">
+                        <div className="rounded-2xl border border-[#E4E9F0] bg-[#6A35D9]/3 p-4 space-y-4">
+                            <p className="text-[10px] font-bold uppercase tracking-widest text-[#6A35D9] flex items-center gap-1.5">
                                 <Bot size={10} /> Optimización IA
                             </p>
 
@@ -1225,9 +1225,9 @@ function CampaignPageInner() {
                                             { key: 'carousel', label: 'Carrusel', desc: 'Todas las variaciones en un carrusel', icon: Layers },
                                         ] as const).map(opt => (
                                             <button key={opt.key} onClick={() => setAdFormat(opt.key)}
-                                                className={`flex flex-col items-start gap-1 p-3 rounded-xl border text-left transition-all ${adFormat === opt.key ? 'bg-purple-500/15 border-purple-500/40' : 'bg-white/3 border-[#E4E9F0] hover:border-[#E4E9F0]'}`}>
-                                                <opt.icon size={12} className={adFormat === opt.key ? 'text-purple-400' : 'text-[#9CA3AF]'} />
-                                                <span className={`text-[11px] font-bold ${adFormat === opt.key ? 'text-purple-300' : 'text-[#9CA3AF]'}`}>{opt.label}</span>
+                                                className={`flex flex-col items-start gap-1 p-3 rounded-xl border text-left transition-all ${adFormat === opt.key ? 'bg-[#6A35D9]/15 border-[#E4E9F0]' : 'bg-[#F4F6FA] border-[#E4E9F0] hover:border-[#E4E9F0]'}`}>
+                                                <opt.icon size={12} className={adFormat === opt.key ? 'text-[#6A35D9]' : 'text-[#9CA3AF]'} />
+                                                <span className={`text-[11px] font-bold ${adFormat === opt.key ? 'text-[#6A35D9]' : 'text-[#9CA3AF]'}`}>{opt.label}</span>
                                                 <span className="text-[9px] text-[#9CA3AF] leading-tight">{opt.desc}</span>
                                             </button>
                                         ))}
@@ -1243,7 +1243,7 @@ function CampaignPageInner() {
                                 </div>
                                 <button
                                     onClick={() => setAdvantageAudience(v => !v)}
-                                    className={`shrink-0 w-11 h-6 rounded-full border transition-all relative ${advantageAudience ? 'bg-purple-500 border-purple-400' : 'bg-[#F0F3F7] border-[#E4E9F0]'}`}
+                                    className={`shrink-0 w-11 h-6 rounded-full border transition-all relative ${advantageAudience ? 'bg-[#6A35D9] border-[#E4E9F0]' : 'bg-[#F0F3F7] border-[#E4E9F0]'}`}
                                 >
                                     <span className={`absolute top-0.5 w-5 h-5 rounded-full bg-white transition-all shadow-sm ${advantageAudience ? 'left-5' : 'left-0.5'}`} />
                                 </button>
@@ -1257,7 +1257,7 @@ function CampaignPageInner() {
                                 </div>
                                 <button
                                     onClick={() => setAdvantageCreative(v => !v)}
-                                    className={`shrink-0 w-11 h-6 rounded-full border transition-all relative ${advantageCreative ? 'bg-blue-500 border-blue-400' : 'bg-[#F0F3F7] border-[#E4E9F0]'}`}
+                                    className={`shrink-0 w-11 h-6 rounded-full border transition-all relative ${advantageCreative ? 'bg-[#233B8F] border-[#E4E9F0]' : 'bg-[#F0F3F7] border-[#E4E9F0]'}`}
                                 >
                                     <span className={`absolute top-0.5 w-5 h-5 rounded-full bg-white transition-all shadow-sm ${advantageCreative ? 'left-5' : 'left-0.5'}`} />
                                 </button>
@@ -1273,9 +1273,9 @@ function CampaignPageInner() {
                                         { key: 'min_roas', label: 'ROAS mín.', desc: 'Retorno garantizado', icon: TrendingUp },
                                     ] as const).map(opt => (
                                         <button key={opt.key} onClick={() => setBidStrategy(opt.key)}
-                                            className={`flex flex-col items-start gap-1 p-3 rounded-xl border text-left transition-all ${bidStrategy === opt.key ? 'bg-purple-500/15 border-purple-500/40' : 'bg-white/3 border-[#E4E9F0] hover:border-[#E4E9F0]'}`}>
-                                            <opt.icon size={12} className={bidStrategy === opt.key ? 'text-purple-400' : 'text-[#9CA3AF]'} />
-                                            <span className={`text-[11px] font-bold ${bidStrategy === opt.key ? 'text-purple-300' : 'text-[#9CA3AF]'}`}>{opt.label}</span>
+                                            className={`flex flex-col items-start gap-1 p-3 rounded-xl border text-left transition-all ${bidStrategy === opt.key ? 'bg-[#6A35D9]/15 border-[#E4E9F0]' : 'bg-[#F4F6FA] border-[#E4E9F0] hover:border-[#E4E9F0]'}`}>
+                                            <opt.icon size={12} className={bidStrategy === opt.key ? 'text-[#6A35D9]' : 'text-[#9CA3AF]'} />
+                                            <span className={`text-[11px] font-bold ${bidStrategy === opt.key ? 'text-[#6A35D9]' : 'text-[#9CA3AF]'}`}>{opt.label}</span>
                                             <span className="text-[9px] text-[#9CA3AF] leading-tight">{opt.desc}</span>
                                         </button>
                                     ))}
@@ -1287,7 +1287,7 @@ function CampaignPageInner() {
                                             <span className="text-xs text-[#9CA3AF]">$</span>
                                             <input type="number" value={bidCapAmount} onChange={e => setBidCapAmount(e.target.value)}
                                                 placeholder="5.00" min="0.5" step="0.5"
-                                                className="w-20 bg-[#F4F6FA] border border-[#E4E9F0] rounded-lg px-2 py-1.5 text-xs text-[#111827] focus:outline-none focus:border-purple-500/50" />
+                                                className="w-20 bg-[#F4F6FA] border border-[#E4E9F0] rounded-lg px-2 py-1.5 text-xs text-[#111827] focus:outline-none focus:border-[#E4E9F0]" />
                                             <span className="text-xs text-[#9CA3AF]">USD</span>
                                         </div>
                                     </div>
@@ -1298,7 +1298,7 @@ function CampaignPageInner() {
                                         <div className="flex items-center gap-1">
                                             <input type="number" value={minRoasTarget} onChange={e => setMinRoasTarget(e.target.value)}
                                                 placeholder="2.0" min="1" step="0.1"
-                                                className="w-20 bg-[#F4F6FA] border border-[#E4E9F0] rounded-lg px-2 py-1.5 text-xs text-[#111827] focus:outline-none focus:border-purple-500/50" />
+                                                className="w-20 bg-[#F4F6FA] border border-[#E4E9F0] rounded-lg px-2 py-1.5 text-xs text-[#111827] focus:outline-none focus:border-[#E4E9F0]" />
                                             <span className="text-xs text-[#9CA3AF]">x retorno</span>
                                         </div>
                                     </div>
@@ -1310,7 +1310,7 @@ function CampaignPageInner() {
                     {/* Save button */}
                     <button onClick={saveConfig} disabled={savingConfig || !form.providerAccountId || !form.name.trim()}
                         className="w-full flex items-center justify-center gap-2 font-bold py-3.5 rounded-2xl disabled:opacity-40 disabled:cursor-not-allowed transition-all"
-                        style={{ background: 'linear-gradient(135deg,#7c3aed,#2563eb)', boxShadow: '0 0 24px rgba(124,58,237,0.3)' }}>
+                        style={{ background: 'linear-gradient(135deg,#6A35D9,#233B8F)', boxShadow: '0 0 24px rgba(106,53,217,0.3)' }}>
                         {savingConfig
                             ? <><Loader2 size={15} className="animate-spin" /> Guardando...</>
                             : configSaved
@@ -1329,7 +1329,7 @@ function CampaignPageInner() {
 
                 {!configSaved && (
                     <div className="absolute inset-0 z-10 flex items-center justify-center rounded-3xl">
-                        <div className="px-4 py-2.5 rounded-xl bg-black/70 border border-[#E4E9F0] backdrop-blur-sm flex items-center gap-2">
+                        <div className="px-4 py-2.5 rounded-xl bg-[#081624]/70 border border-[#E4E9F0] backdrop-blur-sm flex items-center gap-2">
                             <Settings2 size={12} className="text-[#9CA3AF]" />
                             <span className="text-xs text-[#9CA3AF] font-bold">Guarda la configuración primero</span>
                         </div>
@@ -1340,7 +1340,7 @@ function CampaignPageInner() {
                     {/* Section header */}
                     <div className="flex items-center gap-3 px-5 pt-5 pb-4 border-b border-[#E4E9F0]">
                         <div className="w-7 h-7 rounded-xl flex items-center justify-center text-[11px] font-black"
-                            style={{ background: 'rgba(139,92,246,0.15)', color: '#a78bfa' }}>2</div>
+                            style={{ background: 'rgba(106,53,217,0.15)', color: '#9B70E7' }}>2</div>
                         <div className="flex-1">
                             <p className="text-[11px] font-bold uppercase tracking-widest text-[#9CA3AF] flex items-center gap-1.5">
                                 <LayoutGrid size={10} /> Creativos & Textos
@@ -1361,42 +1361,42 @@ function CampaignPageInner() {
                                         <span className="text-[11px] font-normal text-[#6B7280]">({strategy.mediaCount} imágenes)</span>
                                     </button>
                                 ) : (
-                                    <div className="rounded-2xl border border-purple-500/25 bg-purple-500/5 p-4 space-y-4">
+                                    <div className="rounded-2xl border border-[#E4E9F0] bg-[#6A35D9]/5 p-4 space-y-4">
                                         <div className="flex items-center justify-between">
-                                            <p className="text-[11px] font-bold text-purple-300 uppercase tracking-widest flex items-center gap-1.5">
+                                            <p className="text-[11px] font-bold text-[#6A35D9] uppercase tracking-widest flex items-center gap-1.5">
                                                 <Sparkles size={10} /> Generar {strategy.mediaCount} imágenes con IA
                                             </p>
                                             <button onClick={() => setShowBulkPanel(false)} className="text-[#9CA3AF] hover:text-[#111827]"><X size={13} /></button>
                                         </div>
 
                                         {/* Auto style info */}
-                                        <div className="flex items-center gap-2 px-3 py-2 bg-purple-500/8 border border-purple-500/20 rounded-xl">
-                                            <Sparkles size={10} className="text-purple-400 shrink-0" />
-                                            <p className="text-[9px] text-purple-300">La IA elige automáticamente el mejor estilo para cada imagen según la estrategia y el brief del negocio</p>
+                                        <div className="flex items-center gap-2 px-3 py-2 bg-[#6A35D9]/8 border border-[#E4E9F0] rounded-xl">
+                                            <Sparkles size={10} className="text-[#6A35D9] shrink-0" />
+                                            <p className="text-[9px] text-[#6A35D9]">La IA elige automáticamente el mejor estilo para cada imagen según la estrategia y el brief del negocio</p>
                                         </div>
 
                                         {/* Bulk product photo reference (OBLIGATORIA) */}
                                         <div>
                                             <p className="text-[9px] font-bold uppercase mb-2 flex items-center gap-1.5">
                                                 <span className="text-[#9CA3AF]">Foto del producto</span>
-                                                <span className="text-amber-400">· obligatoria</span>
+                                                <span className="text-[#D97706]">· obligatoria</span>
                                             </p>
                                             <input ref={bulkRefFileRef} type="file" accept="image/*" className="hidden"
                                                 onChange={e => { if (e.target.files?.[0]) handleBulkRefImageUpload(e.target.files[0]); e.currentTarget.value = '' }} />
                                             {bulkRefImageUrl ? (
-                                                <div className="flex flex-col gap-2 p-2.5 rounded-xl border border-green-500/25 bg-green-500/5">
-                                                    <img src={bulkRefImageUrl} alt="ref" className="w-full max-h-40 rounded-lg object-contain bg-black/20 border border-[#E4E9F0]" />
+                                                <div className="flex flex-col gap-2 p-2.5 rounded-xl border border-[#059669]/25 bg-[#059669]/5">
+                                                    <img src={bulkRefImageUrl} alt="ref" className="w-full max-h-40 rounded-lg object-contain bg-[#081624]/20 border border-[#E4E9F0]" />
                                                     <div className="flex items-center justify-between">
                                                         <div className="min-w-0">
-                                                            <p className="text-[10px] text-green-400 font-bold">✓ Foto cargada para todos los slots</p>
+                                                            <p className="text-[10px] text-[#059669] font-bold">✓ Foto cargada para todos los slots</p>
                                                             <p className="text-[9px] text-[#9CA3AF]">La IA usará esta imagen como referencia del producto</p>
                                                         </div>
-                                                        <button onClick={() => { setBulkRefImageUrl(''); setRefImageUrls({}) }} className="text-[#9CA3AF] hover:text-red-400 text-xs shrink-0 ml-2">✕</button>
+                                                        <button onClick={() => { setBulkRefImageUrl(''); setRefImageUrls({}) }} className="text-[#9CA3AF] hover:text-[#DC2626] text-xs shrink-0 ml-2">✕</button>
                                                     </div>
                                                 </div>
                                             ) : (
                                                 <button onClick={() => bulkRefFileRef.current?.click()} disabled={uploadingBulkRef}
-                                                    className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-dashed border-[#E4E9F0] bg-white/2 hover:bg-[#F4F6FA] hover:border-[#E4E9F0] transition-all text-[10px] font-bold text-[#9CA3AF] disabled:opacity-50">
+                                                    className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-dashed border-[#E4E9F0] bg-[#F4F6FA] hover:bg-[#F4F6FA] hover:border-[#E4E9F0] transition-all text-[10px] font-bold text-[#9CA3AF] disabled:opacity-50">
                                                     {uploadingBulkRef ? <><Loader2 size={11} className="animate-spin" /> Subiendo...</> : <><Upload size={11} /> Subir foto del producto</>}
                                                 </button>
                                             )}
@@ -1416,11 +1416,11 @@ function CampaignPageInner() {
                                                 </button>
                                                 <button onClick={() => setShowManualPrompt(v => !v)} disabled={!bulkRefImageUrl}
                                                     title="Escribir mi propio prompt (manual)"
-                                                    className={`shrink-0 flex items-center gap-1.5 px-3.5 py-3 rounded-2xl text-[12px] font-bold border transition-all disabled:opacity-40 disabled:cursor-not-allowed ${showManualPrompt ? 'bg-purple-500/25 border-purple-400/60 text-purple-100' : 'bg-purple-500/12 border-purple-500/35 text-purple-200 hover:bg-purple-500/20'}`}>
+                                                    className={`shrink-0 flex items-center gap-1.5 px-3.5 py-3 rounded-2xl text-[12px] font-bold border transition-all disabled:opacity-40 disabled:cursor-not-allowed ${showManualPrompt ? 'bg-[#6A35D9]/25 border-[#E4E9F0] text-purple-100' : 'bg-[#6A35D9]/12 border-[#E4E9F0] text-purple-200 hover:bg-[#5A2BC0]/20'}`}>
                                                     <FileText size={14} /> <span>Manual</span>
                                                 </button>
                                             </div>
-                                            <p className="text-[9px] text-[#9CA3AF] mt-1.5 leading-snug">Cada anuncio con un <b className="text-purple-300/80">ángulo único</b> (problema · solución · producto · lifestyle) → más rendimiento en Meta <span className="text-[#9CA3AF]">(Andromeda)</span>.</p>
+                                            <p className="text-[9px] text-[#9CA3AF] mt-1.5 leading-snug">Cada anuncio con un <b className="text-[#6A35D9]/80">ángulo único</b> (problema · solución · producto · lifestyle) → más rendimiento en Meta <span className="text-[#9CA3AF]">(Andromeda)</span>.</p>
 
                                             {showManualPrompt && (
                                                 <div className="mt-2.5">
@@ -1433,21 +1433,21 @@ function CampaignPageInner() {
                                                     </div>
                                                     <textarea value={bulkUserPrompt} onChange={e => setBulkUserPrompt(e.target.value)}
                                                         rows={3} placeholder="Escribí qué imagen querés (se manda tal cual a gpt-image-2 con tu foto)."
-                                                        className="w-full bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-3 py-2 text-[10px] text-[#6B7280] resize-none focus:outline-none focus:border-purple-500/30 leading-relaxed placeholder:text-[#9CA3AF]" />
+                                                        className="w-full bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-3 py-2 text-[10px] text-[#6B7280] resize-none focus:outline-none focus:border-[#E4E9F0] leading-relaxed placeholder:text-[#9CA3AF]" />
                                                 </div>
                                             )}
                                         </div>
 
                                         {bulkGenerating && (
-                                            <div className="flex items-center gap-3 p-3 bg-purple-500/10 border border-purple-500/20 rounded-xl">
-                                                <Loader2 size={14} className="animate-spin text-purple-400 shrink-0" />
+                                            <div className="flex items-center gap-3 p-3 bg-[#6A35D9]/10 border border-[#E4E9F0] rounded-xl">
+                                                <Loader2 size={14} className="animate-spin text-[#6A35D9] shrink-0" />
                                                 <div className="flex-1">
                                                     <div className="flex items-center justify-between mb-1">
-                                                        <span className="text-[11px] text-purple-300 font-bold">Generando imágenes...</span>
-                                                        <span className="text-[11px] text-purple-400">{bulkProgress}/{strategy.mediaCount}</span>
+                                                        <span className="text-[11px] text-[#6A35D9] font-bold">Generando imágenes...</span>
+                                                        <span className="text-[11px] text-[#6A35D9]">{bulkProgress}/{strategy.mediaCount}</span>
                                                     </div>
                                                     <div className="h-1.5 bg-[#F0F3F7] rounded-full overflow-hidden">
-                                                        <div className="h-full bg-purple-500 rounded-full transition-all" style={{ width: `${(bulkProgress / strategy.mediaCount) * 100}%` }} />
+                                                        <div className="h-full bg-[#6A35D9] rounded-full transition-all" style={{ width: `${(bulkProgress / strategy.mediaCount) * 100}%` }} />
                                                     </div>
                                                 </div>
                                             </div>
@@ -1455,12 +1455,12 @@ function CampaignPageInner() {
 
                                         {/* Ayudas según el paso del flujo */}
                                         {!bulkGenerating && !bulkRefImageUrl && (
-                                            <p className="text-[10px] text-amber-400/80 text-center flex items-center justify-center gap-1.5">
+                                            <p className="text-[10px] text-[#D97706]/80 text-center flex items-center justify-center gap-1.5">
                                                 <Upload size={11} /> Paso 1: subí la foto de tu producto
                                             </p>
                                         )}
                                         {!bulkGenerating && bulkRefImageUrl && Object.keys(imageCustomPrompts).length === 0 && !bulkUserPrompt.trim() && (
-                                            <p className="text-[10px] text-purple-300/80 text-center flex items-center justify-center gap-1.5">
+                                            <p className="text-[10px] text-[#6A35D9]/80 text-center flex items-center justify-center gap-1.5">
                                                 <Sparkles size={11} /> Paso 2: generá el prompt (con AI o manual) para continuar
                                             </p>
                                         )}
@@ -1481,19 +1481,19 @@ function CampaignPageInner() {
                         {/* ── Creative cards grid (cuadros, como estrategias) ── */}
                         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 items-start">
                             {(configSaved ? creatives : Array.from({ length: strategy.mediaCount }, (_, i) => ({ slotIndex: i, mediaUrl: null, primaryText: '', headline: '', description: '', hook: '', hashtags: '' }))).map((creative: any, i: number) => (
-                                <div key={i} className="rounded-2xl border border-white/6 bg-white/2 overflow-hidden">
+                                <div key={i} className="rounded-2xl border border-[#E4E9F0] bg-[#F4F6FA] overflow-hidden">
                                     {/* Card header */}
                                     <div className="flex items-center gap-2 px-4 py-2.5 border-b border-[#E4E9F0]">
                                         <span className="text-[10px] font-black text-[#9CA3AF] uppercase">Anuncio #{i + 1}</span>
-                                        {creative.aiGenerated && <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-400">IA</span>}
-                                        {creative.mediaUrl && <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-green-500/10 border border-green-500/20 text-green-400 flex items-center gap-1"><CheckCircle2 size={8} /> Imagen</span>}
-                                        {creative.primaryText && <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 flex items-center gap-1"><FileText size={8} /> Texto</span>}
+                                        {creative.aiGenerated && <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-[#6A35D9]/10 border border-[#E4E9F0] text-[#6A35D9]">IA</span>}
+                                        {creative.mediaUrl && <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-[#059669]/10 border border-[#059669]/20 text-[#059669] flex items-center gap-1"><CheckCircle2 size={8} /> Imagen</span>}
+                                        {creative.primaryText && <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-[#233B8F]/10 border border-[#E4E9F0] text-[#233B8F] flex items-center gap-1"><FileText size={8} /> Texto</span>}
                                     </div>
 
                                     <div className="flex flex-col">
                                         {/* Image column */}
                                         <div className="p-3">
-                                            <div className="aspect-square rounded-xl bg-white/3 border border-white/6 overflow-hidden relative group">
+                                            <div className="aspect-square rounded-xl bg-[#F4F6FA] border border-[#E4E9F0] overflow-hidden relative group">
                                                 {generatingImages[i] ? (
                                                     <AiGeneratingOverlay />
                                                 ) : creative.mediaUrl ? (
@@ -1503,7 +1503,7 @@ function CampaignPageInner() {
                                                             : <img src={creative.mediaUrl} alt="" className="w-full h-full object-cover" />
                                                         }
                                                         {creative.uploading && (
-                                                            <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
+                                                            <div className="absolute inset-0 bg-[#081624]/60 flex items-center justify-center">
                                                                 <Loader2 size={18} className="animate-spin text-[#6B7280]" />
                                                             </div>
                                                         )}
@@ -1511,20 +1511,20 @@ function CampaignPageInner() {
                                                         {!creative.uploading && creative.mediaType === 'video' && creative.metaMediaStatus && (
                                                             <div className="absolute top-1.5 left-1.5 z-10">
                                                                 {creative.metaMediaStatus === 'processing' && (
-                                                                    <span className="flex items-center gap-1 px-2 py-1 rounded-lg text-[9px] font-bold bg-amber-500/85 text-black">
+                                                                    <span className="flex items-center gap-1 px-2 py-1 rounded-lg text-[9px] font-bold bg-[#D97706]/85 text-black">
                                                                         <Loader2 size={9} className="animate-spin" /> Preparando video…
                                                                     </span>
                                                                 )}
                                                                 {creative.metaMediaStatus === 'ready' && (
-                                                                    <span className="px-2 py-1 rounded-lg text-[9px] font-bold bg-emerald-500/90 text-black">✓ Listo para publicar</span>
+                                                                    <span className="px-2 py-1 rounded-lg text-[9px] font-bold bg-[#059669]/90 text-black">✓ Listo para publicar</span>
                                                                 )}
                                                                 {creative.metaMediaStatus === 'error' && (
-                                                                    <span className="px-2 py-1 rounded-lg text-[9px] font-bold bg-red-500/90 text-white">⚠ Error al preparar</span>
+                                                                    <span className="px-2 py-1 rounded-lg text-[9px] font-bold bg-[#DC2626]/90 text-white">⚠ Error al preparar</span>
                                                                 )}
                                                             </div>
                                                         )}
                                                         {!creative.uploading && (
-                                                            <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-all flex items-center justify-center gap-2">
+                                                            <div className="absolute inset-0 bg-[#081624]/50 opacity-0 group-hover:opacity-100 transition-all flex items-center justify-center gap-2">
                                                                 <button onClick={() => fileRefs.current[i]?.click()} className="p-2 rounded-xl bg-[#F0F3F7] hover:bg-white/40" title="Cambiar">
                                                                     <Upload size={12} />
                                                                 </button>
@@ -1537,7 +1537,7 @@ function CampaignPageInner() {
                                                                     <button onClick={() => {
                                                                         setImageGenPanel(imageGenPanel === i ? null : i)
                                                                         // tu prompt queda libre: no autocompletar
-                                                                    }} className="p-2 rounded-xl bg-purple-500/40 hover:bg-purple-500/60" title="Regenerar con IA">
+                                                                    }} className="p-2 rounded-xl bg-[#6A35D9]/40 hover:bg-[#5A2BC0]/60" title="Regenerar con IA">
                                                                         <Wand2 size={12} />
                                                                     </button>
                                                                 )}
@@ -1556,7 +1556,7 @@ function CampaignPageInner() {
                                                                     setImageGenPanel(imageGenPanel === i ? null : i)
                                                                     // tu prompt queda libre: no autocompletar
                                                                 }}
-                                                                    className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-purple-500/10 border border-purple-500/20 hover:bg-purple-500/20 transition-all text-[10px] font-bold text-purple-400">
+                                                                    className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#6A35D9]/10 border border-[#E4E9F0] hover:bg-[#5A2BC0]/20 transition-all text-[10px] font-bold text-[#6A35D9]">
                                                                     <Wand2 size={11} /> IA
                                                                 </button>
                                                             )}
@@ -1589,7 +1589,7 @@ function CampaignPageInner() {
                                                             setImageGenPanel(imageGenPanel === i ? null : i)
                                                             // tu prompt queda libre: no autocompletar
                                                         }}
-                                                            className="flex-1 flex items-center justify-center gap-1 py-2 rounded-xl bg-purple-500/10 border border-purple-500/20 text-[10px] font-bold text-purple-400">
+                                                            className="flex-1 flex items-center justify-center gap-1 py-2 rounded-xl bg-[#6A35D9]/10 border border-[#E4E9F0] text-[10px] font-bold text-[#6A35D9]">
                                                             <Wand2 size={10} /> IA
                                                         </button>
                                                     )}
@@ -1601,8 +1601,8 @@ function CampaignPageInner() {
                                         <div className="flex-1 p-3 space-y-3 min-w-0">
                                             {/* Hook badge */}
                                             {creative.hook && (
-                                                <div className="px-3 py-2 bg-purple-500/5 border border-purple-500/15 rounded-xl">
-                                                    <p className="text-[9px] text-purple-400 font-bold uppercase mb-0.5">Hook</p>
+                                                <div className="px-3 py-2 bg-[#6A35D9]/5 border border-[#E4E9F0] rounded-xl">
+                                                    <p className="text-[9px] text-[#6A35D9] font-bold uppercase mb-0.5">Hook</p>
                                                     <p className="text-xs text-[#9CA3AF] italic leading-relaxed">"{creative.hook}"</p>
                                                 </div>
                                             )}
@@ -1615,7 +1615,7 @@ function CampaignPageInner() {
                                                         <button
                                                             onClick={() => suggestField(i, 'primaryText')}
                                                             disabled={suggestingField === `${i}-primaryText`}
-                                                            className="flex items-center gap-1 text-[9px] font-bold text-purple-400/70 hover:text-purple-300 disabled:opacity-40 transition-colors"
+                                                            className="flex items-center gap-1 text-[9px] font-bold text-[#6A35D9]/70 hover:text-[#6A35D9] disabled:opacity-40 transition-colors"
                                                         >
                                                             {suggestingField === `${i}-primaryText`
                                                                 ? <Loader2 size={9} className="animate-spin" />
@@ -1630,18 +1630,18 @@ function CampaignPageInner() {
                                                     onChange={e => setCreatives(prev => prev.map((c, j) => j === i ? { ...c, primaryText: e.target.value } : c))}
                                                     rows={4}
                                                     placeholder={copiesGenerated ? '' : 'Genera los textos con IA o escribe manualmente...'}
-                                                    className="w-full bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-3 py-2 text-xs text-[#111827] resize-none focus:outline-none focus:border-purple-500/40 leading-relaxed placeholder:text-[#9CA3AF]"
+                                                    className="w-full bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-3 py-2 text-xs text-[#111827] resize-none focus:outline-none focus:border-[#E4E9F0] leading-relaxed placeholder:text-[#9CA3AF]"
                                                 />
                                                 {/* Suggestions dropdown */}
                                                 {activeSuggestionKey === `${i}-primaryText` && suggestions[`${i}-primaryText`] && (
-                                                    <div className="mt-1.5 rounded-xl border border-purple-500/20 bg-white overflow-hidden">
+                                                    <div className="mt-1.5 rounded-xl border border-[#E4E9F0] bg-white overflow-hidden">
                                                         <div className="flex items-center justify-between px-3 py-2 border-b border-[#E4E9F0]">
-                                                            <p className="text-[9px] font-bold text-purple-400 uppercase">3 opciones — elige una</p>
+                                                            <p className="text-[9px] font-bold text-[#6A35D9] uppercase">3 opciones — elige una</p>
                                                             <button onClick={() => setActiveSuggestionKey(null)} className="text-[#9CA3AF] hover:text-[#111827]"><X size={10} /></button>
                                                         </div>
                                                         {suggestions[`${i}-primaryText`].map((s, si) => (
                                                             <button key={si} onClick={() => applySuggestion(i, 'primaryText', s)}
-                                                                className="w-full text-left px-3 py-2.5 hover:bg-purple-500/10 border-b border-white/3 last:border-0 transition-colors">
+                                                                className="w-full text-left px-3 py-2.5 hover:bg-[#5A2BC0]/10 border-b border-[#E4E9F0] last:border-0 transition-colors">
                                                                 <p className="text-[11px] text-[#6B7280] leading-relaxed line-clamp-3">{s}</p>
                                                             </button>
                                                         ))}
@@ -1656,7 +1656,7 @@ function CampaignPageInner() {
                                                         <label className="text-[9px] font-bold text-[#9CA3AF] uppercase tracking-widest">Titular</label>
                                                         {configSaved && copiesGenerated && (
                                                             <button onClick={() => suggestField(i, 'headline')} disabled={suggestingField === `${i}-headline`}
-                                                                className="flex items-center gap-1 text-[9px] font-bold text-purple-400/70 hover:text-purple-300 disabled:opacity-40 transition-colors">
+                                                                className="flex items-center gap-1 text-[9px] font-bold text-[#6A35D9]/70 hover:text-[#6A35D9] disabled:opacity-40 transition-colors">
                                                                 {suggestingField === `${i}-headline` ? <Loader2 size={9} className="animate-spin" /> : <Sparkles size={9} />}
                                                                 ✨
                                                             </button>
@@ -1664,16 +1664,16 @@ function CampaignPageInner() {
                                                     </div>
                                                     <input value={creative.headline || ''}
                                                         onChange={e => setCreatives(prev => prev.map((c, j) => j === i ? { ...c, headline: e.target.value } : c))}
-                                                        className="w-full bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-3 py-2 text-xs text-[#111827] focus:outline-none focus:border-purple-500/40" />
+                                                        className="w-full bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-3 py-2 text-xs text-[#111827] focus:outline-none focus:border-[#E4E9F0]" />
                                                     {activeSuggestionKey === `${i}-headline` && suggestions[`${i}-headline`] && (
-                                                        <div className="mt-1 rounded-xl border border-purple-500/20 bg-white overflow-hidden">
+                                                        <div className="mt-1 rounded-xl border border-[#E4E9F0] bg-white overflow-hidden">
                                                             <div className="flex items-center justify-between px-2.5 py-1.5 border-b border-[#E4E9F0]">
-                                                                <p className="text-[9px] font-bold text-purple-400 uppercase">Opciones</p>
+                                                                <p className="text-[9px] font-bold text-[#6A35D9] uppercase">Opciones</p>
                                                                 <button onClick={() => setActiveSuggestionKey(null)} className="text-[#9CA3AF] hover:text-[#111827]"><X size={9} /></button>
                                                             </div>
                                                             {suggestions[`${i}-headline`].map((s, si) => (
                                                                 <button key={si} onClick={() => applySuggestion(i, 'headline', s)}
-                                                                    className="w-full text-left px-2.5 py-2 hover:bg-purple-500/10 border-b border-white/3 last:border-0 transition-colors">
+                                                                    className="w-full text-left px-2.5 py-2 hover:bg-[#5A2BC0]/10 border-b border-[#E4E9F0] last:border-0 transition-colors">
                                                                     <p className="text-[11px] text-[#6B7280]">{s}</p>
                                                                 </button>
                                                             ))}
@@ -1685,7 +1685,7 @@ function CampaignPageInner() {
                                                         <label className="text-[9px] font-bold text-[#9CA3AF] uppercase tracking-widest">Descripción</label>
                                                         {configSaved && copiesGenerated && (
                                                             <button onClick={() => suggestField(i, 'description')} disabled={suggestingField === `${i}-description`}
-                                                                className="flex items-center gap-1 text-[9px] font-bold text-purple-400/70 hover:text-purple-300 disabled:opacity-40 transition-colors">
+                                                                className="flex items-center gap-1 text-[9px] font-bold text-[#6A35D9]/70 hover:text-[#6A35D9] disabled:opacity-40 transition-colors">
                                                                 {suggestingField === `${i}-description` ? <Loader2 size={9} className="animate-spin" /> : <Sparkles size={9} />}
                                                                 ✨
                                                             </button>
@@ -1693,16 +1693,16 @@ function CampaignPageInner() {
                                                     </div>
                                                     <input value={creative.description || ''}
                                                         onChange={e => setCreatives(prev => prev.map((c, j) => j === i ? { ...c, description: e.target.value } : c))}
-                                                        className="w-full bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-3 py-2 text-xs text-[#111827] focus:outline-none focus:border-purple-500/40" />
+                                                        className="w-full bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-3 py-2 text-xs text-[#111827] focus:outline-none focus:border-[#E4E9F0]" />
                                                     {activeSuggestionKey === `${i}-description` && suggestions[`${i}-description`] && (
-                                                        <div className="mt-1 rounded-xl border border-purple-500/20 bg-white overflow-hidden">
+                                                        <div className="mt-1 rounded-xl border border-[#E4E9F0] bg-white overflow-hidden">
                                                             <div className="flex items-center justify-between px-2.5 py-1.5 border-b border-[#E4E9F0]">
-                                                                <p className="text-[9px] font-bold text-purple-400 uppercase">Opciones</p>
+                                                                <p className="text-[9px] font-bold text-[#6A35D9] uppercase">Opciones</p>
                                                                 <button onClick={() => setActiveSuggestionKey(null)} className="text-[#9CA3AF] hover:text-[#111827]"><X size={9} /></button>
                                                             </div>
                                                             {suggestions[`${i}-description`].map((s, si) => (
                                                                 <button key={si} onClick={() => applySuggestion(i, 'description', s)}
-                                                                    className="w-full text-left px-2.5 py-2 hover:bg-purple-500/10 border-b border-white/3 last:border-0 transition-colors">
+                                                                    className="w-full text-left px-2.5 py-2 hover:bg-[#5A2BC0]/10 border-b border-[#E4E9F0] last:border-0 transition-colors">
                                                                     <p className="text-[11px] text-[#6B7280]">{s}</p>
                                                                 </button>
                                                             ))}
@@ -1718,7 +1718,7 @@ function CampaignPageInner() {
                                     {imageGenPanel === i && configSaved && strategy.mediaType !== 'video' && (
                                         <div className="border-t border-[#E4E9F0] bg-white p-4 space-y-3">
                                             <div className="flex items-center justify-between">
-                                                <p className="text-[10px] font-bold uppercase tracking-widest text-purple-400 flex items-center gap-1.5">
+                                                <p className="text-[10px] font-bold uppercase tracking-widest text-[#6A35D9] flex items-center gap-1.5">
                                                     <Wand2 size={10} /> {creatives.find(c => c.slotIndex === i)?.mediaUrl ? 'Editar imagen con IA' : 'Generar imagen con IA'}
                                                 </p>
                                                 <button onClick={() => setImageGenPanel(null)} className="text-[#9CA3AF] hover:text-[#111827]"><X size={12} /></button>
@@ -1726,23 +1726,23 @@ function CampaignPageInner() {
 
                                             {/* Reference product photo upload */}
                                             <div className="space-y-1.5">
-                                                <p className="text-[9px] uppercase font-bold tracking-widest"><span className="text-[#9CA3AF]">Foto del producto</span> <span className="text-amber-400">· obligatoria</span></p>
+                                                <p className="text-[9px] uppercase font-bold tracking-widest"><span className="text-[#9CA3AF]">Foto del producto</span> <span className="text-[#D97706]">· obligatoria</span></p>
                                                 {refImageUrls[i] ? (
-                                                    <div className="flex flex-col gap-2 p-2.5 bg-green-500/8 border border-green-500/20 rounded-xl">
-                                                        <img src={refImageUrls[i]} className="w-full max-h-40 rounded-lg object-contain bg-black/20 border border-[#E4E9F0]" />
+                                                    <div className="flex flex-col gap-2 p-2.5 bg-[#059669]/8 border border-[#059669]/20 rounded-xl">
+                                                        <img src={refImageUrls[i]} className="w-full max-h-40 rounded-lg object-contain bg-[#081624]/20 border border-[#E4E9F0]" />
                                                         <div className="flex items-center justify-between">
                                                             <div>
-                                                                <p className="text-[9px] text-green-300 font-bold">Foto del producto cargada ✓</p>
-                                                                <p className="text-[9px] text-green-400/60">La IA usará esta foto como referencia</p>
+                                                                <p className="text-[9px] text-[#059669] font-bold">Foto del producto cargada ✓</p>
+                                                                <p className="text-[9px] text-[#059669]/60">La IA usará esta foto como referencia</p>
                                                             </div>
                                                             <button onClick={() => setRefImageUrls(prev => { const n = { ...prev }; delete n[i]; return n })}
-                                                                className="text-[#9CA3AF] hover:text-red-400 shrink-0"><X size={10} /></button>
+                                                                className="text-[#9CA3AF] hover:text-[#DC2626] shrink-0"><X size={10} /></button>
                                                         </div>
                                                     </div>
                                                 ) : (
                                                     <button onClick={() => refImageFileRefs.current[i]?.click()}
                                                         disabled={uploadingRefImage[i]}
-                                                        className="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl border border-dashed border-purple-500/30 bg-purple-500/5 hover:bg-purple-500/10 hover:border-purple-500/50 transition-all text-[10px] font-bold text-purple-400/70 hover:text-purple-400">
+                                                        className="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl border border-dashed border-[#E4E9F0] bg-[#6A35D9]/5 hover:bg-[#5A2BC0]/10 hover:border-[#E4E9F0] transition-all text-[10px] font-bold text-[#6A35D9]/70 hover:text-[#6A35D9]">
                                                         {uploadingRefImage[i]
                                                             ? <><Loader2 size={10} className="animate-spin" /> Subiendo...</>
                                                             : <><Upload size={10} /> Subir foto del producto</>
@@ -1758,9 +1758,9 @@ function CampaignPageInner() {
                                             </div>
 
                                             {(refImageUrls[i] || creatives.find(c => c.slotIndex === i)?.mediaUrl?.startsWith('http')) && (
-                                                <div className="flex items-center gap-2 px-2.5 py-1.5 bg-green-500/8 border border-green-500/20 rounded-xl">
-                                                    <CheckCircle2 size={9} className="text-green-400 shrink-0" />
-                                                    <p className="text-[9px] text-green-300"><span className="font-bold">gpt-image-2</span> usará tu imagen como base para crear el anuncio</p>
+                                                <div className="flex items-center gap-2 px-2.5 py-1.5 bg-[#059669]/8 border border-[#059669]/20 rounded-xl">
+                                                    <CheckCircle2 size={9} className="text-[#059669] shrink-0" />
+                                                    <p className="text-[9px] text-[#059669]"><span className="font-bold">gpt-image-2</span> usará tu imagen como base para crear el anuncio</p>
                                                 </div>
                                             )}
                                             {/* Calidad fija: Rápida (sin selector) */}
@@ -1768,19 +1768,19 @@ function CampaignPageInner() {
                                                 <div className="flex items-center justify-between mb-1">
                                                     <p className="text-[9px] text-[#9CA3AF] uppercase font-bold">Tu prompt (libre)</p>
                                                     <button onClick={() => generateAiPrompt(i)} disabled={aiPromptLoading}
-                                                        className="text-[9px] font-bold text-purple-300 hover:text-purple-200 flex items-center gap-1 disabled:opacity-40">
+                                                        className="text-[9px] font-bold text-[#6A35D9] hover:text-purple-200 flex items-center gap-1 disabled:opacity-40">
                                                         {aiPromptLoading ? <Loader2 size={8} className="animate-spin" /> : <Sparkles size={8} />}
                                                         {aiPromptLoading ? 'Escribiendo…' : 'Generar con IA'}
                                                     </button>
                                                 </div>
                                                 <textarea value={imageCustomPrompts[i] || ''} onChange={e => setImageCustomPrompts(prev => ({ ...prev, [i]: e.target.value }))}
                                                     rows={3} placeholder="Escribí qué imagen querés (como el admin) o tocá 'Generar con IA'. Se manda tal cual a gpt-image-2."
-                                                    className="w-full bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-2.5 py-2 text-[10px] text-[#111827] resize-none focus:outline-none focus:border-purple-500/40 leading-relaxed placeholder:text-[#9CA3AF]" />
+                                                    className="w-full bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-2.5 py-2 text-[10px] text-[#111827] resize-none focus:outline-none focus:border-[#E4E9F0] leading-relaxed placeholder:text-[#9CA3AF]" />
                                             </div>
                                             <button onClick={() => generateImage(i)}
                                                 disabled={!(refImageUrls[i] || creatives.find(c => c.slotIndex === i)?.mediaUrl?.startsWith('http'))}
                                                 className="w-full flex items-center justify-center gap-1.5 py-2.5 rounded-xl font-bold text-xs transition-all disabled:opacity-40 disabled:cursor-not-allowed"
-                                                style={{ background: 'linear-gradient(135deg,#7c3aed,#2563eb)' }}>
+                                                style={{ background: 'linear-gradient(135deg,#6A35D9,#233B8F)' }}>
                                                 <Sparkles size={12} />
                                                 {(refImageUrls[i] || creatives.find(c => c.slotIndex === i)?.mediaUrl?.startsWith('http')) ? 'Generar con tu producto (gpt-image-2)' : 'Subí la foto del producto primero'}
                                             </button>
@@ -1794,7 +1794,7 @@ function CampaignPageInner() {
                         {configSaved && (
                             <button onClick={generateCopies} disabled={generatingCopies}
                                 className="w-full flex items-center justify-center gap-2 font-bold py-3.5 rounded-2xl disabled:opacity-40 disabled:cursor-not-allowed transition-all"
-                                style={{ background: copiesGenerated ? 'rgba(139,92,246,0.12)' : 'linear-gradient(135deg,#7c3aed,#2563eb)', border: copiesGenerated ? '1px solid rgba(139,92,246,0.25)' : 'none', color: copiesGenerated ? '#c4b5fd' : '#fff', boxShadow: copiesGenerated ? 'none' : '0 0 24px rgba(124,58,237,0.25)' }}>
+                                style={{ background: copiesGenerated ? 'rgba(106,53,217,0.12)' : 'linear-gradient(135deg,#6A35D9,#233B8F)', border: copiesGenerated ? '1px solid rgba(106,53,217,0.25)' : 'none', color: copiesGenerated ? '#6A35D9' : '#fff', boxShadow: copiesGenerated ? 'none' : '0 0 24px rgba(106,53,217,0.25)' }}>
                                 {generatingCopies
                                     ? <><Loader2 size={15} className="animate-spin" /> Generando textos con IA...</>
                                     : copiesGenerated
@@ -1810,9 +1810,9 @@ function CampaignPageInner() {
             {/* ── Floating publish bar ── */}
             {campaign && (
                 <div className="fixed bottom-[65px] left-0 right-0 z-50 px-4 pb-3 pt-4 lg:bottom-0 lg:left-[240px]"
-                    style={{ background: 'linear-gradient(to top,rgba(6,6,16,1) 60%,transparent)' }}>
+                    style={{ background: 'linear-gradient(to top,rgba(8,22,36,1) 60%,transparent)' }}>
                     <div className="max-w-4xl xl:max-w-5xl 2xl:max-w-6xl mx-auto flex items-center gap-3 px-4 py-3 rounded-2xl"
-                        style={{ background: 'rgba(8,8,20,0.92)', border: '1px solid rgba(139,92,246,0.15)', backdropFilter: 'blur(20px)', boxShadow: '0 -4px 30px rgba(0,0,0,0.5),0 0 20px rgba(139,92,246,0.06)' }}>
+                        style={{ background: 'rgba(8,22,36,0.92)', border: '1px solid rgba(106,53,217,0.15)', backdropFilter: 'blur(20px)', boxShadow: '0 -4px 30px rgba(0,0,0,0.5),0 0 20px rgba(106,53,217,0.06)' }}>
                         <div className="flex-1 min-w-0 hidden sm:block">
                             <p className="text-xs font-bold text-[#6B7280] truncate">{form.name}</p>
                             <p className="text-[11px] text-[#9CA3AF]">
@@ -1822,7 +1822,7 @@ function CampaignPageInner() {
                         <button onClick={() => { setPreviewIdx(0); setShowPreview(true) }}
                             disabled={!canPublish || publishing}
                             className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-3 rounded-2xl font-bold text-sm disabled:opacity-30 disabled:cursor-not-allowed transition-all"
-                            style={{ background: canPublish ? 'linear-gradient(135deg,#10b981,#059669)' : 'rgba(15,23,42,0.08)', color: canPublish ? '#fff' : 'rgba(17,24,39,0.55)', boxShadow: canPublish ? '0 0 25px rgba(16,185,129,0.35)' : 'none' }}>
+                            style={{ background: canPublish ? 'linear-gradient(135deg,#059669,#059669)' : 'rgba(15,23,42,0.08)', color: canPublish ? '#fff' : 'rgba(17,24,39,0.55)', boxShadow: canPublish ? '0 0 25px rgba(5,150,105,0.35)' : 'none' }}>
                             {publishing
                                 ? <><Loader2 size={15} className="animate-spin" /> Publicando...</>
                                 : <><Eye size={15} /> <span className="hidden sm:inline">Vista previa y </span>Publicar</>
@@ -1837,7 +1837,7 @@ function CampaignPageInner() {
                 const c = creatives[previewIdx]
                 const pageName = pages.find((p: any) => p.id === form.pageId)?.name || form.name
                 return (
-                    <div className="fixed inset-0 z-[100] overflow-y-auto bg-black/85 backdrop-blur-sm">
+                    <div className="fixed inset-0 z-[100] overflow-y-auto bg-[#081624]/85 backdrop-blur-sm">
                         <div className="flex min-h-full items-center justify-center p-4">
                             <div className="relative w-full max-w-sm py-10">
                                 <button onClick={() => setShowPreview(false)} className="absolute top-0 right-0 text-[#9CA3AF] hover:text-[#111827] flex items-center gap-1.5 text-xs font-bold">
@@ -1847,7 +1847,7 @@ function CampaignPageInner() {
                                 <div className="bg-white rounded-2xl overflow-hidden shadow-2xl">
                                     <div className="flex items-center gap-2.5 px-3 pt-3 pb-2">
                                         <div className="w-9 h-9 rounded-full flex items-center justify-center text-[#111827] text-xs font-black shrink-0"
-                                            style={{ background: 'linear-gradient(135deg,#3b82f6,#7c3aed)' }}>
+                                            style={{ background: 'linear-gradient(135deg,#233B8F,#6A35D9)' }}>
                                             {pageName.charAt(0).toUpperCase()}
                                         </div>
                                         <div className="flex-1 min-w-0">
@@ -1888,17 +1888,17 @@ function CampaignPageInner() {
                                 {/* Advantage+ summary */}
                                 <div className="mt-3 flex flex-wrap items-center gap-2 justify-center">
                                     {advantageAudience && (
-                                        <span className="flex items-center gap-1 text-[10px] font-bold px-2.5 py-1 rounded-full bg-purple-500/15 border border-purple-500/25 text-purple-400">
+                                        <span className="flex items-center gap-1 text-[10px] font-bold px-2.5 py-1 rounded-full bg-[#6A35D9]/15 border border-[#E4E9F0] text-[#6A35D9]">
                                             <Target size={9} /> Advantage+ Audience
                                         </span>
                                     )}
                                     {advantageCreative && (
-                                        <span className="flex items-center gap-1 text-[10px] font-bold px-2.5 py-1 rounded-full bg-blue-500/15 border border-blue-500/25 text-blue-400">
+                                        <span className="flex items-center gap-1 text-[10px] font-bold px-2.5 py-1 rounded-full bg-[#233B8F]/15 border border-[#E4E9F0] text-[#233B8F]">
                                             <Sparkles size={9} /> Advantage+ Creative
                                         </span>
                                     )}
                                     {adFormat === 'carousel' && (
-                                        <span className="flex items-center gap-1 text-[10px] font-bold px-2.5 py-1 rounded-full bg-yellow-500/15 border border-yellow-500/25 text-yellow-400">
+                                        <span className="flex items-center gap-1 text-[10px] font-bold px-2.5 py-1 rounded-full bg-[#D97706]/15 border border-[#D97706]/25 text-[#D97706]">
                                             <Layers size={9} /> Carrusel
                                         </span>
                                     )}
@@ -1921,7 +1921,7 @@ function CampaignPageInner() {
                                 )}
                                 <button onClick={() => { setShowPreview(false); publish() }} disabled={publishing}
                                     className="mt-3 w-full flex items-center justify-center gap-2 px-5 py-3.5 rounded-2xl font-bold text-sm disabled:opacity-50 transition-all"
-                                    style={{ background: 'linear-gradient(135deg,#10b981,#059669)', boxShadow: '0 0 25px rgba(16,185,129,0.4)' }}>
+                                    style={{ background: 'linear-gradient(135deg,#059669,#059669)', boxShadow: '0 0 25px rgba(5,150,105,0.4)' }}>
                                     {publishing ? <><Loader2 size={15} className="animate-spin" /> Publicando...</> : <><Rocket size={15} /> Publicar Campaña</>}
                                 </button>
                             </div>
@@ -1937,7 +1937,7 @@ export default function CampaignPage() {
     return (
         <Suspense fallback={
             <div className="flex items-center justify-center min-h-[60vh]">
-                <Loader2 className="animate-spin text-purple-400" size={32} />
+                <Loader2 className="animate-spin text-[#6A35D9]" size={32} />
             </div>
         }>
             <CampaignPageInner />

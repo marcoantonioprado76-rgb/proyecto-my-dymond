@@ -10,17 +10,17 @@ import Link from 'next/link'
 
 const STATUS_LABELS: Record<string, { label: string; color: string; dot: string }> = {
     DRAFT: { label: 'Borrador', color: 'text-[#9CA3AF] bg-[#F4F6FA] border-[#E4E9F0]', dot: 'bg-[#F0F3F7]' },
-    READY: { label: 'Listo', color: 'text-blue-400 bg-blue-500/10 border-blue-500/20', dot: 'bg-blue-400' },
-    PUBLISHING: { label: 'Publicando', color: 'text-yellow-400 bg-yellow-500/10 border-yellow-500/20', dot: 'bg-yellow-400 animate-pulse' },
-    PUBLISHED: { label: 'Publicado', color: 'text-green-400 bg-green-500/10 border-green-500/20', dot: 'bg-green-400' },
-    FAILED: { label: 'Error', color: 'text-red-400 bg-red-500/10 border-red-500/20', dot: 'bg-red-400' },
-    PAUSED: { label: 'Pausado', color: 'text-orange-400 bg-orange-500/10 border-orange-500/20', dot: 'bg-orange-400' },
+    READY: { label: 'Listo', color: 'text-[#233B8F] bg-[#233B8F]/10 border-[#E4E9F0]', dot: 'bg-[#233B8F]' },
+    PUBLISHING: { label: 'Publicando', color: 'text-[#D97706] bg-[#D97706]/10 border-[#D97706]/20', dot: 'bg-[#D97706] animate-pulse' },
+    PUBLISHED: { label: 'Publicado', color: 'text-[#059669] bg-[#059669]/10 border-[#059669]/20', dot: 'bg-[#059669]' },
+    FAILED: { label: 'Error', color: 'text-[#DC2626] bg-[#DC2626]/10 border-[#DC2626]/20', dot: 'bg-[#DC2626]' },
+    PAUSED: { label: 'Pausado', color: 'text-[#EA580C] bg-[#EA580C]/10 border-[#EA580C]/20', dot: 'bg-[#EA580C]' },
 }
 
 const PLATFORM_MAP: Record<string, { letter: string; color: string }> = {
-    META: { letter: 'f', color: 'text-blue-400' },
-    TIKTOK: { letter: 'T', color: 'text-red-400' },
-    GOOGLE_ADS: { letter: 'G', color: 'text-yellow-400' },
+    META: { letter: 'f', color: 'text-[#233B8F]' },
+    TIKTOK: { letter: 'T', color: 'text-[#DC2626]' },
+    GOOGLE_ADS: { letter: 'G', color: 'text-[#D97706]' },
 }
 
 const FILTERS = ['ALL', 'DRAFT', 'READY', 'PUBLISHED', 'PAUSED', 'FAILED']
@@ -132,12 +132,12 @@ export default function HistoryPage() {
                 </div>
                 <div className="flex items-center gap-2">
                     <Link href="/dashboard/services/ads/wizard"
-                        className="hidden sm:flex items-center gap-1.5 text-xs font-bold px-3 py-2 rounded-xl bg-purple-600 text-white hover:bg-purple-500 transition-all">
+                        className="hidden sm:flex items-center gap-1.5 text-xs font-bold px-3 py-2 rounded-xl bg-[#6A35D9] text-white hover:bg-[#5A2BC0] transition-all">
                         <Plus size={13} /> Nueva
                     </Link>
                     <button onClick={() => fetchCampaigns(true)}
                         className="w-9 h-9 rounded-xl bg-[#F4F6FA] border border-[#E4E9F0] flex items-center justify-center hover:bg-[#F0F3F7] transition-all shrink-0">
-                        <RefreshCw size={14} className={refreshing ? 'animate-spin text-purple-400' : ''} />
+                        <RefreshCw size={14} className={refreshing ? 'animate-spin text-[#6A35D9]' : ''} />
                     </button>
                 </div>
             </div>
@@ -148,12 +148,12 @@ export default function HistoryPage() {
                     <p className="text-[10px] text-[#9CA3AF] font-bold uppercase tracking-widest mb-2">Últimos 30 días</p>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
                     {[
-                        { icon: <Eye size={14} />, label: 'Impresiones', value: fmt(totalImpressions), color: 'text-blue-400' },
-                        { icon: <MousePointerClick size={14} />, label: 'Clics', value: fmt(totalClicks), color: 'text-purple-400' },
-                        { icon: <DollarSign size={14} />, label: 'Gasto', value: `$${totalSpend.toFixed(2)}`, color: 'text-green-400' },
-                        { icon: <Users size={14} />, label: 'Alcance', value: fmt(totalReach), color: 'text-orange-400' },
+                        { icon: <Eye size={14} />, label: 'Impresiones', value: fmt(totalImpressions), color: 'text-[#233B8F]' },
+                        { icon: <MousePointerClick size={14} />, label: 'Clics', value: fmt(totalClicks), color: 'text-[#6A35D9]' },
+                        { icon: <DollarSign size={14} />, label: 'Gasto', value: `$${totalSpend.toFixed(2)}`, color: 'text-[#059669]' },
+                        { icon: <Users size={14} />, label: 'Alcance', value: fmt(totalReach), color: 'text-[#EA580C]' },
                     ].map(({ icon, label, value, color }) => (
-                        <div key={label} className="bg-white/3 border border-[#E4E9F0] rounded-2xl p-4">
+                        <div key={label} className="bg-[#F4F6FA] border border-[#E4E9F0] rounded-2xl p-4">
                             <div className={`flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest mb-2 ${color}`}>
                                 {icon} {label}
                             </div>
@@ -177,7 +177,7 @@ export default function HistoryPage() {
                                 : 'bg-[#F4F6FA] border-[#E4E9F0] text-[#9CA3AF] hover:border-[#E4E9F0] hover:text-[#6B7280]'
                             }`}>
                             {FILTER_LABELS[s]}
-                            <span className={`text-[10px] font-black px-1.5 py-0.5 rounded-md ${filter === s ? 'bg-black/10' : 'bg-[#F0F3F7]'}`}>
+                            <span className={`text-[10px] font-black px-1.5 py-0.5 rounded-md ${filter === s ? 'bg-[#081624]/10' : 'bg-[#F0F3F7]'}`}>
                                 {count}
                             </span>
                         </button>
@@ -187,7 +187,7 @@ export default function HistoryPage() {
 
             {loading ? (
                 <div className="flex flex-col items-center justify-center py-24 gap-3">
-                    <Loader2 className="animate-spin text-purple-400" size={28} />
+                    <Loader2 className="animate-spin text-[#6A35D9]" size={28} />
                     <p className="text-[#9CA3AF] text-sm">Cargando campañas...</p>
                 </div>
             ) : filtered.length === 0 ? (
@@ -196,7 +196,7 @@ export default function HistoryPage() {
                     <p className="text-[#9CA3AF] text-sm font-bold">Sin campañas</p>
                     <p className="text-[#9CA3AF] text-xs mt-1 mb-6">No hay campañas con este filtro</p>
                     <Link href="/dashboard/services/ads/wizard"
-                        className="inline-flex items-center gap-2 px-5 py-2.5 bg-purple-600 text-white text-sm font-bold rounded-xl hover:bg-purple-500 transition-all">
+                        className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#6A35D9] text-white text-sm font-bold rounded-xl hover:bg-[#5A2BC0] transition-all">
                         <Sparkles size={14} /> Crear primera campaña
                     </Link>
                 </div>
@@ -212,7 +212,7 @@ export default function HistoryPage() {
 
                         return (
                             <div key={campaign.id}
-                                className="bg-white/3 border border-[#E4E9F0] rounded-2xl p-4 md:p-5 hover:border-[#E4E9F0] transition-all">
+                                className="bg-[#F4F6FA] border border-[#E4E9F0] rounded-2xl p-4 md:p-5 hover:border-[#E4E9F0] transition-all">
 
                                 {/* Top row */}
                                 <div className="flex items-start gap-3">
@@ -254,19 +254,19 @@ export default function HistoryPage() {
                                         {loadingMetrics && !campaignMetrics ? (
                                             <div className="mt-3 grid grid-cols-4 gap-2">
                                                 {[0, 1, 2, 3].map(i => (
-                                                    <div key={i} className="h-12 bg-white/3 rounded-xl animate-pulse" />
+                                                    <div key={i} className="h-12 bg-[#F4F6FA] rounded-xl animate-pulse" />
                                                 ))}
                                             </div>
                                         ) : hasMetrics ? (
                                             <div className="mt-3">
                                                 <div className="grid grid-cols-4 gap-2">
                                                     {[
-                                                        { label: 'Impresiones', value: fmt(campaignMetrics!.impressions), color: 'text-blue-400' },
-                                                        { label: 'Clics', value: fmt(campaignMetrics!.clicks), color: 'text-purple-400' },
-                                                        { label: 'Gasto', value: `$${campaignMetrics!.spend.toFixed(2)}`, color: 'text-green-400' },
-                                                        { label: 'Alcance', value: fmt(campaignMetrics!.reach), color: 'text-orange-400' },
+                                                        { label: 'Impresiones', value: fmt(campaignMetrics!.impressions), color: 'text-[#233B8F]' },
+                                                        { label: 'Clics', value: fmt(campaignMetrics!.clicks), color: 'text-[#6A35D9]' },
+                                                        { label: 'Gasto', value: `$${campaignMetrics!.spend.toFixed(2)}`, color: 'text-[#059669]' },
+                                                        { label: 'Alcance', value: fmt(campaignMetrics!.reach), color: 'text-[#EA580C]' },
                                                     ].map(({ label, value, color }) => (
-                                                        <div key={label} className="bg-white/3 rounded-xl p-2.5 text-center">
+                                                        <div key={label} className="bg-[#F4F6FA] rounded-xl p-2.5 text-center">
                                                             <p className={`text-sm font-black ${color}`}>{value}</p>
                                                             <p className="text-[9px] text-[#9CA3AF] mt-0.5">{label}</p>
                                                         </div>
@@ -275,14 +275,14 @@ export default function HistoryPage() {
                                                 {/* CTR / CPM row */}
                                                 {metricsExpanded && (
                                                     <div className="grid grid-cols-2 gap-2 mt-2">
-                                                        <div className="bg-white/3 rounded-xl p-2.5 flex items-center gap-2">
+                                                        <div className="bg-[#F4F6FA] rounded-xl p-2.5 flex items-center gap-2">
                                                             <TrendingUp size={13} className="text-[#9CA3AF]" />
                                                             <div>
                                                                 <p className="text-xs font-bold">{campaignMetrics!.ctr.toFixed(2)}%</p>
                                                                 <p className="text-[9px] text-[#9CA3AF]">CTR</p>
                                                             </div>
                                                         </div>
-                                                        <div className="bg-white/3 rounded-xl p-2.5 flex items-center gap-2">
+                                                        <div className="bg-[#F4F6FA] rounded-xl p-2.5 flex items-center gap-2">
                                                             <DollarSign size={13} className="text-[#9CA3AF]" />
                                                             <div>
                                                                 <p className="text-xs font-bold">${campaignMetrics!.cpm.toFixed(2)}</p>
@@ -302,7 +302,7 @@ export default function HistoryPage() {
                                                 </button>
                                             </div>
                                         ) : campaignMetrics?.error ? (
-                                            <div className="mt-3 p-2.5 bg-white/3 rounded-xl flex items-center gap-2">
+                                            <div className="mt-3 p-2.5 bg-[#F4F6FA] rounded-xl flex items-center gap-2">
                                                 <AlertCircle size={12} className="text-[#9CA3AF] shrink-0" />
                                                 <p className="text-[10px] text-[#9CA3AF]">{campaignMetrics.error}</p>
                                             </div>
@@ -312,9 +312,9 @@ export default function HistoryPage() {
 
                                 {/* Failure reason */}
                                 {campaign.status === 'FAILED' && campaign.failureReason && (
-                                    <div className="mt-3 p-3 bg-red-500/5 border border-red-500/15 rounded-xl flex items-start gap-2">
-                                        <AlertCircle size={13} className="text-red-400/70 shrink-0 mt-0.5" />
-                                        <p className="text-[11px] text-red-400/70">{campaign.failureReason}</p>
+                                    <div className="mt-3 p-3 bg-[#DC2626]/5 border border-[#DC2626]/15 rounded-xl flex items-start gap-2">
+                                        <AlertCircle size={13} className="text-[#DC2626]/70 shrink-0 mt-0.5" />
+                                        <p className="text-[11px] text-[#DC2626]/70">{campaign.failureReason}</p>
                                     </div>
                                 )}
 
@@ -322,7 +322,7 @@ export default function HistoryPage() {
                                 <div className="flex items-center gap-2 mt-3 pt-3 border-t border-[#E4E9F0]">
                                     {campaign.status === 'READY' && (
                                         <Link href={`/dashboard/services/ads/preview/${campaign.id}`}
-                                            className="flex-1 sm:flex-none text-center text-xs font-bold px-4 py-2 rounded-xl bg-purple-600 text-white hover:bg-purple-500 transition-all">
+                                            className="flex-1 sm:flex-none text-center text-xs font-bold px-4 py-2 rounded-xl bg-[#6A35D9] text-white hover:bg-[#5A2BC0] transition-all">
                                             Publicar →
                                         </Link>
                                     )}
@@ -334,13 +334,13 @@ export default function HistoryPage() {
                                     )}
                                     {campaign.status === 'FAILED' && (
                                         <Link href={`/dashboard/services/ads/preview/${campaign.id}`}
-                                            className="flex-1 sm:flex-none text-center text-xs font-bold px-4 py-2 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500/20 transition-all">
+                                            className="flex-1 sm:flex-none text-center text-xs font-bold px-4 py-2 rounded-xl bg-[#DC2626]/10 border border-[#DC2626]/20 text-[#DC2626] hover:bg-[#B91C1C]/20 transition-all">
                                             Reintentar
                                         </Link>
                                     )}
                                     {campaign.status === 'PUBLISHED' && campaign.providerCampaignId && (
                                         <a href="https://business.facebook.com/adsmanager" target="_blank" rel="noopener noreferrer"
-                                            className="flex items-center gap-1.5 text-xs font-bold px-4 py-2 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400 hover:bg-blue-500/20 transition-all">
+                                            className="flex items-center gap-1.5 text-xs font-bold px-4 py-2 rounded-xl bg-[#233B8F]/10 border border-[#E4E9F0] text-[#233B8F] hover:bg-[#1B2E6C]/20 transition-all">
                                             <ExternalLink size={12} /> Ads Manager
                                         </a>
                                     )}
@@ -359,7 +359,7 @@ export default function HistoryPage() {
                                                 <button
                                                     onClick={() => deleteCampaign(campaign.id)}
                                                     disabled={deleting === campaign.id}
-                                                    className="text-[10px] font-bold px-2.5 py-1 rounded-lg bg-red-500/20 border border-red-500/30 text-red-400 hover:bg-red-500/35 transition-all disabled:opacity-50"
+                                                    className="text-[10px] font-bold px-2.5 py-1 rounded-lg bg-[#DC2626]/20 border border-[#DC2626]/30 text-[#DC2626] hover:bg-[#B91C1C]/35 transition-all disabled:opacity-50"
                                                 >
                                                     {deleting === campaign.id ? <Loader2 size={10} className="animate-spin" /> : 'Sí, eliminar'}
                                                 </button>
@@ -373,7 +373,7 @@ export default function HistoryPage() {
                                         ) : (
                                             <button
                                                 onClick={() => setConfirmDelete(campaign.id)}
-                                                className="text-[#9CA3AF] hover:text-red-400 transition-all"
+                                                className="text-[#9CA3AF] hover:text-[#DC2626] transition-all"
                                                 title="Eliminar campaña"
                                             >
                                                 <Trash2 size={13} />

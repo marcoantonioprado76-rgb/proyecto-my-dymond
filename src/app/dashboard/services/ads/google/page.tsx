@@ -91,9 +91,9 @@ export default function GoogleAdsPage() {
                         { label: 'YouTube Ads y Smart Bidding', done: false },
                     ].map((step, i) => (
                         <div key={i} className="flex items-center gap-3">
-                            <div className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 ${step.done ? 'bg-green-500/15' : 'bg-[#F4F6FA]'}`}>
+                            <div className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 ${step.done ? 'bg-[#059669]/15' : 'bg-[#F4F6FA]'}`}>
                                 {step.done
-                                    ? <CheckCircle2 size={12} className="text-green-400" />
+                                    ? <CheckCircle2 size={12} className="text-[#059669]" />
                                     : <Clock size={10} className="text-[#9CA3AF]" />}
                             </div>
                             <p className={`text-xs ${step.done ? 'text-[#6B7280]' : 'text-[#9CA3AF]'}`}>{step.label}</p>
@@ -101,7 +101,7 @@ export default function GoogleAdsPage() {
                     ))}
                 </div>
 
-                <div className="mt-5 pt-4 border-t border-white/6">
+                <div className="mt-5 pt-4 border-t border-[#E4E9F0]">
                     <a href="https://ads.google.com/home/tools/manager-accounts/" target="_blank" rel="noopener noreferrer"
                         className="inline-flex items-center gap-2 text-xs font-bold hover:underline" style={{ color: '#4285F4' }}>
                         <ExternalLink size={12} /> Ver Google Ads Manager

@@ -117,17 +117,17 @@ export default function LocationSelector({ selected, onChange, platform = 'meta'
                         const parsed = parseLocation(loc)
                         return (
                             <span key={loc} className={`flex items-center gap-1.5 text-[11px] font-medium px-2.5 py-1 rounded-full border ${parsed.type === 'country'
-                                ? 'bg-purple-500/10 border-purple-500/20 text-purple-300'
-                                : 'bg-blue-500/10 border-blue-500/20 text-blue-300'}`}>
+                                ? 'bg-[#6A35D9]/10 border-[#E4E9F0] text-[#6A35D9]'
+                                : 'bg-[#233B8F]/10 border-[#E4E9F0] text-[#233B8F]'}`}>
                                 {parsed.type === 'country' ? <Globe size={10} /> : parsed.type === 'region' ? <Building2 size={10} /> : <MapPin size={10} />}
                                 {parsed.name}
-                                <button onClick={() => removeLocation(loc)} className="text-[#9CA3AF] hover:text-red-400 transition-all ml-0.5">
+                                <button onClick={() => removeLocation(loc)} className="text-[#9CA3AF] hover:text-[#DC2626] transition-all ml-0.5">
                                     <X size={10} />
                                 </button>
                             </span>
                         )
                     })}
-                    <button onClick={() => onChange([])} className="text-[10px] text-[#9CA3AF] hover:text-red-400 transition-all px-1">
+                    <button onClick={() => onChange([])} className="text-[10px] text-[#9CA3AF] hover:text-[#DC2626] transition-all px-1">
                         Limpiar todo
                     </button>
                 </div>
@@ -140,10 +140,10 @@ export default function LocationSelector({ selected, onChange, platform = 'meta'
                     ['city', 'Departamentos', <Building2 size={12} />, selectedCities.length],
                 ] as const).map(([key, label, icon, count]) => (
                     <button key={key} onClick={() => { setTab(key); setSearch('') }}
-                        className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs font-bold transition-all ${tab === key ? 'text-[#111827] border-b-2 border-purple-500' : 'text-[#9CA3AF] hover:text-[#6B7280]'}`}>
+                        className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs font-bold transition-all ${tab === key ? 'text-[#111827] border-b-2 border-[#E4E9F0]' : 'text-[#9CA3AF] hover:text-[#6B7280]'}`}>
                         {icon} {label}
                         {count > 0 && (
-                            <span className={`text-[9px] px-1.5 py-0.5 rounded-full ${tab === key ? 'bg-purple-500/30 text-purple-200' : 'bg-[#F0F3F7] text-[#9CA3AF]'}`}>{count}</span>
+                            <span className={`text-[9px] px-1.5 py-0.5 rounded-full ${tab === key ? 'bg-[#6A35D9]/30 text-purple-200' : 'bg-[#F0F3F7] text-[#9CA3AF]'}`}>{count}</span>
                         )}
                     </button>
                 ))}
@@ -157,7 +157,7 @@ export default function LocationSelector({ selected, onChange, platform = 'meta'
                         value={search}
                         onChange={e => setSearch(e.target.value)}
                         placeholder={tab === 'country' ? 'Buscar país...' : 'Buscar departamento / región...'}
-                        className="w-full bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl pl-8 pr-3 py-2 text-xs text-[#111827] focus:outline-none focus:border-purple-500/50 placeholder:text-[#9CA3AF]"
+                        className="w-full bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl pl-8 pr-3 py-2 text-xs text-[#111827] focus:outline-none focus:border-[#E4E9F0] placeholder:text-[#9CA3AF]"
                     />
                 </div>
             </div>
@@ -171,11 +171,11 @@ export default function LocationSelector({ selected, onChange, platform = 'meta'
                             return (
                                 <button key={c.code} onClick={() => toggleCountry(c.code)}
                                     className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-medium text-left transition-all ${isSelected
-                                        ? 'bg-purple-500/20 border border-purple-500/40 text-purple-200'
-                                        : 'bg-white/3 border border-[#E4E9F0] text-[#6B7280] hover:bg-[#F0F3F7] hover:text-[#6B7280]'}`}>
+                                        ? 'bg-[#6A35D9]/20 border border-[#E4E9F0] text-purple-200'
+                                        : 'bg-[#F4F6FA] border border-[#E4E9F0] text-[#6B7280] hover:bg-[#F0F3F7] hover:text-[#6B7280]'}`}>
                                     <span className="font-black text-[10px] text-[#9CA3AF] w-5 shrink-0">{c.code}</span>
                                     <span className="truncate flex-1">{c.name}</span>
-                                    {isSelected && <X size={10} className="shrink-0 text-purple-400" />}
+                                    {isSelected && <X size={10} className="shrink-0 text-[#6A35D9]" />}
                                 </button>
                             )
                         })}
@@ -205,16 +205,16 @@ export default function LocationSelector({ selected, onChange, platform = 'meta'
                             return (
                                 <button key={val} onClick={() => toggleLive(item)}
                                     className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs text-left transition-all ${isSelected
-                                        ? 'bg-blue-500/15 border border-blue-500/30 text-blue-200'
-                                        : 'bg-white/3 border border-[#E4E9F0] text-[#6B7280] hover:bg-[#F0F3F7] hover:text-[#6B7280]'}`}>
+                                        ? 'bg-[#233B8F]/15 border border-[#E4E9F0] text-blue-200'
+                                        : 'bg-[#F4F6FA] border border-[#E4E9F0] text-[#6B7280] hover:bg-[#F0F3F7] hover:text-[#6B7280]'}`}>
                                     {isRegion
-                                        ? <Building2 size={11} className={`shrink-0 ${isSelected ? 'text-blue-400' : 'text-[#9CA3AF]'}`} />
-                                        : <MapPin size={11} className={`shrink-0 ${isSelected ? 'text-blue-400' : 'text-[#9CA3AF]'}`} />}
+                                        ? <Building2 size={11} className={`shrink-0 ${isSelected ? 'text-[#233B8F]' : 'text-[#9CA3AF]'}`} />
+                                        : <MapPin size={11} className={`shrink-0 ${isSelected ? 'text-[#233B8F]' : 'text-[#9CA3AF]'}`} />}
                                     <div className="flex-1 min-w-0">
                                         <p className="font-medium truncate">{item.name} {isRegion && <span className="text-[9px] text-[#9CA3AF]">· depto/región</span>}</p>
                                         <p className="text-[10px] text-[#9CA3AF] truncate">{[item.region, item.countryName].filter(Boolean).join(', ') || item.countryCode}</p>
                                     </div>
-                                    {isSelected && <X size={10} className="shrink-0 text-blue-400" />}
+                                    {isSelected && <X size={10} className="shrink-0 text-[#233B8F]" />}
                                 </button>
                             )
                         })}

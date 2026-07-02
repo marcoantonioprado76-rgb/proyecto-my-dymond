@@ -269,21 +269,21 @@ export default function CountryMapSelector({ selected, onChange }: Props) {
                 <div className="absolute top-2 right-2 z-10 flex flex-col gap-1">
                     <button
                         onClick={() => setZoom(z => Math.min(z * 1.6, 12))}
-                        className="w-7 h-7 rounded-lg bg-black/60 border border-[#E4E9F0] flex items-center justify-center hover:bg-[#F0F3F7] text-[#6B7280] hover:text-[#111827] transition-all"
+                        className="w-7 h-7 rounded-lg bg-white/90 border border-[#E4E9F0] shadow-sm flex items-center justify-center hover:bg-[#F0F3F7] text-[#6B7280] hover:text-[#111827] transition-all"
                     ><ZoomIn size={13} /></button>
                     <button
                         onClick={() => setZoom(z => Math.max(z / 1.6, 1))}
-                        className="w-7 h-7 rounded-lg bg-black/60 border border-[#E4E9F0] flex items-center justify-center hover:bg-[#F0F3F7] text-[#6B7280] hover:text-[#111827] transition-all"
+                        className="w-7 h-7 rounded-lg bg-white/90 border border-[#E4E9F0] shadow-sm flex items-center justify-center hover:bg-[#F0F3F7] text-[#6B7280] hover:text-[#111827] transition-all"
                     ><ZoomOut size={13} /></button>
                     <button
                         onClick={() => { setZoom(1); setCenter([0, 20]) }}
-                        className="w-7 h-7 rounded-lg bg-black/60 border border-[#E4E9F0] flex items-center justify-center hover:bg-[#F0F3F7] text-[#6B7280] hover:text-[#111827] transition-all"
+                        className="w-7 h-7 rounded-lg bg-white/90 border border-[#E4E9F0] shadow-sm flex items-center justify-center hover:bg-[#F0F3F7] text-[#6B7280] hover:text-[#111827] transition-all"
                     ><RotateCcw size={11} /></button>
                 </div>
 
                 {/* Tooltip */}
                 {tooltip && (
-                    <div className="absolute top-2 left-2 z-10 px-2 py-1 bg-black/80 border border-[#E4E9F0] rounded-lg text-[11px] text-[#111827] pointer-events-none">
+                    <div className="absolute top-2 left-2 z-10 px-2 py-1 bg-white/95 border border-[#E4E9F0] shadow-sm rounded-lg text-[11px] text-[#111827] pointer-events-none">
                         {tooltip}
                     </div>
                 )}
@@ -322,9 +322,9 @@ export default function CountryMapSelector({ selected, onChange }: Props) {
                                             onMouseEnter={() => setTooltip(info?.name || null)}
                                             onMouseLeave={() => setTooltip(null)}
                                             style={{
-                                                default: { fill: isSel ? '#7c3aed' : '#1a1a3e', stroke: '#0d0d2b', strokeWidth: 0.4, outline: 'none', cursor: info ? 'pointer' : 'default' },
-                                                hover: { fill: isSel ? '#8b5cf6' : '#2d2b69', stroke: '#0d0d2b', strokeWidth: 0.4, outline: 'none', cursor: info ? 'pointer' : 'default' },
-                                                pressed: { fill: '#5b21b6', outline: 'none' }
+                                                default: { fill: isSel ? '#6A35D9' : '#E4E9F0', stroke: '#D5DCE6', strokeWidth: 0.4, outline: 'none', cursor: info ? 'pointer' : 'default' },
+                                                hover: { fill: isSel ? '#6A35D9' : '#DDD6F3', stroke: '#C9D2DE', strokeWidth: 0.4, outline: 'none', cursor: info ? 'pointer' : 'default' },
+                                                pressed: { fill: '#6A35D9', outline: 'none' }
                                             }}
                                         />
                                     )
@@ -354,8 +354,8 @@ export default function CountryMapSelector({ selected, onChange }: Props) {
                                     {/* Visible dot */}
                                     <circle
                                         r={dotR}
-                                        fill={isSel ? '#3b82f6' : countrySelected ? '#a78bfa' : '#64748b'}
-                                        stroke={isSel ? '#93c5fd' : '#0f172a'}
+                                        fill={isSel ? '#233B8F' : countrySelected ? '#9B70E7' : '#94A3B8'}
+                                        stroke={isSel ? '#233B8F' : '#9CA3AF'}
                                         strokeWidth={isSel ? 1.5 : 0.8}
                                         style={{ pointerEvents: 'none', transition: 'all 0.15s' }}
                                     />
@@ -363,7 +363,7 @@ export default function CountryMapSelector({ selected, onChange }: Props) {
                                         <text
                                             textAnchor="middle"
                                             y={-8}
-                                            style={{ fontSize: `${Math.max(3, 4.5 / zoom)}px`, fill: '#93c5fd', fontWeight: 700, pointerEvents: 'none' }}
+                                            style={{ fontSize: `${Math.max(3, 4.5 / zoom)}px`, fill: '#233B8F', fontWeight: 700, pointerEvents: 'none' }}
                                         >
                                             {city.name}
                                         </text>
@@ -382,7 +382,7 @@ export default function CountryMapSelector({ selected, onChange }: Props) {
                     value={citySearch}
                     onChange={e => setCitySearch(e.target.value)}
                     placeholder="Buscar ciudad o departamento (Ej: Bogotá, Medellín...)"
-                    className="w-full bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl pl-8 pr-3 py-2 text-sm text-[#111827] focus:outline-none focus:border-blue-500/50 placeholder:text-[#9CA3AF]"
+                    className="w-full bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl pl-8 pr-3 py-2 text-sm text-[#111827] focus:outline-none focus:border-[#E4E9F0] placeholder:text-[#9CA3AF]"
                 />
                 {citySearch && (
                     <button onClick={() => setCitySearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#9CA3AF] hover:text-[#111827]">
@@ -397,7 +397,7 @@ export default function CountryMapSelector({ selected, onChange }: Props) {
                                 <button
                                     key={`${c.name}-${c.country}`}
                                     onClick={() => { toggle(c.name); setCitySearch('') }}
-                                    className={`w-full flex items-center justify-between px-3 py-2.5 text-sm hover:bg-[#F4F6FA] transition-all text-left ${isSel ? 'text-blue-400' : 'text-[#6B7280]'}`}
+                                    className={`w-full flex items-center justify-between px-3 py-2.5 text-sm hover:bg-[#F4F6FA] transition-all text-left ${isSel ? 'text-[#233B8F]' : 'text-[#6B7280]'}`}
                                 >
                                     <span className="flex items-center gap-2">
                                         <MapPin size={11} className="text-[#9CA3AF] shrink-0" />
@@ -415,18 +415,18 @@ export default function CountryMapSelector({ selected, onChange }: Props) {
             {selected.length > 0 ? (
                 <div className="flex flex-wrap gap-1.5">
                     {selectedCountries.map(code => (
-                        <span key={code} className="flex items-center gap-1 text-xs bg-purple-500/10 border border-purple-500/20 text-purple-300 px-2.5 py-1 rounded-full">
+                        <span key={code} className="flex items-center gap-1 text-xs bg-[#6A35D9]/10 border border-[#E4E9F0] text-[#6A35D9] px-2.5 py-1 rounded-full">
                             {CODE_TO_NAME[code] || code}
-                            <button onClick={() => toggle(code)} className="hover:text-red-400 ml-0.5"><X size={9} /></button>
+                            <button onClick={() => toggle(code)} className="hover:text-[#DC2626] ml-0.5"><X size={9} /></button>
                         </span>
                     ))}
                     {selectedCities.map(city => (
-                        <span key={city} className="flex items-center gap-1 text-xs bg-blue-500/10 border border-blue-500/20 text-blue-300 px-2.5 py-1 rounded-full">
+                        <span key={city} className="flex items-center gap-1 text-xs bg-[#233B8F]/10 border border-[#E4E9F0] text-[#233B8F] px-2.5 py-1 rounded-full">
                             <MapPin size={9} />{city}
-                            <button onClick={() => toggle(city)} className="hover:text-red-400 ml-0.5"><X size={9} /></button>
+                            <button onClick={() => toggle(city)} className="hover:text-[#DC2626] ml-0.5"><X size={9} /></button>
                         </span>
                     ))}
-                    <button onClick={() => onChange([])} className="text-[11px] text-[#9CA3AF] hover:text-red-400 px-2 py-1 transition-colors">
+                    <button onClick={() => onChange([])} className="text-[11px] text-[#9CA3AF] hover:text-[#DC2626] px-2 py-1 transition-colors">
                         Limpiar todo
                     </button>
                 </div>

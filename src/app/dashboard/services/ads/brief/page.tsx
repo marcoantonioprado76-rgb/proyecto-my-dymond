@@ -32,7 +32,7 @@ const emptyBrief: BriefForm = {
 
 const Loader = () => (
     <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="w-8 h-8 border-2 border-purple-400/30 border-t-purple-400 rounded-full animate-spin" />
+        <div className="w-8 h-8 border-2 border-[#E4E9F0] border-t-[#6A35D9] rounded-full animate-spin" />
     </div>
 )
 
@@ -230,7 +230,7 @@ function CreateBriefView({ onSaved, onCancel }: { onSaved: (b: Brief) => void; o
             </div>
 
             {error && (
-                <div className="mb-5 p-4 bg-red-500/10 border border-red-500/20 rounded-2xl flex gap-3 text-red-400 text-sm">
+                <div className="mb-5 p-4 bg-[#DC2626]/10 border border-[#DC2626]/20 rounded-2xl flex gap-3 text-[#DC2626] text-sm">
                     <AlertCircle size={16} className="shrink-0 mt-0.5" /><p className="flex-1">{error}</p>
                     <button onClick={() => setError(null)} className="font-bold text-xs">✕</button>
                 </div>
@@ -239,21 +239,21 @@ function CreateBriefView({ onSaved, onCancel }: { onSaved: (b: Brief) => void; o
             {!brief ? (
                 <>
                     {/* PASO 1 — Categoría del negocio (arriba de todo, obligatoria) */}
-                    <p className="text-[11px] font-bold text-purple-300 mb-2.5 flex items-center gap-1.5">
+                    <p className="text-[11px] font-bold text-[#6A35D9] mb-2.5 flex items-center gap-1.5">
                         <Sparkles size={12} /> Describí tu negocio
                         <span className="text-[#9CA3AF] font-normal">— la IA detecta el rubro automáticamente</span>
                     </p>
 
                     {/* Ayuda: prompt para ChatGPT (adaptado a la categoría elegida) */}
-                    <div className="mb-5 p-3.5 rounded-2xl" style={{ background: 'rgba(59,130,246,0.06)', border: '1px solid rgba(59,130,246,0.18)' }}>
-                        <p className="text-[11px] font-bold text-blue-300 mb-1 flex items-center gap-1.5">
+                    <div className="mb-5 p-3.5 rounded-2xl" style={{ background: 'rgba(35,59,143,0.06)', border: '1px solid rgba(35,59,143,0.18)' }}>
+                        <p className="text-[11px] font-bold text-[#233B8F] mb-1 flex items-center gap-1.5">
                             🤖 ¿No sabés qué escribir? Usá tu ChatGPT
                         </p>
                         <p className="text-[10px] text-[#9CA3AF] leading-relaxed mb-2.5">
                             Copiá este prompt, pegalo en tu ChatGPT y respondé las preguntas (ChatGPT detecta tu rubro y pregunta lo relevante). Al final te dará un texto completo — pegalo abajo y generá el brief.
                         </p>
                         <button onClick={copyChatGptPrompt}
-                            className={`flex items-center gap-2 px-3.5 py-2 rounded-xl border text-[11px] font-bold transition-all ${copiedPrompt ? 'bg-emerald-500/15 border-emerald-500/40 text-emerald-300' : 'bg-blue-500/12 border-blue-500/30 text-blue-200 hover:bg-blue-500/20'}`}>
+                            className={`flex items-center gap-2 px-3.5 py-2 rounded-xl border text-[11px] font-bold transition-all ${copiedPrompt ? 'bg-[#059669]/15 border-[#059669]/40 text-[#059669]' : 'bg-[#233B8F]/12 border-[#E4E9F0] text-blue-200 hover:bg-[#1B2E6C]/20'}`}>
                             {copiedPrompt ? <><CheckCircle2 size={13} /> ¡Copiado! Pegalo en ChatGPT</> : <><Type size={13} /> Copiar prompt para ChatGPT</>}
                         </button>
                     </div>
@@ -271,9 +271,9 @@ function CreateBriefView({ onSaved, onCancel }: { onSaved: (b: Brief) => void; o
                         <div className="space-y-4">
                             <textarea value={text} onChange={e => setText(e.target.value)} rows={9}
                                 placeholder="Pegá acá la descripción de tu negocio. ¿No sabés qué escribir? Copiá el prompt de ChatGPT (botón de arriba), respondé sus preguntas y pegá el resultado. Cuanto más completo, mejor el brief (incluí: qué vendés, a quién, qué problema resolvés, beneficios, diferencial, objetivo, país y ciudades)."
-                                className="w-full bg-[#F4F6FA] border border-[#E4E9F0] rounded-2xl px-4 py-3 text-sm text-[#111827] resize-none focus:outline-none focus:border-purple-500/50 placeholder:text-[#9CA3AF] leading-relaxed" />
+                                className="w-full bg-[#F4F6FA] border border-[#E4E9F0] rounded-2xl px-4 py-3 text-sm text-[#111827] resize-none focus:outline-none focus:border-[#E4E9F0] placeholder:text-[#9CA3AF] leading-relaxed" />
                             <div className="flex items-center justify-between -mt-1">
-                                <span className={`text-[11px] font-bold ${text.trim().length >= 80 ? 'text-emerald-400' : 'text-[#9CA3AF]'}`}>
+                                <span className={`text-[11px] font-bold ${text.trim().length >= 80 ? 'text-[#059669]' : 'text-[#9CA3AF]'}`}>
                                     {text.trim().length >= 80 ? '✓ Buen detalle' : `${text.trim().length}/80 — agregá más detalle`}
                                 </span>
                             </div>
@@ -282,10 +282,10 @@ function CreateBriefView({ onSaved, onCancel }: { onSaved: (b: Brief) => void; o
 
                             {/* Gate: Meta debe estar conectado */}
                             {metaConnected === false && (
-                                <div className="p-3.5 rounded-2xl flex items-center gap-3" style={{ background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.25)' }}>
-                                    <AlertCircle size={16} className="text-amber-400 shrink-0" />
+                                <div className="p-3.5 rounded-2xl flex items-center gap-3" style={{ background: 'rgba(217,119,6,0.08)', border: '1px solid rgba(217,119,6,0.25)' }}>
+                                    <AlertCircle size={16} className="text-[#D97706] shrink-0" />
                                     <p className="flex-1 text-[11px] text-amber-200/90">Conectá tu cuenta de <b>Meta</b> para generar el negocio (se usa para detectar tus ciudades/departamentos).</p>
-                                    <Link href="/dashboard/services/ads/meta" className="text-[11px] font-bold text-amber-300 hover:text-amber-200 whitespace-nowrap">Conectar →</Link>
+                                    <Link href="/dashboard/services/ads/meta" className="text-[11px] font-bold text-[#D97706] hover:text-amber-200 whitespace-nowrap">Conectar →</Link>
                                 </div>
                             )}
 
@@ -312,24 +312,24 @@ function CreateBriefView({ onSaved, onCancel }: { onSaved: (b: Brief) => void; o
                             {!audioBlob ? (
                                 <div className="flex flex-col items-center gap-6">
                                     <button onClick={recording ? stopRecording : startRecording}
-                                        className={`relative w-28 h-28 rounded-full flex items-center justify-center transition-all ${recording ? 'bg-red-500 shadow-[0_0_60px_rgba(239,68,68,0.5)]' : 'bg-purple-600 shadow-[0_0_60px_rgba(139,92,246,0.4)]'}`}>
-                                        {recording && <span className="absolute inset-0 rounded-full bg-red-400 animate-ping opacity-25" />}
+                                        className={`relative w-28 h-28 rounded-full flex items-center justify-center transition-all ${recording ? 'bg-[#DC2626] shadow-[0_0_60px_rgba(220,38,38,0.5)]' : 'bg-[#6A35D9] shadow-[0_0_60px_rgba(106,53,217,0.4)]'}`}>
+                                        {recording && <span className="absolute inset-0 rounded-full bg-[#DC2626] animate-ping opacity-25" />}
                                         {recording ? <Square size={32} className="text-[#111827]" /> : <Mic size={32} className="text-[#111827]" />}
                                     </button>
-                                    {recording && <p className="text-4xl font-black font-mono text-red-400">{fmtTime(recordingTime)}</p>}
+                                    {recording && <p className="text-4xl font-black font-mono text-[#DC2626]">{fmtTime(recordingTime)}</p>}
                                     {!recording && <p className="text-sm text-[#9CA3AF]">Toca para grabar</p>}
                                 </div>
                             ) : (
                                 <div className="flex flex-col items-center gap-4">
-                                    <div className="w-20 h-20 rounded-full bg-green-500/20 border-2 border-green-500/40 flex items-center justify-center">
-                                        <Volume2 size={32} className="text-green-400" />
+                                    <div className="w-20 h-20 rounded-full bg-[#059669]/20 border-2 border-[#059669]/40 flex items-center justify-center">
+                                        <Volume2 size={32} className="text-[#059669]" />
                                     </div>
                                     <p className="text-sm text-[#6B7280]">Audio ({fmtTime(recordingTime)})</p>
                                     <div className="flex gap-3">
                                         <button onClick={() => { setAudioBlob(null); setRecordingTime(0) }} className="px-4 py-2 rounded-xl bg-[#F4F6FA] border border-[#E4E9F0] text-sm font-bold hover:bg-[#F0F3F7] transition-all flex items-center gap-2">
                                             <RefreshCw size={14} /> Volver a grabar
                                         </button>
-                                        <button onClick={transcribeAudio} disabled={transcribing} className="px-6 py-2 rounded-xl bg-purple-600 text-white text-sm font-bold hover:bg-purple-500 disabled:opacity-50 transition-all flex items-center gap-2">
+                                        <button onClick={transcribeAudio} disabled={transcribing} className="px-6 py-2 rounded-xl bg-[#6A35D9] text-white text-sm font-bold hover:bg-[#5A2BC0] disabled:opacity-50 transition-all flex items-center gap-2">
                                             {transcribing ? <><Loader2 size={14} className="animate-spin" /> Transcribiendo...</> : <><Sparkles size={14} /> Transcribir</>}
                                         </button>
                                     </div>
@@ -340,27 +340,27 @@ function CreateBriefView({ onSaved, onCancel }: { onSaved: (b: Brief) => void; o
                 </>
             ) : (
                 <div className="space-y-4">
-                    <div className="p-4 bg-green-500/10 border border-green-500/20 rounded-2xl flex items-center gap-3">
-                        <CheckCircle2 size={18} className="text-green-400 shrink-0" />
+                    <div className="p-4 bg-[#059669]/10 border border-[#059669]/20 rounded-2xl flex items-center gap-3">
+                        <CheckCircle2 size={18} className="text-[#059669] shrink-0" />
                         <div>
-                            <p className="text-sm font-bold text-green-300">{brief.name} · {brief.industry}</p>
-                            <p className="text-xs text-green-400/60 mt-0.5">Brief generado. Puedes editarlo antes de guardar.</p>
+                            <p className="text-sm font-bold text-[#059669]">{brief.name} · {brief.industry}</p>
+                            <p className="text-xs text-[#059669]/60 mt-0.5">Brief generado. Puedes editarlo antes de guardar.</p>
                         </div>
                         <button onClick={() => setBrief(null)} className="ml-auto text-xs font-bold text-[#9CA3AF] hover:text-[#6B7280] transition-all">Descartar</button>
                     </div>
 
                     {/* Lo nuevo que generó la IA según la categoría (orientado a los anuncios) */}
                     {(() => { const b = brief as any; const cat = AD_CATEGORIES.find(c => c.id === b.category); return (
-                        <div className="p-4 rounded-2xl space-y-3" style={{ background: 'rgba(139,92,246,0.06)', border: '1px solid rgba(139,92,246,0.18)' }}>
-                            <p className="text-[11px] font-bold text-purple-300 flex items-center gap-1.5">
+                        <div className="p-4 rounded-2xl space-y-3" style={{ background: 'rgba(106,53,217,0.06)', border: '1px solid rgba(106,53,217,0.18)' }}>
+                            <p className="text-[11px] font-bold text-[#6A35D9] flex items-center gap-1.5">
                                 <Sparkles size={12} /> Enfoque del anuncio {cat && <span className="text-[#9CA3AF] font-normal">· {cat.emoji} {cat.label}</span>}
                             </p>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-[11px]">
                                 {Array.isArray(b.benefits) && b.benefits.length > 0 && (
-                                    <div><p className="text-[#9CA3AF] font-bold uppercase mb-1">Beneficios</p><ul className="space-y-0.5">{b.benefits.map((x: string, i: number) => <li key={i} className="text-[#6B7280] flex gap-1.5"><span className="text-purple-400">✓</span>{x}</li>)}</ul></div>
+                                    <div><p className="text-[#9CA3AF] font-bold uppercase mb-1">Beneficios</p><ul className="space-y-0.5">{b.benefits.map((x: string, i: number) => <li key={i} className="text-[#6B7280] flex gap-1.5"><span className="text-[#6A35D9]">✓</span>{x}</li>)}</ul></div>
                                 )}
                                 {Array.isArray(b.adConcepts) && b.adConcepts.length > 0 && (
-                                    <div><p className="text-[#9CA3AF] font-bold uppercase mb-1">Conceptos visuales</p><ul className="space-y-0.5">{b.adConcepts.map((x: string, i: number) => <li key={i} className="text-[#6B7280] flex gap-1.5"><span className="text-blue-400">▸</span>{x}</li>)}</ul></div>
+                                    <div><p className="text-[#9CA3AF] font-bold uppercase mb-1">Conceptos visuales</p><ul className="space-y-0.5">{b.adConcepts.map((x: string, i: number) => <li key={i} className="text-[#6B7280] flex gap-1.5"><span className="text-[#233B8F]">▸</span>{x}</li>)}</ul></div>
                                 )}
                                 {b.transformation && <div className="sm:col-span-2"><p className="text-[#9CA3AF] font-bold uppercase mb-1">Transformación (antes→después)</p><p className="text-[#6B7280]">{b.transformation}</p></div>}
                                 {b.targetCustomer && <div><p className="text-[#9CA3AF] font-bold uppercase mb-1">Cliente ideal</p><p className="text-[#6B7280]">{b.targetCustomer}</p></div>}
@@ -381,7 +381,7 @@ function CreateBriefView({ onSaved, onCancel }: { onSaved: (b: Brief) => void; o
                         <button onClick={onCancel} className="flex-1 py-3 rounded-2xl bg-[#F4F6FA] border border-[#E4E9F0] text-sm font-bold hover:bg-[#F0F3F7] transition-all">
                             Cancelar
                         </button>
-                        <button onClick={saveBrief} disabled={saving} className="flex-1 py-3 rounded-2xl bg-gradient-to-r from-purple-600 to-blue-600 text-white text-sm font-bold hover:opacity-90 disabled:opacity-50 transition-all flex items-center justify-center gap-2">
+                        <button onClick={saveBrief} disabled={saving} className="flex-1 py-3 rounded-2xl bg-gradient-to-r from-[#6A35D9] to-[#233B8F] text-white text-sm font-bold hover:opacity-90 disabled:opacity-50 transition-all flex items-center justify-center gap-2">
                             {saving ? <><Loader2 size={16} className="animate-spin" /> Guardando...</> : <><Save size={16} /> Guardar Negocio</>}
                         </button>
                     </div>
@@ -420,7 +420,7 @@ function EditBriefView({ brief, onSaved, onCancel }: { brief: Brief; onSaved: (b
                 </div>
             </div>
             {error && (
-                <div className="mb-5 p-4 bg-red-500/10 border border-red-500/20 rounded-2xl flex gap-3 text-red-400 text-sm">
+                <div className="mb-5 p-4 bg-[#DC2626]/10 border border-[#DC2626]/20 rounded-2xl flex gap-3 text-[#DC2626] text-sm">
                     <AlertCircle size={16} className="shrink-0 mt-0.5" /><p className="flex-1">{error}</p>
                     <button onClick={() => setError(null)} className="font-bold text-xs">✕</button>
                 </div>
@@ -428,7 +428,7 @@ function EditBriefView({ brief, onSaved, onCancel }: { brief: Brief; onSaved: (b
             <EditBriefForm brief={form} onChange={setForm} />
             <div className="flex gap-3 mt-6">
                 <button onClick={onCancel} className="flex-1 py-3 rounded-2xl bg-[#F4F6FA] border border-[#E4E9F0] text-sm font-bold hover:bg-[#F0F3F7] transition-all">Cancelar</button>
-                <button onClick={save} disabled={saving} className="flex-1 py-3 rounded-2xl bg-gradient-to-r from-purple-600 to-blue-600 text-white text-sm font-bold hover:opacity-90 disabled:opacity-50 transition-all flex items-center justify-center gap-2">
+                <button onClick={save} disabled={saving} className="flex-1 py-3 rounded-2xl bg-gradient-to-r from-[#6A35D9] to-[#233B8F] text-white text-sm font-bold hover:opacity-90 disabled:opacity-50 transition-all flex items-center justify-center gap-2">
                     {saving ? <><Loader2 size={16} className="animate-spin" /> Guardando...</> : <><Save size={16} /> Guardar Cambios</>}
                 </button>
             </div>
@@ -460,7 +460,7 @@ function EditBriefForm({ brief, onChange }: { brief: BriefForm; onChange: (b: Br
                 <TagList label="Puntos de Dolor" items={brief.painPoints} onChange={v => onChange({ ...brief, painPoints: v })} placeholder="Ej: Dificultad para bajar de peso..." />
                 <TagList label="Intereses" items={brief.interests} onChange={v => onChange({ ...brief, interests: v })} placeholder="Ej: Salud y bienestar..." />
                 <div>
-                    <label className="text-xs font-bold text-[#9CA3AF] uppercase tracking-widest block mb-2">Ubicaciones <span className="text-purple-400/60 font-normal lowercase">· detectadas por IA, podés ajustarlas</span></label>
+                    <label className="text-xs font-bold text-[#9CA3AF] uppercase tracking-widest block mb-2">Ubicaciones <span className="text-[#6A35D9]/60 font-normal lowercase">· detectadas por IA, podés ajustarlas</span></label>
                     <LocationSelector selected={brief.targetLocations || []} onChange={v => onChange({ ...brief, targetLocations: v })} platform="meta" />
                 </div>
             </Section>
@@ -475,8 +475,8 @@ function EditBriefForm({ brief, onChange }: { brief: BriefForm; onChange: (b: Br
             {((brief as any).category || (brief as any).benefits || (brief as any).adConcepts) && (
                 <Section title="Enfoque del Anuncio (IA)">
                     <div>
-                        <label className="text-xs font-bold text-[#9CA3AF] uppercase tracking-widest block mb-2">Categoría <span className="text-purple-400/60 font-normal lowercase">· detectada por IA, podés cambiarla</span></label>
-                        <select value={(brief as any).category || 'otro'} onChange={e => onChange({ ...brief, category: e.target.value } as any)} className="w-full bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-3 py-2.5 text-sm text-[#111827] focus:outline-none focus:border-purple-500/50 [&>option]:bg-white">
+                        <label className="text-xs font-bold text-[#9CA3AF] uppercase tracking-widest block mb-2">Categoría <span className="text-[#6A35D9]/60 font-normal lowercase">· detectada por IA, podés cambiarla</span></label>
+                        <select value={(brief as any).category || 'otro'} onChange={e => onChange({ ...brief, category: e.target.value } as any)} className="w-full bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-3 py-2.5 text-sm text-[#111827] focus:outline-none focus:border-[#E4E9F0] [&>option]:bg-white">
                             {AD_CATEGORIES.map(c => <option key={c.id} value={c.id}>{c.emoji} {c.label}</option>)}
                         </select>
                     </div>
@@ -489,16 +489,16 @@ function EditBriefForm({ brief, onChange }: { brief: BriefForm; onChange: (b: Br
                             <div>
                                 <label className="text-xs font-bold text-[#9CA3AF] uppercase tracking-widest block mb-2">Edad mín.</label>
                                 <input type="number" min={18} max={65} value={(brief as any).targetAgeMin ?? ''} onChange={e => onChange({ ...brief, targetAgeMin: e.target.value ? Number(e.target.value) : undefined } as any)}
-                                    placeholder="18" className="w-full bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-3 py-2.5 text-sm text-[#111827] focus:outline-none focus:border-purple-500/50" />
+                                    placeholder="18" className="w-full bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-3 py-2.5 text-sm text-[#111827] focus:outline-none focus:border-[#E4E9F0]" />
                             </div>
                             <div>
                                 <label className="text-xs font-bold text-[#9CA3AF] uppercase tracking-widest block mb-2">Edad máx.</label>
                                 <input type="number" min={18} max={65} value={(brief as any).targetAgeMax ?? ''} onChange={e => onChange({ ...brief, targetAgeMax: e.target.value ? Number(e.target.value) : undefined } as any)}
-                                    placeholder="65" className="w-full bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-3 py-2.5 text-sm text-[#111827] focus:outline-none focus:border-purple-500/50" />
+                                    placeholder="65" className="w-full bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-3 py-2.5 text-sm text-[#111827] focus:outline-none focus:border-[#E4E9F0]" />
                             </div>
                             <div>
                                 <label className="text-xs font-bold text-[#9CA3AF] uppercase tracking-widest block mb-2">Género</label>
-                                <select value={(brief as any).targetGender || 'all'} onChange={e => onChange({ ...brief, targetGender: e.target.value } as any)} className="w-full bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-3 py-2.5 text-sm text-[#111827] focus:outline-none focus:border-purple-500/50 [&>option]:bg-white">
+                                <select value={(brief as any).targetGender || 'all'} onChange={e => onChange({ ...brief, targetGender: e.target.value } as any)} className="w-full bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-3 py-2.5 text-sm text-[#111827] focus:outline-none focus:border-[#E4E9F0] [&>option]:bg-white">
                                     <option value="all">Todos</option>
                                     <option value="male">Hombres</option>
                                     <option value="female">Mujeres</option>
@@ -507,7 +507,7 @@ function EditBriefForm({ brief, onChange }: { brief: BriefForm; onChange: (b: Br
                         </div>
                         <div>
                             <label className="text-xs font-bold text-[#9CA3AF] uppercase tracking-widest block mb-2">Posicionamiento</label>
-                            <select value={(brief as any).positioning || ''} onChange={e => onChange({ ...brief, positioning: e.target.value } as any)} className="w-full bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-3 py-2.5 text-sm text-[#111827] focus:outline-none focus:border-purple-500/50 [&>option]:bg-white">
+                            <select value={(brief as any).positioning || ''} onChange={e => onChange({ ...brief, positioning: e.target.value } as any)} className="w-full bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-3 py-2.5 text-sm text-[#111827] focus:outline-none focus:border-[#E4E9F0] [&>option]:bg-white">
                                 <option value="">—</option>
                                 <option value="premium">Premium</option>
                                 <option value="medio">Medio</option>
@@ -533,7 +533,7 @@ function EditBriefForm({ brief, onChange }: { brief: BriefForm; onChange: (b: Br
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label className="text-xs font-bold text-[#9CA3AF] uppercase tracking-widest block mb-2">Objetivo Principal</label>
-                        <select {...field('primaryObjective')} className="w-full bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-3 py-2.5 text-sm text-[#111827] focus:outline-none focus:border-purple-500/50 [&>option]:bg-white">
+                        <select {...field('primaryObjective')} className="w-full bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-3 py-2.5 text-sm text-[#111827] focus:outline-none focus:border-[#E4E9F0] [&>option]:bg-white">
                             <option value="conversion">Conversión / Ventas</option>
                             <option value="leads">Generación de Leads</option>
                             <option value="traffic">Tráfico al sitio</option>
@@ -564,16 +564,16 @@ function TagList({ label, items, onChange, placeholder }: { label: string; items
             <label className="text-xs font-bold text-[#9CA3AF] uppercase tracking-widest block mb-2">{label}</label>
             <div className="flex flex-wrap gap-2 mb-2">
                 {items.map((item, i) => (
-                    <span key={i} className="flex items-center gap-1.5 text-xs bg-purple-500/10 border border-purple-500/20 text-purple-300 px-3 py-1.5 rounded-full font-medium">
+                    <span key={i} className="flex items-center gap-1.5 text-xs bg-[#6A35D9]/10 border border-[#E4E9F0] text-[#6A35D9] px-3 py-1.5 rounded-full font-medium">
                         {item}
-                        <button onClick={() => onChange(items.filter((_, j) => j !== i))} className="text-purple-400 hover:text-red-400">×</button>
+                        <button onClick={() => onChange(items.filter((_, j) => j !== i))} className="text-[#6A35D9] hover:text-[#DC2626]">×</button>
                     </span>
                 ))}
             </div>
             <div className="flex gap-2">
                 <input value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), add())}
-                    placeholder={placeholder} className="flex-1 bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-3 py-2 text-sm text-[#111827] focus:outline-none focus:border-purple-500/50 placeholder:text-[#9CA3AF]" />
-                <button onClick={add} className="px-3 py-2 bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl text-xs font-bold hover:bg-purple-500/20 transition-all">+ Agregar</button>
+                    placeholder={placeholder} className="flex-1 bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-3 py-2 text-sm text-[#111827] focus:outline-none focus:border-[#E4E9F0] placeholder:text-[#9CA3AF]" />
+                <button onClick={add} className="px-3 py-2 bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl text-xs font-bold hover:bg-[#5A2BC0]/20 transition-all">+ Agregar</button>
             </div>
         </div>
     )
@@ -583,7 +583,7 @@ function InputField({ label, value, onChange, placeholder }: { label: string; va
     return (
         <div>
             <label className="text-xs font-bold text-[#9CA3AF] uppercase tracking-widest block mb-2">{label}</label>
-            <input value={value} onChange={onChange} placeholder={placeholder} className="w-full bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-3 py-2.5 text-sm text-[#111827] focus:outline-none focus:border-purple-500/50 placeholder:text-[#9CA3AF]" />
+            <input value={value} onChange={onChange} placeholder={placeholder} className="w-full bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-3 py-2.5 text-sm text-[#111827] focus:outline-none focus:border-[#E4E9F0] placeholder:text-[#9CA3AF]" />
         </div>
     )
 }
@@ -592,7 +592,7 @@ function TextareaField({ label, value, onChange }: { label: string; value: strin
     return (
         <div>
             <label className="text-xs font-bold text-[#9CA3AF] uppercase tracking-widest block mb-2">{label}</label>
-            <textarea value={value} onChange={onChange} rows={3} className="w-full bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-3 py-2.5 text-sm text-[#111827] resize-none focus:outline-none focus:border-purple-500/50 leading-relaxed" />
+            <textarea value={value} onChange={onChange} rows={3} className="w-full bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-3 py-2.5 text-sm text-[#111827] resize-none focus:outline-none focus:border-[#E4E9F0] leading-relaxed" />
         </div>
     )
 }

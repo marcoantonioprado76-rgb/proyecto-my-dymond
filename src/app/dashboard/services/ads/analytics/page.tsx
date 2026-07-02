@@ -73,13 +73,13 @@ const PERIODS = [
 ]
 
 const METRICS = [
-    { key: 'spend',         label: 'Gasto',            color: '#10B981' },
-    { key: 'linkClicks',    label: 'Clics enlace',     color: '#8B5CF6' },
-    { key: 'impressions',   label: 'Impresiones',      color: '#38BDF8' },
-    { key: 'reach',         label: 'Alcance',          color: '#F472B6' },
+    { key: 'spend',         label: 'Gasto',            color: '#059669' },
+    { key: 'linkClicks',    label: 'Clics enlace',     color: '#6A35D9' },
+    { key: 'impressions',   label: 'Impresiones',      color: '#233B8F' },
+    { key: 'reach',         label: 'Alcance',          color: '#FF096C' },
     { key: 'conversations', label: 'Conversaciones WA', color: '#25D366' },
-    { key: 'conversions',   label: 'Conversiones',     color: '#F59E0B' },
-    { key: 'videoViews',    label: 'Vistas de video',  color: '#F87171' },
+    { key: 'conversions',   label: 'Conversiones',     color: '#D97706' },
+    { key: 'videoViews',    label: 'Vistas de video',  color: '#DC2626' },
 ]
 
 const MONTHS = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic']
@@ -312,21 +312,21 @@ export default function AnalyticsPage() {
     }
 
     const summaryCards = [
-        { label: 'Gasto',              value: `$${grand.spend.toFixed(2)}`, color: '#10B981', icon: DollarSign },
-        { label: 'Clics enlace',       value: fmt(grand.linkClicks),        color: '#8B5CF6', icon: MousePointerClick },
-        { label: 'Impresiones',        value: fmt(grand.impressions),       color: '#38BDF8', icon: Eye },
-        { label: 'Alcance',            value: fmt(grand.reach),             color: '#F472B6', icon: Users },
-        { label: 'CTR',                value: `${ctr}%`,                   color: '#2DD4BF', icon: TrendingUp },
-        { label: 'CPC',                value: `$${cpc}`,                   color: '#A78BFA', icon: Zap },
-        { label: 'CPM',                value: `$${cpm}`,                   color: '#60A5FA', icon: BarChart3 },
+        { label: 'Gasto',              value: `$${grand.spend.toFixed(2)}`, color: '#059669', icon: DollarSign },
+        { label: 'Clics enlace',       value: fmt(grand.linkClicks),        color: '#6A35D9', icon: MousePointerClick },
+        { label: 'Impresiones',        value: fmt(grand.impressions),       color: '#233B8F', icon: Eye },
+        { label: 'Alcance',            value: fmt(grand.reach),             color: '#FF096C', icon: Users },
+        { label: 'CTR',                value: `${ctr}%`,                   color: '#059669', icon: TrendingUp },
+        { label: 'CPC',                value: `$${cpc}`,                   color: '#9B70E7', icon: Zap },
+        { label: 'CPM',                value: `$${cpm}`,                   color: '#233B8F', icon: BarChart3 },
         ...(grand.conversations > 0 ? [{ label: 'Conv. WhatsApp', value: fmt(grand.conversations), color: '#25D366', icon: Target }] : []),
-        ...(grand.conversations > 0 && cpConv ? [{ label: 'Costo/Conv. WA', value: `$${cpConv}`, color: '#16A34A', icon: DollarSign }] : []),
-        ...(grand.conversions > 0 ? [{ label: 'Conversiones',  value: fmt(grand.conversions),  color: '#F59E0B', icon: Target }] : []),
-        ...(grand.conversions > 0 && cpa ? [{ label: 'CPA', value: `$${cpa}`, color: '#FB923C', icon: DollarSign }] : []),
-        ...(grand.purchases > 0 ? [{ label: 'Compras', value: fmt(grand.purchases), color: '#F59E0B', icon: Target }] : []),
-        ...(grand.leads > 0 ? [{ label: 'Leads', value: fmt(grand.leads), color: '#A78BFA', icon: Users }] : []),
-        ...(grand.videoViews > 0 ? [{ label: 'Vistas video', value: fmt(grand.videoViews), color: '#F87171', icon: BarChart3 }] : []),
-        ...(grand.landingPageViews > 0 ? [{ label: 'Vistas landing', value: fmt(grand.landingPageViews), color: '#34D399', icon: Eye }] : []),
+        ...(grand.conversations > 0 && cpConv ? [{ label: 'Costo/Conv. WA', value: `$${cpConv}`, color: '#059669', icon: DollarSign }] : []),
+        ...(grand.conversions > 0 ? [{ label: 'Conversiones',  value: fmt(grand.conversions),  color: '#D97706', icon: Target }] : []),
+        ...(grand.conversions > 0 && cpa ? [{ label: 'CPA', value: `$${cpa}`, color: '#EA580C', icon: DollarSign }] : []),
+        ...(grand.purchases > 0 ? [{ label: 'Compras', value: fmt(grand.purchases), color: '#D97706', icon: Target }] : []),
+        ...(grand.leads > 0 ? [{ label: 'Leads', value: fmt(grand.leads), color: '#9B70E7', icon: Users }] : []),
+        ...(grand.videoViews > 0 ? [{ label: 'Vistas video', value: fmt(grand.videoViews), color: '#DC2626', icon: BarChart3 }] : []),
+        ...(grand.landingPageViews > 0 ? [{ label: 'Vistas landing', value: fmt(grand.landingPageViews), color: '#059669', icon: Eye }] : []),
     ]
 
     return (
@@ -344,16 +344,16 @@ export default function AnalyticsPage() {
                 </div>
                 <button onClick={() => fetchData(true)}
                     className="w-9 h-9 rounded-xl bg-[#F4F6FA] border border-[#E4E9F0] flex items-center justify-center hover:bg-[#F0F3F7] transition-all">
-                    <RefreshCw size={14} className={refreshing ? 'animate-spin text-purple-400' : ''} />
+                    <RefreshCw size={14} className={refreshing ? 'animate-spin text-[#6A35D9]' : ''} />
                 </button>
             </div>
 
             {/* Error banner */}
             {fetchError && (
-                <div className="mb-5 flex items-center gap-3 p-3.5 rounded-2xl text-red-400 text-xs"
-                    style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)' }}>
+                <div className="mb-5 flex items-center gap-3 p-3.5 rounded-2xl text-[#DC2626] text-xs"
+                    style={{ background: 'rgba(220,38,38,0.08)', border: '1px solid rgba(220,38,38,0.2)' }}>
                     <span className="flex-1">{fetchError}</span>
-                    <button onClick={() => setFetchError(null)} className="text-red-400/50 hover:text-red-400">✕</button>
+                    <button onClick={() => setFetchError(null)} className="text-[#DC2626]/50 hover:text-[#DC2626]">✕</button>
                 </div>
             )}
 
@@ -362,14 +362,14 @@ export default function AnalyticsPage() {
                 <div className="flex gap-1 bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl p-1">
                     {PERIODS.map(p => (
                         <button key={p.key} onClick={() => setPeriod(p.key)}
-                            className={`text-xs font-bold px-3 py-1.5 rounded-lg transition-all ${period === p.key ? 'bg-purple-600 text-white' : 'text-[#9CA3AF] hover:text-[#6B7280]'}`}>
+                            className={`text-xs font-bold px-3 py-1.5 rounded-lg transition-all ${period === p.key ? 'bg-[#6A35D9] text-white' : 'text-[#9CA3AF] hover:text-[#6B7280]'}`}>
                             {p.label}
                         </button>
                     ))}
                 </div>
                 {campaigns.length > 1 && (
                     <select value={selectedCampaign} onChange={e => setSelectedCampaign(e.target.value)}
-                        className="bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-3 py-2 text-xs text-[#111827] focus:outline-none focus:border-purple-500/50 [&>option]:bg-white">
+                        className="bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl px-3 py-2 text-xs text-[#111827] focus:outline-none focus:border-[#E4E9F0] [&>option]:bg-white">
                         <option value="ALL">Todas las campañas</option>
                         {campaigns.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                     </select>
@@ -378,7 +378,7 @@ export default function AnalyticsPage() {
 
             {loading ? (
                 <div className="flex flex-col items-center justify-center py-32 gap-3">
-                    <Loader2 size={28} className="animate-spin text-purple-400" />
+                    <Loader2 size={28} className="animate-spin text-[#6A35D9]" />
                     <p className="text-[#9CA3AF] text-sm">Cargando métricas desde Meta Ads...</p>
                 </div>
             ) : daily.length === 0 ? (
@@ -386,7 +386,7 @@ export default function AnalyticsPage() {
                     <BarChart3 size={32} className="text-[#9CA3AF] mx-auto mb-3" />
                     <p className="text-[#9CA3AF] font-bold text-sm">Sin datos para este período</p>
                     <p className="text-[#9CA3AF] text-xs mt-1">Las campañas publicadas aparecerán aquí</p>
-                    <Link href="/dashboard/services/ads/meta" className="mt-4 inline-flex items-center gap-1.5 text-xs font-bold text-purple-400 hover:underline">
+                    <Link href="/dashboard/services/ads/meta" className="mt-4 inline-flex items-center gap-1.5 text-xs font-bold text-[#6A35D9] hover:underline">
                         ← Volver a Campañas
                     </Link>
                 </div>
@@ -395,7 +395,7 @@ export default function AnalyticsPage() {
                     {/* Summary cards */}
                     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 mb-5">
                         {summaryCards.map(({ label, value, color, icon: Icon }) => (
-                            <div key={label} className="bg-white/3 border border-[#E4E9F0] rounded-2xl p-3.5">
+                            <div key={label} className="bg-[#F4F6FA] border border-[#E4E9F0] rounded-2xl p-3.5">
                                 <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest mb-1.5" style={{ color }}>
                                     <Icon size={10} /> {label}
                                 </div>
@@ -405,7 +405,7 @@ export default function AnalyticsPage() {
                     </div>
 
                     {/* Chart */}
-                    <div className="bg-white/3 border border-[#E4E9F0] rounded-2xl p-4 md:p-5 mb-4">
+                    <div className="bg-[#F4F6FA] border border-[#E4E9F0] rounded-2xl p-4 md:p-5 mb-4">
                         <div className="flex flex-wrap gap-2 mb-5">
                             {METRICS.map(m => {
                                 const on = activeMetrics.has(m.key)
@@ -426,8 +426,8 @@ export default function AnalyticsPage() {
 
                     {/* Per-campaign totals */}
                     {totals.length > 1 && (
-                        <div className="bg-white/3 border border-[#E4E9F0] rounded-2xl overflow-hidden mb-4">
-                            <div className="px-4 py-3 border-b border-white/6">
+                        <div className="bg-[#F4F6FA] border border-[#E4E9F0] rounded-2xl overflow-hidden mb-4">
+                            <div className="px-4 py-3 border-b border-[#E4E9F0]">
                                 <p className="text-[10px] font-bold uppercase tracking-widest text-[#9CA3AF]">Por campaña</p>
                             </div>
                             <div className="overflow-x-auto">
@@ -441,17 +441,17 @@ export default function AnalyticsPage() {
                                     </thead>
                                     <tbody>
                                         {totals.map(t => (
-                                            <tr key={t.campaignId} className="border-b border-white/4 hover:bg-white/[0.02] transition-colors">
+                                            <tr key={t.campaignId} className="border-b border-[#E4E9F0] hover:bg-white/[0.02] transition-colors">
                                                 <td className="px-4 py-2.5 font-bold text-[#6B7280] max-w-[180px] truncate">{t.campaignName}</td>
-                                                <td className="px-4 py-2.5 font-bold" style={{ color: '#10B981' }}>${t.spend}</td>
-                                                <td className="px-4 py-2.5 font-bold" style={{ color: '#8B5CF6' }}>{fmt(t.linkClicks ?? t.clicks)}</td>
-                                                <td className="px-4 py-2.5" style={{ color: '#38BDF8' }}>{fmt(t.impressions)}</td>
-                                                <td className="px-4 py-2.5" style={{ color: '#F472B6' }}>{fmt(t.reach ?? 0)}</td>
+                                                <td className="px-4 py-2.5 font-bold" style={{ color: '#059669' }}>${t.spend}</td>
+                                                <td className="px-4 py-2.5 font-bold" style={{ color: '#6A35D9' }}>{fmt(t.linkClicks ?? t.clicks)}</td>
+                                                <td className="px-4 py-2.5" style={{ color: '#233B8F' }}>{fmt(t.impressions)}</td>
+                                                <td className="px-4 py-2.5" style={{ color: '#FF096C' }}>{fmt(t.reach ?? 0)}</td>
                                                 <td className="px-4 py-2.5 font-bold" style={{ color: '#25D366' }}>{fmt(t.conversations ?? 0)}</td>
-                                                <td className="px-4 py-2.5" style={{ color: '#F59E0B' }}>{fmt(t.conversions ?? 0)}</td>
-                                                <td className="px-4 py-2.5" style={{ color: '#2DD4BF' }}>{t.ctr}%</td>
-                                                <td className="px-4 py-2.5" style={{ color: '#A78BFA' }}>${t.cpc}</td>
-                                                <td className="px-4 py-2.5" style={{ color: '#60A5FA' }}>${t.cpm ?? '0.00'}</td>
+                                                <td className="px-4 py-2.5" style={{ color: '#D97706' }}>{fmt(t.conversions ?? 0)}</td>
+                                                <td className="px-4 py-2.5" style={{ color: '#059669' }}>{t.ctr}%</td>
+                                                <td className="px-4 py-2.5" style={{ color: '#9B70E7' }}>${t.cpc}</td>
+                                                <td className="px-4 py-2.5" style={{ color: '#233B8F' }}>${t.cpm ?? '0.00'}</td>
                                             </tr>
                                         ))}
                                     </tbody>
@@ -461,8 +461,8 @@ export default function AnalyticsPage() {
                     )}
 
                     {/* Daily breakdown */}
-                    <div className="bg-white/3 border border-[#E4E9F0] rounded-2xl overflow-hidden">
-                        <div className="px-4 py-3 border-b border-white/6">
+                    <div className="bg-[#F4F6FA] border border-[#E4E9F0] rounded-2xl overflow-hidden">
+                        <div className="px-4 py-3 border-b border-[#E4E9F0]">
                             <p className="text-[10px] font-bold uppercase tracking-widest text-[#9CA3AF]">Detalle diario</p>
                         </div>
                         <div className="overflow-x-auto">
@@ -481,17 +481,17 @@ export default function AnalyticsPage() {
                                         const dayCpc = lc > 0 ? (d.spend / lc).toFixed(2) : '0.00'
                                         const dayCpm = d.impressions > 0 ? ((d.spend / d.impressions) * 1000).toFixed(2) : '0.00'
                                         return (
-                                            <tr key={d.date} className="border-b border-white/4 hover:bg-white/[0.02] transition-colors">
+                                            <tr key={d.date} className="border-b border-[#E4E9F0] hover:bg-white/[0.02] transition-colors">
                                                 <td className="px-4 py-2.5 text-[#6B7280] font-medium">{fmtShort(d.date)}</td>
-                                                <td className="px-4 py-2.5 font-bold" style={{ color: '#10B981' }}>${d.spend.toFixed(2)}</td>
-                                                <td className="px-4 py-2.5 font-bold" style={{ color: '#8B5CF6' }}>{fmt(lc)}</td>
-                                                <td className="px-4 py-2.5" style={{ color: '#38BDF8' }}>{fmt(d.impressions)}</td>
-                                                <td className="px-4 py-2.5" style={{ color: '#F472B6' }}>{fmt(d.reach ?? 0)}</td>
+                                                <td className="px-4 py-2.5 font-bold" style={{ color: '#059669' }}>${d.spend.toFixed(2)}</td>
+                                                <td className="px-4 py-2.5 font-bold" style={{ color: '#6A35D9' }}>{fmt(lc)}</td>
+                                                <td className="px-4 py-2.5" style={{ color: '#233B8F' }}>{fmt(d.impressions)}</td>
+                                                <td className="px-4 py-2.5" style={{ color: '#FF096C' }}>{fmt(d.reach ?? 0)}</td>
                                                 <td className="px-4 py-2.5 font-bold" style={{ color: '#25D366' }}>{fmt(d.conversations ?? 0)}</td>
-                                                <td className="px-4 py-2.5" style={{ color: '#F59E0B' }}>{fmt(d.conversions ?? 0)}</td>
-                                                <td className="px-4 py-2.5" style={{ color: '#2DD4BF' }}>{dayCtr}%</td>
-                                                <td className="px-4 py-2.5" style={{ color: '#A78BFA' }}>${dayCpc}</td>
-                                                <td className="px-4 py-2.5" style={{ color: '#60A5FA' }}>${dayCpm}</td>
+                                                <td className="px-4 py-2.5" style={{ color: '#D97706' }}>{fmt(d.conversions ?? 0)}</td>
+                                                <td className="px-4 py-2.5" style={{ color: '#059669' }}>{dayCtr}%</td>
+                                                <td className="px-4 py-2.5" style={{ color: '#9B70E7' }}>${dayCpc}</td>
+                                                <td className="px-4 py-2.5" style={{ color: '#233B8F' }}>${dayCpm}</td>
                                             </tr>
                                         )
                                     })}
