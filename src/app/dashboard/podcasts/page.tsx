@@ -21,6 +21,8 @@ const fmt = (t: number) => {
   const m = Math.floor(t / 60), s = Math.floor(t % 60)
   return `${m}:${String(s).padStart(2, '0')}`
 }
+const BARS = Array.from({ length: 64 }, (_, i) =>
+  0.22 + 0.78 * Math.abs(Math.sin(i * 1.7) * 0.6 + Math.cos(i * 0.55) * 0.4))
 
 export default function PodcastsPage() {
   const [podcasts, setPodcasts] = useState<Podcast[]>([])
@@ -34,6 +36,7 @@ export default function PodcastsPage() {
   const [playing, setPlaying] = useState(false)
   const [cur, setCur] = useState(0)
   const [dur, setDur] = useState(0)
+  const [vol, setVol] = useState(1)
 
   useEffect(() => {
     fetch('/api/podcasts')
@@ -55,7 +58,9 @@ export default function PodcastsPage() {
   }
   const heroAudio = selected ? isDirectAudio(selected.embedUrl) : false
   const frac = dur ? cur / dur : 0
+  const epNum = selected ? podcasts.findIndex(p => p.id === selected.id) + 1 : 0
   const toggle = () => { const a = audioRef.current; if (!a) return; a.paused ? a.play().catch(() => {}) : a.pause() }
+  const skip = (s: number) => { const a = audioRef.current; if (!a) return; a.currentTime = Math.max(0, Math.min(dur || a.duration || 0, a.currentTime + s)) }
   const seekAt = (e: React.MouseEvent<HTMLDivElement>) => {
     const a = audioRef.current; if (!a || !dur) return
     const r = e.currentTarget.getBoundingClientRect()
@@ -86,45 +91,77 @@ export default function PodcastsPage() {
           <p style={{ fontSize: 14, color: '#6B7280', marginTop: 12, maxWidth: 460 }}>Episodios exclusivos para aprender sobre productos, bienestar y negocio.</p>
         </div>
 
-        {/* ── Destacado (dinámico) ── */}
+        {/* ── Destacado (dinámico) — el card principal que reproduce ── */}
         {selected && (
-          <div ref={heroRef} style={{ background: '#fff', border: '1px solid #E8EAF2', borderRadius: 24, padding: 18, marginBottom: 22, boxShadow: '0 30px 70px -40px rgba(35,59,143,0.35)', display: 'flex', gap: 20, flexWrap: 'wrap', alignItems: 'center' }}>
-            {/* Cover */}
-            <div style={{ flex: '0 0 auto', width: 300, maxWidth: '100%', margin: '0 auto', position: 'relative', borderRadius: 18, overflow: 'hidden', aspectRatio: '16/10', background: '#0a0e24' }}>
-              {selected.coverUrl
-                ? <img src={selected.coverUrl} alt={selected.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                : <div style={{ width: '100%', height: '100%', display: 'grid', placeItems: 'center', color: 'rgba(255,255,255,0.3)' }}><i className="fa-solid fa-microphone" style={{ fontSize: 36 }} /></div>}
-              <button onClick={heroAudio ? toggle : undefined} aria-label="play" style={{ position: 'absolute', bottom: 12, left: 12, width: 46, height: 46, borderRadius: '50%', border: 'none', cursor: heroAudio ? 'pointer' : 'default', background: DG, color: '#fff', display: 'grid', placeItems: 'center', fontSize: 16, boxShadow: '0 8px 20px -6px rgba(183,53,184,0.8)' }}>
-                <i className={`fa-solid ${playing ? 'fa-pause' : 'fa-play'}`} style={{ marginLeft: playing ? 0 : 2 }} />
-              </button>
+          <div ref={heroRef} style={{
+            position: 'relative', overflow: 'hidden', borderRadius: 26, marginBottom: 24, padding: 22,
+            background: 'radial-gradient(900px 320px at 88% -25%, rgba(168,85,247,0.28), transparent 55%), linear-gradient(150deg,#171e46 0%,#0f1332 52%,#0a0e24 100%)',
+            border: '1px solid rgba(255,255,255,0.08)', boxShadow: '0 44px 100px -50px rgba(10,14,36,0.95), inset 0 1px 0 rgba(255,255,255,0.05)',
+            display: 'flex', gap: 26, flexWrap: 'wrap', alignItems: 'center',
+          }}>
+            {/* Cover + badge episodio */}
+            <div style={{ flex: '0 0 auto', width: 300, maxWidth: '100%', margin: '0 auto', position: 'relative' }}>
+              <div style={{ borderRadius: 18, overflow: 'hidden', aspectRatio: '1 / 1', background: '#0a0e24', border: '1px solid rgba(255,255,255,0.1)', boxShadow: '0 26px 60px -28px rgba(0,0,0,0.85)' }}>
+                {selected.coverUrl
+                  ? <img src={selected.coverUrl} alt={selected.title} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                  : <div style={{ width: '100%', height: '100%', display: 'grid', placeItems: 'center', color: 'rgba(255,255,255,0.3)' }}><i className="fa-solid fa-microphone" style={{ fontSize: 42 }} /></div>}
+              </div>
+              {epNum > 0 && (
+                <div style={{ position: 'absolute', bottom: -10, left: -10, background: 'linear-gradient(180deg,#141a3d,#0a0e24)', border: '1px solid rgba(168,85,247,0.45)', borderRadius: 14, padding: '7px 15px', textAlign: 'center', boxShadow: '0 12px 26px -12px rgba(0,0,0,0.8)' }}>
+                  <p style={{ fontSize: 8.5, fontWeight: 800, letterSpacing: '0.14em', color: 'rgba(255,255,255,0.5)', margin: 0 }}>EPISODIO</p>
+                  <p style={{ fontSize: 24, fontWeight: 900, background: DG, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', margin: 0, lineHeight: 1 }}>{String(epNum).padStart(2, '0')}</p>
+                </div>
+              )}
             </div>
 
-            {/* Info */}
-            <div style={{ flex: '1 1 320px', minWidth: 280 }}>
-              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 11, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#B735B8' }}>
-                <i className="fa-solid fa-star" style={{ fontSize: 10 }} /> Episodio destacado
+            {/* Info + player */}
+            <div style={{ flex: '1 1 340px', minWidth: 288, color: '#fff' }}>
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, fontSize: 12, fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.72)' }}>
+                <i className="fa-solid fa-microphone" style={{ color: '#C77DFF', fontSize: 12 }} /> EP. {epNum} · Podcast
               </span>
-              <h2 style={{ fontSize: 24, fontWeight: 900, color: '#111827', margin: '6px 0 0', lineHeight: 1.15 }}>{selected.title}</h2>
-              {selected.description && <p style={{ fontSize: 14, color: '#5B6472', lineHeight: 1.6, marginTop: 8 }}>{selected.description}</p>}
+              <h2 style={{ fontSize: 30, fontWeight: 900, margin: '8px 0 0', lineHeight: 1.1, letterSpacing: '-0.01em' }}>{selected.title}</h2>
+              {selected.description && <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.72)', lineHeight: 1.6, marginTop: 8 }}>{selected.description}</p>}
+
+              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 14 }}>
+                <HeroChip icon="fa-headphones" label="Podcast" />
+                {heroAudio && dur > 0 && <HeroChip icon="fa-clock" label={`${Math.max(1, Math.round(dur / 60))} min`} />}
+              </div>
+              <p style={{ fontSize: 12.5, color: 'rgba(255,255,255,0.5)', marginTop: 12, display: 'flex', alignItems: 'center', gap: 7 }}>
+                <i className="fa-regular fa-calendar" /> Publicado el {new Date(selected.createdAt).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' })}
+              </p>
 
               {heroAudio ? (
-                <div style={{ marginTop: 16 }}>
+                <div style={{ marginTop: 16, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 18, padding: '14px 16px' }}>
                   <audio key={selected.id} ref={audioRef} src={selected.embedUrl} preload="metadata"
                     onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)} onEnded={() => setPlaying(false)}
                     onTimeUpdate={e => setCur(e.currentTarget.currentTime)} onLoadedMetadata={e => setDur(e.currentTarget.duration)} />
-                  {/* barra de avance */}
-                  <div onClick={seekAt} style={{ height: 8, borderRadius: 999, background: '#EDEFF6', cursor: 'pointer', position: 'relative', overflow: 'hidden' }}>
-                    <div style={{ position: 'absolute', inset: 0, width: `${frac * 100}%`, background: DG, borderRadius: 999 }} />
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                    <button onClick={toggle} aria-label={playing ? 'Pausar' : 'Reproducir'} style={{ flex: '0 0 auto', width: 54, height: 54, borderRadius: '50%', border: 'none', cursor: 'pointer', background: DG, color: '#fff', display: 'grid', placeItems: 'center', fontSize: 19, boxShadow: '0 10px 26px -8px rgba(183,53,184,0.85)' }}>
+                      <i className={`fa-solid ${playing ? 'fa-pause' : 'fa-play'}`} style={{ marginLeft: playing ? 0 : 3 }} />
+                    </button>
+                    <button onClick={() => skip(-15)} title="-15s" style={ctrlBtn}><i className="fa-solid fa-rotate-left" /><span style={{ position: 'absolute', fontSize: 8.5, fontWeight: 800 }}>15</span></button>
+                    <div onClick={seekAt} style={{ flex: 1, position: 'relative', display: 'flex', alignItems: 'center', gap: 2, height: 42, cursor: 'pointer', minWidth: 70 }}>
+                      {BARS.map((h, i) => {
+                        const on = i / BARS.length <= frac
+                        return <div key={i} style={{ flex: 1, height: `${h * 100}%`, borderRadius: 2, background: on ? 'linear-gradient(180deg,#E779FF,#B735B8)' : 'rgba(255,255,255,0.16)', minWidth: 2 }} />
+                      })}
+                      <div style={{ position: 'absolute', top: 0, bottom: 0, left: `${frac * 100}%`, width: 2, background: '#fff', borderRadius: 2, opacity: 0.9, pointerEvents: 'none' }} />
+                    </div>
+                    <button onClick={() => skip(15)} title="+15s" style={ctrlBtn}><i className="fa-solid fa-rotate-right" /><span style={{ position: 'absolute', fontSize: 8.5, fontWeight: 800 }}>15</span></button>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 7, flex: '0 0 auto' }}>
+                      <i className="fa-solid fa-volume-high" style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)' }} />
+                      <input type="range" min={0} max={1} step={0.01} value={vol} className="dm-vol"
+                        onChange={e => { const v = parseFloat(e.target.value); setVol(v); if (audioRef.current) audioRef.current.volume = v }}
+                        style={{ width: 72, ['--pct' as any]: `${vol * 100}%` }} />
+                    </div>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 8 }}>
-                    <span style={{ fontSize: 12, color: '#8A93A2', fontVariantNumeric: 'tabular-nums' }}>{fmt(cur)} / {fmt(dur)}</span>
-                    <button onClick={toggle} style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '9px 20px', borderRadius: 12, border: 'none', cursor: 'pointer', background: DG, color: '#fff', fontWeight: 800, fontSize: 14, boxShadow: '0 10px 24px -10px rgba(183,53,184,0.7)' }}>
-                      <i className={`fa-solid ${playing ? 'fa-pause' : 'fa-headphones'}`} /> {playing ? 'Pausar' : 'Escuchar'}
-                    </button>
+                    <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.6)', fontVariantNumeric: 'tabular-nums' }}>{fmt(cur)}</span>
+                    <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.6)', fontVariantNumeric: 'tabular-nums' }}>{fmt(dur)}</span>
                   </div>
                 </div>
               ) : (
-                <Link href={`/dashboard/podcasts/${selected.id}`} style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '10px 22px', borderRadius: 12, background: DG, color: '#fff', fontWeight: 800, fontSize: 14, textDecoration: 'none', marginTop: 16 }}>
+                <Link href={`/dashboard/podcasts/${selected.id}`} style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '11px 24px', borderRadius: 12, background: DG, color: '#fff', fontWeight: 800, fontSize: 14, textDecoration: 'none', marginTop: 16 }}>
                   <i className="fa-solid fa-headphones" /> Escuchar
                 </Link>
               )}
@@ -171,4 +208,18 @@ export default function PodcastsPage() {
       </div>
     </div>
   )
+}
+
+function HeroChip({ icon, label }: { icon: string; label: string }) {
+  return (
+    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 7, padding: '6px 13px', borderRadius: 999, fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.85)', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)' }}>
+      <i className={`fa-solid ${icon}`} style={{ color: '#C77DFF', fontSize: 11 }} /> {label}
+    </span>
+  )
+}
+
+const ctrlBtn: React.CSSProperties = {
+  position: 'relative', flex: '0 0 auto', width: 38, height: 38, borderRadius: '50%',
+  border: '1px solid rgba(255,255,255,0.14)', background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.85)',
+  cursor: 'pointer', display: 'grid', placeItems: 'center', fontSize: 14,
 }
