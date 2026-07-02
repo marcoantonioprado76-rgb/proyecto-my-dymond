@@ -171,14 +171,14 @@ export default function TokenPricingAdmin() {
                   <span className="block text-[10px] uppercase tracking-[0.2em] text-[#111827]/40 mb-1">Input ($ / 1M tk)</span>
                   <input type="number" step="0.01" min="0" value={cur.input}
                     onChange={e => updateField(model, 'input', e.target.value)}
-                    className="w-full px-3 py-2 rounded-lg bg-black/30 border border-[#E4E9F0] text-sm font-mono text-white focus:border-violet-400 focus:outline-none" />
+                    className="w-full px-3 py-2 rounded-lg bg-[#F4F6FA] border border-[#E4E9F0] text-sm font-mono text-[#111827] focus:border-[#B735B8] focus:outline-none" />
                   <span className="block text-[10px] text-[#111827]/30 mt-1 font-mono">default: ${def.input}</span>
                 </label>
                 <label className="block">
                   <span className="block text-[10px] uppercase tracking-[0.2em] text-[#111827]/40 mb-1">Output ($ / 1M tk)</span>
                   <input type="number" step="0.01" min="0" value={cur.output}
                     onChange={e => updateField(model, 'output', e.target.value)}
-                    className="w-full px-3 py-2 rounded-lg bg-black/30 border border-[#E4E9F0] text-sm font-mono text-white focus:border-violet-400 focus:outline-none" />
+                    className="w-full px-3 py-2 rounded-lg bg-[#F4F6FA] border border-[#E4E9F0] text-sm font-mono text-[#111827] focus:border-[#B735B8] focus:outline-none" />
                   <span className="block text-[10px] text-[#111827]/30 mt-1 font-mono">default: ${def.output}</span>
                 </label>
               </div>

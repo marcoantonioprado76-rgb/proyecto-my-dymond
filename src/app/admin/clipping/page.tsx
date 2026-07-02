@@ -472,7 +472,7 @@ export default function AdminClippingPage() {
                         <Pencil size={14} />
                       </button>
                       <button onClick={() => deleteCampaign(c.id)}
-                        className="p-2 rounded-lg transition-colors hover:bg-red-500/10 text-white/40 hover:text-red-400">
+                        className="p-2 rounded-lg transition-colors hover:bg-red-500/10 text-[#9CA3AF] hover:text-red-500">
                         <Trash2 size={14} />
                       </button>
                     </div>

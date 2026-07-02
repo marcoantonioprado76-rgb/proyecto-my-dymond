@@ -294,13 +294,13 @@ export default function AdminCoursesPage() {
       </div>
 
       {/* Tabs */}
-      <div style={{ display: 'flex', gap: 4, marginBottom: 24, borderBottom: '1px solid rgba(255,255,255,0.06)', paddingBottom: 0 }}>
+      <div style={{ display: 'flex', gap: 4, marginBottom: 24, borderBottom: '1px solid #E4E9F0', paddingBottom: 0 }}>
         {(['courses', 'enrollments'] as const).map(tab => (
           <button key={tab} onClick={() => setActiveTab(tab)}
             style={{
               padding: '8px 16px', fontSize: 13, fontWeight: 600, cursor: 'pointer', border: 'none',
-              background: 'none', borderBottom: activeTab === tab ? '2px solid #D203DD' : '2px solid transparent',
-              color: activeTab === tab ? '#D203DD' : '#6B7280',
+              background: 'none', borderBottom: activeTab === tab ? '2px solid #B735B8' : '2px solid transparent',
+              color: activeTab === tab ? '#B735B8' : '#6B7280',
               marginBottom: -1,
             }}>
             {tab === 'courses' ? 'Cursos' : 'Inscripciones'}
@@ -330,7 +330,7 @@ export default function AdminCoursesPage() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               {courses.map(c => (
                 <div key={c.id} style={{ padding: '14px 16px', borderRadius: 14,
-                  background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
+                  background: 'rgba(255,255,255,0.03)', border: '1px solid #E4E9F0' }}>
                   {/* Top row: cover + info + actions */}
                   <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                   {/* Cover thumb */}
@@ -347,7 +347,7 @@ export default function AdminCoursesPage() {
 
                   {/* Info */}
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <p style={{ fontSize: 14, fontWeight: 700, color: '#fff', marginBottom: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.title}</p>
+                    <p style={{ fontSize: 14, fontWeight: 700, color: '#111827', marginBottom: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.title}</p>
                     <p style={{ fontSize: 11, color: '#6B7280' }}>
                       {Number(c.price).toFixed(2)} USDT · {c._count.videos} vid · {c._count.enrollments} inscritos
                     </p>
@@ -374,7 +374,7 @@ export default function AdminCoursesPage() {
                       }
                     })
                   }}
-                    style={{ padding: '6px 10px', borderRadius: 8, background: '#F0F3F7', border: '1px solid rgba(255,255,255,0.08)', cursor: 'pointer' }}>
+                    style={{ padding: '6px 10px', borderRadius: 8, background: '#F0F3F7', border: '1px solid #E4E9F0', cursor: 'pointer' }}>
                     <Edit2 size={13} className="text-[#111827]/50" />
                   </button>
                   <button onClick={() => setDeleteId(c.id)}
@@ -388,12 +388,12 @@ export default function AdminCoursesPage() {
                     <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.06em', padding: '3px 8px', borderRadius: 6,
                       color: c.active ? '#00FF88' : '#6B7280',
                       background: c.active ? 'rgba(0,255,136,0.08)' : '#F0F3F7',
-                      border: `1px solid ${c.active ? 'rgba(0,255,136,0.2)' : 'rgba(255,255,255,0.08)'}` }}>
+                      border: `1px solid ${c.active ? 'rgba(0,255,136,0.2)' : '#E4E9F0'}` }}>
                       {c.active ? 'Activo' : 'Inactivo'}
                     </span>
                     {c.freeForPlan && (
                       <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.06em', padding: '3px 8px', borderRadius: 6,
-                        color: '#D203DD', background: 'rgba(210,3,221,0.08)', border: '1px solid rgba(210,3,221,0.2)' }}>
+                        color: '#B735B8', background: 'rgba(210,3,221,0.08)', border: '1px solid rgba(210,3,221,0.2)' }}>
                         Gratis / Plan
                       </span>
                     )}
@@ -413,13 +413,13 @@ export default function AdminCoursesPage() {
             {(['ALL', 'PENDING', 'PENDING_VERIFICATION', 'APPROVED', 'REJECTED'] as const).map(s => (
               <button key={s} onClick={() => setEnrollmentTab(s)}
                 style={{ padding: '5px 12px', borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: 'pointer', border: '1px solid',
-                  borderColor: enrollmentTab === s ? 'rgba(210,3,221,0.4)' : 'rgba(255,255,255,0.08)',
+                  borderColor: enrollmentTab === s ? 'rgba(210,3,221,0.4)' : '#E4E9F0',
                   background: enrollmentTab === s ? 'rgba(210,3,221,0.08)' : 'transparent',
-                  color: enrollmentTab === s ? '#D203DD' : '#6B7280' }}>
+                  color: enrollmentTab === s ? '#B735B8' : '#6B7280' }}>
                 {s === 'ALL' ? 'Todas' : STATUS_LABEL[s]}
               </button>
             ))}
-            <button onClick={fetchEnrollments} style={{ marginLeft: 'auto', padding: '5px 10px', borderRadius: 8, background: '#F0F3F7', border: '1px solid rgba(255,255,255,0.08)', cursor: 'pointer' }}>
+            <button onClick={fetchEnrollments} style={{ marginLeft: 'auto', padding: '5px 10px', borderRadius: 8, background: '#F0F3F7', border: '1px solid #E4E9F0', cursor: 'pointer' }}>
               <RefreshCw size={12} className="text-[#111827]/40" />
             </button>
           </div>
@@ -432,13 +432,13 @@ export default function AdminCoursesPage() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               {enrollments.map(e => (
                 <div key={e.id} style={{ padding: '14px 16px', borderRadius: 14,
-                  background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
+                  background: 'rgba(255,255,255,0.03)', border: '1px solid #E4E9F0' }}>
                   <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12, flexWrap: 'wrap' }}>
                     <div style={{ flex: 1, minWidth: 200 }}>
-                      <p style={{ fontSize: 14, fontWeight: 700, color: '#fff' }}>{e.user.fullName}</p>
+                      <p style={{ fontSize: 14, fontWeight: 700, color: '#111827' }}>{e.user.fullName}</p>
                       <p style={{ fontSize: 12, color: '#6B7280' }}>{e.user.username} · {e.user.email}</p>
                       <p style={{ fontSize: 12, color: '#6B7280', marginTop: 4 }}>
-                        Curso: <span style={{ color: '#D203DD' }}>{e.course.title}</span>
+                        Curso: <span style={{ color: '#B735B8' }}>{e.course.title}</span>
                         <span style={{ color: '#6B7280' }}> — {Number(e.course.price).toFixed(2)} USDT</span>
                       </p>
                       <p style={{ fontSize: 11, color: '#9CA3AF', marginTop: 2 }}>
@@ -453,7 +453,7 @@ export default function AdminCoursesPage() {
 
                       {e.proofUrl && (
                         <a href={e.proofUrl} target="_blank" rel="noopener noreferrer"
-                          style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 11, color: '#D203DD',
+                          style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 11, color: '#B735B8',
                             padding: '5px 10px', borderRadius: 8, background: 'rgba(210,3,221,0.08)', border: '1px solid rgba(210,3,221,0.2)', textDecoration: 'none' }}>
                           <ExternalLink size={11} /> Comprobante
                         </a>
@@ -521,7 +521,7 @@ export default function AdminCoursesPage() {
                     onChange={e => setCourseModal({ ...courseModal, data: { ...courseModal.data, [key]: e.target.value } })}
                     placeholder={placeholder}
                     rows={3}
-                    style={{ width: '100%', padding: '9px 12px', borderRadius: 10, fontSize: 13, color: '#fff',
+                    style={{ width: '100%', padding: '9px 12px', borderRadius: 10, fontSize: 13, color: '#111827',
                       background: '#F0F3F7', border: '1px solid #E4E9F0', outline: 'none', resize: 'vertical', boxSizing: 'border-box' }}
                   />
                 ) : (
@@ -530,7 +530,7 @@ export default function AdminCoursesPage() {
                     value={(courseModal.data as any)[key]}
                     onChange={e => setCourseModal({ ...courseModal, data: { ...courseModal.data, [key]: e.target.value } })}
                     placeholder={placeholder}
-                    style={{ width: '100%', padding: '9px 12px', borderRadius: 10, fontSize: 13, color: '#fff',
+                    style={{ width: '100%', padding: '9px 12px', borderRadius: 10, fontSize: 13, color: '#111827',
                       background: '#F0F3F7', border: '1px solid #E4E9F0', outline: 'none', boxSizing: 'border-box' }}
                   />
                 )}
@@ -580,7 +580,7 @@ export default function AdminCoursesPage() {
                   value={courseModal.data.categoria}
                   onChange={e => setCourseModal({ ...courseModal, data: { ...courseModal.data, categoria: e.target.value } })}
                   placeholder="Ej. Ventas, Mindset, Producto"
-                  style={{ width: '100%', padding: '9px 12px', borderRadius: 10, fontSize: 13, color: '#fff',
+                  style={{ width: '100%', padding: '9px 12px', borderRadius: 10, fontSize: 13, color: '#111827',
                     background: '#F0F3F7', border: '1px solid #E4E9F0', outline: 'none', boxSizing: 'border-box' }}
                 />
                 <datalist id="course-categorias">
@@ -592,12 +592,12 @@ export default function AdminCoursesPage() {
                 <select
                   value={courseModal.data.nivel}
                   onChange={e => setCourseModal({ ...courseModal, data: { ...courseModal.data, nivel: e.target.value } })}
-                  style={{ width: '100%', padding: '9px 12px', borderRadius: 10, fontSize: 13, color: '#fff',
+                  style={{ width: '100%', padding: '9px 12px', borderRadius: 10, fontSize: 13, color: '#111827',
                     background: '#F0F3F7', border: '1px solid #E4E9F0', outline: 'none', boxSizing: 'border-box' }}>
-                  <option value="" style={{ background: '#1a1a1a' }}>—</option>
-                  <option value="Principiante" style={{ background: '#1a1a1a' }}>Principiante</option>
-                  <option value="Intermedio" style={{ background: '#1a1a1a' }}>Intermedio</option>
-                  <option value="Avanzado" style={{ background: '#1a1a1a' }}>Avanzado</option>
+                  <option value="" style={{ background: '#fff', color: '#111827' }}>—</option>
+                  <option value="Principiante" style={{ background: '#fff', color: '#111827' }}>Principiante</option>
+                  <option value="Intermedio" style={{ background: '#fff', color: '#111827' }}>Intermedio</option>
+                  <option value="Avanzado" style={{ background: '#fff', color: '#111827' }}>Avanzado</option>
                 </select>
               </div>
             </div>
@@ -699,7 +699,7 @@ export default function AdminCoursesPage() {
                       {/* Recursos descargables */}
                       <div style={{ marginTop: 6 }}>
                         {(v.recursos || []).map((r, j) => (
-                          <div key={j} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, color: '#374151', background: 'rgba(255,255,255,0.04)', borderRadius: 6, padding: '5px 8px', marginBottom: 4 }}>
+                          <div key={j} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, color: 'rgba(255,255,255,0.82)', background: 'rgba(255,255,255,0.04)', borderRadius: 6, padding: '5px 8px', marginBottom: 4 }}>
                             <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>📎 {r.titulo}</span>
                             <button onClick={() => removeResource(idx, j)} style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', fontSize: 12 }}>✕</button>
                           </div>
@@ -748,7 +748,7 @@ export default function AdminCoursesPage() {
             <h3 style={{ fontSize: 15, fontWeight: 700, color: '#fff', marginBottom: 12 }}>Rechazar inscripción</h3>
             <label style={{ fontSize: 12, color: '#6B7280', display: 'block', marginBottom: 6 }}>Motivo (opcional)</label>
             <textarea value={rejectNotes} onChange={e => setRejectNotes(e.target.value)} rows={3} placeholder="Ej: Comprobante no válido"
-              style={{ width: '100%', padding: '9px 12px', borderRadius: 10, fontSize: 13, color: '#fff',
+              style={{ width: '100%', padding: '9px 12px', borderRadius: 10, fontSize: 13, color: '#111827',
                 background: '#F0F3F7', border: '1px solid #E4E9F0', outline: 'none', resize: 'none', boxSizing: 'border-box' }} />
             <div style={{ display: 'flex', gap: 10, marginTop: 16 }}>
               <button onClick={() => setRejectModal(null)}

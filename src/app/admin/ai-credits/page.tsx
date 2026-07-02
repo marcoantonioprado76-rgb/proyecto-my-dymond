@@ -231,7 +231,7 @@ export default function AdminAICreditsPage() {
               placeholder="sk-proj-..."
               value={keyInput}
               onChange={e => setKeyInput(e.target.value)}
-              className="w-full rounded-xl px-4 py-3 pr-11 text-sm font-mono text-[#111827] placeholder-white/20 outline-none"
+              className="w-full rounded-xl px-4 py-3 pr-11 text-sm font-mono text-[#111827] placeholder-[#9CA3AF] outline-none"
               style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)' }}
             />
             <button type="button" onClick={() => setShowKey(v => !v)}
@@ -248,7 +248,7 @@ export default function AdminAICreditsPage() {
 
           <button onClick={saveAdminKey} disabled={savingKey || !keyInput.trim()}
             className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold disabled:opacity-40 transition-all"
-            style={{ background: 'linear-gradient(135deg, rgba(162,102,255,0.3), rgba(154,203,255,0.2))', border: '1px solid #E4E9F0', color: '#fff' }}>
+            style={{ background: 'linear-gradient(135deg, rgba(162,102,255,0.3), rgba(154,203,255,0.2))', border: '1px solid #E4E9F0', color: '#111827' }}>
             {savingKey ? <Loader2 className="w-4 h-4 animate-spin" /> : <Key className="w-4 h-4" />}
             {aiConfig?.hasKey ? 'Actualizar Key Global' : 'Guardar Key Global'}
           </button>
@@ -352,7 +352,7 @@ export default function AdminAICreditsPage() {
               placeholder="Buscar usuario..."
               value={search}
               onChange={e => setSearch(e.target.value)}
-              className="w-full pl-8 pr-3 py-2 rounded-xl text-xs text-[#111827] placeholder-white/20 outline-none"
+              className="w-full pl-8 pr-3 py-2 rounded-xl text-xs text-[#111827] placeholder-[#9CA3AF] outline-none"
               style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid #E4E9F0' }}
             />
           </div>
@@ -445,7 +445,7 @@ export default function AdminAICreditsPage() {
                           placeholder="Monto en USD"
                           value={creditInput}
                           onChange={e => setCreditInput(e.target.value)}
-                          className="w-full rounded-xl pl-7 pr-3 py-2 text-sm text-[#111827] placeholder-white/20 outline-none tabular-nums"
+                          className="w-full rounded-xl pl-7 pr-3 py-2 text-sm text-[#111827] placeholder-[#9CA3AF] outline-none tabular-nums"
                           style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid #E4E9F0' }}
                         />
                       </div>

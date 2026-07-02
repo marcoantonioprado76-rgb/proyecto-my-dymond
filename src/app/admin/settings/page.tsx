@@ -246,13 +246,13 @@ export default function AdminSettingsPage() {
           placeholder={placeholder}
           value={prices[settingKey] ?? ''}
           onChange={e => setPrices(prev => ({ ...prev, [settingKey]: e.target.value }))}
-          className="w-28 bg-black/30 border border-[#E4E9F0] rounded-xl pl-6 pr-3 py-2 text-sm font-bold text-white outline-none focus:border-white/30 text-right"
+          className="w-28 bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl pl-6 pr-3 py-2 text-sm font-bold text-[#111827] outline-none focus:border-[#B735B8]/50 text-right"
         />
       </div>
       <button
         onClick={() => saveKey(settingKey)}
         disabled={saving === settingKey}
-        className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#EEF2F7] hover:bg-white/15 border border-[#E4E9F0] text-xs font-bold transition-colors disabled:opacity-50 whitespace-nowrap"
+        className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#EEF2F7] hover:bg-[#E4E9F0] border border-[#E4E9F0] text-xs font-bold transition-colors disabled:opacity-50 whitespace-nowrap"
       >
         {saving === settingKey
           ? <Loader2 size={12} className="animate-spin" />
@@ -277,13 +277,13 @@ export default function AdminSettingsPage() {
           placeholder={placeholder ?? fallback}
           value={prices[settingKey] ?? ''}
           onChange={e => setPrices(prev => ({ ...prev, [settingKey]: e.target.value }))}
-          className={`w-28 bg-black/30 border border-[#E4E9F0] rounded-xl ${prefix ? 'pl-6' : 'pl-3'} pr-3 py-2 text-sm font-bold text-white outline-none focus:border-white/30 text-right`}
+          className={`w-28 bg-[#F4F6FA] border border-[#E4E9F0] rounded-xl ${prefix ? 'pl-6' : 'pl-3'} pr-3 py-2 text-sm font-bold text-[#111827] outline-none focus:border-[#B735B8]/50 text-right`}
         />
       </div>
       <button
         onClick={() => saveNumberKey(settingKey, fallback)}
         disabled={saving === settingKey}
-        className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#EEF2F7] hover:bg-white/15 border border-[#E4E9F0] text-xs font-bold transition-colors disabled:opacity-50 whitespace-nowrap"
+        className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#EEF2F7] hover:bg-[#E4E9F0] border border-[#E4E9F0] text-xs font-bold transition-colors disabled:opacity-50 whitespace-nowrap"
       >
         {saving === settingKey
           ? <Loader2 size={12} className="animate-spin" />
@@ -322,7 +322,7 @@ export default function AdminSettingsPage() {
 
             <div className="rounded-2xl overflow-hidden border border-[#E4E9F0]">
               {/* Column headers */}
-              <div className="grid grid-cols-3 px-5 py-2.5 border-b border-white/6"
+              <div className="grid grid-cols-3 px-5 py-2.5 border-b border-[#E4E9F0]"
                 style={{ background: 'rgba(255,255,255,0.03)' }}>
                 <span className="text-[10px] font-bold uppercase tracking-widest text-[#111827]/25">Plan</span>
                 <span className="text-[10px] font-bold uppercase tracking-widest text-[#111827]/25 flex items-center gap-1">
@@ -353,7 +353,7 @@ export default function AdminSettingsPage() {
               ))}
             </div>
 
-            <div className="flex items-start gap-2 p-3 rounded-xl bg-white/[0.02] border border-white/6">
+            <div className="flex items-start gap-2 p-3 rounded-xl bg-[#F7F9FC] border border-[#E4E9F0]">
               <Info size={12} className="text-[#111827]/25 mt-0.5 shrink-0" />
               <p className="text-[11px] text-[#111827]/30 leading-relaxed">
                 El <strong className="text-[#111827]/45">precio inicial</strong> se cobra cuando el usuario activa el plan por primera vez.
@@ -372,7 +372,7 @@ export default function AdminSettingsPage() {
 
             <div className="rounded-2xl overflow-hidden border border-[#E4E9F0]">
               {/* Column headers */}
-              <div className="grid grid-cols-3 px-5 py-2.5 border-b border-white/6"
+              <div className="grid grid-cols-3 px-5 py-2.5 border-b border-[#E4E9F0]"
                 style={{ background: 'rgba(255,255,255,0.03)' }}>
                 <span className="text-[10px] font-bold uppercase tracking-widest text-[#111827]/25">Plan</span>
                 <span className="text-[10px] font-bold uppercase tracking-widest text-[#111827]/25 flex items-center gap-1">
@@ -401,7 +401,7 @@ export default function AdminSettingsPage() {
               ))}
             </div>
 
-            <div className="flex items-start gap-2 p-3 rounded-xl bg-white/[0.02] border border-white/6">
+            <div className="flex items-start gap-2 p-3 rounded-xl bg-[#F7F9FC] border border-[#E4E9F0]">
               <Info size={12} className="text-[#111827]/25 mt-0.5 shrink-0" />
               <p className="text-[11px] text-[#111827]/30 leading-relaxed">
                 Los <strong className="text-[#111827]/45">créditos IA incluidos</strong> (en USD) y la cantidad de <strong className="text-[#111827]/45">bots / agentes</strong> que cada plan otorga al usuario.
@@ -498,7 +498,7 @@ export default function AdminSettingsPage() {
               ))}
             </div>
 
-            <div className="flex items-start gap-2 p-3 rounded-xl bg-white/[0.02] border border-white/6">
+            <div className="flex items-start gap-2 p-3 rounded-xl bg-[#F7F9FC] border border-[#E4E9F0]">
               <Info size={12} className="text-[#111827]/25 mt-0.5 shrink-0" />
               <p className="text-[11px] text-[#111827]/30 leading-relaxed">
                 Si <strong className="text-[#111827]/45">todos los planes están desactivados</strong>, al hacer clic en "Comprar plan" desde el dashboard, el usuario verá únicamente la opción de <strong className="text-[#111827]/45">Fase Global</strong>.
@@ -535,7 +535,7 @@ export default function AdminSettingsPage() {
           </section>
 
           {/* Flow info */}
-          <div className="bg-white/[0.02] border border-white/6 rounded-2xl p-4">
+          <div className="bg-[#F7F9FC] border border-[#E4E9F0] rounded-2xl p-4">
             <p className="text-[11px] text-[#111827]/30 leading-relaxed">
               <strong className="text-[#111827]/50">Flujo de compra:</strong> El usuario selecciona un plan → ve el precio y QR de pago → realiza el pago → sube su comprobante → tú revisas y apruebas desde <em>Compras</em>.
             </p>

@@ -141,7 +141,7 @@ export default function AdminPodcastsPage() {
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           {podcasts.map(p => (
-            <div key={p.id} style={{ padding: '14px 16px', borderRadius: 14, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
+            <div key={p.id} style={{ padding: '14px 16px', borderRadius: 14, background: '#fff', border: '1px solid #E4E9F0' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                 {/* Cover */}
                 <div style={{ width: 48, height: 48, borderRadius: 10, flexShrink: 0, overflow: 'hidden', background: 'rgba(210,3,221,0.06)', border: '1px solid rgba(210,3,221,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -149,14 +149,14 @@ export default function AdminPodcastsPage() {
                 </div>
                 {/* Info */}
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <p style={{ fontSize: 14, fontWeight: 700, color: '#fff', marginBottom: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.title}</p>
+                  <p style={{ fontSize: 14, fontWeight: 700, color: '#111827', marginBottom: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.title}</p>
                   <p style={{ fontSize: 11, color: '#6B7280', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {p.embedUrl} · {p.active ? 'Activo' : 'Oculto'}
                   </p>
                 </div>
                 {/* Actions */}
                 <button onClick={() => { setSaveError(null); setModal({ mode: 'edit', data: { id: p.id, title: p.title, description: p.description ?? '', coverUrl: p.coverUrl ?? '', embedUrl: p.embedUrl, order: String(p.order), active: p.active, organizationId: p.organizationId ?? null, mediaMode: isAudioUrl(p.embedUrl) ? 'file' : 'url' } }) }}
-                  style={{ padding: '6px 10px', borderRadius: 8, background: '#F0F3F7', border: '1px solid rgba(255,255,255,0.08)', cursor: 'pointer' }}>
+                  style={{ padding: '6px 10px', borderRadius: 8, background: '#F0F3F7', border: '1px solid #E4E9F0', cursor: 'pointer' }}>
                   <Edit2 size={13} className="text-[#111827]/50" />
                 </button>
                 <button onClick={() => setDeleteId(p.id)}

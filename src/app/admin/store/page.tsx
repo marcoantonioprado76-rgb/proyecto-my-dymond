@@ -199,9 +199,9 @@ export default function AdminStorePage() {
         {(['items', 'orders'] as const).map(t => (
           <button key={t} onClick={() => setActiveTab(t)}
             style={{ padding: '8px 18px', borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: 'pointer', border: '1px solid',
-              borderColor: activeTab === t ? 'rgba(210,3,221,0.4)' : 'rgba(255,255,255,0.08)',
+              borderColor: activeTab === t ? 'rgba(210,3,221,0.4)' : '#E4E9F0',
               background: activeTab === t ? 'rgba(210,3,221,0.08)' : 'transparent',
-              color: activeTab === t ? '#D203DD' : '#6B7280' }}>
+              color: activeTab === t ? '#B735B8' : '#6B7280' }}>
             {t === 'items' ? '🏷️ Productos' : '📦 Pedidos'}
           </button>
         ))}
@@ -211,7 +211,7 @@ export default function AdminStorePage() {
       {activeTab === 'items' && (
         <div>
           <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 14, gap: 8 }}>
-            <button onClick={fetchItems} style={{ padding: '7px 10px', borderRadius: 8, background: '#F0F3F7', border: '1px solid rgba(255,255,255,0.08)', cursor: 'pointer' }}>
+            <button onClick={fetchItems} style={{ padding: '7px 10px', borderRadius: 8, background: '#F0F3F7', border: '1px solid #E4E9F0', cursor: 'pointer' }}>
               <RefreshCw size={13} className="text-[#111827]/40" />
             </button>
             <button onClick={openCreate} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 16px', borderRadius: 8, background: 'linear-gradient(135deg, #D203DD, #00FF88)', border: 'none', cursor: 'pointer', fontWeight: 700, fontSize: 13, color: '#000' }}>
@@ -228,12 +228,12 @@ export default function AdminStorePage() {
               {items.map(item => {
                 const img = Array.isArray(item.images) && item.images.length > 0 ? item.images[0] : null
                 return (
-                  <div key={item.id} style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '12px 16px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 12 }}>
+                  <div key={item.id} style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '12px 16px', background: '#fff', border: '1px solid #E4E9F0', borderRadius: 12 }}>
                     <div style={{ width: 52, height: 52, borderRadius: 8, overflow: 'hidden', flexShrink: 0, background: '#F0F3F7' }}>
                       {img && <img src={img} alt={item.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />}
                     </div>
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <p style={{ fontWeight: 700, color: '#fff', fontSize: 14, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.title}</p>
+                      <p style={{ fontWeight: 700, color: '#111827', fontSize: 14, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.title}</p>
                       <p style={{ fontSize: 12, color: '#6B7280' }}>
                         {item.category} · {item.price.toFixed(2)} USDT{item.memberPrice != null ? ` / ${item.memberPrice.toFixed(2)} socio` : ''} · Stock: {item.stock}
                       </p>
@@ -242,7 +242,7 @@ export default function AdminStorePage() {
                       {item.active ? 'Activo' : 'Inactivo'}
                     </span>
                     <div style={{ display: 'flex', gap: 6 }}>
-                      <button onClick={() => openEdit(item)} style={{ padding: '6px 8px', borderRadius: 7, background: 'rgba(210,3,221,0.07)', border: '1px solid rgba(210,3,221,0.15)', cursor: 'pointer', color: '#D203DD' }}><Edit2 size={13} /></button>
+                      <button onClick={() => openEdit(item)} style={{ padding: '6px 8px', borderRadius: 7, background: 'rgba(210,3,221,0.07)', border: '1px solid rgba(210,3,221,0.15)', cursor: 'pointer', color: '#B735B8' }}><Edit2 size={13} /></button>
                       <button onClick={() => setDeleteConfirm(item.id)} style={{ padding: '6px 8px', borderRadius: 7, background: 'rgba(239,68,68,0.07)', border: '1px solid rgba(239,68,68,0.2)', cursor: 'pointer', color: '#ef4444' }}><Trash2 size={13} /></button>
                     </div>
                   </div>
@@ -260,12 +260,12 @@ export default function AdminStorePage() {
             {ORDER_STATUSES.map(s => (
               <button key={s} onClick={() => setOrderTab(s)}
                 style={{ padding: '5px 12px', borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: 'pointer', border: '1px solid', background: 'transparent',
-                  borderColor: orderTab === s ? 'rgba(210,3,221,0.4)' : 'rgba(255,255,255,0.08)',
-                  color: orderTab === s ? '#D203DD' : '#6B7280' }}>
+                  borderColor: orderTab === s ? 'rgba(210,3,221,0.4)' : '#E4E9F0',
+                  color: orderTab === s ? '#B735B8' : '#6B7280' }}>
                 {s === 'ALL' ? 'Todos' : STATUS_LABEL[s]}
               </button>
             ))}
-            <button onClick={fetchOrders} style={{ marginLeft: 'auto', padding: '5px 10px', borderRadius: 8, background: '#F0F3F7', border: '1px solid rgba(255,255,255,0.08)', cursor: 'pointer' }}>
+            <button onClick={fetchOrders} style={{ marginLeft: 'auto', padding: '5px 10px', borderRadius: 8, background: '#F0F3F7', border: '1px solid #E4E9F0', cursor: 'pointer' }}>
               <RefreshCw size={12} className="text-[#111827]/40" />
             </button>
           </div>
@@ -279,13 +279,13 @@ export default function AdminStorePage() {
               {orders.map(order => {
                 const isExp = expandedOrder === order.id
                 return (
-                  <div key={order.id} style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 14, overflow: 'hidden' }}>
+                  <div key={order.id} style={{ background: '#fff', border: '1px solid #E4E9F0', borderRadius: 14, overflow: 'hidden' }}>
                     {/* Order header */}
                     <button onClick={() => setExpandedOrder(isExp ? null : order.id)}
                       style={{ width: '100%', padding: '14px 16px', display: 'flex', alignItems: 'center', gap: 12, background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left' }}>
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', marginBottom: 4 }}>
-                          <span style={{ fontSize: 13, fontWeight: 700, color: '#fff' }}>#{order.id.slice(0, 8).toUpperCase()}</span>
+                          <span style={{ fontSize: 13, fontWeight: 700, color: '#111827' }}>#{order.id.slice(0, 8).toUpperCase()}</span>
                           <span className={`text-[10px] font-bold tracking-widest px-2 py-1 rounded-md border ${STATUS_BADGE[order.status] ?? ''}`}>
                             {STATUS_LABEL[order.status]}
                           </span>
@@ -307,11 +307,11 @@ export default function AdminStorePage() {
                             const imgs = Array.isArray(oi.item.images) ? oi.item.images : []
                             return (
                               <div key={oi.id} style={{ display: 'flex', gap: 10, alignItems: 'center', marginBottom: 8 }}>
-                                <div style={{ width: 40, height: 40, borderRadius: 7, overflow: 'hidden', flexShrink: 0, background: 'rgba(255,255,255,0.04)' }}>
+                                <div style={{ width: 40, height: 40, borderRadius: 7, overflow: 'hidden', flexShrink: 0, background: '#F0F3F7' }}>
                                   {imgs[0] && <img src={imgs[0]} alt={oi.item.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />}
                                 </div>
                                 <div>
-                                  <p style={{ fontSize: 13, fontWeight: 600, color: '#fff' }}>{oi.item.title}</p>
+                                  <p style={{ fontSize: 13, fontWeight: 600, color: '#111827' }}>{oi.item.title}</p>
                                   <p style={{ fontSize: 11, color: '#6B7280' }}>
                                     {Object.entries(oi.selectedVariants).map(([k, v]) => `${k}: ${v}`).join(' · ')}
                                     {Object.keys(oi.selectedVariants).length > 0 && ' · '}
@@ -327,28 +327,28 @@ export default function AdminStorePage() {
                         </div>
 
                         {/* Delivery */}
-                        <div style={{ background: 'rgba(255,255,255,0.02)', borderRadius: 10, padding: '12px 14px', marginBottom: 14 }}>
+                        <div style={{ background: '#F7F9FC', borderRadius: 10, padding: '12px 14px', marginBottom: 14 }}>
                           <p style={{ fontSize: 11, fontWeight: 700, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>📦 Datos de entrega</p>
                           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px 16px', fontSize: 12 }}>
-                            <div><span style={{ color: '#6B7280' }}>Destinatario: </span><span style={{ color: '#fff', fontWeight: 600 }}>{order.recipientName}</span></div>
-                            <div><span style={{ color: '#6B7280' }}>Teléfono: </span><span style={{ color: '#fff' }}>{order.phone}</span></div>
-                            <div style={{ gridColumn: '1 / -1' }}><span style={{ color: '#6B7280' }}>Dirección: </span><span style={{ color: '#fff' }}>{order.address}</span></div>
-                            <div><span style={{ color: '#6B7280' }}>Ciudad: </span><span style={{ color: '#fff' }}>{order.city}</span></div>
-                            <div><span style={{ color: '#6B7280' }}>Estado/Dpto: </span><span style={{ color: '#fff' }}>{order.state}</span></div>
-                            <div><span style={{ color: '#6B7280' }}>País: </span><span style={{ color: '#fff' }}>{order.country}</span></div>
-                            {order.zipCode && <div><span style={{ color: '#6B7280' }}>CP: </span><span style={{ color: '#fff' }}>{order.zipCode}</span></div>}
-                            {order.deliveryNotes && <div style={{ gridColumn: '1 / -1' }}><span style={{ color: '#6B7280' }}>Notas: </span><span style={{ color: '#fff' }}>{order.deliveryNotes}</span></div>}
+                            <div><span style={{ color: '#6B7280' }}>Destinatario: </span><span style={{ color: '#111827', fontWeight: 600 }}>{order.recipientName}</span></div>
+                            <div><span style={{ color: '#6B7280' }}>Teléfono: </span><span style={{ color: '#111827' }}>{order.phone}</span></div>
+                            <div style={{ gridColumn: '1 / -1' }}><span style={{ color: '#6B7280' }}>Dirección: </span><span style={{ color: '#111827' }}>{order.address}</span></div>
+                            <div><span style={{ color: '#6B7280' }}>Ciudad: </span><span style={{ color: '#111827' }}>{order.city}</span></div>
+                            <div><span style={{ color: '#6B7280' }}>Estado/Dpto: </span><span style={{ color: '#111827' }}>{order.state}</span></div>
+                            <div><span style={{ color: '#6B7280' }}>País: </span><span style={{ color: '#111827' }}>{order.country}</span></div>
+                            {order.zipCode && <div><span style={{ color: '#6B7280' }}>CP: </span><span style={{ color: '#111827' }}>{order.zipCode}</span></div>}
+                            {order.deliveryNotes && <div style={{ gridColumn: '1 / -1' }}><span style={{ color: '#6B7280' }}>Notas: </span><span style={{ color: '#111827' }}>{order.deliveryNotes}</span></div>}
                           </div>
                         </div>
 
                         {/* Payment info */}
                         <div style={{ marginBottom: 14 }}>
                           <p style={{ fontSize: 11, fontWeight: 700, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>Pago</p>
-                          <p style={{ fontSize: 12, color: '#6B7280' }}>Método: <span style={{ color: '#fff', fontWeight: 600 }}>{order.paymentMethod === 'CRYPTO' ? '₮ Cripto (USDT-BEP20)' : '📎 Comprobante manual'}</span></p>
+                          <p style={{ fontSize: 12, color: '#6B7280' }}>Método: <span style={{ color: '#111827', fontWeight: 600 }}>{order.paymentMethod === 'CRYPTO' ? '₮ Cripto (USDT-BEP20)' : '📎 Comprobante manual'}</span></p>
                           {order.txHash && (
                             <p style={{ fontSize: 11, marginTop: 4 }}>
                               <span style={{ color: '#6B7280' }}>Tx: </span>
-                              <a href={`https://bscscan.com/tx/${order.txHash}`} target="_blank" rel="noreferrer" style={{ color: '#D203DD', wordBreak: 'break-all', textDecoration: 'none' }}>{order.txHash} ↗</a>
+                              <a href={`https://bscscan.com/tx/${order.txHash}`} target="_blank" rel="noreferrer" style={{ color: '#B735B8', wordBreak: 'break-all', textDecoration: 'none' }}>{order.txHash} ↗</a>
                             </p>
                           )}
                           {order.proofUrl && (
