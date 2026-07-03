@@ -115,7 +115,7 @@ function PublishProgress({ active, failed }: { active: boolean; failed: boolean 
                         filter: 'drop-shadow(0 10px 26px rgba(255,120,40,0.6)) drop-shadow(0 8px 18px rgba(5,11,20,0.8))',
                     }}>
                         {imgOk ? (
-                            <img src="/cohete.png" alt="" draggable={false} onError={() => setImgOk(false)}
+                            <img src="/cohete.png?v=2" alt="" draggable={false} onError={() => setImgOk(false)}
                                 className="block select-none" style={{ height: 172, width: 'auto' }} />
                         ) : (
                             <span className="text-8xl block leading-none select-none">🚀</span>
