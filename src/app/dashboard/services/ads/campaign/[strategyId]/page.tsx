@@ -39,17 +39,18 @@ const PUBLISH_STAGES = [
 // Partículas de escape del cohete (humo + chispas), emitidas desde la base.
 // Valores derivados del índice (deterministas) para no romper la hidratación.
 function RocketFX() {
-    const smoke = Array.from({ length: 12 }, (_, i) => ({
-        sx: ((i % 5) - 2) * 16, sy: 42 + (i % 3) * 22, size: 12 + (i % 4) * 5,
-        dur: 1.1 + (i % 4) * 0.25, delay: (i % 6) * 0.16,
+    const smoke = Array.from({ length: 10 }, (_, i) => ({
+        sx: ((i % 5) - 2) * 13, sy: 46 + (i % 3) * 24, size: 8 + (i % 4) * 4,
+        dur: 1.2 + (i % 4) * 0.25, delay: (i % 6) * 0.18,
     }))
-    const spark = Array.from({ length: 18 }, (_, i) => ({
-        tx: ((i % 7) - 3) * 12, ty: 52 + (i % 5) * 16, size: 3 + (i % 3),
-        dur: 0.5 + (i % 5) * 0.12, delay: (i % 9) * 0.08,
-        color: ['#FFD166', '#FF7A1A', '#FF2D95', '#FBBF24', '#FF4D4D'][i % 5],
+    // Muchas chispitas pequeñas en los colores de la barra (rosa/morado/azul) + cálidos
+    const spark = Array.from({ length: 32 }, (_, i) => ({
+        tx: ((i % 9) - 4) * 9, ty: 40 + (i % 6) * 15, size: 2 + (i % 3),
+        dur: 0.45 + (i % 6) * 0.1, delay: (i % 13) * 0.05,
+        color: ['#FFD166', '#FF7A1A', '#FF2D95', '#B735B8', '#4C97D8', '#FBBF24'][i % 6],
     }))
     return (
-        <div className="absolute" style={{ bottom: 30, left: '50%' }}>
+        <div className="absolute" style={{ bottom: 46, left: '46%' }}>
             {smoke.map((s, i) => (
                 <span key={'sm' + i} className="absolute rounded-full" style={{
                     left: -s.size / 2, top: 0, width: s.size, height: s.size,
@@ -98,19 +99,19 @@ function PublishProgress({ active, failed }: { active: boolean; failed: boolean 
     const stage = Math.min(PUBLISH_STAGES.length - 1, Math.floor(pct / (100 / PUBLISH_STAGES.length)))
     const launched = pct >= 100
     return (
-        <div className="fixed inset-0 z-[120] flex items-center justify-center bg-[#050B14]/93 backdrop-blur-md px-6">
-            <div className="relative w-full max-w-sm flex flex-col items-center gap-5 rounded-3xl p-8 overflow-hidden"
-                style={{ background: 'radial-gradient(120% 80% at 50% -10%, rgba(183,53,184,0.18), rgba(255,255,255,0) 60%), linear-gradient(180deg, #0B1B2B 0%, #081624 100%)', border: '1px solid rgba(255,255,255,0.08)', boxShadow: '0 40px 90px -30px rgba(0,0,0,0.65)' }}>
+        <div className="fixed inset-0 z-[120] flex items-center justify-center bg-[#050B14]/72 backdrop-blur-lg px-6">
+            {/* Sin cuadro: la escena flota sobre el fondo difuminado */}
+            <div className="relative w-full max-w-sm flex flex-col items-center gap-6">
                 {/* ── Escena del cohete: humo + chispas + temblor y despegue al 100% ── */}
-                <div className="relative w-full flex items-end justify-center" style={{ height: 128 }}>
-                    <span className="absolute rounded-full blur-2xl" style={{ bottom: 24, width: 120, height: 120, background: 'rgba(255,45,149,0.22)' }} />
+                <div className="relative w-full flex items-end justify-center" style={{ height: 176 }}>
+                    <span className="absolute rounded-full blur-3xl" style={{ bottom: 30, width: 160, height: 160, background: 'rgba(255,45,149,0.20)' }} />
                     {!launched && <RocketFX />}
                     <div className="relative" style={{
-                        marginBottom: 22,
-                        animation: launched ? 'rocket-launch 1.2s cubic-bezier(0.5,0,0.75,0) forwards' : 'rocket-shake 0.11s linear infinite',
-                        filter: 'drop-shadow(0 4px 14px rgba(255,120,40,0.6))',
+                        marginBottom: 26,
+                        animation: launched ? 'rocket-launch 1.2s cubic-bezier(0.5,0,0.75,0) forwards' : 'rocket-shake 0.1s linear infinite',
+                        filter: 'drop-shadow(0 8px 22px rgba(255,120,40,0.75))',
                     }}>
-                        <span className="text-6xl block leading-none select-none">🚀</span>
+                        <span className="text-8xl block leading-none select-none">🚀</span>
                     </div>
                 </div>
                 {/* Etapa + porcentaje */}
