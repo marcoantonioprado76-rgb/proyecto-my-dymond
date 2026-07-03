@@ -145,7 +145,7 @@ function PublishProgress({ active, failed }: { active: boolean; failed: boolean 
                             style={{ left: `${pct}%`, width: 10, height: 10, transform: 'translate(-50%,-50%)', transition: 'left .3s ease-out', background: '#fff', boxShadow: '0 0 10px 3px rgba(255,255,255,0.95), 0 0 20px 7px rgba(255,45,149,0.7)' }} />
                     </div>
                     <p className="text-center text-white/55 text-[11px] mt-4 font-semibold"
-                        style={{ textShadow: '0 2px 8px rgba(5,11,20,0.95)' }}>Esto puede tardar un momento. No cierres esta ventana 🙏</p>
+                        style={{ textShadow: '0 2px 8px rgba(5,11,20,0.95)' }}>Esto puede tardar un momento. No cierres esta ventana.</p>
                 </div>
             </div>
         </div>
