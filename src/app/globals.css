@@ -233,9 +233,9 @@
   80% { transform: translate(1px, -1.5px) rotate(-1deg); }
 }
 @keyframes rocket-launch {
-  0% { transform: translateY(0) translateX(0) rotate(0deg) scale(1); opacity: 1; }
-  16% { transform: translateY(12px) scale(0.9); }              /* se agacha: toma impulso */
-  100% { transform: translateY(-160%) translateX(46px) rotate(16deg) scale(0.6); opacity: 0; }
+  0% { transform: translateY(0) scale(1); opacity: 1; }
+  16% { transform: translateY(14px) scale(0.9); }              /* se agacha: toma impulso */
+  100% { transform: translateY(-170%) scale(0.58); opacity: 0; }
 }
 @keyframes rk-smoke {
   0% { transform: translate(0, 0) scale(0.4); opacity: 0.5; }

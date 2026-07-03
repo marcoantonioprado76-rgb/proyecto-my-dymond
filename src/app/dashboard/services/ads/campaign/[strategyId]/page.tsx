@@ -50,7 +50,7 @@ function RocketFX() {
         color: ['#FFD166', '#FF7A1A', '#FF2D95', '#B735B8', '#4C97D8', '#FBBF24'][i % 6],
     }))
     return (
-        <div className="absolute" style={{ bottom: 46, left: '46%' }}>
+        <div className="absolute" style={{ bottom: 30, left: '50%' }}>
             {smoke.map((s, i) => (
                 <span key={'sm' + i} className="absolute rounded-full" style={{
                     left: -s.size / 2, top: 0, width: s.size, height: s.size,
@@ -74,6 +74,7 @@ function RocketFX() {
 function PublishProgress({ active, failed }: { active: boolean; failed: boolean }) {
     const [pct, setPct] = useState(0)
     const [show, setShow] = useState(false)
+    const [imgOk, setImgOk] = useState(true)   // usa /cohete.png; si no existe, cae al emoji
     const shownRef = useRef(false)
     const setShown = (v: boolean) => { shownRef.current = v; setShow(v) }
     const failedRef = useRef(failed)
@@ -111,9 +112,14 @@ function PublishProgress({ active, failed }: { active: boolean; failed: boolean 
                     <div className="relative" style={{
                         marginBottom: 26,
                         animation: launched ? 'rocket-launch 1.2s cubic-bezier(0.5,0,0.75,0) forwards' : 'rocket-shake 0.1s linear infinite',
-                        filter: 'drop-shadow(0 8px 22px rgba(255,120,40,0.7)) drop-shadow(0 6px 16px rgba(5,11,20,0.8))',
+                        filter: 'drop-shadow(0 10px 26px rgba(255,120,40,0.6)) drop-shadow(0 8px 18px rgba(5,11,20,0.8))',
                     }}>
-                        <span className="text-8xl block leading-none select-none">🚀</span>
+                        {imgOk ? (
+                            <img src="/cohete.png" alt="" draggable={false} onError={() => setImgOk(false)}
+                                className="block select-none" style={{ height: 150, width: 'auto' }} />
+                        ) : (
+                            <span className="text-8xl block leading-none select-none">🚀</span>
+                        )}
                     </div>
                 </div>
                 {/* Etapa + porcentaje */}
