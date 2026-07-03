@@ -39,22 +39,24 @@ const PUBLISH_STAGES = [
 // Partículas de escape del cohete (humo + chispas), emitidas desde la base.
 // Valores derivados del índice (deterministas) para no romper la hidratación.
 function RocketFX() {
-    const smoke = Array.from({ length: 10 }, (_, i) => ({
-        sx: ((i % 5) - 2) * 13, sy: 46 + (i % 3) * 24, size: 8 + (i % 4) * 4,
-        dur: 1.2 + (i % 4) * 0.25, delay: (i % 6) * 0.18,
+    // Más humo y más chispas (escape potente). Colores de la barra + cálidos.
+    const smoke = Array.from({ length: 20 }, (_, i) => ({
+        sx: ((i % 7) - 3) * 13, sy: 46 + (i % 4) * 24, size: 11 + (i % 5) * 5,
+        dur: 1.1 + (i % 5) * 0.22, delay: (i % 9) * 0.13,
     }))
-    // Muchas chispitas pequeñas en los colores de la barra (rosa/morado/azul) + cálidos
-    const spark = Array.from({ length: 32 }, (_, i) => ({
-        tx: ((i % 9) - 4) * 9, ty: 40 + (i % 6) * 15, size: 2 + (i % 3),
-        dur: 0.45 + (i % 6) * 0.1, delay: (i % 13) * 0.05,
-        color: ['#FFD166', '#FF7A1A', '#FF2D95', '#B735B8', '#4C97D8', '#FBBF24'][i % 6],
+    const spark = Array.from({ length: 54 }, (_, i) => ({
+        tx: ((i % 11) - 5) * 9, ty: 38 + (i % 7) * 15, size: 2 + (i % 3),
+        dur: 0.4 + (i % 6) * 0.1, delay: (i % 16) * 0.045,
+        color: ['#FFD166', '#FF7A1A', '#FF2D95', '#B735B8', '#4C97D8', '#FBBF24', '#FFF3C4'][i % 7],
     }))
     return (
-        <div className="absolute" style={{ bottom: 30, left: '50%' }}>
+        <div className="absolute" style={{ bottom: 32, left: '50%' }}>
+            {/* Resplandor cálido del motor (pulsa) */}
+            <span className="absolute rounded-full animate-pulse" style={{ left: -30, top: -16, width: 60, height: 46, background: 'radial-gradient(circle, rgba(255,190,90,0.6), rgba(255,120,40,0.22) 55%, transparent 76%)', filter: 'blur(3px)' }} />
             {smoke.map((s, i) => (
                 <span key={'sm' + i} className="absolute rounded-full" style={{
                     left: -s.size / 2, top: 0, width: s.size, height: s.size,
-                    background: 'radial-gradient(circle, rgba(210,210,235,0.42), rgba(210,210,235,0) 70%)',
+                    background: 'radial-gradient(circle, rgba(214,214,238,0.5), rgba(214,214,238,0) 70%)',
                     ['--sx']: s.sx + 'px', ['--sy']: s.sy + 'px',
                     animation: `rk-smoke ${s.dur}s ease-out ${s.delay}s infinite`,
                 } as any} />
@@ -115,7 +117,7 @@ function PublishProgress({ active, failed }: { active: boolean; failed: boolean 
                         filter: 'drop-shadow(0 10px 26px rgba(255,120,40,0.6)) drop-shadow(0 8px 18px rgba(5,11,20,0.8))',
                     }}>
                         {imgOk ? (
-                            <img src="/cohete.png?v=2" alt="" draggable={false} onError={() => setImgOk(false)}
+                            <img src="/cohete.png?v=3" alt="" draggable={false} onError={() => setImgOk(false)}
                                 className="block select-none" style={{ height: 172, width: 'auto' }} />
                         ) : (
                             <span className="text-8xl block leading-none select-none">🚀</span>
