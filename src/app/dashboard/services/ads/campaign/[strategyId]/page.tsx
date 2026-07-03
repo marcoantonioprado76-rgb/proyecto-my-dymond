@@ -102,6 +102,8 @@ function PublishProgress({ active, failed }: { active: boolean; failed: boolean 
         <div className="fixed inset-0 z-[120] flex items-center justify-center bg-[#050B14]/72 backdrop-blur-lg px-6">
             {/* Sin cuadro: la escena flota sobre el fondo difuminado */}
             <div className="relative w-full max-w-sm flex flex-col items-center gap-6">
+                {/* Halo navy detrás del contenido → legibilidad sobre fondos claros */}
+                <span aria-hidden className="pointer-events-none absolute" style={{ top: -44, bottom: -28, left: -90, right: -90, zIndex: -1, background: 'radial-gradient(62% 58% at 50% 58%, rgba(5,11,20,0.94), rgba(5,11,20,0.55) 42%, rgba(5,11,20,0) 78%)', filter: 'blur(6px)' }} />
                 {/* ── Escena del cohete: humo + chispas + temblor y despegue al 100% ── */}
                 <div className="relative w-full flex items-end justify-center" style={{ height: 176 }}>
                     <span className="absolute rounded-full blur-3xl" style={{ bottom: 30, width: 160, height: 160, background: 'rgba(255,45,149,0.20)' }} />
@@ -109,7 +111,7 @@ function PublishProgress({ active, failed }: { active: boolean; failed: boolean 
                     <div className="relative" style={{
                         marginBottom: 26,
                         animation: launched ? 'rocket-launch 1.2s cubic-bezier(0.5,0,0.75,0) forwards' : 'rocket-shake 0.1s linear infinite',
-                        filter: 'drop-shadow(0 8px 22px rgba(255,120,40,0.75))',
+                        filter: 'drop-shadow(0 8px 22px rgba(255,120,40,0.7)) drop-shadow(0 6px 16px rgba(5,11,20,0.8))',
                     }}>
                         <span className="text-8xl block leading-none select-none">🚀</span>
                     </div>
@@ -117,19 +119,25 @@ function PublishProgress({ active, failed }: { active: boolean; failed: boolean 
                 {/* Etapa + porcentaje */}
                 <div className="w-full">
                     <div className="flex items-end justify-between mb-2.5 gap-3">
-                        <span className="text-sm font-extrabold leading-tight text-white">
+                        <span className="text-sm font-extrabold leading-tight text-white"
+                            style={{ textShadow: '0 2px 10px rgba(5,11,20,0.95), 0 1px 2px rgba(5,11,20,1)' }}>
                             {launched ? '¡Despegue! 🎉' : PUBLISH_STAGES[stage]}
                         </span>
                         <span className="text-lg font-black tabular-nums text-transparent bg-clip-text shrink-0"
-                            style={{ backgroundImage: 'linear-gradient(135deg,#FF2D95,#B735B8,#233B8F)' }}>{Math.round(pct)}%</span>
+                            style={{ backgroundImage: 'linear-gradient(135deg,#FF2D95,#B735B8,#233B8F)', filter: 'drop-shadow(0 2px 6px rgba(5,11,20,0.9))' }}>{Math.round(pct)}%</span>
                     </div>
-                    <div className="relative h-2.5 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.08)' }}>
-                        <div className="h-full rounded-full relative overflow-hidden"
+                    {/* Barra: track + relleno + chispita en la punta que avanza */}
+                    <div className="relative h-2.5">
+                        <div className="absolute inset-0 rounded-full" style={{ background: 'rgba(255,255,255,0.10)', boxShadow: '0 1px 3px rgba(5,11,20,0.6)' }} />
+                        <div className="absolute inset-y-0 left-0 rounded-full overflow-hidden"
                             style={{ width: `${pct}%`, transition: 'width .3s ease-out', background: 'linear-gradient(90deg,#FF2D95,#B735B8,#233B8F)' }}>
                             <span className="absolute inset-y-0 w-1/2 ai-shimmer-bar" style={{ background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.55), transparent)' }} />
                         </div>
+                        <span className="absolute top-1/2 rounded-full pointer-events-none animate-pulse"
+                            style={{ left: `${pct}%`, width: 10, height: 10, transform: 'translate(-50%,-50%)', transition: 'left .3s ease-out', background: '#fff', boxShadow: '0 0 10px 3px rgba(255,255,255,0.95), 0 0 20px 7px rgba(255,45,149,0.7)' }} />
                     </div>
-                    <p className="text-center text-white/45 text-[11px] mt-4 font-semibold">Esto puede tardar un momento. No cierres esta ventana 🙏</p>
+                    <p className="text-center text-white/55 text-[11px] mt-4 font-semibold"
+                        style={{ textShadow: '0 2px 8px rgba(5,11,20,0.95)' }}>Esto puede tardar un momento. No cierres esta ventana 🙏</p>
                 </div>
             </div>
         </div>
