@@ -30,7 +30,7 @@ export default function PodcastsPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [search, setSearch] = useState('')
-  const [cat, setCat] = useState('Todos')
+  const [cat, setCat] = useState('Bienestar')
   const [selected, setSelected] = useState<Podcast | null>(null)
 
   const heroRef = useRef<HTMLDivElement>(null)
@@ -61,7 +61,7 @@ export default function PodcastsPage() {
   const cats = FIXED_CATS
   const filtered = podcasts.filter(p =>
     p.title.toLowerCase().includes(search.toLowerCase()) &&
-    (cat === 'Todos' || podCategory(p) === cat))
+    podCategory(p) === cat)
 
   function choose(p: Podcast, play = false) {
     setSelected(p); setCur(0); setDur(0); setPlaying(false)
@@ -188,24 +188,25 @@ export default function PodcastsPage() {
             style={{ width: '100%', padding: '12px 16px 12px 38px', borderRadius: 14, fontSize: 14, color: '#111827', outline: 'none', background: '#fff', border: '1px solid #E8EAF2', boxSizing: 'border-box' }} />
         </div>
 
-        {/* Chips de categoría (se crean solos al categorizar podcasts en el admin) */}
-        {cats.length > 0 && (
-          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 16 }}>
-            {['Todos', ...cats].map(c => {
-              const active = cat === c
-              return (
-                <button key={c} onClick={() => setCat(c)}
-                  style={{ padding: '8px 16px', borderRadius: 999, fontSize: 13, fontWeight: 800, cursor: 'pointer',
-                    border: active ? 'none' : '1px solid #E8EAF2',
-                    background: active ? DG : '#fff',
-                    color: active ? '#fff' : '#5B6472',
-                    boxShadow: active ? '0 8px 20px -10px rgba(183,53,184,0.7)' : 'none' }}>
-                  {c}
-                </button>
-              )
-            })}
-          </div>
-        )}
+        {/* Chips de categoría (Bienestar · Negocio · Soy Diamante) */}
+        <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 18 }}>
+          {cats.map(c => {
+            const active = cat === c
+            const icon = c === 'Negocio' ? 'fa-briefcase' : c === 'Soy Diamante' ? 'fa-gem' : 'fa-heart'
+            return (
+              <button key={c} onClick={() => setCat(c)}
+                style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '11px 22px', borderRadius: 999, fontSize: 14, fontWeight: 800, cursor: 'pointer', letterSpacing: '0.01em', transition: 'transform .15s, box-shadow .15s',
+                  border: active ? 'none' : '1.5px solid #E4E9F0',
+                  background: active ? DG : '#fff',
+                  color: active ? '#fff' : '#374151',
+                  transform: active ? 'translateY(-1px)' : 'none',
+                  boxShadow: active ? '0 12px 28px -8px rgba(183,53,184,0.65)' : '0 6px 16px -10px rgba(15,23,42,0.35)' }}>
+                <i className={`fa-solid ${icon}`} style={{ fontSize: 13, color: active ? '#fff' : '#B735B8' }} />
+                {c}
+              </button>
+            )
+          })}
+        </div>
 
         {/* Lista */}
         {filtered.length === 0 ? (
