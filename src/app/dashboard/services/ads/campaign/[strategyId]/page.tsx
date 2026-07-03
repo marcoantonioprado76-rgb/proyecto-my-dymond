@@ -40,13 +40,13 @@ const PUBLISH_STAGES = [
 // Valores derivados del índice (deterministas) para no romper la hidratación.
 function RocketFX() {
     // Más humo y más chispas (escape potente). Colores de la barra + cálidos.
-    const smoke = Array.from({ length: 20 }, (_, i) => ({
-        sx: ((i % 7) - 3) * 13, sy: 46 + (i % 4) * 24, size: 11 + (i % 5) * 5,
-        dur: 1.1 + (i % 5) * 0.22, delay: (i % 9) * 0.13,
+    const smoke = Array.from({ length: 38 }, (_, i) => ({
+        sx: ((i % 9) - 4) * 18, sy: 40 + (i % 5) * 22, size: 13 + (i % 6) * 6,
+        dur: 1.2 + (i % 6) * 0.24, delay: (i % 13) * 0.1,
     }))
-    const spark = Array.from({ length: 54 }, (_, i) => ({
-        tx: ((i % 11) - 5) * 9, ty: 38 + (i % 7) * 15, size: 2 + (i % 3),
-        dur: 0.4 + (i % 6) * 0.1, delay: (i % 16) * 0.045,
+    const spark = Array.from({ length: 60 }, (_, i) => ({
+        tx: ((i % 11) - 5) * 10, ty: 38 + (i % 7) * 15, size: 2 + (i % 3),
+        dur: 0.4 + (i % 6) * 0.1, delay: (i % 17) * 0.042,
         color: ['#FFD166', '#FF7A1A', '#FF2D95', '#B735B8', '#4C97D8', '#FBBF24', '#FFF3C4'][i % 7],
     }))
     return (
@@ -56,7 +56,7 @@ function RocketFX() {
             {smoke.map((s, i) => (
                 <span key={'sm' + i} className="absolute rounded-full" style={{
                     left: -s.size / 2, top: 0, width: s.size, height: s.size,
-                    background: 'radial-gradient(circle, rgba(214,214,238,0.5), rgba(214,214,238,0) 70%)',
+                    background: 'radial-gradient(circle, rgba(216,216,240,0.62), rgba(216,216,240,0) 72%)',
                     ['--sx']: s.sx + 'px', ['--sy']: s.sy + 'px',
                     animation: `rk-smoke ${s.dur}s ease-out ${s.delay}s infinite`,
                 } as any} />

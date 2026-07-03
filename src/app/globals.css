@@ -238,8 +238,8 @@
   100% { transform: translateY(-170%) scale(0.58); opacity: 0; }
 }
 @keyframes rk-smoke {
-  0% { transform: translate(0, 0) scale(0.4); opacity: 0.5; }
-  100% { transform: translate(var(--sx), var(--sy)) scale(2.4); opacity: 0; }
+  0% { transform: translate(0, 0) scale(0.4); opacity: 0.6; }
+  100% { transform: translate(var(--sx), var(--sy)) scale(3); opacity: 0; }
 }
 @keyframes rk-spark {
   0% { transform: translate(0, 0) scale(1); opacity: 1; }
