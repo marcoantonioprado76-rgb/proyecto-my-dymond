@@ -285,13 +285,26 @@ export default function AdminPodcastsPage() {
 
               {/* Categoría */}
               <div>
-                <label style={{ fontSize: 12, color: '#6B7280', display: 'block', marginBottom: 6 }}>Categoría (escribí una nueva o elegí; es el filtro que verán los usuarios)</label>
+                <label style={{ fontSize: 12, color: '#6B7280', display: 'block', marginBottom: 6 }}>Categoría (filtro que verán los usuarios)</label>
                 <input type="text" list="pod-cats" value={modal.data.categoria} onChange={e => setModal({ ...modal, data: { ...modal.data, categoria: e.target.value } })}
-                  placeholder="Ej. Producto, Negocio, Desarrollo Personal, Plan de Pagos…"
+                  placeholder="Bienestar · Negocio · Soy Diamante"
                   style={{ width: '100%', padding: '8px 10px', borderRadius: 8, fontSize: 13, color: '#fff', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', outline: 'none', boxSizing: 'border-box' }} />
                 <datalist id="pod-cats">
-                  {Array.from(new Set(podcasts.map(p => p.categoria).filter(Boolean))).map(c => <option key={c as string} value={c as string} />)}
+                  {Array.from(new Set(['Bienestar', 'Negocio', 'Soy Diamante', ...(podcasts.map(p => p.categoria).filter(Boolean) as string[])])).map(c => <option key={c} value={c} />)}
                 </datalist>
+                <div style={{ display: 'flex', gap: 6, marginTop: 8, flexWrap: 'wrap' }}>
+                  {['Bienestar', 'Negocio', 'Soy Diamante'].map(c => {
+                    const on = (modal.data.categoria || '').trim().toLowerCase() === c.toLowerCase()
+                    return (
+                      <button key={c} type="button" onClick={() => setModal({ ...modal, data: { ...modal.data, categoria: c } })}
+                        style={{ padding: '5px 12px', borderRadius: 999, fontSize: 12, fontWeight: 700, cursor: 'pointer', color: '#fff',
+                          border: on ? 'none' : '1px solid rgba(255,255,255,0.14)',
+                          background: on ? 'linear-gradient(135deg,#FF2D95,#B735B8,#233B8F)' : 'rgba(255,255,255,0.05)' }}>
+                        {c}
+                      </button>
+                    )
+                  })}
+                </div>
               </div>
 
               {/* Order */}

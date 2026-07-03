@@ -51,16 +51,14 @@ export default function PodcastsPage() {
       .catch(() => { setError('Error al cargar podcasts'); setLoading(false) })
   }, [])
 
-  // Categoría del episodio: la que puso el admin, o si no, se deriva del nombre
-  // (la palabra después de "FASE": Detox, Women, Energy…) para que los chips
-  // aparezcan solos aunque no se haya etiquetado nada.
-  const podCategory = (p: Podcast): string | null => {
-    if (p.categoria && p.categoria.trim()) return p.categoria.trim()
-    const m = p.title.match(/fase\s+([a-záéíóúñ]+)/i)
-    if (m) return m[1].charAt(0).toUpperCase() + m[1].slice(1).toLowerCase()
-    return null
+  // 3 categorías fijas del negocio (siempre visibles como botones).
+  // Si el admin asigna una de estas al episodio, manda; si no, cae en "Bienestar".
+  const FIXED_CATS = ['Bienestar', 'Negocio', 'Soy Diamante']
+  const podCategory = (p: Podcast): string => {
+    const c = p.categoria?.trim().toLowerCase()
+    return FIXED_CATS.find(fc => fc.toLowerCase() === c) ?? 'Bienestar'
   }
-  const cats = Array.from(new Set(podcasts.map(podCategory).filter(Boolean))) as string[]
+  const cats = FIXED_CATS
   const filtered = podcasts.filter(p =>
     p.title.toLowerCase().includes(search.toLowerCase()) &&
     (cat === 'Todos' || podCategory(p) === cat))
