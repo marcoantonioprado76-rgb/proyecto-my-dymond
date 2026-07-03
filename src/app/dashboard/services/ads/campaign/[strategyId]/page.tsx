@@ -36,6 +36,40 @@ const PUBLISH_STAGES = [
     'Creando los anuncios…',
     'Revisando todo…',
 ]
+// Partículas de escape del cohete (humo + chispas), emitidas desde la base.
+// Valores derivados del índice (deterministas) para no romper la hidratación.
+function RocketFX() {
+    const smoke = Array.from({ length: 12 }, (_, i) => ({
+        sx: ((i % 5) - 2) * 16, sy: 42 + (i % 3) * 22, size: 12 + (i % 4) * 5,
+        dur: 1.1 + (i % 4) * 0.25, delay: (i % 6) * 0.16,
+    }))
+    const spark = Array.from({ length: 18 }, (_, i) => ({
+        tx: ((i % 7) - 3) * 12, ty: 52 + (i % 5) * 16, size: 3 + (i % 3),
+        dur: 0.5 + (i % 5) * 0.12, delay: (i % 9) * 0.08,
+        color: ['#FFD166', '#FF7A1A', '#FF2D95', '#FBBF24', '#FF4D4D'][i % 5],
+    }))
+    return (
+        <div className="absolute" style={{ bottom: 30, left: '50%' }}>
+            {smoke.map((s, i) => (
+                <span key={'sm' + i} className="absolute rounded-full" style={{
+                    left: -s.size / 2, top: 0, width: s.size, height: s.size,
+                    background: 'radial-gradient(circle, rgba(210,210,235,0.42), rgba(210,210,235,0) 70%)',
+                    ['--sx']: s.sx + 'px', ['--sy']: s.sy + 'px',
+                    animation: `rk-smoke ${s.dur}s ease-out ${s.delay}s infinite`,
+                } as any} />
+            ))}
+            {spark.map((s, i) => (
+                <span key={'sp' + i} className="absolute rounded-full" style={{
+                    left: -s.size / 2, top: 0, width: s.size, height: s.size, background: s.color,
+                    boxShadow: `0 0 6px ${s.color}`,
+                    ['--tx']: s.tx + 'px', ['--ty']: s.ty + 'px',
+                    animation: `rk-spark ${s.dur}s ease-out ${s.delay}s infinite`,
+                } as any} />
+            ))}
+        </div>
+    )
+}
+
 function PublishProgress({ active, failed }: { active: boolean; failed: boolean }) {
     const [pct, setPct] = useState(0)
     const [show, setShow] = useState(false)
@@ -55,28 +89,35 @@ function PublishProgress({ active, failed }: { active: boolean; failed: boolean 
             return () => clearInterval(id)
         } else if (shownRef.current) {
             if (failedRef.current) { setShown(false); return }  // falló → ocultar sin "publicado"
-            setPct(100)                          // terminó OK → completa la barra
-            const t = setTimeout(() => setShown(false), 750)
+            setPct(100)                          // terminó OK → completa la barra y despega
+            const t = setTimeout(() => setShown(false), 1300)
             return () => clearTimeout(t)
         }
     }, [active])  // eslint-disable-line react-hooks/exhaustive-deps
     if (!show) return null
     const stage = Math.min(PUBLISH_STAGES.length - 1, Math.floor(pct / (100 / PUBLISH_STAGES.length)))
+    const launched = pct >= 100
     return (
         <div className="fixed inset-0 z-[120] flex items-center justify-center bg-[#050B14]/93 backdrop-blur-md px-6">
-            <div className="w-full max-w-sm flex flex-col items-center gap-6 rounded-3xl p-8"
+            <div className="relative w-full max-w-sm flex flex-col items-center gap-5 rounded-3xl p-8 overflow-hidden"
                 style={{ background: 'radial-gradient(120% 80% at 50% -10%, rgba(183,53,184,0.18), rgba(255,255,255,0) 60%), linear-gradient(180deg, #0B1B2B 0%, #081624 100%)', border: '1px solid rgba(255,255,255,0.08)', boxShadow: '0 40px 90px -30px rgba(0,0,0,0.65)' }}>
-                {/* Cohete con glow — se eleva con el progreso */}
-                <div className="relative flex items-center justify-center h-16">
-                    <span className="absolute w-24 h-24 rounded-full blur-2xl" style={{ background: 'rgba(255,45,149,0.30)' }} />
-                    <div className="text-5xl relative"
-                        style={{ transform: `translateY(${(1 - pct / 100) * 12}px)`, transition: 'transform .3s ease', filter: 'drop-shadow(0 8px 18px rgba(255,45,149,0.5))' }}>🚀</div>
+                {/* ── Escena del cohete: humo + chispas + temblor y despegue al 100% ── */}
+                <div className="relative w-full flex items-end justify-center" style={{ height: 128 }}>
+                    <span className="absolute rounded-full blur-2xl" style={{ bottom: 24, width: 120, height: 120, background: 'rgba(255,45,149,0.22)' }} />
+                    {!launched && <RocketFX />}
+                    <div className="relative" style={{
+                        marginBottom: 22,
+                        animation: launched ? 'rocket-launch 1.2s cubic-bezier(0.5,0,0.75,0) forwards' : 'rocket-shake 0.11s linear infinite',
+                        filter: 'drop-shadow(0 4px 14px rgba(255,120,40,0.6))',
+                    }}>
+                        <span className="text-6xl block leading-none select-none">🚀</span>
+                    </div>
                 </div>
                 {/* Etapa + porcentaje */}
                 <div className="w-full">
                     <div className="flex items-end justify-between mb-2.5 gap-3">
                         <span className="text-sm font-extrabold leading-tight text-white">
-                            {pct >= 100 ? '¡Publicado! 🎉' : PUBLISH_STAGES[stage]}
+                            {launched ? '¡Despegue! 🎉' : PUBLISH_STAGES[stage]}
                         </span>
                         <span className="text-lg font-black tabular-nums text-transparent bg-clip-text shrink-0"
                             style={{ backgroundImage: 'linear-gradient(135deg,#FF2D95,#B735B8,#233B8F)' }}>{Math.round(pct)}%</span>
