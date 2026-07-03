@@ -51,10 +51,19 @@ export default function PodcastsPage() {
       .catch(() => { setError('Error al cargar podcasts'); setLoading(false) })
   }, [])
 
-  const cats = Array.from(new Set(podcasts.map(p => p.categoria).filter(Boolean))) as string[]
+  // Categoría del episodio: la que puso el admin, o si no, se deriva del nombre
+  // (la palabra después de "FASE": Detox, Women, Energy…) para que los chips
+  // aparezcan solos aunque no se haya etiquetado nada.
+  const podCategory = (p: Podcast): string | null => {
+    if (p.categoria && p.categoria.trim()) return p.categoria.trim()
+    const m = p.title.match(/fase\s+([a-záéíóúñ]+)/i)
+    if (m) return m[1].charAt(0).toUpperCase() + m[1].slice(1).toLowerCase()
+    return null
+  }
+  const cats = Array.from(new Set(podcasts.map(podCategory).filter(Boolean))) as string[]
   const filtered = podcasts.filter(p =>
     p.title.toLowerCase().includes(search.toLowerCase()) &&
-    (cat === 'Todos' || p.categoria === cat))
+    (cat === 'Todos' || podCategory(p) === cat))
 
   function choose(p: Podcast, play = false) {
     setSelected(p); setCur(0); setDur(0); setPlaying(false)
