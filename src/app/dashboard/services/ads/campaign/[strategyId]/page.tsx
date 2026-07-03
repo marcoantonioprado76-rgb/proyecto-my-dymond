@@ -867,7 +867,7 @@ function CampaignPageInner() {
     // ── Render ──────────────────────────────────────────────────────────────
 
     return (
-        <div className="px-4 md:px-6 xl:px-10 pt-6 max-w-4xl xl:max-w-5xl 2xl:max-w-6xl mx-auto pb-36 text-white">
+        <div className="px-4 md:px-6 xl:px-10 pt-6 max-w-4xl xl:max-w-5xl 2xl:max-w-6xl mx-auto pb-36 text-white" style={{ background: 'radial-gradient(120% 55% at 50% -5%, rgba(183,53,184,0.12), rgba(255,255,255,0) 55%), radial-gradient(90% 55% at 100% 108%, rgba(106,53,217,0.10), rgba(255,255,255,0) 60%), linear-gradient(180deg, #081624 0%, #050B14 100%)', minHeight: 'calc(100vh - 2rem)', borderRadius: 24, border: '1px solid rgba(255,255,255,0.08)', boxShadow: '0 30px 60px -30px rgba(8,22,36,0.5)' }}>
 
             {/* Overlay de publicación: cohete + barra de progreso */}
             <PublishProgress active={publishing} failed={!!error} />
