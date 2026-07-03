@@ -188,5 +188,26 @@ export async function register() {
         }
         // 12s tras el boot — después del reconnect de Baileys (10s), para que el bot esté listo.
         setTimeout(startBroadcasts, 12_000)
+
+        // ── Reto 90D: recordatorios + reporte final automáticos ──────────────
+        //
+        // Cada 60s revisa la hora (America/La_Paz) contra los horarios configurados
+        // en WhatsAppConfig y dispara el recordatorio o el reporte final que toque.
+        // Auto-detecta la ventana y es idempotente (guard en memoria + fila centinela
+        // en reto90d_reports), así que correr cada minuto NO duplica envíos. Si no hay
+        // config/reto activo, sale de inmediato (2 findFirst baratos). No usa cron
+        // externo; el endpoint /api/cron/reto-90d/* queda como respaldo manual.
+        const retoScheduler = async () => {
+            try {
+                const { runReminders, runFinalReport } = await import('@/lib/reto90d/scheduler')
+                await runReminders()
+                await runFinalReport()
+            } catch (err) {
+                console.error('[RETO90D] scheduler tick error:', err)
+            }
+        }
+        // 20s tras el boot (después de que Baileys reconecte) y luego cada minuto.
+        setTimeout(retoScheduler, 20_000)
+        setInterval(retoScheduler, 60 * 1000)
     }
 }
