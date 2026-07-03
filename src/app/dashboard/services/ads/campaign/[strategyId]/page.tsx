@@ -63,23 +63,32 @@ function PublishProgress({ active, failed }: { active: boolean; failed: boolean 
     if (!show) return null
     const stage = Math.min(PUBLISH_STAGES.length - 1, Math.floor(pct / (100 / PUBLISH_STAGES.length)))
     return (
-        <div className="fixed inset-0 z-[120] flex flex-col items-center justify-center bg-[#050B14]/93 backdrop-blur-md px-6 gap-7">
-            <div className="text-5xl" style={{ transform: `translateY(${(1 - pct / 100) * 14}px)`, transition: 'transform .3s ease' }}>🚀</div>
-            <div className="w-full max-w-sm">
-                <div className="flex items-end justify-between mb-2.5 gap-3">
-                    <span className="ai-grad-text text-sm font-extrabold leading-tight" style={{ backgroundImage: 'linear-gradient(90deg,#B735B8,#4C97D8,#B735B8)' }}>
-                        {pct >= 100 ? '¡Publicado!' : PUBLISH_STAGES[stage]}
-                    </span>
-                    <span className="text-base font-black text-white shrink-0">{Math.round(pct)}%</span>
+        <div className="fixed inset-0 z-[120] flex items-center justify-center bg-[#050B14]/93 backdrop-blur-md px-6">
+            <div className="w-full max-w-sm flex flex-col items-center gap-6 rounded-3xl p-8"
+                style={{ background: 'radial-gradient(120% 80% at 50% -10%, rgba(183,53,184,0.18), rgba(255,255,255,0) 60%), linear-gradient(180deg, #0B1B2B 0%, #081624 100%)', border: '1px solid rgba(255,255,255,0.08)', boxShadow: '0 40px 90px -30px rgba(0,0,0,0.65)' }}>
+                {/* Cohete con glow — se eleva con el progreso */}
+                <div className="relative flex items-center justify-center h-16">
+                    <span className="absolute w-24 h-24 rounded-full blur-2xl" style={{ background: 'rgba(255,45,149,0.30)' }} />
+                    <div className="text-5xl relative"
+                        style={{ transform: `translateY(${(1 - pct / 100) * 12}px)`, transition: 'transform .3s ease', filter: 'drop-shadow(0 8px 18px rgba(255,45,149,0.5))' }}>🚀</div>
                 </div>
-                <div className="relative h-3 rounded-full bg-white/10 overflow-hidden border border-white/10">
-                    <div className="h-full rounded-full" style={{
-                        width: `${pct}%`, transition: 'width .3s ease-out',
-                        background: 'linear-gradient(90deg,#B735B8,#FF2D95,#FBBF24,#4C97D8,#B735B8)',
-                        backgroundSize: '300% 100%', animation: 'ai-liquid 3s ease infinite',
-                    }} />
+                {/* Etapa + porcentaje */}
+                <div className="w-full">
+                    <div className="flex items-end justify-between mb-2.5 gap-3">
+                        <span className="text-sm font-extrabold leading-tight text-white">
+                            {pct >= 100 ? '¡Publicado! 🎉' : PUBLISH_STAGES[stage]}
+                        </span>
+                        <span className="text-lg font-black tabular-nums text-transparent bg-clip-text shrink-0"
+                            style={{ backgroundImage: 'linear-gradient(135deg,#FF2D95,#B735B8,#233B8F)' }}>{Math.round(pct)}%</span>
+                    </div>
+                    <div className="relative h-2.5 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.08)' }}>
+                        <div className="h-full rounded-full relative overflow-hidden"
+                            style={{ width: `${pct}%`, transition: 'width .3s ease-out', background: 'linear-gradient(90deg,#FF2D95,#B735B8,#233B8F)' }}>
+                            <span className="absolute inset-y-0 w-1/2 ai-shimmer-bar" style={{ background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.55), transparent)' }} />
+                        </div>
+                    </div>
+                    <p className="text-center text-white/45 text-[11px] mt-4 font-semibold">Esto puede tardar un momento. No cierres esta ventana 🙏</p>
                 </div>
-                <p className="text-center text-white/45 text-[11px] mt-3.5 font-semibold">Esto puede tardar un momento. No cierres esta ventana 🙏</p>
             </div>
         </div>
     )
