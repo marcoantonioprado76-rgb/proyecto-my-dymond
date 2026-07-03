@@ -132,7 +132,7 @@ export async function PATCH(
     if (days > 0) {
       await prisma.$executeRaw`
         UPDATE users
-        SET plan_expires_at = GREATEST(COALESCE(plan_expires_at, NOW()), NOW()) + make_interval(days => ${days}),
+        SET plan_expires_at = GREATEST(COALESCE(plan_expires_at, NOW()), NOW()) + (${days} * INTERVAL '1 day'),
             is_active = true
         WHERE id = ${params.id}::uuid
       `

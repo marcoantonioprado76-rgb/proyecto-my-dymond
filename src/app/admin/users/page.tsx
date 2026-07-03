@@ -158,13 +158,23 @@ export default function AdminUsersPage() {
 
   async function updateUser(id: string, patch: Record<string, unknown>) {
     setUpdating(id)
-    await fetch(`/api/admin/users/${id}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(patch),
-    })
-    await fetchUsers()
-    setUpdating(null)
+    try {
+      const res = await fetch(`/api/admin/users/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(patch),
+      })
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}))
+        alert(data.error ?? 'No se pudo actualizar. Intenta de nuevo.')
+        return
+      }
+      await fetchUsers()
+    } catch {
+      alert('Error de conexión al actualizar.')
+    } finally {
+      setUpdating(null)
+    }
   }
 
   async function confirmDelete() {
