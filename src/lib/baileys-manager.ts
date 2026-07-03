@@ -112,6 +112,29 @@ async function handleMessage(
         return
     }
 
+    // ── Reto 90D ────────────────────────────────────────────────────────────────
+    // Si este bot es el bot DEDICADO del reto, enrutamos el mensaje al flujo del
+    // reto (evidencias) y NO seguimos el flujo normal de bots de venta. Imports
+    // dinámicos para evitar dependencias circulares en la carga del módulo.
+    let esRetoBot = false
+    try {
+        const { isReto90dBot } = await import('./whatsapp/reto90dSender')
+        esRetoBot = await isReto90dBot(conn.botId)
+    } catch (err) {
+        // Ante cualquier duda tratamos como bot normal (no silenciar bots de venta).
+        console.error('[BAILEYS] Reto90d check error:', err)
+        esRetoBot = false
+    }
+    if (esRetoBot) {
+        try {
+            const { handleReto90dInbound } = await import('./reto90d/inboundHandler')
+            await handleReto90dInbound(conn, msg)
+        } catch (err) {
+            console.error('[BAILEYS] Reto90d inbound error:', err)
+        }
+        return
+    }
+
     // Deduplicación por ID de mensaje
     if (msg.key.id) {
         const exists = await prisma.message.findUnique({ where: { messageId: msg.key.id } })
@@ -577,6 +600,20 @@ export const BaileysManager = {
             return true
         } catch (err) {
             console.error('[BAILEYS] sendImage error:', err)
+            return false
+        }
+    },
+
+    // Envía texto a un JID crudo (p.ej. grupos ...@g.us). Usado por el módulo Reto 90D
+    // para publicar reportes en el grupo del reto. No modifica el flujo de bots normales.
+    async sendToJid(botId: string, jid: string, text: string): Promise<boolean> {
+        const conn = connections.get(botId)
+        if (!conn?.sock || conn.status !== 'connected') return false
+        try {
+            await conn.sock.sendMessage(jid, { text })
+            return true
+        } catch (err) {
+            console.error('[BAILEYS] sendToJid error:', err)
             return false
         }
     },

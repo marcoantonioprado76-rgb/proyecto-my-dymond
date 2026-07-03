@@ -25,6 +25,7 @@ import {
   BrainCircuit,
   LayoutTemplate,
   Building2,
+  Target,
 } from 'lucide-react'
 
 const NAV = [
@@ -44,6 +45,7 @@ const NAV = [
   { href: '/admin/podcasts', label: 'Podcasts', icon: Mic },
   { href: '/admin/store', label: 'Tienda', icon: Store },
   { href: '/admin/entradas', label: 'Entradas', icon: Ticket },
+  { href: '/admin/reto-90d', label: 'Reto 90D', icon: Target },
   { href: '/admin/settings', label: 'Precios', icon: Settings },
 ]
 
