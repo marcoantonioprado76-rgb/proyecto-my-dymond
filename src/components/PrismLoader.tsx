@@ -1,12 +1,10 @@
 export default function PrismLoader({ small }: { small?: boolean }) {
   if (small) {
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '40vh', gap: 32 }}>
-        <div className="prism-container" style={{ width: 80, height: 80 }}>
-          <div className="prism-aura" />
-          <div className="prism-echo" style={{ width: 56, height: 56 }} />
-          <div className="prism-ring" style={{ width: 56, height: 56 }} />
-        </div>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '40vh', gap: 18 }}>
+        {/* mix-blend-mode: screen → el negro del GIF desaparece y solo se ve el neón */}
+        <img src="/loader.gif" alt="" width={150} height={150}
+          style={{ mixBlendMode: 'screen', pointerEvents: 'none', userSelect: 'none' }} draggable={false} />
         <span className="prism-text__main">Cargando</span>
       </div>
     )
@@ -14,11 +12,8 @@ export default function PrismLoader({ small }: { small?: boolean }) {
 
   return (
     <div className="prism-loader">
-      <div className="prism-container">
-        <div className="prism-aura" />
-        <div className="prism-echo" />
-        <div className="prism-ring" />
-      </div>
+      <img src="/loader.gif" alt="" width={320} height={320}
+        style={{ mixBlendMode: 'screen', pointerEvents: 'none', userSelect: 'none' }} draggable={false} />
       <div className="prism-text">
         <span className="prism-text__main">Cargando</span>
         <span className="prism-text__sub">Procesando Datos</span>
