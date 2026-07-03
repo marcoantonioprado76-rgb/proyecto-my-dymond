@@ -116,7 +116,7 @@ function PublishProgress({ active, failed }: { active: boolean; failed: boolean 
                     }}>
                         {imgOk ? (
                             <img src="/cohete.png" alt="" draggable={false} onError={() => setImgOk(false)}
-                                className="block select-none" style={{ height: 150, width: 'auto' }} />
+                                className="block select-none" style={{ height: 172, width: 'auto' }} />
                         ) : (
                             <span className="text-8xl block leading-none select-none">🚀</span>
                         )}
