@@ -1660,3 +1660,160 @@ model Organization {
 
   @@map("organizations")
 }
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Reto 90D WhatsApp — módulo de retos de 90 días vía WhatsApp (Baileys).
+// ADITIVO: no modifica ningún modelo existente. `userId` es columna suelta
+// (sin relación Prisma) para NO tocar el modelo User. Tablas: reto90d_*.
+// ═══════════════════════════════════════════════════════════════════════════
+
+model Challenge {
+  id          String   @id @default(uuid()) @db.Uuid
+  name        String
+  description String?  @db.Text
+  startDate   DateTime @map("start_date")
+  endDate     DateTime @map("end_date")
+  isActive    Boolean  @default(true) @map("is_active")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  tasks   DailyTask[]
+  members ChallengeMember[]
+  reports DailyReport[]
+
+  @@map("reto90d_challenges")
+}
+
+model DailyTask {
+  id               String   @id @default(uuid()) @db.Uuid
+  challengeId      String   @map("challenge_id") @db.Uuid
+  title            String
+  description      String   @db.Text
+  evidenceType     String   @map("evidence_type")      // IMAGE | TEXT | NUMBER | LINK | DOCUMENT
+  expectedKeywords String[] @map("expected_keywords")
+  points           Int      @default(10)
+  deadlineTime     String   @map("deadline_time")      // "HH:mm"
+  autoApproveMin   Float    @default(0.85) @map("auto_approve_min")
+  requiresReview   Boolean  @default(false) @map("requires_review")
+  validExamples    String[] @map("valid_examples")     // URLs de evidencia válida (ejemplos)
+  isActive         Boolean  @default(true) @map("is_active")
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+
+  challenge   Challenge        @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+  submissions TaskSubmission[]
+
+  @@index([challengeId])
+  @@map("reto90d_tasks")
+}
+
+model ChallengeMember {
+  id          String   @id @default(uuid()) @db.Uuid
+  challengeId String   @map("challenge_id") @db.Uuid
+  userId      String?  @map("user_id") @db.Uuid       // enlaza con User (columna suelta, sin relación)
+  fullName    String   @map("full_name")
+  phone       String
+  status      String   @default("ACTIVE")             // ACTIVE | PAUSED | REMOVED
+  joinedAt    DateTime @default(now()) @map("joined_at")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  challenge Challenge @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+
+  @@unique([challengeId, phone])
+  @@index([phone])
+  @@map("reto90d_members")
+}
+
+model TaskSubmission {
+  id             String    @id @default(uuid()) @db.Uuid
+  taskId         String?   @map("task_id") @db.Uuid
+  challengeId    String?   @map("challenge_id") @db.Uuid
+  userId         String?   @map("user_id") @db.Uuid
+  fullName       String?   @map("full_name")
+  phone          String
+  whatsappMsgId  String    @unique @map("whatsapp_msg_id")   // anti-dup nivel 1
+  mediaUrl       String?   @map("media_url")
+  mediaHash      String?   @map("media_hash")                // anti-dup nivel 2
+  textContent    String?   @map("text_content") @db.Text
+  aiTaskDetected String?   @map("ai_task_detected")
+  aiConfidence   Float?    @map("ai_confidence")
+  aiExplanation  String?   @map("ai_explanation") @db.Text
+  status         String    @default("PENDING")   // PENDING|APPROVED|REJECTED|REVIEW|DUPLICATED|NEEDS_CLARIFICATION
+  pointsEarned   Int       @default(0) @map("points_earned")
+  reviewedBy     String?   @map("reviewed_by")
+  reviewedAt     DateTime? @map("reviewed_at")
+  submittedAt    DateTime  @default(now()) @map("submitted_at")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+
+  task       DailyTask?            @relation(fields: [taskId], references: [id], onDelete: SetNull)
+  reviewLogs SubmissionReviewLog[]
+
+  @@index([phone])
+  @@index([challengeId])
+  @@index([status])
+  @@index([mediaHash])
+  @@map("reto90d_submissions")
+}
+
+model DailyReport {
+  id          String   @id @default(uuid()) @db.Uuid
+  challengeId String   @map("challenge_id") @db.Uuid
+  userId      String?  @map("user_id") @db.Uuid
+  fullName    String?  @map("full_name")
+  phone       String
+  reportDate  DateTime @map("report_date")
+  totalTasks  Int      @map("total_tasks")
+  completed   Int
+  pending     Int
+  rejected    Int
+  review      Int
+  points      Int
+  summary     String   @db.Text
+  sentToUser  Boolean  @default(false) @map("sent_to_user")
+  sentToAdmin Boolean  @default(false) @map("sent_to_admin")
+  sentToGroup Boolean  @default(false) @map("sent_to_group")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  challenge Challenge @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+
+  @@unique([challengeId, phone, reportDate])
+  @@index([reportDate])
+  @@map("reto90d_reports")
+}
+
+model SubmissionReviewLog {
+  id             String   @id @default(uuid()) @db.Uuid
+  submissionId   String   @map("submission_id") @db.Uuid
+  reviewedBy     String   @map("reviewed_by")
+  previousStatus String   @map("previous_status")
+  newStatus      String   @map("new_status")
+  reason         String?  @db.Text
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  submission TaskSubmission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+
+  @@index([submissionId])
+  @@map("reto90d_review_logs")
+}
+
+model WhatsAppConfig {
+  id                    String   @id @default(uuid()) @db.Uuid
+  challengeId           String?  @map("challenge_id") @db.Uuid
+  botId                 String?  @map("bot_id") @db.Uuid   // bot Baileys dedicado del reto
+  adminPhone            String?  @map("admin_phone")
+  groupId               String?  @map("group_id")          // JID del grupo (...@g.us)
+  isActive              Boolean  @default(true) @map("is_active")
+  sendGroupReports      Boolean  @default(false) @map("send_group_reports")
+  morningReminderTime   String   @default("09:00") @map("morning_reminder_time")
+  middayReminderTime    String   @default("12:30") @map("midday_reminder_time")
+  afternoonReminderTime String   @default("17:30") @map("afternoon_reminder_time")
+  nightReminderTime     String   @default("21:30") @map("night_reminder_time")
+  finalReportTime       String   @default("23:50") @map("final_report_time")
+  timezone              String   @default("America/La_Paz")
+  createdAt             DateTime @default(now()) @map("created_at")
+  updatedAt             DateTime @updatedAt @map("updated_at")
+
+  @@map("reto90d_whatsapp_config")
+}
