@@ -32,7 +32,7 @@ const emptyBrief: BriefForm = {
 
 const Loader = () => (
     <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="w-8 h-8 border-2 border$1-white/10 border$1-white/10 rounded-full animate-spin" />
+        <div className="w-8 h-8 border-2 border-[#E4E9F0] border-t-[#B735B8] rounded-full animate-spin" />
     </div>
 )
 
@@ -218,7 +218,7 @@ function CreateBriefView({ onSaved, onCancel }: { onSaved: (b: Brief) => void; o
     const fmtTime = (s: number) => `${Math.floor(s / 60).toString().padStart(2, '0')}:${(s % 60).toString().padStart(2, '0')}`
 
     return (
-        <div className="px-4 md:px-6 xl:px-10 pt-6 max-w-screen-xl 2xl:max-w-screen-2xl mx-auto pb-24 text-white" style={{ background: 'radial-gradient(120% 60% at 50% -5%, rgba(183,53,184,0.14), rgba(255,255,255,0) 55%), radial-gradient(90% 60% at 100% 110%, rgba(106,53,217,0.12), rgba(255,255,255,0) 60%), linear-gradient(180deg, #0B1B2B 0%, #081624 55%, #050B14 100%)', minHeight: 'calc(100vh - 1.5rem)', borderRadius: 24, border: '1px solid rgba(255,255,255,0.06)' }}>
+        <div className="px-4 md:px-6 xl:px-10 pt-6 max-w-screen-xl 2xl:max-w-screen-2xl mx-auto pb-24 text-white">
             <div className="flex items-center gap-4 mb-8">
                 <button onClick={onCancel} className="w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-all">
                     <ArrowLeft size={16} />
@@ -253,7 +253,7 @@ function CreateBriefView({ onSaved, onCancel }: { onSaved: (b: Brief) => void; o
                             Copiá este prompt, pegalo en tu ChatGPT y respondé las preguntas (ChatGPT detecta tu rubro y pregunta lo relevante). Al final te dará un texto completo — pegalo abajo y generá el brief.
                         </p>
                         <button onClick={copyChatGptPrompt}
-                            className={`flex items-center gap-2 px-3.5 py-2 rounded-xl border text-[11px] font-bold transition-all ${copiedPrompt ? 'bg-[#22C55E]/15 border-[#22C55E]/40 text-[#22C55E]' : 'bg-[#4C97D8]/12 border$1-white/10 text-blue-200 hover:bg-[#4C97D8]/20'}`}>
+                            className={`flex items-center gap-2 px-3.5 py-2 rounded-xl border text-[11px] font-bold transition-all ${copiedPrompt ? 'bg-[#22C55E]/15 border-[#22C55E]/40 text-[#22C55E]' : 'bg-[#4C97D8]/12 border-white/10 text-blue-200 hover:bg-[#4C97D8]/20'}`}>
                             {copiedPrompt ? <><CheckCircle2 size={13} /> ¡Copiado! Pegalo en ChatGPT</> : <><Type size={13} /> Copiar prompt para ChatGPT</>}
                         </button>
                     </div>
@@ -271,7 +271,7 @@ function CreateBriefView({ onSaved, onCancel }: { onSaved: (b: Brief) => void; o
                         <div className="space-y-4">
                             <textarea value={text} onChange={e => setText(e.target.value)} rows={9}
                                 placeholder="Pegá acá la descripción de tu negocio. ¿No sabés qué escribir? Copiá el prompt de ChatGPT (botón de arriba), respondé sus preguntas y pegá el resultado. Cuanto más completo, mejor el brief (incluí: qué vendés, a quién, qué problema resolvés, beneficios, diferencial, objetivo, país y ciudades)."
-                                className="w-full bg-[#0B1B2B] border border-white/20 rounded-2xl px-4 py-3 text-sm text-white resize-none focus:outline-none focus:border$1-white/10 placeholder:text-white/25 leading-relaxed" />
+                                className="w-full bg-[#0B1B2B] border border-white/20 rounded-2xl px-4 py-3 text-sm text-white resize-none focus:outline-none focus:border-white/10 placeholder:text-white/25 leading-relaxed" />
                             <div className="flex items-center justify-between -mt-1">
                                 <span className={`text-[11px] font-bold ${text.trim().length >= 80 ? 'text-[#22C55E]' : 'text-white/30'}`}>
                                     {text.trim().length >= 80 ? '✓ Buen detalle' : `${text.trim().length}/80 — agregá más detalle`}
@@ -476,7 +476,7 @@ function EditBriefForm({ brief, onChange }: { brief: BriefForm; onChange: (b: Br
                 <Section title="Enfoque del Anuncio (IA)">
                     <div>
                         <label className="text-xs font-bold text-white/40 uppercase tracking-widest block mb-2">Categoría <span className="text-[#B735B8]/60 font-normal lowercase">· detectada por IA, podés cambiarla</span></label>
-                        <select value={(brief as any).category || 'otro'} onChange={e => onChange({ ...brief, category: e.target.value } as any)} className="w-full bg-[#0B1B2B] border border-white/20 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border$1-white/10 [&>option]:bg-[#0B1B2B]">
+                        <select value={(brief as any).category || 'otro'} onChange={e => onChange({ ...brief, category: e.target.value } as any)} className="w-full bg-[#0B1B2B] border border-white/20 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-white/10 [&>option]:bg-[#0B1B2B]">
                             {AD_CATEGORIES.map(c => <option key={c.id} value={c.id}>{c.emoji} {c.label}</option>)}
                         </select>
                     </div>
@@ -489,16 +489,16 @@ function EditBriefForm({ brief, onChange }: { brief: BriefForm; onChange: (b: Br
                             <div>
                                 <label className="text-xs font-bold text-white/40 uppercase tracking-widest block mb-2">Edad mín.</label>
                                 <input type="number" min={18} max={65} value={(brief as any).targetAgeMin ?? ''} onChange={e => onChange({ ...brief, targetAgeMin: e.target.value ? Number(e.target.value) : undefined } as any)}
-                                    placeholder="18" className="w-full bg-[#0B1B2B] border border-white/20 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border$1-white/10" />
+                                    placeholder="18" className="w-full bg-[#0B1B2B] border border-white/20 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-white/10" />
                             </div>
                             <div>
                                 <label className="text-xs font-bold text-white/40 uppercase tracking-widest block mb-2">Edad máx.</label>
                                 <input type="number" min={18} max={65} value={(brief as any).targetAgeMax ?? ''} onChange={e => onChange({ ...brief, targetAgeMax: e.target.value ? Number(e.target.value) : undefined } as any)}
-                                    placeholder="65" className="w-full bg-[#0B1B2B] border border-white/20 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border$1-white/10" />
+                                    placeholder="65" className="w-full bg-[#0B1B2B] border border-white/20 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-white/10" />
                             </div>
                             <div>
                                 <label className="text-xs font-bold text-white/40 uppercase tracking-widest block mb-2">Género</label>
-                                <select value={(brief as any).targetGender || 'all'} onChange={e => onChange({ ...brief, targetGender: e.target.value } as any)} className="w-full bg-[#0B1B2B] border border-white/20 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border$1-white/10 [&>option]:bg-[#0B1B2B]">
+                                <select value={(brief as any).targetGender || 'all'} onChange={e => onChange({ ...brief, targetGender: e.target.value } as any)} className="w-full bg-[#0B1B2B] border border-white/20 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-white/10 [&>option]:bg-[#0B1B2B]">
                                     <option value="all">Todos</option>
                                     <option value="male">Hombres</option>
                                     <option value="female">Mujeres</option>
@@ -507,7 +507,7 @@ function EditBriefForm({ brief, onChange }: { brief: BriefForm; onChange: (b: Br
                         </div>
                         <div>
                             <label className="text-xs font-bold text-white/40 uppercase tracking-widest block mb-2">Posicionamiento</label>
-                            <select value={(brief as any).positioning || ''} onChange={e => onChange({ ...brief, positioning: e.target.value } as any)} className="w-full bg-[#0B1B2B] border border-white/20 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border$1-white/10 [&>option]:bg-[#0B1B2B]">
+                            <select value={(brief as any).positioning || ''} onChange={e => onChange({ ...brief, positioning: e.target.value } as any)} className="w-full bg-[#0B1B2B] border border-white/20 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-white/10 [&>option]:bg-[#0B1B2B]">
                                 <option value="">—</option>
                                 <option value="premium">Premium</option>
                                 <option value="medio">Medio</option>
@@ -533,7 +533,7 @@ function EditBriefForm({ brief, onChange }: { brief: BriefForm; onChange: (b: Br
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label className="text-xs font-bold text-white/40 uppercase tracking-widest block mb-2">Objetivo Principal</label>
-                        <select {...field('primaryObjective')} className="w-full bg-[#0B1B2B] border border-white/20 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border$1-white/10 [&>option]:bg-[#0B1B2B]">
+                        <select {...field('primaryObjective')} className="w-full bg-[#0B1B2B] border border-white/20 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-white/10 [&>option]:bg-[#0B1B2B]">
                             <option value="conversion">Conversión / Ventas</option>
                             <option value="leads">Generación de Leads</option>
                             <option value="traffic">Tráfico al sitio</option>
@@ -564,7 +564,7 @@ function TagList({ label, items, onChange, placeholder }: { label: string; items
             <label className="text-xs font-bold text-white/40 uppercase tracking-widest block mb-2">{label}</label>
             <div className="flex flex-wrap gap-2 mb-2">
                 {items.map((item, i) => (
-                    <span key={i} className="flex items-center gap-1.5 text-xs bg-[#B735B8]/10 border border$1-white/10 text-[#B735B8] px-3 py-1.5 rounded-full font-medium">
+                    <span key={i} className="flex items-center gap-1.5 text-xs bg-[#B735B8]/10 border border-white/10 text-[#B735B8] px-3 py-1.5 rounded-full font-medium">
                         {item}
                         <button onClick={() => onChange(items.filter((_, j) => j !== i))} className="text-[#B735B8] hover:text-[#F87171]">×</button>
                     </span>
@@ -572,7 +572,7 @@ function TagList({ label, items, onChange, placeholder }: { label: string; items
             </div>
             <div className="flex gap-2">
                 <input value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), add())}
-                    placeholder={placeholder} className="flex-1 bg-[#0B1B2B] border border-white/20 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border$1-white/10 placeholder:text-white/30" />
+                    placeholder={placeholder} className="flex-1 bg-[#0B1B2B] border border-white/20 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-white/10 placeholder:text-white/30" />
                 <button onClick={add} className="px-3 py-2 bg-white/5 border border-white/10 rounded-xl text-xs font-bold hover:bg-[#B735B8]/20 transition-all">+ Agregar</button>
             </div>
         </div>
@@ -583,7 +583,7 @@ function InputField({ label, value, onChange, placeholder }: { label: string; va
     return (
         <div>
             <label className="text-xs font-bold text-white/40 uppercase tracking-widest block mb-2">{label}</label>
-            <input value={value} onChange={onChange} placeholder={placeholder} className="w-full bg-[#0B1B2B] border border-white/20 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border$1-white/10 placeholder:text-white/30" />
+            <input value={value} onChange={onChange} placeholder={placeholder} className="w-full bg-[#0B1B2B] border border-white/20 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-white/10 placeholder:text-white/30" />
         </div>
     )
 }
@@ -592,7 +592,7 @@ function TextareaField({ label, value, onChange }: { label: string; value: strin
     return (
         <div>
             <label className="text-xs font-bold text-white/40 uppercase tracking-widest block mb-2">{label}</label>
-            <textarea value={value} onChange={onChange} rows={3} className="w-full bg-[#0B1B2B] border border-white/20 rounded-xl px-3 py-2.5 text-sm text-white resize-none focus:outline-none focus:border$1-white/10 leading-relaxed" />
+            <textarea value={value} onChange={onChange} rows={3} className="w-full bg-[#0B1B2B] border border-white/20 rounded-xl px-3 py-2.5 text-sm text-white resize-none focus:outline-none focus:border-white/10 leading-relaxed" />
         </div>
     )
 }

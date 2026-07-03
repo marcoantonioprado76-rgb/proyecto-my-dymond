@@ -13,7 +13,7 @@ const FEATURES = [
 
 export default function TikTokAdsPage() {
     return (
-        <div className="px-4 md:px-6 xl:px-10 pt-6 pb-28 max-w-screen-lg mx-auto text-white" style={{ background: 'radial-gradient(120% 60% at 50% -5%, rgba(183,53,184,0.14), rgba(255,255,255,0) 55%), radial-gradient(90% 60% at 100% 110%, rgba(106,53,217,0.12), rgba(255,255,255,0) 60%), linear-gradient(180deg, #0B1B2B 0%, #081624 55%, #050B14 100%)', minHeight: 'calc(100vh - 1.5rem)', borderRadius: 24, border: '1px solid rgba(255,255,255,0.06)' }}>
+        <div className="px-4 md:px-6 xl:px-10 pt-6 pb-28 max-w-screen-lg mx-auto text-white">
 
             {/* Header */}
             <div className="flex items-center gap-4 mb-8">
@@ -57,13 +57,13 @@ export default function TikTokAdsPage() {
 
             {/* Features preview */}
             <div className="mb-8">
-                <p className="text-[10px] font-black uppercase tracking-widest text-white/25 mb-4">Lo que podrás hacer</p>
+                <p className="text-[10px] font-black uppercase tracking-widest text-[#64748B] mb-4">Lo que podrás hacer</p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {FEATURES.map((f, i) => {
                         const Icon = f.icon
                         return (
                             <div key={i} className="flex items-start gap-3 p-4 rounded-2xl"
-                                style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)' }}>
+                                style={{ background: '#0B1B2B', border: '1px solid rgba(255,255,255,0.06)' }}>
                                 <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 mt-0.5"
                                     style={{ background: 'rgba(238,29,82,0.1)', border: '1px solid rgba(238,29,82,0.2)' }}>
                                     <Icon size={15} className="text-[#FF2D95]" />
@@ -80,8 +80,8 @@ export default function TikTokAdsPage() {
 
             {/* Status */}
             <div className="rounded-2xl p-5"
-                style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.07)' }}>
-                <p className="text-[10px] font-black uppercase tracking-widest text-white/25 mb-4">Estado de integración</p>
+                style={{ background: '#0B1B2B', border: '1px solid rgba(255,255,255,0.07)' }}>
+                <p className="text-[10px] font-black uppercase tracking-widest text-[#64748B] mb-4">Estado de integración</p>
                 <div className="space-y-3">
                     {[
                         { label: 'App de TikTok Developers creada', done: true },

@@ -867,7 +867,7 @@ function CampaignPageInner() {
     // ── Render ──────────────────────────────────────────────────────────────
 
     return (
-        <div className="px-4 md:px-6 xl:px-10 pt-6 max-w-4xl xl:max-w-5xl 2xl:max-w-6xl mx-auto pb-36 text-white" style={{ background: 'radial-gradient(120% 60% at 50% -5%, rgba(183,53,184,0.14), rgba(255,255,255,0) 55%), radial-gradient(90% 60% at 100% 110%, rgba(106,53,217,0.12), rgba(255,255,255,0) 60%), linear-gradient(180deg, #0B1B2B 0%, #081624 55%, #050B14 100%)', minHeight: 'calc(100vh - 1.5rem)', borderRadius: 24, border: '1px solid rgba(255,255,255,0.06)' }}>
+        <div className="px-4 md:px-6 xl:px-10 pt-6 max-w-4xl xl:max-w-5xl 2xl:max-w-6xl mx-auto pb-36 text-white">
 
             {/* Overlay de publicación: cohete + barra de progreso */}
             <PublishProgress active={publishing} failed={!!error} />
@@ -908,8 +908,8 @@ function CampaignPageInner() {
             </div>
 
             {/* Platform badges */}
-            <div className="flex flex-wrap items-center gap-2 mb-5 px-3 py-2.5 bg-white/2 border border-white/5 border-l-2 border$1-white/10 rounded-2xl">
-                <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-[#4C97D8]/10 border border$1-white/10 text-[#4C97D8]">{strategy.platform}</span>
+            <div className="flex flex-wrap items-center gap-2 mb-5 px-3 py-2.5 bg-white/2 border border-white/5 border-l-2 border-white/10 rounded-2xl">
+                <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-[#4C97D8]/10 border border-white/10 text-[#4C97D8]">{strategy.platform}</span>
                 <span className="text-[11px] text-white/30 flex items-center gap-1">
                     {strategy.mediaType === 'video' ? <Video size={10} /> : <ImageIcon size={10} />}
                     {strategy.mediaCount} {strategy.mediaType === 'video' ? 'videos' : 'imágenes'}
@@ -947,7 +947,7 @@ function CampaignPageInner() {
                 SECCIÓN 1 — CONFIGURACIÓN
             ══════════════════════════════════════════════ */}
             <div className={`mb-4 rounded-3xl border transition-all overflow-hidden ${tab !== 'config' ? 'hidden' : ''} ${configSaved ? 'border-[#22C55E]/20' : 'border-white/8'}`}
-                style={{ background: configSaved ? 'rgba(16,185,129,0.02)' : 'rgba(255,255,255,0.02)' }}>
+                style={{ background: configSaved ? 'rgba(16,185,129,0.02)' : '#0B1B2B' }}>
 
                 {/* Section header */}
                 <div className="flex items-center gap-3 px-5 pt-5 pb-4 border-b border-white/5">
@@ -968,7 +968,7 @@ function CampaignPageInner() {
                         <input
                             value={form.name}
                             onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
-                            className="w-full bg-[#0B1B2B] border border-white/20 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border$1-white/10 transition-colors"
+                            className="w-full bg-[#0B1B2B] border border-white/20 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-white/10 transition-colors"
                         />
                     </div>
 
@@ -984,7 +984,7 @@ function CampaignPageInner() {
                                         setForm(f => ({ ...f, providerAccountId: e.target.value, providerAccountName: sel?.displayName || '', pixelId: '' }))
                                         if (strategy?.platform === 'META') fetchPixels(e.target.value)
                                     }}
-                                    className="w-full bg-[#0B1B2B] border border-white/20 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border$1-white/10 [&>option]:bg-[#0B1B2B]"
+                                    className="w-full bg-[#0B1B2B] border border-white/20 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-white/10 [&>option]:bg-[#0B1B2B]"
                                 >
                                     {accounts.map((a: any) => (
                                         <option key={a.providerAccountId} value={a.providerAccountId}>{a.displayName}</option>
@@ -1008,7 +1008,7 @@ function CampaignPageInner() {
                                         const saved = pid ? getWaPrefs()[pid] : ''
                                         setForm(f => ({ ...f, pageId: pid, whatsappNumber: selectedPage?.whatsappNumber || saved || '' }))
                                     }}
-                                    className="w-full bg-[#0B1B2B] border border-white/20 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border$1-white/10 [&>option]:bg-[#0B1B2B]"
+                                    className="w-full bg-[#0B1B2B] border border-white/20 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-white/10 [&>option]:bg-[#0B1B2B]"
                                 >
                                     <option value="">Seleccionar página...</option>
                                     {pages.map((p: any) => (
@@ -1016,7 +1016,7 @@ function CampaignPageInner() {
                                     ))}
                                 </select>
                                 {form.pageId && pages.find((p: any) => p.id === form.pageId)?.instagramUsername && (
-                                    <div className="mt-1.5 flex items-center gap-2 px-2.5 py-1.5 bg-[#FF2D95]/5 border border$1-white/10 rounded-xl">
+                                    <div className="mt-1.5 flex items-center gap-2 px-2.5 py-1.5 bg-[#FF2D95]/5 border border-white/10 rounded-xl">
                                         <span className="text-[10px] font-bold text-[#FF2D95]">IG</span>
                                         <span className="text-xs text-white/40">@{pages.find((p: any) => p.id === form.pageId)?.instagramUsername}</span>
                                     </div>
@@ -1140,7 +1140,7 @@ function CampaignPageInner() {
                         <div>
                             <label className="text-[10px] font-bold text-white/35 uppercase tracking-widest block mb-1.5">Pixel de seguimiento <span className="text-[#B735B8]/50 normal-case font-normal">· señal de conversión</span></label>
                             <select value={form.pixelId} onChange={e => setForm(f => ({ ...f, pixelId: e.target.value }))}
-                                className="w-full bg-[#0B1B2B] border border-white/20 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border$1-white/10 [&>option]:bg-[#0B1B2B]">
+                                className="w-full bg-[#0B1B2B] border border-white/20 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-white/10 [&>option]:bg-[#0B1B2B]">
                                 <option value="">Sin pixel</option>
                                 {pixels.map((p: any) => <option key={p.id} value={p.id}>{p.name}</option>)}
                             </select>
@@ -1160,7 +1160,7 @@ function CampaignPageInner() {
                             <label className="text-[10px] font-bold text-white/35 uppercase tracking-widest block mb-1.5">URL de destino</label>
                             <input value={form.destinationUrl} onChange={e => setForm(f => ({ ...f, destinationUrl: e.target.value }))}
                                 placeholder="https://tusitio.com"
-                                className="w-full bg-[#0B1B2B] border border-white/20 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border$1-white/10 placeholder:text-white/20" />
+                                className="w-full bg-[#0B1B2B] border border-white/20 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-white/10 placeholder:text-white/20" />
                         </div>
                     )}
 
@@ -1180,7 +1180,7 @@ function CampaignPageInner() {
                                         inputMode="decimal"
                                         value={form.dailyBudgetUSD}
                                         onChange={e => setForm(f => ({ ...f, dailyBudgetUSD: e.target.value }))}
-                                        className="w-full bg-[#0B1B2B] border border-white/20 rounded-xl pl-7 pr-20 py-2.5 text-xl font-black text-white focus:outline-none focus:border$1-white/10"
+                                        className="w-full bg-[#0B1B2B] border border-white/20 rounded-xl pl-7 pr-20 py-2.5 text-xl font-black text-white focus:outline-none focus:border-white/10"
                                     />
                                     <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-white/25 pointer-events-none">USD/día</span>
                                 </div>
@@ -1210,7 +1210,7 @@ function CampaignPageInner() {
                     </button>
 
                     {showAdvanced && (
-                        <div className="rounded-2xl border border$1-white/10 bg-[#B735B8]/3 p-4 space-y-4">
+                        <div className="rounded-2xl border border-white/10 bg-[#B735B8]/3 p-4 space-y-4">
                             <p className="text-[10px] font-bold uppercase tracking-widest text-[#B735B8] flex items-center gap-1.5">
                                 <Bot size={10} /> Optimización IA
                             </p>
@@ -1225,7 +1225,7 @@ function CampaignPageInner() {
                                             { key: 'carousel', label: 'Carrusel', desc: 'Todas las variaciones en un carrusel', icon: Layers },
                                         ] as const).map(opt => (
                                             <button key={opt.key} onClick={() => setAdFormat(opt.key)}
-                                                className={`flex flex-col items-start gap-1 p-3 rounded-xl border text-left transition-all ${adFormat === opt.key ? 'bg-[#B735B8]/15 border$1-white/10' : 'bg-white/3 border-white/8 hover:border-white/20'}`}>
+                                                className={`flex flex-col items-start gap-1 p-3 rounded-xl border text-left transition-all ${adFormat === opt.key ? 'bg-[#B735B8]/15 border-white/10' : 'bg-white/3 border-white/8 hover:border-white/20'}`}>
                                                 <opt.icon size={12} className={adFormat === opt.key ? 'text-[#B735B8]' : 'text-white/30'} />
                                                 <span className={`text-[11px] font-bold ${adFormat === opt.key ? 'text-[#B735B8]' : 'text-white/50'}`}>{opt.label}</span>
                                                 <span className="text-[9px] text-white/25 leading-tight">{opt.desc}</span>
@@ -1243,7 +1243,7 @@ function CampaignPageInner() {
                                 </div>
                                 <button
                                     onClick={() => setAdvantageAudience(v => !v)}
-                                    className={`shrink-0 w-11 h-6 rounded-full border transition-all relative ${advantageAudience ? 'bg-[#B735B8] border$1-white/10' : 'bg-white/8 border-white/15'}`}
+                                    className={`shrink-0 w-11 h-6 rounded-full border transition-all relative ${advantageAudience ? 'bg-[#B735B8] border-white/10' : 'bg-white/8 border-white/15'}`}
                                 >
                                     <span className={`absolute top-0.5 w-5 h-5 rounded-full bg-white transition-all shadow-sm ${advantageAudience ? 'left-5' : 'left-0.5'}`} />
                                 </button>
@@ -1257,7 +1257,7 @@ function CampaignPageInner() {
                                 </div>
                                 <button
                                     onClick={() => setAdvantageCreative(v => !v)}
-                                    className={`shrink-0 w-11 h-6 rounded-full border transition-all relative ${advantageCreative ? 'bg-[#4C97D8] border$1-white/10' : 'bg-white/8 border-white/15'}`}
+                                    className={`shrink-0 w-11 h-6 rounded-full border transition-all relative ${advantageCreative ? 'bg-[#4C97D8] border-white/10' : 'bg-white/8 border-white/15'}`}
                                 >
                                     <span className={`absolute top-0.5 w-5 h-5 rounded-full bg-white transition-all shadow-sm ${advantageCreative ? 'left-5' : 'left-0.5'}`} />
                                 </button>
@@ -1273,7 +1273,7 @@ function CampaignPageInner() {
                                         { key: 'min_roas', label: 'ROAS mín.', desc: 'Retorno garantizado', icon: TrendingUp },
                                     ] as const).map(opt => (
                                         <button key={opt.key} onClick={() => setBidStrategy(opt.key)}
-                                            className={`flex flex-col items-start gap-1 p-3 rounded-xl border text-left transition-all ${bidStrategy === opt.key ? 'bg-[#B735B8]/15 border$1-white/10' : 'bg-white/3 border-white/8 hover:border-white/20'}`}>
+                                            className={`flex flex-col items-start gap-1 p-3 rounded-xl border text-left transition-all ${bidStrategy === opt.key ? 'bg-[#B735B8]/15 border-white/10' : 'bg-white/3 border-white/8 hover:border-white/20'}`}>
                                             <opt.icon size={12} className={bidStrategy === opt.key ? 'text-[#B735B8]' : 'text-white/30'} />
                                             <span className={`text-[11px] font-bold ${bidStrategy === opt.key ? 'text-[#B735B8]' : 'text-white/50'}`}>{opt.label}</span>
                                             <span className="text-[9px] text-white/25 leading-tight">{opt.desc}</span>
@@ -1287,7 +1287,7 @@ function CampaignPageInner() {
                                             <span className="text-xs text-white/40">$</span>
                                             <input type="number" value={bidCapAmount} onChange={e => setBidCapAmount(e.target.value)}
                                                 placeholder="5.00" min="0.5" step="0.5"
-                                                className="w-20 bg-[#0B1B2B] border border-white/20 rounded-lg px-2 py-1.5 text-xs text-white focus:outline-none focus:border$1-white/10" />
+                                                className="w-20 bg-[#0B1B2B] border border-white/20 rounded-lg px-2 py-1.5 text-xs text-white focus:outline-none focus:border-white/10" />
                                             <span className="text-xs text-white/25">USD</span>
                                         </div>
                                     </div>
@@ -1298,7 +1298,7 @@ function CampaignPageInner() {
                                         <div className="flex items-center gap-1">
                                             <input type="number" value={minRoasTarget} onChange={e => setMinRoasTarget(e.target.value)}
                                                 placeholder="2.0" min="1" step="0.1"
-                                                className="w-20 bg-[#0B1B2B] border border-white/20 rounded-lg px-2 py-1.5 text-xs text-white focus:outline-none focus:border$1-white/10" />
+                                                className="w-20 bg-[#0B1B2B] border border-white/20 rounded-lg px-2 py-1.5 text-xs text-white focus:outline-none focus:border-white/10" />
                                             <span className="text-xs text-white/25">x retorno</span>
                                         </div>
                                     </div>
@@ -1325,7 +1325,7 @@ function CampaignPageInner() {
                 SECCIÓN 2 — CREATIVOS & TEXTOS
             ══════════════════════════════════════════════ */}
             <div ref={creativesRef} className={`mb-4 rounded-3xl border transition-all overflow-hidden relative ${tab !== 'creativos' ? 'hidden' : ''} ${!configSaved ? 'border-white/5' : 'border-white/8'}`}
-                style={{ background: 'rgba(255,255,255,0.015)' }}>
+                style={{ background: '#0B1B2B' }}>
 
                 {!configSaved && (
                     <div className="absolute inset-0 z-10 flex items-center justify-center rounded-3xl">
@@ -1361,7 +1361,7 @@ function CampaignPageInner() {
                                         <span className="text-[11px] font-normal text-white/70">({strategy.mediaCount} imágenes)</span>
                                     </button>
                                 ) : (
-                                    <div className="rounded-2xl border border$1-white/10 bg-[#B735B8]/5 p-4 space-y-4">
+                                    <div className="rounded-2xl border border-white/10 bg-[#B735B8]/5 p-4 space-y-4">
                                         <div className="flex items-center justify-between">
                                             <p className="text-[11px] font-bold text-[#B735B8] uppercase tracking-widest flex items-center gap-1.5">
                                                 <Sparkles size={10} /> Generar {strategy.mediaCount} imágenes con IA
@@ -1370,7 +1370,7 @@ function CampaignPageInner() {
                                         </div>
 
                                         {/* Auto style info */}
-                                        <div className="flex items-center gap-2 px-3 py-2 bg-[#B735B8]/8 border border$1-white/10 rounded-xl">
+                                        <div className="flex items-center gap-2 px-3 py-2 bg-[#B735B8]/8 border border-white/10 rounded-xl">
                                             <Sparkles size={10} className="text-[#B735B8] shrink-0" />
                                             <p className="text-[9px] text-[#B735B8]">La IA elige automáticamente el mejor estilo para cada imagen según la estrategia y el brief del negocio</p>
                                         </div>
@@ -1416,7 +1416,7 @@ function CampaignPageInner() {
                                                 </button>
                                                 <button onClick={() => setShowManualPrompt(v => !v)} disabled={!bulkRefImageUrl}
                                                     title="Escribir mi propio prompt (manual)"
-                                                    className={`shrink-0 flex items-center gap-1.5 px-3.5 py-3 rounded-2xl text-[12px] font-bold border transition-all disabled:opacity-40 disabled:cursor-not-allowed ${showManualPrompt ? 'bg-[#B735B8]/25 border$1-white/10 text-purple-100' : 'bg-[#B735B8]/12 border$1-white/10 text-purple-200 hover:bg-[#B735B8]/20'}`}>
+                                                    className={`shrink-0 flex items-center gap-1.5 px-3.5 py-3 rounded-2xl text-[12px] font-bold border transition-all disabled:opacity-40 disabled:cursor-not-allowed ${showManualPrompt ? 'bg-[#B735B8]/25 border-white/10 text-purple-100' : 'bg-[#B735B8]/12 border-white/10 text-purple-200 hover:bg-[#B735B8]/20'}`}>
                                                     <FileText size={14} /> <span>Manual</span>
                                                 </button>
                                             </div>
@@ -1433,13 +1433,13 @@ function CampaignPageInner() {
                                                     </div>
                                                     <textarea value={bulkUserPrompt} onChange={e => setBulkUserPrompt(e.target.value)}
                                                         rows={3} placeholder="Escribí qué imagen querés (se manda tal cual a gpt-image-2 con tu foto)."
-                                                        className="w-full bg-[#0B1B2B] border border-white/12 rounded-xl px-3 py-2 text-[10px] text-white/80 resize-none focus:outline-none focus:border$1-white/10 leading-relaxed placeholder:text-white/15" />
+                                                        className="w-full bg-[#0B1B2B] border border-white/12 rounded-xl px-3 py-2 text-[10px] text-white/80 resize-none focus:outline-none focus:border-white/10 leading-relaxed placeholder:text-white/15" />
                                                 </div>
                                             )}
                                         </div>
 
                                         {bulkGenerating && (
-                                            <div className="flex items-center gap-3 p-3 bg-[#B735B8]/10 border border$1-white/10 rounded-xl">
+                                            <div className="flex items-center gap-3 p-3 bg-[#B735B8]/10 border border-white/10 rounded-xl">
                                                 <Loader2 size={14} className="animate-spin text-[#B735B8] shrink-0" />
                                                 <div className="flex-1">
                                                     <div className="flex items-center justify-between mb-1">
@@ -1485,9 +1485,9 @@ function CampaignPageInner() {
                                     {/* Card header */}
                                     <div className="flex items-center gap-2 px-4 py-2.5 border-b border-white/5">
                                         <span className="text-[10px] font-black text-white/30 uppercase">Anuncio #{i + 1}</span>
-                                        {creative.aiGenerated && <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-[#B735B8]/10 border border$1-white/10 text-[#B735B8]">IA</span>}
+                                        {creative.aiGenerated && <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-[#B735B8]/10 border border-white/10 text-[#B735B8]">IA</span>}
                                         {creative.mediaUrl && <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-[#22C55E]/10 border border-[#22C55E]/20 text-[#22C55E] flex items-center gap-1"><CheckCircle2 size={8} /> Imagen</span>}
-                                        {creative.primaryText && <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-[#4C97D8]/10 border border$1-white/10 text-[#4C97D8] flex items-center gap-1"><FileText size={8} /> Texto</span>}
+                                        {creative.primaryText && <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-[#4C97D8]/10 border border-white/10 text-[#4C97D8] flex items-center gap-1"><FileText size={8} /> Texto</span>}
                                     </div>
 
                                     <div className="flex flex-col">
@@ -1556,7 +1556,7 @@ function CampaignPageInner() {
                                                                     setImageGenPanel(imageGenPanel === i ? null : i)
                                                                     // tu prompt queda libre: no autocompletar
                                                                 }}
-                                                                    className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#B735B8]/10 border border$1-white/10 hover:bg-[#B735B8]/20 transition-all text-[10px] font-bold text-[#B735B8]">
+                                                                    className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#B735B8]/10 border border-white/10 hover:bg-[#B735B8]/20 transition-all text-[10px] font-bold text-[#B735B8]">
                                                                     <Wand2 size={11} /> IA
                                                                 </button>
                                                             )}
@@ -1589,7 +1589,7 @@ function CampaignPageInner() {
                                                             setImageGenPanel(imageGenPanel === i ? null : i)
                                                             // tu prompt queda libre: no autocompletar
                                                         }}
-                                                            className="flex-1 flex items-center justify-center gap-1 py-2 rounded-xl bg-[#B735B8]/10 border border$1-white/10 text-[10px] font-bold text-[#B735B8]">
+                                                            className="flex-1 flex items-center justify-center gap-1 py-2 rounded-xl bg-[#B735B8]/10 border border-white/10 text-[10px] font-bold text-[#B735B8]">
                                                             <Wand2 size={10} /> IA
                                                         </button>
                                                     )}
@@ -1601,7 +1601,7 @@ function CampaignPageInner() {
                                         <div className="flex-1 p-3 space-y-3 min-w-0">
                                             {/* Hook badge */}
                                             {creative.hook && (
-                                                <div className="px-3 py-2 bg-[#B735B8]/5 border border$1-white/10 rounded-xl">
+                                                <div className="px-3 py-2 bg-[#B735B8]/5 border border-white/10 rounded-xl">
                                                     <p className="text-[9px] text-[#B735B8] font-bold uppercase mb-0.5">Hook</p>
                                                     <p className="text-xs text-white/50 italic leading-relaxed">"{creative.hook}"</p>
                                                 </div>
@@ -1630,11 +1630,11 @@ function CampaignPageInner() {
                                                     onChange={e => setCreatives(prev => prev.map((c, j) => j === i ? { ...c, primaryText: e.target.value } : c))}
                                                     rows={4}
                                                     placeholder={copiesGenerated ? '' : 'Genera los textos con IA o escribe manualmente...'}
-                                                    className="w-full bg-[#0B1B2B] border border-white/20 rounded-xl px-3 py-2 text-xs text-white resize-none focus:outline-none focus:border$1-white/10 leading-relaxed placeholder:text-white/20"
+                                                    className="w-full bg-[#0B1B2B] border border-white/20 rounded-xl px-3 py-2 text-xs text-white resize-none focus:outline-none focus:border-white/10 leading-relaxed placeholder:text-white/20"
                                                 />
                                                 {/* Suggestions dropdown */}
                                                 {activeSuggestionKey === `${i}-primaryText` && suggestions[`${i}-primaryText`] && (
-                                                    <div className="mt-1.5 rounded-xl border border$1-white/10 bg-[#050B14] overflow-hidden">
+                                                    <div className="mt-1.5 rounded-xl border border-white/10 bg-[#050B14] overflow-hidden">
                                                         <div className="flex items-center justify-between px-3 py-2 border-b border-white/5">
                                                             <p className="text-[9px] font-bold text-[#B735B8] uppercase">3 opciones — elige una</p>
                                                             <button onClick={() => setActiveSuggestionKey(null)} className="text-white/20 hover:text-white"><X size={10} /></button>
@@ -1664,9 +1664,9 @@ function CampaignPageInner() {
                                                     </div>
                                                     <input value={creative.headline || ''}
                                                         onChange={e => setCreatives(prev => prev.map((c, j) => j === i ? { ...c, headline: e.target.value } : c))}
-                                                        className="w-full bg-[#0B1B2B] border border-white/20 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border$1-white/10" />
+                                                        className="w-full bg-[#0B1B2B] border border-white/20 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-white/10" />
                                                     {activeSuggestionKey === `${i}-headline` && suggestions[`${i}-headline`] && (
-                                                        <div className="mt-1 rounded-xl border border$1-white/10 bg-[#050B14] overflow-hidden">
+                                                        <div className="mt-1 rounded-xl border border-white/10 bg-[#050B14] overflow-hidden">
                                                             <div className="flex items-center justify-between px-2.5 py-1.5 border-b border-white/5">
                                                                 <p className="text-[9px] font-bold text-[#B735B8] uppercase">Opciones</p>
                                                                 <button onClick={() => setActiveSuggestionKey(null)} className="text-white/20 hover:text-white"><X size={9} /></button>
@@ -1693,9 +1693,9 @@ function CampaignPageInner() {
                                                     </div>
                                                     <input value={creative.description || ''}
                                                         onChange={e => setCreatives(prev => prev.map((c, j) => j === i ? { ...c, description: e.target.value } : c))}
-                                                        className="w-full bg-[#0B1B2B] border border-white/20 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border$1-white/10" />
+                                                        className="w-full bg-[#0B1B2B] border border-white/20 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-white/10" />
                                                     {activeSuggestionKey === `${i}-description` && suggestions[`${i}-description`] && (
-                                                        <div className="mt-1 rounded-xl border border$1-white/10 bg-[#050B14] overflow-hidden">
+                                                        <div className="mt-1 rounded-xl border border-white/10 bg-[#050B14] overflow-hidden">
                                                             <div className="flex items-center justify-between px-2.5 py-1.5 border-b border-white/5">
                                                                 <p className="text-[9px] font-bold text-[#B735B8] uppercase">Opciones</p>
                                                                 <button onClick={() => setActiveSuggestionKey(null)} className="text-white/20 hover:text-white"><X size={9} /></button>
@@ -1742,7 +1742,7 @@ function CampaignPageInner() {
                                                 ) : (
                                                     <button onClick={() => refImageFileRefs.current[i]?.click()}
                                                         disabled={uploadingRefImage[i]}
-                                                        className="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl border border-dashed border$1-white/10 bg-[#B735B8]/5 hover:bg-[#B735B8]/10 hover:border$1-white/10 transition-all text-[10px] font-bold text-[#B735B8]/70 hover:text-[#B735B8]">
+                                                        className="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl border border-dashed border-white/10 bg-[#B735B8]/5 hover:bg-[#B735B8]/10 hover:border-white/10 transition-all text-[10px] font-bold text-[#B735B8]/70 hover:text-[#B735B8]">
                                                         {uploadingRefImage[i]
                                                             ? <><Loader2 size={10} className="animate-spin" /> Subiendo...</>
                                                             : <><Upload size={10} /> Subir foto del producto</>
@@ -1775,7 +1775,7 @@ function CampaignPageInner() {
                                                 </div>
                                                 <textarea value={imageCustomPrompts[i] || ''} onChange={e => setImageCustomPrompts(prev => ({ ...prev, [i]: e.target.value }))}
                                                     rows={3} placeholder="Escribí qué imagen querés (como el admin) o tocá 'Generar con IA'. Se manda tal cual a gpt-image-2."
-                                                    className="w-full bg-[#0B1B2B] border border-white/20 rounded-xl px-2.5 py-2 text-[10px] text-white resize-none focus:outline-none focus:border$1-white/10 leading-relaxed placeholder:text-white/20" />
+                                                    className="w-full bg-[#0B1B2B] border border-white/20 rounded-xl px-2.5 py-2 text-[10px] text-white resize-none focus:outline-none focus:border-white/10 leading-relaxed placeholder:text-white/20" />
                                             </div>
                                             <button onClick={() => generateImage(i)}
                                                 disabled={!(refImageUrls[i] || creatives.find(c => c.slotIndex === i)?.mediaUrl?.startsWith('http'))}
@@ -1888,12 +1888,12 @@ function CampaignPageInner() {
                                 {/* Advantage+ summary */}
                                 <div className="mt-3 flex flex-wrap items-center gap-2 justify-center">
                                     {advantageAudience && (
-                                        <span className="flex items-center gap-1 text-[10px] font-bold px-2.5 py-1 rounded-full bg-[#B735B8]/15 border border$1-white/10 text-[#B735B8]">
+                                        <span className="flex items-center gap-1 text-[10px] font-bold px-2.5 py-1 rounded-full bg-[#B735B8]/15 border border-white/10 text-[#B735B8]">
                                             <Target size={9} /> Advantage+ Audience
                                         </span>
                                     )}
                                     {advantageCreative && (
-                                        <span className="flex items-center gap-1 text-[10px] font-bold px-2.5 py-1 rounded-full bg-[#4C97D8]/15 border border$1-white/10 text-[#4C97D8]">
+                                        <span className="flex items-center gap-1 text-[10px] font-bold px-2.5 py-1 rounded-full bg-[#4C97D8]/15 border border-white/10 text-[#4C97D8]">
                                             <Sparkles size={9} /> Advantage+ Creative
                                         </span>
                                     )}

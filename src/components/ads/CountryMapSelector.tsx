@@ -382,7 +382,7 @@ export default function CountryMapSelector({ selected, onChange }: Props) {
                     value={citySearch}
                     onChange={e => setCitySearch(e.target.value)}
                     placeholder="Buscar ciudad o departamento (Ej: Bogotá, Medellín...)"
-                    className="w-full bg-white/5 border border-white/10 rounded-xl pl-8 pr-3 py-2 text-sm text-white focus:outline-none focus:border$1-white/10 placeholder:text-white/20"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl pl-8 pr-3 py-2 text-sm text-white focus:outline-none focus:border-white/10 placeholder:text-white/20"
                 />
                 {citySearch && (
                     <button onClick={() => setCitySearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-white/30 hover:text-white">
@@ -415,13 +415,13 @@ export default function CountryMapSelector({ selected, onChange }: Props) {
             {selected.length > 0 ? (
                 <div className="flex flex-wrap gap-1.5">
                     {selectedCountries.map(code => (
-                        <span key={code} className="flex items-center gap-1 text-xs bg-[#B735B8]/10 border border$1-white/10 text-[#B735B8] px-2.5 py-1 rounded-full">
+                        <span key={code} className="flex items-center gap-1 text-xs bg-[#B735B8]/10 border border-white/10 text-[#B735B8] px-2.5 py-1 rounded-full">
                             {CODE_TO_NAME[code] || code}
                             <button onClick={() => toggle(code)} className="hover:text-[#F87171] ml-0.5"><X size={9} /></button>
                         </span>
                     ))}
                     {selectedCities.map(city => (
-                        <span key={city} className="flex items-center gap-1 text-xs bg-[#4C97D8]/10 border border$1-white/10 text-[#4C97D8] px-2.5 py-1 rounded-full">
+                        <span key={city} className="flex items-center gap-1 text-xs bg-[#4C97D8]/10 border border-white/10 text-[#4C97D8] px-2.5 py-1 rounded-full">
                             <MapPin size={9} />{city}
                             <button onClick={() => toggle(city)} className="hover:text-[#F87171] ml-0.5"><X size={9} /></button>
                         </span>

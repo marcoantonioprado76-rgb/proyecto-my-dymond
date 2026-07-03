@@ -330,7 +330,7 @@ export default function AnalyticsPage() {
     ]
 
     return (
-        <div className="px-4 md:px-6 pt-6 max-w-5xl mx-auto pb-24 text-white" style={{ background: 'radial-gradient(120% 60% at 50% -5%, rgba(183,53,184,0.14), rgba(255,255,255,0) 55%), radial-gradient(90% 60% at 100% 110%, rgba(106,53,217,0.12), rgba(255,255,255,0) 60%), linear-gradient(180deg, #0B1B2B 0%, #081624 55%, #050B14 100%)', minHeight: 'calc(100vh - 1.5rem)', borderRadius: 24, border: '1px solid rgba(255,255,255,0.06)' }}>
+        <div className="px-4 md:px-6 pt-6 max-w-5xl mx-auto pb-24 text-white">
 
             {/* Header */}
             <div className="flex items-center gap-3 mb-6">
@@ -369,7 +369,7 @@ export default function AnalyticsPage() {
                 </div>
                 {campaigns.length > 1 && (
                     <select value={selectedCampaign} onChange={e => setSelectedCampaign(e.target.value)}
-                        className="bg-[#0B1B2B] border border-white/20 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border$1-white/10 [&>option]:bg-[#0B1B2B]">
+                        className="bg-[#0B1B2B] border border-white/20 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-white/10 [&>option]:bg-[#0B1B2B]">
                         <option value="ALL">Todas las campañas</option>
                         {campaigns.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                     </select>
@@ -414,7 +414,7 @@ export default function AnalyticsPage() {
                                         className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold border transition-all"
                                         style={on
                                             ? { background: m.color + '20', borderColor: m.color + '50', color: m.color }
-                                            : { background: 'rgba(255,255,255,0.03)', borderColor: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.3)' }}>
+                                            : { background: '#0B1B2B', borderColor: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.3)' }}>
                                         <span style={{ width: 7, height: 7, borderRadius: '50%', background: on ? m.color : 'rgba(255,255,255,0.2)', display: 'inline-block', flexShrink: 0 }} />
                                         {m.label}
                                     </button>
@@ -435,7 +435,7 @@ export default function AnalyticsPage() {
                                     <thead>
                                         <tr className="border-b border-white/5">
                                             {['Campaña', 'Gasto', 'Clics enlace', 'Impresiones', 'Alcance', 'Conv. WA', 'Conversiones', 'CTR', 'CPC', 'CPM'].map(h => (
-                                                <th key={h} className="px-4 py-2.5 text-left text-[10px] font-bold uppercase tracking-widest text-white/25">{h}</th>
+                                                <th key={h} className="px-4 py-2.5 text-left text-[10px] font-bold uppercase tracking-widest text-[#64748B]">{h}</th>
                                             ))}
                                         </tr>
                                     </thead>
@@ -470,7 +470,7 @@ export default function AnalyticsPage() {
                                 <thead>
                                     <tr className="border-b border-white/5">
                                         {['Fecha', 'Gasto', 'Clics enlace', 'Impresiones', 'Alcance', 'Conv. WA', 'Conversiones', 'CTR', 'CPC', 'CPM'].map(h => (
-                                            <th key={h} className="px-4 py-2.5 text-left text-[10px] font-bold uppercase tracking-widest text-white/25">{h}</th>
+                                            <th key={h} className="px-4 py-2.5 text-left text-[10px] font-bold uppercase tracking-widest text-[#64748B]">{h}</th>
                                         ))}
                                     </tr>
                                 </thead>

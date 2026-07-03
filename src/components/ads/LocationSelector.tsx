@@ -117,8 +117,8 @@ export default function LocationSelector({ selected, onChange, platform = 'meta'
                         const parsed = parseLocation(loc)
                         return (
                             <span key={loc} className={`flex items-center gap-1.5 text-[11px] font-medium px-2.5 py-1 rounded-full border ${parsed.type === 'country'
-                                ? 'bg-[#B735B8]/10 border$1-white/10 text-[#B735B8]'
-                                : 'bg-[#4C97D8]/10 border$1-white/10 text-[#4C97D8]'}`}>
+                                ? 'bg-[#B735B8]/10 border-white/10 text-[#B735B8]'
+                                : 'bg-[#4C97D8]/10 border-white/10 text-[#4C97D8]'}`}>
                                 {parsed.type === 'country' ? <Globe size={10} /> : parsed.type === 'region' ? <Building2 size={10} /> : <MapPin size={10} />}
                                 {parsed.name}
                                 <button onClick={() => removeLocation(loc)} className="text-white/30 hover:text-[#F87171] transition-all ml-0.5">
@@ -140,7 +140,7 @@ export default function LocationSelector({ selected, onChange, platform = 'meta'
                     ['city', 'Departamentos', <Building2 size={12} />, selectedCities.length],
                 ] as const).map(([key, label, icon, count]) => (
                     <button key={key} onClick={() => { setTab(key); setSearch('') }}
-                        className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs font-bold transition-all ${tab === key ? 'text-white border-b-2 border$1-white/10' : 'text-white/30 hover:text-white/60'}`}>
+                        className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs font-bold transition-all ${tab === key ? 'text-white border-b-2 border-white/10' : 'text-white/30 hover:text-white/60'}`}>
                         {icon} {label}
                         {count > 0 && (
                             <span className={`text-[9px] px-1.5 py-0.5 rounded-full ${tab === key ? 'bg-[#B735B8]/30 text-purple-200' : 'bg-white/8 text-white/40'}`}>{count}</span>
@@ -157,7 +157,7 @@ export default function LocationSelector({ selected, onChange, platform = 'meta'
                         value={search}
                         onChange={e => setSearch(e.target.value)}
                         placeholder={tab === 'country' ? 'Buscar país...' : 'Buscar departamento / región...'}
-                        className="w-full bg-white/5 border border-white/10 rounded-xl pl-8 pr-3 py-2 text-xs text-white focus:outline-none focus:border$1-white/10 placeholder:text-white/20"
+                        className="w-full bg-white/5 border border-white/10 rounded-xl pl-8 pr-3 py-2 text-xs text-white focus:outline-none focus:border-white/10 placeholder:text-white/20"
                     />
                 </div>
             </div>
@@ -171,7 +171,7 @@ export default function LocationSelector({ selected, onChange, platform = 'meta'
                             return (
                                 <button key={c.code} onClick={() => toggleCountry(c.code)}
                                     className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-medium text-left transition-all ${isSelected
-                                        ? 'bg-[#B735B8]/20 border border$1-white/10 text-purple-200'
+                                        ? 'bg-[#B735B8]/20 border border-white/10 text-purple-200'
                                         : 'bg-white/3 border border-white/8 text-white/60 hover:bg-white/8 hover:text-white/90'}`}>
                                     <span className="font-black text-[10px] text-white/30 w-5 shrink-0">{c.code}</span>
                                     <span className="truncate flex-1">{c.name}</span>
@@ -205,7 +205,7 @@ export default function LocationSelector({ selected, onChange, platform = 'meta'
                             return (
                                 <button key={val} onClick={() => toggleLive(item)}
                                     className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs text-left transition-all ${isSelected
-                                        ? 'bg-[#4C97D8]/15 border border$1-white/10 text-blue-200'
+                                        ? 'bg-[#4C97D8]/15 border border-white/10 text-blue-200'
                                         : 'bg-white/3 border border-white/8 text-white/60 hover:bg-white/8 hover:text-white/90'}`}>
                                     {isRegion
                                         ? <Building2 size={11} className={`shrink-0 ${isSelected ? 'text-[#4C97D8]' : 'text-white/20'}`} />

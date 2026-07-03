@@ -94,7 +94,7 @@ export default function PreviewPage() {
     const isPublished = campaign.status === 'PUBLISHED'
 
     return (
-        <div className="px-4 md:px-6 pt-6 max-w-screen-xl mx-auto pb-24 text-white" style={{ background: 'radial-gradient(120% 60% at 50% -5%, rgba(183,53,184,0.14), rgba(255,255,255,0) 55%), radial-gradient(90% 60% at 100% 110%, rgba(106,53,217,0.12), rgba(255,255,255,0) 60%), linear-gradient(180deg, #0B1B2B 0%, #081624 55%, #050B14 100%)', minHeight: 'calc(100vh - 1.5rem)', borderRadius: 24, border: '1px solid rgba(255,255,255,0.06)' }}>
+        <div className="px-4 md:px-6 pt-6 max-w-screen-xl mx-auto pb-24 text-white">
             {/* Header */}
             <div className="flex items-center gap-4 mb-6">
                 <Link href="/dashboard/services/ads/meta" className="w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-all">
@@ -254,7 +254,7 @@ export default function PreviewPage() {
                                 <button
                                     key={i}
                                     onClick={() => setActiveSlot(i)}
-                                    className={`w-10 h-10 rounded-xl overflow-hidden border-2 transition-all ${i === activeSlot ? 'border$1-white/10' : 'border-white/10 hover:border-white/30'}`}
+                                    className={`w-10 h-10 rounded-xl overflow-hidden border-2 transition-all ${i === activeSlot ? 'border-white/10' : 'border-white/10 hover:border-white/30'}`}
                                 >
                                     {c.mediaUrl
                                         ? <img src={c.mediaUrl} alt="" className="w-full h-full object-cover" />
@@ -272,7 +272,7 @@ export default function PreviewPage() {
                             <div
                                 key={i}
                                 onClick={() => setActiveSlot(i)}
-                                className={`bg-dark-900/40 border rounded-2xl p-4 cursor-pointer transition-all ${i === activeSlot ? 'border$1-white/10 bg-[#B735B8]/5' : 'border-white/5 hover:border-white/15'}`}
+                                className={`bg-dark-900/40 border rounded-2xl p-4 cursor-pointer transition-all ${i === activeSlot ? 'border-white/10 bg-[#B735B8]/5' : 'border-white/5 hover:border-white/15'}`}
                             >
                                 <div className="flex items-center justify-between mb-2">
                                     <span className="text-[10px] font-black uppercase text-white/30">Anuncio #{i + 1}</span>
@@ -290,20 +290,20 @@ export default function PreviewPage() {
                                             value={creative.primaryText}
                                             onChange={e => setCreatives(prev => prev.map((c, j) => j === i ? { ...c, primaryText: e.target.value } : c))}
                                             rows={4}
-                                            className="w-full bg-[#0B1B2B] border border-white/20 rounded-xl px-3 py-2 text-xs text-white resize-none focus:outline-none focus:border$1-white/10 leading-relaxed"
+                                            className="w-full bg-[#0B1B2B] border border-white/20 rounded-xl px-3 py-2 text-xs text-white resize-none focus:outline-none focus:border-white/10 leading-relaxed"
                                         />
                                         <div className="grid grid-cols-2 gap-2">
                                             <input
                                                 value={creative.headline}
                                                 onChange={e => setCreatives(prev => prev.map((c, j) => j === i ? { ...c, headline: e.target.value } : c))}
                                                 placeholder="Titular"
-                                                className="bg-[#0B1B2B] border border-white/20 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border$1-white/10 placeholder:text-white/30"
+                                                className="bg-[#0B1B2B] border border-white/20 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-white/10 placeholder:text-white/30"
                                             />
                                             <input
                                                 value={creative.description || ''}
                                                 onChange={e => setCreatives(prev => prev.map((c, j) => j === i ? { ...c, description: e.target.value } : c))}
                                                 placeholder="Descripción"
-                                                className="bg-[#0B1B2B] border border-white/20 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border$1-white/10 placeholder:text-white/30"
+                                                className="bg-[#0B1B2B] border border-white/20 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-white/10 placeholder:text-white/30"
                                             />
                                         </div>
                                         <div className="flex gap-2">

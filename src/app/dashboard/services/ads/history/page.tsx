@@ -10,7 +10,7 @@ import Link from 'next/link'
 
 const STATUS_LABELS: Record<string, { label: string; color: string; dot: string }> = {
     DRAFT: { label: 'Borrador', color: 'text-white/50 bg-white/5 border-white/10', dot: 'bg-white/30' },
-    READY: { label: 'Listo', color: 'text-[#4C97D8] bg-[#4C97D8]/10 border$1-white/10', dot: 'bg-[#4C97D8]' },
+    READY: { label: 'Listo', color: 'text-[#4C97D8] bg-[#4C97D8]/10 border-white/10', dot: 'bg-[#4C97D8]' },
     PUBLISHING: { label: 'Publicando', color: 'text-[#FBBF24] bg-[#FBBF24]/10 border-[#FBBF24]/20', dot: 'bg-[#FBBF24] animate-pulse' },
     PUBLISHED: { label: 'Publicado', color: 'text-[#22C55E] bg-[#22C55E]/10 border-[#22C55E]/20', dot: 'bg-[#22C55E]' },
     FAILED: { label: 'Error', color: 'text-[#F87171] bg-[#F87171]/10 border-[#F87171]/20', dot: 'bg-[#F87171]' },
@@ -118,7 +118,7 @@ export default function HistoryPage() {
     const totalReach = metricValues.reduce((s, m) => s + (m.reach || 0), 0)
 
     return (
-        <div className="px-4 md:px-6 pt-6 max-w-screen-2xl mx-auto pb-24 text-white" style={{ background: 'radial-gradient(120% 60% at 50% -5%, rgba(183,53,184,0.14), rgba(255,255,255,0) 55%), radial-gradient(90% 60% at 100% 110%, rgba(106,53,217,0.12), rgba(255,255,255,0) 60%), linear-gradient(180deg, #0B1B2B 0%, #081624 55%, #050B14 100%)', minHeight: 'calc(100vh - 1.5rem)', borderRadius: 24, border: '1px solid rgba(255,255,255,0.06)' }}>
+        <div className="px-4 md:px-6 pt-6 max-w-screen-2xl mx-auto pb-24 text-white">
 
             {/* Header */}
             <div className="flex items-center gap-3 mb-7">
@@ -340,7 +340,7 @@ export default function HistoryPage() {
                                     )}
                                     {campaign.status === 'PUBLISHED' && campaign.providerCampaignId && (
                                         <a href="https://business.facebook.com/adsmanager" target="_blank" rel="noopener noreferrer"
-                                            className="flex items-center gap-1.5 text-xs font-bold px-4 py-2 rounded-xl bg-[#4C97D8]/10 border border$1-white/10 text-[#4C97D8] hover:bg-[#4C97D8]/20 transition-all">
+                                            className="flex items-center gap-1.5 text-xs font-bold px-4 py-2 rounded-xl bg-[#4C97D8]/10 border border-white/10 text-[#4C97D8] hover:bg-[#4C97D8]/20 transition-all">
                                             <ExternalLink size={12} /> Ads Manager
                                         </a>
                                     )}

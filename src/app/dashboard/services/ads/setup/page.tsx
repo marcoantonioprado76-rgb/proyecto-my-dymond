@@ -74,7 +74,7 @@ export default function SetupPage() {
     }
 
     return (
-        <div className="px-4 md:px-6 pt-6 max-w-3xl mx-auto pb-24 text-white" style={{ background: 'radial-gradient(120% 60% at 50% -5%, rgba(183,53,184,0.14), rgba(255,255,255,0) 55%), radial-gradient(90% 60% at 100% 110%, rgba(106,53,217,0.12), rgba(255,255,255,0) 60%), linear-gradient(180deg, #0B1B2B 0%, #081624 55%, #050B14 100%)', minHeight: 'calc(100vh - 1.5rem)', borderRadius: 24, border: '1px solid rgba(255,255,255,0.06)' }}>
+        <div className="px-4 md:px-6 pt-6 max-w-3xl mx-auto pb-24 text-white">
 
             {/* Header */}
             <div className="flex items-center gap-3 mb-7">
@@ -164,7 +164,7 @@ export default function SetupPage() {
                     )}
 
                     {/* Info */}
-                    <div className="bg-[#4C97D8]/5 border border$1-white/10 rounded-2xl p-4">
+                    <div className="bg-[#4C97D8]/5 border border-white/10 rounded-2xl p-4">
                         <div className="flex items-center gap-2 mb-2">
                             <Sparkles size={13} className="text-[#4C97D8]" />
                             <p className="text-xs font-bold text-[#4C97D8] uppercase tracking-widest">¿Por qué tu propia API Key?</p>
@@ -198,7 +198,7 @@ export default function SetupPage() {
                                     value={apiKey}
                                     onChange={e => setApiKey(e.target.value)}
                                     placeholder="sk-proj-..."
-                                    className="w-full bg-[#0B1B2B] border border-white/20 rounded-xl px-4 py-3 text-sm font-mono text-white pr-12 focus:outline-none focus:border$1-white/10 placeholder:text-white/30 transition-colors"
+                                    className="w-full bg-[#0B1B2B] border border-white/20 rounded-xl px-4 py-3 text-sm font-mono text-white pr-12 focus:outline-none focus:border-white/10 placeholder:text-white/30 transition-colors"
                                 />
                                 <button type="button" onClick={() => setShowKey(!showKey)}
                                     className="absolute right-3 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/60 transition-colors">
@@ -210,7 +210,7 @@ export default function SetupPage() {
                         <div>
                             <label className="text-[11px] font-bold text-white/40 uppercase tracking-widest block mb-2">Modelo de IA</label>
                             <select value={model} onChange={e => setModel(e.target.value)}
-                                className="w-full bg-[#0B1B2B] border border-white/20 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border$1-white/10 transition-colors [&>option]:bg-[#0B1B2B]">
+                                className="w-full bg-[#0B1B2B] border border-white/20 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-white/10 transition-colors [&>option]:bg-[#0B1B2B]">
                                 <option value="gpt-5.2">GPT-5.2 ⚡ Última generación — ⚠ Mayor costo</option>
                                 <option value="gpt-5.1">GPT-5.1 ⚡ Más inteligente — ⚠ Mayor costo</option>
                                 <option value="gpt-4.1">GPT-4.1 — Alta calidad</option>
