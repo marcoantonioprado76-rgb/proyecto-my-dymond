@@ -818,7 +818,7 @@ function WizardContent() {
                                                                 <button
                                                                     onClick={() => createCampaign(strategy)}
                                                                     disabled={creating}
-                                                                    className="w-full flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-[#B735B8] to-[#4C97D8] hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-[0_0_18px_rgba(183,53,184,0.18)]"
+                                                                    className="w-full flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-[#FF2D95] via-[#B735B8] to-[#233B8F] hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-[0_0_18px_rgba(183,53,184,0.18)]"
                                                                 >
                                                                     {creatingId === strategy.id
                                                                         ? <><Loader2 size={13} className="animate-spin" /> Creando anuncio…</>

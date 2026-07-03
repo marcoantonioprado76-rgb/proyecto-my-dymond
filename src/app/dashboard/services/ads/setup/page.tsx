@@ -221,7 +221,7 @@ export default function SetupPage() {
                         </div>
 
                         <button type="submit" disabled={saving || !apiKey.trim()}
-                            className="w-full bg-[#B735B8] hover:bg-[#B735B8] disabled:opacity-40 disabled:cursor-not-allowed text-white font-bold py-3 rounded-xl transition-all flex items-center justify-center gap-2 active:scale-[0.98]">
+                            className="w-full bg-gradient-to-r from-[#FF2D95] via-[#B735B8] to-[#233B8F] hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed text-white font-bold py-3 rounded-xl transition-all flex items-center justify-center gap-2 active:scale-[0.98]">
                             {saving ? <><Loader2 size={15} className="animate-spin" /> Validando...</> : 'Guardar y validar API Key'}
                         </button>
                     </form>

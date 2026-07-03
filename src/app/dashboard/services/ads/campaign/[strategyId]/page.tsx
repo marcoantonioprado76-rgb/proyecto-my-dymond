@@ -898,7 +898,7 @@ function CampaignPageInner() {
                         <button key={t.id}
                             onClick={() => { if (!t.locked) setTab(t.id) }}
                             disabled={t.locked}
-                            className={`flex-1 flex items-center justify-center gap-1.5 text-[11px] sm:text-xs font-bold px-3 py-2.5 rounded-xl transition-all ${active ? 'bg-gradient-to-br from-[#B735B8]/90 to-[#4C97D8]/80 text-white shadow-[0_0_18px_rgba(183,53,184,0.3)]' : t.locked ? 'text-white/20 cursor-not-allowed' : 'text-white/45 hover:text-white/70 hover:bg-white/5'}`}>
+                            className={`flex-1 flex items-center justify-center gap-1.5 text-[11px] sm:text-xs font-bold px-3 py-2.5 rounded-xl transition-all ${active ? 'bg-gradient-to-br from-[#FF2D95]/90 via-[#B735B8]/90 to-[#233B8F]/80 text-white shadow-[0_0_18px_rgba(183,53,184,0.3)]' : t.locked ? 'text-white/20 cursor-not-allowed' : 'text-white/45 hover:text-white/70 hover:bg-white/5'}`}>
                             {t.done ? <CheckCircle2 size={12} className={active ? 'text-white' : 'text-[#22C55E]'} /> : <t.icon size={12} />}
                             {t.label}
                             {t.locked && <span className="text-[9px] opacity-60">🔒</span>}

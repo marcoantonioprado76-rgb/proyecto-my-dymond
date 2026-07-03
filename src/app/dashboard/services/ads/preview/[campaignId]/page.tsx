@@ -111,7 +111,7 @@ export default function PreviewPage() {
                     <button
                         onClick={publish}
                         disabled={publishing || campaign.status === 'PUBLISHING'}
-                        className="flex items-center gap-2 bg-gradient-to-r from-[#B735B8] to-[#4C97D8] text-white font-bold px-5 py-2.5 rounded-xl hover:opacity-90 disabled:opacity-50 transition-all text-sm shadow-[0_0_30px_rgba(183,53,184,0.3)]"
+                        className="flex items-center gap-2 bg-gradient-to-r from-[#FF2D95] via-[#B735B8] to-[#233B8F] text-white font-bold px-5 py-2.5 rounded-xl hover:opacity-90 disabled:opacity-50 transition-all text-sm shadow-[0_0_30px_rgba(183,53,184,0.3)]"
                     >
                         {publishing ? <><Loader2 size={15} className="animate-spin" /> Publicando...</> : <><Rocket size={15} /> Publicar Campaña</>}
                     </button>
@@ -191,7 +191,7 @@ export default function PreviewPage() {
                         <div className="bg-[#18191a] rounded-2xl overflow-hidden border border-white/10">
                             {/* Post header */}
                             <div className="flex items-center gap-3 p-3 border-b border-white/5">
-                                <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#B735B8] to-[#4C97D8] flex items-center justify-center text-xs font-black">
+                                <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#FF2D95] via-[#B735B8] to-[#233B8F] flex items-center justify-center text-xs font-black">
                                     {campaign.brief?.name?.[0] || 'N'}
                                 </div>
                                 <div className="flex-1">
@@ -330,7 +330,7 @@ export default function PreviewPage() {
                             <button
                                 onClick={publish}
                                 disabled={publishing || campaign.status === 'PUBLISHING'}
-                                className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-[#B735B8] to-[#4C97D8] text-white font-bold py-4 rounded-2xl hover:opacity-90 disabled:opacity-50 transition-all mt-4 shadow-[0_0_30px_rgba(183,53,184,0.3)]"
+                                className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-[#FF2D95] via-[#B735B8] to-[#233B8F] text-white font-bold py-4 rounded-2xl hover:opacity-90 disabled:opacity-50 transition-all mt-4 shadow-[0_0_30px_rgba(183,53,184,0.3)]"
                             >
                                 {publishing
                                     ? <><Loader2 size={18} className="animate-spin" /> Publicando en Meta Ads...</>

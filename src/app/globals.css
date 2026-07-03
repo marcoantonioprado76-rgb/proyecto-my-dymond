@@ -132,6 +132,22 @@
     @apply btn-outline-water;
   }
 
+  /* Botón primario de IA — gradiente de marca (rosa → morado → azul), como el botón "+ Crear".
+     Antes era una clase inexistente → los botones salían transparentes/sin fondo. */
+  .btn-ai-glass {
+    background: linear-gradient(135deg, #FF2D95 0%, #B735B8 48%, #233B8F 100%);
+    background-size: 170% auto;
+    border: none;
+    box-shadow: 0 12px 30px -10px rgba(183, 53, 184, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+    transition: background-position 0.5s ease, box-shadow 0.3s ease, transform 0.15s ease;
+  }
+  .btn-ai-glass:hover {
+    background-position: right center;
+    box-shadow: 0 16px 38px -10px rgba(255, 45, 149, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.22);
+  }
+  .btn-ai-glass:active { transform: scale(0.98); }
+  .btn-ai-glass:disabled { opacity: 0.5; box-shadow: none; cursor: not-allowed; }
+
   .card {
     @apply water-glass p-8 border-white/5;
   }
