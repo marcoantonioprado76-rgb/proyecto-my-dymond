@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import {
   Settings, Save, Loader2, Check, AlertCircle, Info, Bot, Clock, Globe, Sparkles,
-  QrCode, Smartphone, Power, RefreshCw,
+  QrCode, Smartphone, Power, RefreshCw, Mic,
 } from 'lucide-react'
 
 // ── Paleta de marca ───────────────────────────────────────────────────────────
@@ -224,6 +224,7 @@ interface RetoConfig {
   timezone: string
   botInstructions: string
   welcomeMessage: string
+  voiceId: string
 }
 
 const DEFAULTS: RetoConfig = {
@@ -240,6 +241,7 @@ const DEFAULTS: RetoConfig = {
   timezone: 'America/La_Paz',
   botInstructions: '',
   welcomeMessage: '',
+  voiceId: '',
 }
 
 const labelStyle: React.CSSProperties = { fontSize: 12, color: '#6B7280', display: 'block', marginBottom: 6, fontWeight: 600 }
@@ -257,6 +259,12 @@ export default function RetoConfiguracionPage() {
   const [keyInput, setKeyInput] = useState('')
   const [hasKey, setHasKey] = useState(false)
   const [removeKey, setRemoveKey] = useState(false)
+  const [elevenInput, setElevenInput] = useState('')
+  const [hasEleven, setHasEleven] = useState(false)
+  const [removeEleven, setRemoveEleven] = useState(false)
+  const [voices, setVoices] = useState<{ id: string; name: string; desc?: string }[]>([])
+  const [voicesLoading, setVoicesLoading] = useState(false)
+  const [voicesMsg, setVoicesMsg] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
@@ -287,9 +295,11 @@ export default function RetoConfiguracionPage() {
           timezone: c.timezone ?? DEFAULTS.timezone,
           botInstructions: c.botInstructions ?? '',
           welcomeMessage: c.welcomeMessage ?? '',
+          voiceId: c.voiceId ?? '',
         })
         setBots(Array.isArray(d.bots) ? (d.bots as BotOption[]) : [])
         setHasKey(!!d.hasOpenaiKey)
+        setHasEleven(!!d.hasElevenKey)
       } catch {
         if (alive) setError('No se pudo cargar la configuración.')
       } finally {
@@ -303,6 +313,24 @@ export default function RetoConfiguracionPage() {
   function set<K extends keyof RetoConfig>(key: K, value: RetoConfig[K]) {
     setForm(prev => ({ ...prev, [key]: value }))
     setSaved(false)
+  }
+
+  async function loadVoices() {
+    setVoicesLoading(true)
+    setVoicesMsg(null)
+    try {
+      const r = await fetch('/api/admin/reto-90d/voices')
+      const d = await r.json().catch(() => ({}))
+      const list = Array.isArray(d.voices) ? d.voices : []
+      setVoices(list)
+      if (!list.length) setVoicesMsg('No se encontraron voces.')
+      else if (d.source === 'catalog') setVoicesMsg('Mostrando voces del catálogo (agrega tu API key de ElevenLabs para ver las tuyas).')
+      else setVoicesMsg(`${list.length} voces de tu cuenta ElevenLabs.`)
+    } catch {
+      setVoicesMsg('No se pudieron cargar las voces.')
+    } finally {
+      setVoicesLoading(false)
+    }
   }
 
   async function loadGroups() {
@@ -347,8 +375,10 @@ export default function RetoConfiguracionPage() {
         timezone: form.timezone.trim() || DEFAULTS.timezone,
         botInstructions: form.botInstructions.trim() || null,
         welcomeMessage: form.welcomeMessage.trim() || null,
-        // Key: si escribió una, la manda; si pidió quitarla, null; si no, no la toca.
+        voiceId: form.voiceId || null,
+        // Keys: si escribió una, la manda; si pidió quitarla, null; si no, no la toca.
         ...(removeKey ? { openaiApiKey: null } : keyInput.trim() ? { openaiApiKey: keyInput.trim() } : {}),
+        ...(removeEleven ? { elevenLabsApiKey: null } : elevenInput.trim() ? { elevenLabsApiKey: elevenInput.trim() } : {}),
       }
       const r = await fetch('/api/admin/reto-90d/settings', {
         method: 'PATCH',
@@ -362,6 +392,9 @@ export default function RetoConfiguracionPage() {
       if (removeKey) { setHasKey(false); setRemoveKey(false) }
       else if (keyInput.trim()) { setHasKey(true) }
       setKeyInput('')
+      if (removeEleven) { setHasEleven(false); setRemoveEleven(false) }
+      else if (elevenInput.trim()) { setHasEleven(true) }
+      setElevenInput('')
       setSaved(true)
       setTimeout(() => setSaved(false), 2500)
     } catch (e) {
@@ -493,6 +526,73 @@ export default function RetoConfiguracionPage() {
                   Se quitará la key al guardar. <button type="button" onClick={() => setRemoveKey(false)} style={{ background: 'none', border: 'none', color: '#233B8F', fontWeight: 700, cursor: 'pointer', textDecoration: 'underline', padding: 0 }}>Cancelar</button>
                 </p>
               )}
+            </div>
+
+            {/* Card: Voz del bot (ElevenLabs) ────────────────────── */}
+            <div style={{ background: '#fff', border: '1px solid #E4E9F0', borderRadius: 16, padding: 20 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                <Mic size={15} className="text-[#B735B8]" />
+                <p style={{ fontSize: 13, fontWeight: 800, color: '#111827', margin: 0, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                  Voz del bot (ElevenLabs)
+                </p>
+                {hasEleven && !removeEleven && (
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: 11, fontWeight: 800, color: '#16A34A', background: 'rgba(22,163,74,0.1)', padding: '2px 8px', borderRadius: 999 }}>
+                    <Check size={11} /> Conectada
+                  </span>
+                )}
+              </div>
+              <p style={{ fontSize: 12, color: '#6B7280', lineHeight: 1.6, margin: '0 0 12px' }}>
+                Cuando un participante manda un <strong>audio</strong>, el bot responde con <strong>nota de voz</strong>.
+                Conecta tu API key de ElevenLabs y elige la voz. Se guarda cifrada.
+              </p>
+
+              {/* API key ElevenLabs */}
+              <label style={labelStyle}>API Key de ElevenLabs</label>
+              <input
+                type="password"
+                value={elevenInput}
+                onChange={e => { setElevenInput(e.target.value); setRemoveEleven(false); setSaved(false) }}
+                placeholder={hasEleven ? '•••••••••• (ya configurada — escribe para reemplazar)' : 'Tu API key de ElevenLabs'}
+                autoComplete="off"
+                style={inputStyle}
+              />
+              {hasEleven && !removeEleven && (
+                <button type="button" onClick={() => { setRemoveEleven(true); setElevenInput(''); setSaved(false) }}
+                  style={{ marginTop: 8, background: 'none', border: 'none', color: '#DC2626', fontSize: 12, fontWeight: 700, cursor: 'pointer', padding: 0 }}>
+                  Quitar la key guardada
+                </button>
+              )}
+              {removeEleven && (
+                <p style={{ fontSize: 12, color: '#DC2626', margin: '8px 0 0' }}>
+                  Se quitará al guardar. <button type="button" onClick={() => setRemoveEleven(false)} style={{ background: 'none', border: 'none', color: '#233B8F', fontWeight: 700, cursor: 'pointer', textDecoration: 'underline', padding: 0 }}>Cancelar</button>
+                </p>
+              )}
+
+              {/* Selector de voz */}
+              <div style={{ marginTop: 16 }}>
+                <label style={labelStyle}>Voz</label>
+                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
+                  <button type="button" onClick={loadVoices} disabled={voicesLoading}
+                    style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '9px 14px', borderRadius: 10, fontSize: 12.5, fontWeight: 700, color: '#fff', border: 'none', background: BRAND_GRADIENT, cursor: voicesLoading ? 'wait' : 'pointer', flexShrink: 0 }}>
+                    {voicesLoading ? <Loader2 size={13} className="animate-spin" /> : <RefreshCw size={13} />} Cargar voces
+                  </button>
+                  <select
+                    value={form.voiceId}
+                    onChange={e => set('voiceId', e.target.value)}
+                    style={{ ...inputStyle, flex: 1, minWidth: 180, cursor: 'pointer' }}
+                  >
+                    <option value="">— Voz por defecto —</option>
+                    {voices.map(v => (
+                      <option key={v.id} value={v.id}>{v.name}{v.desc ? ` · ${v.desc}` : ''}</option>
+                    ))}
+                    {/* Mantener la voz guardada aunque no esté en la lista cargada */}
+                    {form.voiceId && !voices.some(v => v.id === form.voiceId) && (
+                      <option value={form.voiceId}>Voz guardada ({form.voiceId.slice(0, 8)}…)</option>
+                    )}
+                  </select>
+                </div>
+                {voicesMsg && <p style={{ fontSize: 11, color: '#9CA3AF', margin: '8px 0 0' }}>{voicesMsg}</p>}
+              </div>
             </div>
 
             {/* Card: Bot y contactos ─────────────────────────────── */}

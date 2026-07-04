@@ -1822,6 +1822,8 @@ model WhatsAppConfig {
   botInstructions       String?  @db.Text @map("bot_instructions")   // system prompt: tono, trato y contexto del plan
   welcomeMessage        String?  @db.Text @map("welcome_message")    // bienvenida al registrarse ({nombre}, {reto})
   openaiApiKeyEnc       String?  @db.Text @map("openai_api_key_enc") // API key de OpenAI del reto (cifrada)
+  elevenLabsApiKeyEnc   String?  @db.Text @map("elevenlabs_api_key_enc") // API key de ElevenLabs (cifrada)
+  voiceId               String?  @map("voice_id")                    // voz elegida para las notas de voz
   createdAt             DateTime @default(now()) @map("created_at")
   updatedAt             DateTime @updatedAt @map("updated_at")
 

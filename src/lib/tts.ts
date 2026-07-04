@@ -145,6 +145,50 @@ export async function synthesizeVoiceNote(text: string, voiceId?: string | null)
 }
 
 /**
+ * TTS "crudo": voz por ID directo (no del catálogo) y con una API key dada.
+ * Usado por el módulo Reto 90D para respetar la key y la voz elegidas en el panel.
+ * @returns Buffer OGG/Opus o null (nunca lanza).
+ */
+export async function synthesizeElevenRaw(
+  text: string,
+  voiceId: string,
+  apiKey: string,
+): Promise<Buffer | null> {
+  if (!apiKey || !voiceId) return null
+  const clean = cleanForSpeech(text)
+  if (!clean) return null
+
+  const controller = new AbortController()
+  const timeout = setTimeout(() => controller.abort(), 30_000)
+  try {
+    const res = await fetch(
+      `${ELEVEN_BASE}/text-to-speech/${voiceId}?output_format=opus_48000_64`,
+      {
+        method: 'POST',
+        headers: { 'xi-api-key': apiKey, 'Content-Type': 'application/json' },
+        signal: controller.signal,
+        body: JSON.stringify({ text: clean, model_id: ELEVEN_MODEL }),
+      },
+    )
+    if (!res.ok) {
+      console.error(`[TTS/reto] ElevenLabs ${res.status}: ${(await res.text()).slice(0, 200)}`)
+      return null
+    }
+    const buf = Buffer.from(await res.arrayBuffer())
+    if (buf.length < 64 || buf.toString('ascii', 0, 4) !== 'OggS') {
+      console.error('[TTS/reto] respuesta no es OGG/Opus, se omite la voz')
+      return null
+    }
+    return buf
+  } catch (err) {
+    console.error('[TTS/reto] error generando voz:', err instanceof Error ? err.message : err)
+    return null
+  } finally {
+    clearTimeout(timeout)
+  }
+}
+
+/**
  * Muestra MP3 para REPRODUCIR EN EL NAVEGADOR (preview de voces).
  * Safari no reproduce OGG/Opus, así que el preview usa MP3 (universal). Las notas
  * de voz reales a WhatsApp siguen en OGG/Opus vía synthesizeVoiceNote().

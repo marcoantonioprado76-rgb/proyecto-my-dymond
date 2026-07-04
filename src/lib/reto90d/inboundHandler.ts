@@ -126,13 +126,19 @@ function makeReplySender(
   jid: string,
   phone: string,
   asVoice: boolean,
-  voiceId?: string | null,
 ): (text: string) => Promise<void> {
   return async (text: string) => {
     if (asVoice && text) {
       try {
-        const { synthesizeVoiceNote } = await import('@/lib/tts')
-        const ogg = await synthesizeVoiceNote(text, voiceId)
+        const { getRetoVoice } = await import('@/lib/whatsapp/reto90dSender')
+        const { apiKey, voiceId } = await getRetoVoice()
+        const tts = await import('@/lib/tts')
+        let ogg: Buffer | null = null
+        if (apiKey && voiceId) {
+          ogg = await tts.synthesizeElevenRaw(text, voiceId, apiKey) // voz + key del panel
+        } else {
+          ogg = await tts.synthesizeVoiceNote(text, voiceId) // fallback voz por defecto (key de entorno)
+        }
         if (ogg) {
           try { await conn.sock?.sendPresenceUpdate('recording', jid) } catch (e) { /* no-op */ }
           await conn.sock?.sendMessage(jid, { audio: ogg, mimetype: 'audio/ogg; codecs=opus', ptt: true })

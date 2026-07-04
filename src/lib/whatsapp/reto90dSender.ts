@@ -15,6 +15,8 @@ type ConfigCache = {
   botInstructions: string | null
   welcomeMessage: string | null
   openaiApiKeyEnc: string | null
+  elevenLabsApiKeyEnc: string | null
+  voiceId: string | null
   at: number
 }
 let cache: ConfigCache | null = null
@@ -27,7 +29,7 @@ async function getConfig(): Promise<ConfigCache> {
   try {
     const cfg = await prisma.whatsAppConfig.findFirst({
       where: { isActive: true },
-      select: { botId: true, groupId: true, adminPhone: true, botInstructions: true, welcomeMessage: true, openaiApiKeyEnc: true },
+      select: { botId: true, groupId: true, adminPhone: true, botInstructions: true, welcomeMessage: true, openaiApiKeyEnc: true, elevenLabsApiKeyEnc: true, voiceId: true },
       orderBy: { updatedAt: 'desc' },
     })
     cache = {
@@ -37,14 +39,27 @@ async function getConfig(): Promise<ConfigCache> {
       botInstructions: cfg?.botInstructions ?? null,
       welcomeMessage: cfg?.welcomeMessage ?? null,
       openaiApiKeyEnc: cfg?.openaiApiKeyEnc ?? null,
+      elevenLabsApiKeyEnc: cfg?.elevenLabsApiKeyEnc ?? null,
+      voiceId: cfg?.voiceId ?? null,
       at: now,
     }
   } catch (err) {
     console.error('[reto90d/sender] getConfig failed:', err)
     // No dejamos que un fallo de BD tumbe el flujo del bot: devolvemos cache viejo o vacío.
-    cache = cache ?? { botId: null, groupId: null, adminPhone: null, botInstructions: null, welcomeMessage: null, openaiApiKeyEnc: null, at: now }
+    cache = cache ?? { botId: null, groupId: null, adminPhone: null, botInstructions: null, welcomeMessage: null, openaiApiKeyEnc: null, elevenLabsApiKeyEnc: null, voiceId: null, at: now }
   }
   return cache
+}
+
+/** Voz del reto: key de ElevenLabs (panel o entorno) + voiceId elegido. */
+export async function getRetoVoice(): Promise<{ apiKey: string | null; voiceId: string | null }> {
+  const cfg = await getConfig()
+  let apiKey: string | null = null
+  if (cfg.elevenLabsApiKeyEnc) {
+    try { apiKey = decrypt(cfg.elevenLabsApiKeyEnc) || null } catch { apiKey = null }
+  }
+  if (!apiKey) apiKey = process.env.ELEVENLABS_API_KEY || null
+  return { apiKey, voiceId: cfg.voiceId }
 }
 
 /** Instrucciones/system-prompt del bot (tono, trato y contexto del plan) o null. */

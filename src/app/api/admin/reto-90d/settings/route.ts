@@ -19,10 +19,11 @@ export async function GET(_req: NextRequest) {
     }),
   ])
 
-  // Nunca devolvemos la key (ni cifrada): solo si existe una configurada.
+  // Nunca devolvemos las keys (ni cifradas): solo si existen configuradas.
   const hasOpenaiKey = !!config?.openaiApiKeyEnc
-  const safeConfig = config ? { ...config, openaiApiKeyEnc: undefined } : null
-  return NextResponse.json({ config: safeConfig, bots, hasOpenaiKey })
+  const hasElevenKey = !!config?.elevenLabsApiKeyEnc
+  const safeConfig = config ? { ...config, openaiApiKeyEnc: undefined, elevenLabsApiKeyEnc: undefined } : null
+  return NextResponse.json({ config: safeConfig, bots, hasOpenaiKey, hasElevenKey })
 }
 
 const patchSchema = z.object({
@@ -40,8 +41,10 @@ const patchSchema = z.object({
   timezone: z.string().optional(),
   botInstructions: z.string().nullable().optional(),
   welcomeMessage: z.string().nullable().optional(),
-  // Key de OpenAI en claro desde el form: '' o null = borrar; undefined = no tocar.
+  voiceId: z.string().nullable().optional(),
+  // Keys en claro desde el form: '' o null = borrar; undefined = no tocar.
   openaiApiKey: z.string().nullable().optional(),
+  elevenLabsApiKey: z.string().nullable().optional(),
 })
 
 // PATCH /api/admin/reto-90d/settings
@@ -60,13 +63,17 @@ export async function PATCH(req: NextRequest) {
     )
   }
 
-  const { openaiApiKey, ...rest } = parsed.data
+  const { openaiApiKey, elevenLabsApiKey, ...rest } = parsed.data
   const data: Record<string, unknown> = { ...rest }
 
-  // Manejo de la key: undefined = no tocar; '' o null = borrar; texto = cifrar y guardar.
+  // Manejo de las keys: undefined = no tocar; '' o null = borrar; texto = cifrar y guardar.
   if (openaiApiKey !== undefined) {
     const trimmed = (openaiApiKey ?? '').trim()
     data.openaiApiKeyEnc = trimmed ? encrypt(trimmed) : null
+  }
+  if (elevenLabsApiKey !== undefined) {
+    const trimmed = (elevenLabsApiKey ?? '').trim()
+    data.elevenLabsApiKeyEnc = trimmed ? encrypt(trimmed) : null
   }
 
   const existing = await prisma.whatsAppConfig.findFirst()
@@ -77,5 +84,10 @@ export async function PATCH(req: NextRequest) {
   invalidateRetoConfigCache()
 
   const hasOpenaiKey = !!saved.openaiApiKeyEnc
-  return NextResponse.json({ config: { ...saved, openaiApiKeyEnc: undefined }, hasOpenaiKey })
+  const hasElevenKey = !!saved.elevenLabsApiKeyEnc
+  return NextResponse.json({
+    config: { ...saved, openaiApiKeyEnc: undefined, elevenLabsApiKeyEnc: undefined },
+    hasOpenaiKey,
+    hasElevenKey,
+  })
 }
