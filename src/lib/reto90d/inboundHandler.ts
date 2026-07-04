@@ -83,10 +83,13 @@ async function computeStatus(
   phone: string,
 ): Promise<{ tasksStatus: TaskStatusLite[]; points: number }> {
   try {
-    const tasks = await getActiveTasksForToday(challenge.id)
-    const pending = await getPendingTasksForUser(phone, challenge.id, new Date())
+    // Consultas en paralelo (rapidez).
+    const [tasks, pending, subs] = await Promise.all([
+      getActiveTasksForToday(challenge.id),
+      getPendingTasksForUser(phone, challenge.id, new Date()),
+      getDaySubmissions(phone, challenge.id, new Date()),
+    ])
     const pendingIds = new Set(pending.map((t) => t.id))
-    const subs = await getDaySubmissions(phone, challenge.id, new Date())
     const points = subs
       .filter((s) => s.status === 'APPROVED')
       .reduce((a, s) => a + (s.pointsEarned || 0), 0)
@@ -134,7 +137,14 @@ async function classifyAndReply(
   // Ya clasificada antes (reintento de Baileys) → no reprocesar ni re-responder
   if (submission.status !== 'PENDING') return
 
-  const tasks = await getActiveTasksForToday(challenge.id)
+  // Contexto en paralelo (rapidez).
+  const [tasks, dailyHistory, instructions, openaiKey] = await Promise.all([
+    getActiveTasksForToday(challenge.id),
+    buildDailyHistory(phone, challenge.id),
+    getRetoInstructions(),
+    getEffectiveOpenAIKey(),
+  ])
+
   if (tasks.length === 0) {
     const noTasks: AiResult = {
       detectedTaskId: null,
@@ -148,13 +158,10 @@ async function classifyAndReply(
     }
     await applyClassification(submission.id, noTasks)
     await sendToPhone(phone, NO_TASKS_MSG)
-    await saveRetoMessage(challenge.id, phone, 'bot', NO_TASKS_MSG)
+    void saveRetoMessage(challenge.id, phone, 'bot', NO_TASKS_MSG)
     return
   }
 
-  const dailyHistory = await buildDailyHistory(phone, challenge.id)
-  const instructions = (await getRetoInstructions()) ?? undefined
-  const openaiKey = (await getEffectiveOpenAIKey()) ?? undefined
   const ai = await classifyEvidenceWithAI({
     imageUrl: opts.dataUrl,
     text: opts.text || undefined,
@@ -170,14 +177,14 @@ async function classifyAndReply(
     phone,
     dailyHistory,
     now: new Date(),
-    instructions,
-    openaiKey,
+    instructions: instructions ?? undefined,
+    openaiKey: openaiKey ?? undefined,
   })
 
   await applyClassification(submission.id, ai)
   if (ai.userMessage) {
     await sendToPhone(phone, ai.userMessage)
-    await saveRetoMessage(challenge.id, phone, 'bot', ai.userMessage)
+    void saveRetoMessage(challenge.id, phone, 'bot', ai.userMessage)
   }
 }
 
@@ -205,6 +212,9 @@ export async function handleReto90dInbound(conn: RetoConn, msg: proto.IWebMessag
   // 2) SOLO responde a inscritos: si no es miembro ACTIVE, silencio total.
   const member = await getMemberByPhone(phone, challenge.id)
   if (!member) return
+
+  // Mostrar "escribiendo…" de inmediato (como los bots de venta) → se siente veloz.
+  try { await conn.sock?.sendPresenceUpdate('composing', jid) } catch (e) { /* no-op */ }
 
   // ── IMAGEN → clasificar evidencia ──────────────────────────────────────────
   if (hasImage) {
@@ -256,21 +266,24 @@ export async function handleReto90dInbound(conn: RetoConn, msg: proto.IWebMessag
   }
 
   // ── TEXTO → asistente conversacional (recuerda el hilo + responde pendientes) ─
-  const history = await getRecentMessages(challenge.id, phone) // contexto previo
-  await saveRetoMessage(challenge.id, phone, 'user', text)
+  // Todo el contexto en paralelo (rapidez). El guardado del mensaje no bloquea.
+  void saveRetoMessage(challenge.id, phone, 'user', text)
+  const [history, status, instructions, openaiKey] = await Promise.all([
+    getRecentMessages(challenge.id, phone),
+    computeStatus(challenge, phone),
+    getRetoInstructions(),
+    getEffectiveOpenAIKey(),
+  ])
 
-  const { tasksStatus, points } = await computeStatus(challenge, phone)
-  const instructions = (await getRetoInstructions()) ?? undefined
-  const openaiKey = (await getEffectiveOpenAIKey()) ?? undefined
   const result = await assistParticipant({
-    instructions,
+    instructions: instructions ?? undefined,
     participantName: firstName(member.fullName),
     challengeName: challenge.name,
-    tasksStatus,
-    points,
+    tasksStatus: status.tasksStatus,
+    points: status.points,
     history,
     userText: text,
-    openaiKey,
+    openaiKey: openaiKey ?? undefined,
   })
 
   if (result.intent === 'evidence') {
@@ -280,5 +293,5 @@ export async function handleReto90dInbound(conn: RetoConn, msg: proto.IWebMessag
   }
 
   await sendToPhone(phone, result.reply)
-  await saveRetoMessage(challenge.id, phone, 'bot', result.reply)
+  void saveRetoMessage(challenge.id, phone, 'bot', result.reply)
 }
