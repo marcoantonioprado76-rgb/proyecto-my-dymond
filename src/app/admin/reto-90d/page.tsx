@@ -384,8 +384,6 @@ export default function AdminReto90dDashboard() {
 
       <SubNav />
 
-      {!loading && !error && <ChallengeManager hasActive={!!challenge} onChanged={load} />}
-
       {loading ? (
         <div className="flex justify-center py-20"><Loader2 size={22} className="animate-spin" style={{ color: MUTED }} /></div>
       ) : error ? (

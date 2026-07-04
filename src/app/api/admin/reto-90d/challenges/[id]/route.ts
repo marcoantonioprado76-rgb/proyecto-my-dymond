@@ -6,6 +6,7 @@ import {
   getChallenge,
   updateChallenge,
   setChallengeActive,
+  deleteChallenge,
 } from '@/lib/reto90d/challengeService'
 
 const patchSchema = z.object({
@@ -59,4 +60,12 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
   })
 
   return NextResponse.json({ challenge })
+}
+
+export async function DELETE(_req: NextRequest, { params }: { params: { id: string } }) {
+  const admin = await getAdminUser()
+  if (!admin) return unauthorizedAdmin()
+
+  await deleteChallenge(params.id)
+  return NextResponse.json({ ok: true })
 }

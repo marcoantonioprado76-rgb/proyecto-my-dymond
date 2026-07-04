@@ -117,6 +117,17 @@ export async function listChallenges() {
 }
 
 /** Activa o desactiva un reto. */
+/** Elimina un reto y TODO lo suyo (tareas, miembros, evidencias, reportes) vía cascada. */
+export async function deleteChallenge(id: string) {
+  try {
+    await prisma.challenge.delete({ where: { id } })
+    return true
+  } catch (err) {
+    console.error(`[reto90d/challengeService] deleteChallenge failed (id=${id}):`, err)
+    throw new Error('No se pudo eliminar el reto')
+  }
+}
+
 export async function setChallengeActive(id: string, isActive: boolean) {
   try {
     return await prisma.challenge.update({
