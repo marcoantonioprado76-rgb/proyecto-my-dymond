@@ -252,6 +252,9 @@ export default function RetoConfiguracionPage() {
   const [groups, setGroups] = useState<{ id: string; subject: string; size?: number }[]>([])
   const [groupsLoading, setGroupsLoading] = useState(false)
   const [groupsMsg, setGroupsMsg] = useState<string | null>(null)
+  const [keyInput, setKeyInput] = useState('')
+  const [hasKey, setHasKey] = useState(false)
+  const [removeKey, setRemoveKey] = useState(false)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
@@ -283,6 +286,7 @@ export default function RetoConfiguracionPage() {
           botInstructions: c.botInstructions ?? '',
         })
         setBots(Array.isArray(d.bots) ? (d.bots as BotOption[]) : [])
+        setHasKey(!!d.hasOpenaiKey)
       } catch {
         if (alive) setError('No se pudo cargar la configuración.')
       } finally {
@@ -339,6 +343,8 @@ export default function RetoConfiguracionPage() {
         finalReportTime: form.finalReportTime,
         timezone: form.timezone.trim() || DEFAULTS.timezone,
         botInstructions: form.botInstructions.trim() || null,
+        // Key: si escribió una, la manda; si pidió quitarla, null; si no, no la toca.
+        ...(removeKey ? { openaiApiKey: null } : keyInput.trim() ? { openaiApiKey: keyInput.trim() } : {}),
       }
       const r = await fetch('/api/admin/reto-90d/settings', {
         method: 'PATCH',
@@ -349,6 +355,9 @@ export default function RetoConfiguracionPage() {
         const j = await r.json().catch(() => ({}))
         throw new Error(j.error ?? `HTTP ${r.status}`)
       }
+      if (removeKey) { setHasKey(false); setRemoveKey(false) }
+      else if (keyInput.trim()) { setHasKey(true) }
+      setKeyInput('')
       setSaved(true)
       setTimeout(() => setSaved(false), 2500)
     } catch (e) {
@@ -418,6 +427,47 @@ export default function RetoConfiguracionPage() {
                 placeholder={"Ej: Eres el coach del Reto 90 Días de My Diamond. Trata a cada participante por su nombre, con energía y cercanía (tutéalos). Recuérdales el porqué del reto y felicítalos cuando cumplen. Sé claro y breve. Si una evidencia no corresponde, explícales con amabilidad qué falta."}
                 style={{ ...inputStyle, resize: 'vertical', minHeight: 120, lineHeight: 1.6, fontFamily: 'inherit' }}
               />
+            </div>
+
+            {/* Card: API Key de OpenAI (motor de la IA) ──────────── */}
+            <div style={{ background: '#fff', border: '1px solid #E4E9F0', borderRadius: 16, padding: 20 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                <Sparkles size={15} className="text-[#B735B8]" />
+                <p style={{ fontSize: 13, fontWeight: 800, color: '#111827', margin: 0, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                  API Key de OpenAI
+                </p>
+                {hasKey && !removeKey && (
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: 11, fontWeight: 800, color: '#16A34A', background: 'rgba(22,163,74,0.1)', padding: '2px 8px', borderRadius: 999 }}>
+                    <Check size={11} /> Configurada
+                  </span>
+                )}
+              </div>
+              <p style={{ fontSize: 12, color: '#6B7280', lineHeight: 1.6, margin: '0 0 12px' }}>
+                Con esta key el bot clasifica las fotos y conversa. Se guarda cifrada. Si la dejas vacía, el bot
+                usa la del entorno (si existe) o responde en modo básico.
+              </p>
+              <input
+                type="password"
+                value={keyInput}
+                onChange={e => { setKeyInput(e.target.value); setRemoveKey(false); setSaved(false) }}
+                placeholder={hasKey ? '•••••••••• (ya configurada — escribe para reemplazar)' : 'sk-...'}
+                autoComplete="off"
+                style={inputStyle}
+              />
+              {hasKey && !removeKey && (
+                <button
+                  type="button"
+                  onClick={() => { setRemoveKey(true); setKeyInput(''); setSaved(false) }}
+                  style={{ marginTop: 8, background: 'none', border: 'none', color: '#DC2626', fontSize: 12, fontWeight: 700, cursor: 'pointer', padding: 0 }}
+                >
+                  Quitar la key guardada
+                </button>
+              )}
+              {removeKey && (
+                <p style={{ fontSize: 12, color: '#DC2626', margin: '8px 0 0' }}>
+                  Se quitará la key al guardar. <button type="button" onClick={() => setRemoveKey(false)} style={{ background: 'none', border: 'none', color: '#233B8F', fontWeight: 700, cursor: 'pointer', textDecoration: 'underline', padding: 0 }}>Cancelar</button>
+                </p>
+              )}
             </div>
 
             {/* Card: Bot y contactos ─────────────────────────────── */}

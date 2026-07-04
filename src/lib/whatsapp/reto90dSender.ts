@@ -5,12 +5,14 @@
 // ─────────────────────────────────────────────────────────────────────────────
 import { prisma } from '@/lib/prisma'
 import { BaileysManager } from '@/lib/baileys-manager'
+import { decrypt } from '@/lib/crypto'
 
 type ConfigCache = {
   botId: string | null
   groupId: string | null
   adminPhone: string | null
   botInstructions: string | null
+  openaiApiKeyEnc: string | null
   at: number
 }
 let cache: ConfigCache | null = null
@@ -23,7 +25,7 @@ async function getConfig(): Promise<ConfigCache> {
   try {
     const cfg = await prisma.whatsAppConfig.findFirst({
       where: { isActive: true },
-      select: { botId: true, groupId: true, adminPhone: true, botInstructions: true },
+      select: { botId: true, groupId: true, adminPhone: true, botInstructions: true, openaiApiKeyEnc: true },
       orderBy: { updatedAt: 'desc' },
     })
     cache = {
@@ -31,12 +33,13 @@ async function getConfig(): Promise<ConfigCache> {
       groupId: cfg?.groupId ?? null,
       adminPhone: cfg?.adminPhone ?? null,
       botInstructions: cfg?.botInstructions ?? null,
+      openaiApiKeyEnc: cfg?.openaiApiKeyEnc ?? null,
       at: now,
     }
   } catch (err) {
     console.error('[reto90d/sender] getConfig failed:', err)
     // No dejamos que un fallo de BD tumbe el flujo del bot: devolvemos cache viejo o vacío.
-    cache = cache ?? { botId: null, groupId: null, adminPhone: null, botInstructions: null, at: now }
+    cache = cache ?? { botId: null, groupId: null, adminPhone: null, botInstructions: null, openaiApiKeyEnc: null, at: now }
   }
   return cache
 }
@@ -44,6 +47,20 @@ async function getConfig(): Promise<ConfigCache> {
 /** Instrucciones/system-prompt del bot (tono, trato y contexto del plan) o null. */
 export async function getRetoInstructions(): Promise<string | null> {
   return (await getConfig()).botInstructions
+}
+
+/** Key de OpenAI efectiva: la configurada en el panel (cifrada) o, si no, la de entorno. */
+export async function getEffectiveOpenAIKey(): Promise<string | null> {
+  const enc = (await getConfig()).openaiApiKeyEnc
+  if (enc) {
+    try {
+      const key = decrypt(enc)
+      if (key) return key
+    } catch (err) {
+      console.error('[reto90d/sender] decrypt openai key failed:', err)
+    }
+  }
+  return process.env.OPENAI_API_KEY || null
 }
 
 /** Invalida el cache (útil tras guardar la configuración en el panel). */

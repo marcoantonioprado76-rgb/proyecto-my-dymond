@@ -24,7 +24,7 @@ import {
 import { saveRetoMessage, getRecentMessages } from './conversationService'
 import { classifyEvidenceWithAI } from '@/lib/ai/classifyTaskEvidence'
 import { assistParticipant, type TaskStatusLite } from '@/lib/ai/retoAssistant'
-import { sendToPhone, getRetoInstructions } from '@/lib/whatsapp/reto90dSender'
+import { sendToPhone, getRetoInstructions, getEffectiveOpenAIKey } from '@/lib/whatsapp/reto90dSender'
 
 // Conexión Baileys mínima que necesitamos (estructuralmente compatible con BaileysConnection)
 type RetoConn = { botId: string; sock?: any }
@@ -154,6 +154,7 @@ async function classifyAndReply(
 
   const dailyHistory = await buildDailyHistory(phone, challenge.id)
   const instructions = (await getRetoInstructions()) ?? undefined
+  const openaiKey = (await getEffectiveOpenAIKey()) ?? undefined
   const ai = await classifyEvidenceWithAI({
     imageUrl: opts.dataUrl,
     text: opts.text || undefined,
@@ -170,6 +171,7 @@ async function classifyAndReply(
     dailyHistory,
     now: new Date(),
     instructions,
+    openaiKey,
   })
 
   await applyClassification(submission.id, ai)
@@ -259,6 +261,7 @@ export async function handleReto90dInbound(conn: RetoConn, msg: proto.IWebMessag
 
   const { tasksStatus, points } = await computeStatus(challenge, phone)
   const instructions = (await getRetoInstructions()) ?? undefined
+  const openaiKey = (await getEffectiveOpenAIKey()) ?? undefined
   const result = await assistParticipant({
     instructions,
     participantName: firstName(member.fullName),
@@ -267,6 +270,7 @@ export async function handleReto90dInbound(conn: RetoConn, msg: proto.IWebMessag
     points,
     history,
     userText: text,
+    openaiKey,
   })
 
   if (result.intent === 'evidence') {

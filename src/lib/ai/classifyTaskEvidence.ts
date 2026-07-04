@@ -34,6 +34,8 @@ export type ClassifyInput = {
   now: Date
   /** System prompt del admin: tono, trato y contexto del plan. */
   instructions?: string
+  /** Key de OpenAI resuelta (panel o entorno). Si no se pasa, usa process.env. */
+  openaiKey?: string
 }
 
 // Máximo de imágenes de referencia a enviar en total (control de costo/latencia).
@@ -77,10 +79,10 @@ type OpenAIMessageContent =
 
 export type LabeledImage = { url: string; label: string }
 
-async function callOpenAI(prompt: string, images: LabeledImage[] = []): Promise<string> {
-  const apiKey = process.env.OPENAI_API_KEY
+async function callOpenAI(prompt: string, images: LabeledImage[] = [], apiKeyOverride?: string): Promise<string> {
+  const apiKey = apiKeyOverride || process.env.OPENAI_API_KEY
   if (!apiKey) {
-    throw new Error('Falta la variable de entorno OPENAI_API_KEY para el clasificador de evidencias.')
+    throw new Error('Falta la API Key de OpenAI (configúrala en el panel del reto o en el entorno).')
   }
 
   let content: OpenAIMessageContent
@@ -174,7 +176,7 @@ export async function classifyEvidenceWithAI(input: ClassifyInput): Promise<Clas
   })
 
   try {
-    const raw = await callOpenAI(prompt, images)
+    const raw = await callOpenAI(prompt, images, input.openaiKey)
 
     let parsed: Record<string, unknown>
     try {

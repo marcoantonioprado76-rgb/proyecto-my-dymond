@@ -3,6 +3,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { getAdminUser, unauthorizedAdmin } from '@/lib/admin-auth'
 import { prisma } from '@/lib/prisma'
+import { encrypt } from '@/lib/crypto'
+import { invalidateRetoConfigCache } from '@/lib/whatsapp/reto90dSender'
 
 // GET /api/admin/reto-90d/settings
 // Configuración de WhatsApp del reto + bots disponibles para asignar.
@@ -17,7 +19,10 @@ export async function GET(_req: NextRequest) {
     }),
   ])
 
-  return NextResponse.json({ config, bots })
+  // Nunca devolvemos la key (ni cifrada): solo si existe una configurada.
+  const hasOpenaiKey = !!config?.openaiApiKeyEnc
+  const safeConfig = config ? { ...config, openaiApiKeyEnc: undefined } : null
+  return NextResponse.json({ config: safeConfig, bots, hasOpenaiKey })
 }
 
 const patchSchema = z.object({
@@ -34,6 +39,8 @@ const patchSchema = z.object({
   finalReportTime: z.string().optional(),
   timezone: z.string().optional(),
   botInstructions: z.string().nullable().optional(),
+  // Key de OpenAI en claro desde el form: '' o null = borrar; undefined = no tocar.
+  openaiApiKey: z.string().nullable().optional(),
 })
 
 // PATCH /api/admin/reto-90d/settings
@@ -52,12 +59,22 @@ export async function PATCH(req: NextRequest) {
     )
   }
 
-  const data = parsed.data
-  const existing = await prisma.whatsAppConfig.findFirst()
+  const { openaiApiKey, ...rest } = parsed.data
+  const data: Record<string, unknown> = { ...rest }
 
-  const config = existing
+  // Manejo de la key: undefined = no tocar; '' o null = borrar; texto = cifrar y guardar.
+  if (openaiApiKey !== undefined) {
+    const trimmed = (openaiApiKey ?? '').trim()
+    data.openaiApiKeyEnc = trimmed ? encrypt(trimmed) : null
+  }
+
+  const existing = await prisma.whatsAppConfig.findFirst()
+  const saved = existing
     ? await prisma.whatsAppConfig.update({ where: { id: existing.id }, data })
     : await prisma.whatsAppConfig.create({ data })
 
-  return NextResponse.json({ config })
+  invalidateRetoConfigCache()
+
+  const hasOpenaiKey = !!saved.openaiApiKeyEnc
+  return NextResponse.json({ config: { ...saved, openaiApiKeyEnc: undefined }, hasOpenaiKey })
 }

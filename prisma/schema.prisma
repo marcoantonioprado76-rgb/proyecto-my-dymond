@@ -1815,6 +1815,7 @@ model WhatsAppConfig {
   finalReportTime       String   @default("23:50") @map("final_report_time")
   timezone              String   @default("America/La_Paz")
   botInstructions       String?  @db.Text @map("bot_instructions")   // system prompt: tono, trato y contexto del plan
+  openaiApiKeyEnc       String?  @db.Text @map("openai_api_key_enc") // API key de OpenAI del reto (cifrada)
   createdAt             DateTime @default(now()) @map("created_at")
   updatedAt             DateTime @updatedAt @map("updated_at")
 

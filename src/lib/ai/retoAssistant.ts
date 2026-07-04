@@ -17,6 +17,8 @@ export type AssistInput = {
   points: number
   history: RetoChatMessage[]
   userText: string
+  /** Key de OpenAI resuelta (panel o entorno). Si no se pasa, usa process.env. */
+  openaiKey?: string
 }
 export type AssistResult = { intent: 'chat' | 'evidence'; reply: string }
 
@@ -43,7 +45,7 @@ function fallbackReply(input: AssistInput): string {
 }
 
 export async function assistParticipant(input: AssistInput): Promise<AssistResult> {
-  const apiKey = process.env.OPENAI_API_KEY
+  const apiKey = input.openaiKey || process.env.OPENAI_API_KEY
   if (!apiKey) return { intent: 'chat', reply: fallbackReply(input) }
 
   const statusText = input.tasksStatus.length
