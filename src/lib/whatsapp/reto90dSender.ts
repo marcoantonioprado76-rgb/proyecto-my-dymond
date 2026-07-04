@@ -6,6 +6,7 @@
 import { prisma } from '@/lib/prisma'
 import { BaileysManager } from '@/lib/baileys-manager'
 import { decrypt } from '@/lib/crypto'
+import { normalizePhone } from '@/lib/reto90d/memberService'
 
 type ConfigCache = {
   botId: string | null
@@ -97,14 +98,14 @@ export async function sendToPhone(phone: string, text: string): Promise<boolean>
     console.warn('[reto90d/sender] sin botId configurado, no se envía a', phone)
     return false
   }
-  return BaileysManager.sendText(botId, phone, text)
+  return BaileysManager.sendText(botId, normalizePhone(phone), text)
 }
 
 /** Envía un texto al admin configurado (adminPhone). */
 export async function sendToAdmin(text: string): Promise<boolean> {
   const cfg = await getConfig()
   if (!cfg.botId || !cfg.adminPhone) return false
-  return BaileysManager.sendText(cfg.botId, cfg.adminPhone, text)
+  return BaileysManager.sendText(cfg.botId, normalizePhone(cfg.adminPhone), text)
 }
 
 /** Envía un texto al grupo de WhatsApp del reto (JID ...@g.us). */

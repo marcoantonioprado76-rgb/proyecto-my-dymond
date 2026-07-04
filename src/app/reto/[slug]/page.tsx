@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Calendar, Gem, CheckCircle2, Loader2 } from 'lucide-react'
+import { Calendar, CheckCircle2, Loader2 } from 'lucide-react'
 
 const BRAND = 'linear-gradient(135deg,#FF2D95 0%,#B735B8 48%,#233B8F 100%)'
 const NAVY = '#1E2A4A'
@@ -82,17 +82,27 @@ export default function RetoRegisterPage({ params }: { params: { slug: string } 
     <div style={{
       minHeight: '100vh', width: '100%', display: 'flex', flexDirection: 'column',
       alignItems: 'center', justifyContent: 'center', padding: '32px 16px', boxSizing: 'border-box',
-      background: 'radial-gradient(1200px 600px at 20% -10%, rgba(255,45,149,0.18), transparent 55%), radial-gradient(1200px 700px at 90% 110%, rgba(35,59,143,0.35), transparent 55%), linear-gradient(160deg,#0C1428 0%,#141033 55%,#0B1020 100%)',
+      position: 'relative', overflow: 'hidden',
+      backgroundColor: '#0A1320',
+      backgroundImage: 'linear-gradient(180deg, rgba(11,27,43,0.66) 0%, rgba(8,16,28,0.80) 46%, rgba(5,11,20,0.93) 100%), url(/auth-bg.jpg)',
+      backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat',
     }}>
-      {/* Marca MY DIAMOND */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 22 }}>
-        <Gem size={26} style={{ color: '#fff', filter: 'drop-shadow(0 0 10px rgba(255,45,149,0.6))' }} />
-        <span style={{ color: '#fff', fontWeight: 800, letterSpacing: '0.16em', fontSize: 17 }}>MY DIAMOND</span>
+      {/* Glows suaves (igual que el login) */}
+      <div style={{ pointerEvents: 'none', position: 'fixed', inset: 0, overflow: 'hidden' }}>
+        <div style={{ position: 'absolute', top: -240, left: -160, width: 600, height: 600, borderRadius: '50%', filter: 'blur(150px)', background: 'rgba(255,9,108,0.16)' }} />
+        <div style={{ position: 'absolute', bottom: -240, right: -160, width: 600, height: 600, borderRadius: '50%', filter: 'blur(150px)', background: 'rgba(106,53,217,0.18)' }} />
+      </div>
+
+      {/* Logo oficial MY DIAMOND */}
+      <div style={{ position: 'relative', zIndex: 10, marginBottom: 24, display: 'flex', justifyContent: 'center' }}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/logo-oficial-mydiamond.png" alt="MY DIAMOND" style={{ width: 210, height: 'auto', display: 'block', filter: 'drop-shadow(0 5px 12px rgba(0,0,0,0.85)) drop-shadow(0 22px 46px rgba(0,0,0,0.68)) drop-shadow(0 0 28px rgba(183,53,184,0.30))' }} />
       </div>
 
       <div style={{
-        width: '100%', maxWidth: 470, background: '#fff', borderRadius: 26,
-        boxShadow: '0 30px 80px rgba(0,0,0,0.45)', padding: '34px 30px', boxSizing: 'border-box',
+        width: '100%', maxWidth: 470, position: 'relative', zIndex: 10, background: '#fff', borderRadius: 24,
+        boxShadow: '0 0 0 1px rgba(255,255,255,0.10), 0 44px 100px -22px rgba(0,0,0,0.88), 0 18px 48px rgba(0,0,0,0.6)',
+        padding: '34px 30px', boxSizing: 'border-box',
       }}>
         {state === 'loading' ? (
           <div style={{ display: 'flex', justifyContent: 'center', padding: '40px 0' }}>

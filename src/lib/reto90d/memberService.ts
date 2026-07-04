@@ -17,9 +17,12 @@ export interface EnrollMemberInput {
   city?: string | null
 }
 
-/** Normaliza un teléfono a solo dígitos (quita +, espacios, guiones, etc.). */
+/** Normaliza un teléfono a solo dígitos y asegura código de país en móviles bolivianos. */
 export function normalizePhone(phone: string): string {
-  return (phone ?? '').replace(/\D/g, '')
+  let d = (phone ?? '').replace(/\D/g, '')
+  // Móvil boliviano local (8 dígitos, empieza en 6 o 7) → anteponer 591 para WhatsApp.
+  if (d.length === 8 && /^[67]/.test(d)) d = '591' + d
+  return d
 }
 
 /**
