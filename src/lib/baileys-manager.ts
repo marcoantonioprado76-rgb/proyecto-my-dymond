@@ -101,6 +101,24 @@ async function handleMessage(
         jid.endsWith('@g.us')
     ) return
 
+    // [TRAZA TEMPORAL reto] registrar en BD que el socket del reto SÍ recibe entrantes.
+    try {
+        const { isReto90dBot } = await import('./whatsapp/reto90dSender')
+        if (await isReto90dBot(conn.botId)) {
+            const c = msg.message
+            const kind = c?.audioMessage ? 'audio' : c?.imageMessage ? 'imagen'
+                : (c?.conversation || c?.extendedTextMessage?.text || '').slice(0, 40) || 'otro'
+            await prisma.retoMessage.create({
+                data: {
+                    challengeId: '00000000-0000-0000-0000-000000000000',
+                    phone: jid.split('@')[0],
+                    role: 'user',
+                    content: `📥TRACE ${kind}`,
+                },
+            }).catch(() => { })
+        }
+    } catch (e) { /* no-op */ }
+
     // Verificar que el bot siga ACTIVE en BD (puede haberse pausado mientras el socket sigue conectado)
     const botStatus = await prisma.bot.findUnique({
         where: { id: conn.botId },
