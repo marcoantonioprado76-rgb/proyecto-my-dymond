@@ -12,6 +12,7 @@ type ConfigCache = {
   groupId: string | null
   adminPhone: string | null
   botInstructions: string | null
+  welcomeMessage: string | null
   openaiApiKeyEnc: string | null
   at: number
 }
@@ -25,7 +26,7 @@ async function getConfig(): Promise<ConfigCache> {
   try {
     const cfg = await prisma.whatsAppConfig.findFirst({
       where: { isActive: true },
-      select: { botId: true, groupId: true, adminPhone: true, botInstructions: true, openaiApiKeyEnc: true },
+      select: { botId: true, groupId: true, adminPhone: true, botInstructions: true, welcomeMessage: true, openaiApiKeyEnc: true },
       orderBy: { updatedAt: 'desc' },
     })
     cache = {
@@ -33,13 +34,14 @@ async function getConfig(): Promise<ConfigCache> {
       groupId: cfg?.groupId ?? null,
       adminPhone: cfg?.adminPhone ?? null,
       botInstructions: cfg?.botInstructions ?? null,
+      welcomeMessage: cfg?.welcomeMessage ?? null,
       openaiApiKeyEnc: cfg?.openaiApiKeyEnc ?? null,
       at: now,
     }
   } catch (err) {
     console.error('[reto90d/sender] getConfig failed:', err)
     // No dejamos que un fallo de BD tumbe el flujo del bot: devolvemos cache viejo o vacío.
-    cache = cache ?? { botId: null, groupId: null, adminPhone: null, botInstructions: null, openaiApiKeyEnc: null, at: now }
+    cache = cache ?? { botId: null, groupId: null, adminPhone: null, botInstructions: null, welcomeMessage: null, openaiApiKeyEnc: null, at: now }
   }
   return cache
 }
@@ -47,6 +49,11 @@ async function getConfig(): Promise<ConfigCache> {
 /** Instrucciones/system-prompt del bot (tono, trato y contexto del plan) o null. */
 export async function getRetoInstructions(): Promise<string | null> {
   return (await getConfig()).botInstructions
+}
+
+/** Plantilla de bienvenida configurada (o null → se usa la de por defecto). */
+export async function getWelcomeTemplate(): Promise<string | null> {
+  return (await getConfig()).welcomeMessage
 }
 
 /** Key de OpenAI efectiva: la configurada en el panel (cifrada) o, si no, la de entorno. */

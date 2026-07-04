@@ -223,6 +223,7 @@ interface RetoConfig {
   finalReportTime: string
   timezone: string
   botInstructions: string
+  welcomeMessage: string
 }
 
 const DEFAULTS: RetoConfig = {
@@ -238,6 +239,7 @@ const DEFAULTS: RetoConfig = {
   finalReportTime: '23:50',
   timezone: 'America/La_Paz',
   botInstructions: '',
+  welcomeMessage: '',
 }
 
 const labelStyle: React.CSSProperties = { fontSize: 12, color: '#6B7280', display: 'block', marginBottom: 6, fontWeight: 600 }
@@ -284,6 +286,7 @@ export default function RetoConfiguracionPage() {
           finalReportTime: c.finalReportTime ?? DEFAULTS.finalReportTime,
           timezone: c.timezone ?? DEFAULTS.timezone,
           botInstructions: c.botInstructions ?? '',
+          welcomeMessage: c.welcomeMessage ?? '',
         })
         setBots(Array.isArray(d.bots) ? (d.bots as BotOption[]) : [])
         setHasKey(!!d.hasOpenaiKey)
@@ -343,6 +346,7 @@ export default function RetoConfiguracionPage() {
         finalReportTime: form.finalReportTime,
         timezone: form.timezone.trim() || DEFAULTS.timezone,
         botInstructions: form.botInstructions.trim() || null,
+        welcomeMessage: form.welcomeMessage.trim() || null,
         // Key: si escribió una, la manda; si pidió quitarla, null; si no, no la toca.
         ...(removeKey ? { openaiApiKey: null } : keyInput.trim() ? { openaiApiKey: keyInput.trim() } : {}),
       }
@@ -426,6 +430,27 @@ export default function RetoConfiguracionPage() {
                 rows={7}
                 placeholder={"Ej: Eres el coach del Reto 90 Días de My Diamond. Trata a cada participante por su nombre, con energía y cercanía (tutéalos). Recuérdales el porqué del reto y felicítalos cuando cumplen. Sé claro y breve. Si una evidencia no corresponde, explícales con amabilidad qué falta."}
                 style={{ ...inputStyle, resize: 'vertical', minHeight: 120, lineHeight: 1.6, fontFamily: 'inherit' }}
+              />
+            </div>
+
+            {/* Card: Mensaje de bienvenida ──────────────────────── */}
+            <div style={{ background: '#fff', border: '1px solid #E4E9F0', borderRadius: 16, padding: 20 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                <Sparkles size={15} className="text-[#B735B8]" />
+                <p style={{ fontSize: 13, fontWeight: 800, color: '#111827', margin: 0, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                  Mensaje de bienvenida
+                </p>
+              </div>
+              <p style={{ fontSize: 12, color: '#6B7280', lineHeight: 1.6, margin: '0 0 12px' }}>
+                Se envía por WhatsApp apenas alguien se registra. Usa <code>{'{nombre}'}</code> y <code>{'{reto}'}</code>
+                {' '}y se reemplazan solos. Si lo dejas vacío, se usa un mensaje por defecto.
+              </p>
+              <textarea
+                value={form.welcomeMessage}
+                onChange={e => set('welcomeMessage', e.target.value)}
+                rows={5}
+                placeholder={'¡Felicidades {nombre}! 🎉 Te uniste al reto {reto}. Envíame tus evidencias (foto o texto) y te las reviso. Si me preguntas "¿qué me falta?" te digo tus pendientes. ¡Vamos! 💪'}
+                style={{ ...inputStyle, resize: 'vertical', minHeight: 96, lineHeight: 1.6, fontFamily: 'inherit' }}
               />
             </div>
 

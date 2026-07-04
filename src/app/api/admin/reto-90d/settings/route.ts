@@ -39,6 +39,7 @@ const patchSchema = z.object({
   finalReportTime: z.string().optional(),
   timezone: z.string().optional(),
   botInstructions: z.string().nullable().optional(),
+  welcomeMessage: z.string().nullable().optional(),
   // Key de OpenAI en claro desde el form: '' o null = borrar; undefined = no tocar.
   openaiApiKey: z.string().nullable().optional(),
 })
