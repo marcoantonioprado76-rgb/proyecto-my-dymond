@@ -618,6 +618,24 @@ export const BaileysManager = {
         }
     },
 
+    // Lista los grupos de WhatsApp donde participa el número conectado (Reto 90D:
+    // para sugerir/elegir el grupo de reportes sin copiar el JID a mano).
+    async listGroups(botId: string): Promise<Array<{ id: string; subject: string; size?: number }>> {
+        const conn = connections.get(botId)
+        if (!conn?.sock || conn.status !== 'connected') return []
+        try {
+            const groups = await conn.sock.groupFetchAllParticipating()
+            return Object.values(groups || {}).map((g: any) => ({
+                id: g.id,
+                subject: g.subject || g.id,
+                size: g.size ?? g.participants?.length,
+            }))
+        } catch (err) {
+            console.error('[BAILEYS] listGroups error:', err)
+            return []
+        }
+    },
+
     async connect(botId: string, botName: string, openaiKey: string, reportPhone: string, opts: { forceFresh?: boolean } = {}) {
         const existing = connections.get(botId)
         // Si ya está realmente conectado, no tocar nunca.

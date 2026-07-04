@@ -249,6 +249,9 @@ const inputStyle: React.CSSProperties = {
 export default function RetoConfiguracionPage() {
   const [form, setForm] = useState<RetoConfig>(DEFAULTS)
   const [bots, setBots] = useState<BotOption[]>([])
+  const [groups, setGroups] = useState<{ id: string; subject: string; size?: number }[]>([])
+  const [groupsLoading, setGroupsLoading] = useState(false)
+  const [groupsMsg, setGroupsMsg] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
@@ -293,6 +296,29 @@ export default function RetoConfiguracionPage() {
   function set<K extends keyof RetoConfig>(key: K, value: RetoConfig[K]) {
     setForm(prev => ({ ...prev, [key]: value }))
     setSaved(false)
+  }
+
+  async function loadGroups() {
+    setGroupsLoading(true)
+    setGroupsMsg(null)
+    try {
+      const r = await fetch('/api/admin/reto-90d/groups')
+      const d = await r.json()
+      if (!d.connected) {
+        setGroups([])
+        setGroupsMsg('Conecta primero el número del reto (arriba) para ver tus grupos.')
+      } else if (!Array.isArray(d.groups) || d.groups.length === 0) {
+        setGroups([])
+        setGroupsMsg('El número del reto no está en ningún grupo todavía.')
+      } else {
+        setGroups(d.groups)
+        setGroupsMsg(null)
+      }
+    } catch {
+      setGroupsMsg('No se pudieron cargar los grupos.')
+    } finally {
+      setGroupsLoading(false)
+    }
   }
 
   async function handleSave() {
@@ -419,9 +445,41 @@ export default function RetoConfiguracionPage() {
                   />
                 </div>
 
-                {/* Group id */}
+                {/* Group id — sugerencias automáticas de los grupos del número */}
                 <div>
-                  <label style={labelStyle}>Grupo de WhatsApp (JID)</label>
+                  <label style={labelStyle}>Grupo de WhatsApp (reportes)</label>
+                  <div style={{ display: 'flex', gap: 8, marginBottom: 8, flexWrap: 'wrap', alignItems: 'center' }}>
+                    <button
+                      type="button"
+                      onClick={loadGroups}
+                      disabled={groupsLoading}
+                      style={{
+                        display: 'inline-flex', alignItems: 'center', gap: 6, padding: '8px 14px', borderRadius: 10,
+                        fontSize: 12.5, fontWeight: 700, color: '#fff', border: 'none', background: BRAND_GRADIENT,
+                        cursor: groupsLoading ? 'wait' : 'pointer', opacity: groupsLoading ? 0.75 : 1, flexShrink: 0,
+                      }}
+                    >
+                      {groupsLoading ? <Loader2 size={13} className="animate-spin" /> : <RefreshCw size={13} />}
+                      {groupsLoading ? 'Buscando…' : 'Sugerir mis grupos'}
+                    </button>
+                    {groups.length > 0 && (
+                      <select
+                        value={groups.some(g => g.id === form.groupId) ? form.groupId : ''}
+                        onChange={e => set('groupId', e.target.value)}
+                        style={{ ...inputStyle, flex: 1, minWidth: 180, cursor: 'pointer' }}
+                      >
+                        <option value="">— Elige un grupo —</option>
+                        {groups.map(g => (
+                          <option key={g.id} value={g.id}>
+                            {g.subject}{g.size ? ` · ${g.size} miembros` : ''}
+                          </option>
+                        ))}
+                      </select>
+                    )}
+                  </div>
+                  {groupsMsg && (
+                    <p style={{ fontSize: 11, color: '#9CA3AF', margin: '0 0 8px' }}>{groupsMsg}</p>
+                  )}
                   <input
                     type="text"
                     value={form.groupId}
@@ -430,7 +488,7 @@ export default function RetoConfiguracionPage() {
                     style={inputStyle}
                   />
                   <p style={{ fontSize: 11, color: '#9CA3AF', marginTop: 6 }}>
-                    Identificador del grupo donde se envían los reportes (termina en <code>@g.us</code>).
+                    Elige uno de tus grupos (autocompleta el JID) o pégalo a mano (termina en <code>@g.us</code>).
                   </p>
                 </div>
               </div>
