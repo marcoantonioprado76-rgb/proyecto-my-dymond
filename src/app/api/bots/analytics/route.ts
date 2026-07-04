@@ -14,7 +14,7 @@ export async function GET(req: NextRequest) {
 
   // Todos los bots del usuario
   const bots = await prisma.bot.findMany({
-    where: { userId: user.userId },
+    where: { userId: user.userId, isReto: false },
     select: { id: true },
   })
   const botIds = bots.map(b => b.id)

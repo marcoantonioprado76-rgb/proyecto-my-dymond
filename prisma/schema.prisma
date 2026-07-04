@@ -118,6 +118,8 @@ model Bot {
   voiceEnabled         Boolean        @default(false) @map("voice_enabled")
   voiceMode            String         @default("off") @map("voice_mode")
   voiceId              String?        @map("voice_id")
+  // Bot DEDICADO del Reto 90D: número aparte, se excluye del panel/límites de bots de venta.
+  isReto               Boolean        @default(false) @map("is_reto")
   createdAt            DateTime       @default(now()) @map("created_at")
   updatedAt            DateTime       @updatedAt @map("updated_at")
   secret               BotSecret?

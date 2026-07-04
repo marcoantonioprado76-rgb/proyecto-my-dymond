@@ -1,10 +1,11 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import {
   Settings, Save, Loader2, Check, AlertCircle, Info, Bot, Clock, Globe, Sparkles,
+  QrCode, Smartphone, Power, RefreshCw,
 } from 'lucide-react'
 
 // ── Paleta de marca ───────────────────────────────────────────────────────────
@@ -66,6 +67,137 @@ function Toggle({ on, onToggle }: { on: boolean; onToggle: () => void }) {
         }}
       />
     </button>
+  )
+}
+
+// ── Conexión del número del reto (QR dedicado, aparte de los bots) ─────────────
+interface ConnStatus { status: string; qrBase64?: string; phone?: string }
+
+function RetoConnection() {
+  const [status, setStatus] = useState<ConnStatus>({ status: 'loading' })
+  const [connecting, setConnecting] = useState(false)
+  const [err, setErr] = useState<string | null>(null)
+  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null)
+
+  async function fetchStatus(): Promise<string | undefined> {
+    try {
+      const r = await fetch('/api/admin/reto-90d/connection')
+      const d = await r.json()
+      const s: ConnStatus = d.status ?? { status: 'disconnected' }
+      setStatus(s)
+      return s.status
+    } catch {
+      return undefined
+    }
+  }
+
+  function stopPolling() {
+    if (pollRef.current) { clearInterval(pollRef.current); pollRef.current = null }
+  }
+  function startPolling() {
+    stopPolling()
+    pollRef.current = setInterval(async () => {
+      const s = await fetchStatus()
+      if (s === 'connected' || s === 'disconnected') { stopPolling(); setConnecting(false) }
+    }, 2500)
+  }
+
+  useEffect(() => {
+    fetchStatus().then((s) => { if (s === 'connecting' || s === 'qr_ready') startPolling() })
+    return () => stopPolling()
+  }, [])
+
+  async function connect() {
+    setConnecting(true); setErr(null)
+    try {
+      const r = await fetch('/api/admin/reto-90d/connection', { method: 'POST' })
+      const d = await r.json().catch(() => ({}))
+      if (!r.ok) throw new Error(d.error ?? `HTTP ${r.status}`)
+      setStatus({ status: 'connecting' })
+      startPolling()
+    } catch (e) {
+      setErr(e instanceof Error ? e.message : 'No se pudo conectar el número del reto.')
+      setConnecting(false)
+    }
+  }
+
+  async function disconnect() {
+    setErr(null)
+    try { await fetch('/api/admin/reto-90d/connection', { method: 'DELETE' }) } catch {}
+    stopPolling(); setConnecting(false)
+    await fetchStatus()
+  }
+
+  const st = status.status
+  const connected = st === 'connected'
+  const box: React.CSSProperties = { border: '1px solid #E4E9F0', borderRadius: 14, padding: 16, background: '#F9FAFC' }
+  const primaryBtn: React.CSSProperties = {
+    display: 'inline-flex', alignItems: 'center', gap: 8, padding: '10px 18px', borderRadius: 10,
+    fontSize: 13, fontWeight: 800, color: '#fff', border: 'none', background: BRAND_GRADIENT,
+    cursor: connecting ? 'wait' : 'pointer', opacity: connecting ? 0.75 : 1,
+  }
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+      <div style={{ display: 'flex', gap: 10, padding: '12px 14px', borderRadius: 12, background: 'rgba(217,119,6,0.06)', border: '1px solid rgba(217,119,6,0.25)' }}>
+        <AlertCircle size={15} style={{ color: '#D97706', flexShrink: 0, marginTop: 1 }} />
+        <p style={{ fontSize: 12, color: '#6B7280', lineHeight: 1.6, margin: 0 }}>
+          Este número es <strong style={{ color: '#111827' }}>exclusivo del reto</strong>. Usa un número de WhatsApp
+          <strong style={{ color: '#111827' }}> DIFERENTE</strong> al de tus bots de venta — se conecta aquí, aparte, y no se mezcla con ningún bot.
+        </p>
+      </div>
+
+      <div style={box}>
+        {st === 'loading' ? (
+          <div style={{ display: 'flex', justifyContent: 'center', padding: '10px 0' }}>
+            <Loader2 size={18} className="animate-spin" style={{ color: '#B735B8' }} />
+          </div>
+        ) : connected ? (
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <div style={{ width: 36, height: 36, borderRadius: 10, background: 'rgba(22,163,74,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Smartphone size={17} style={{ color: '#16A34A' }} />
+              </div>
+              <div>
+                <p style={{ fontSize: 13.5, fontWeight: 800, color: '#16A34A', margin: 0 }}>Número conectado ✅</p>
+                <p style={{ fontSize: 12, color: '#6B7280', margin: '2px 0 0' }}>{status.phone ? `+${status.phone}` : 'Número del reto activo'}</p>
+              </div>
+            </div>
+            <button onClick={disconnect} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '8px 14px', borderRadius: 10, fontSize: 12.5, fontWeight: 700, background: '#fff', border: '1px solid #E4E9F0', color: '#DC2626', cursor: 'pointer' }}>
+              <Power size={13} /> Desconectar
+            </button>
+          </div>
+        ) : st === 'qr_ready' && status.qrBase64 ? (
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
+            <p style={{ fontSize: 12.5, color: '#6B7280', margin: 0, textAlign: 'center' }}>
+              Abre <strong style={{ color: '#111827' }}>WhatsApp → Dispositivos vinculados</strong> en el teléfono del reto y escanea:
+            </p>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={status.qrBase64} alt="QR del número del reto" style={{ width: 200, height: 200, borderRadius: 12, border: '1px solid #E4E9F0' }} />
+            <button onClick={connect} disabled={connecting} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '7px 14px', borderRadius: 10, fontSize: 12.5, fontWeight: 700, background: '#fff', border: '1px solid #E4E9F0', color: '#6B7280', cursor: 'pointer' }}>
+              <RefreshCw size={13} className={connecting ? 'animate-spin' : ''} /> Regenerar QR
+            </button>
+          </div>
+        ) : st === 'connecting' ? (
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, padding: '6px 0' }}>
+            <Loader2 size={20} className="animate-spin" style={{ color: '#B735B8' }} />
+            <p style={{ fontSize: 12.5, color: '#6B7280', margin: 0 }}>Generando QR…</p>
+          </div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, padding: '4px 0' }}>
+            <div style={{ width: 40, height: 40, borderRadius: 12, background: 'rgba(183,53,184,0.10)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <QrCode size={19} style={{ color: '#B735B8' }} />
+            </div>
+            <p style={{ fontSize: 12.5, color: '#6B7280', margin: 0, textAlign: 'center' }}>El número del reto no está conectado.</p>
+            <button onClick={connect} disabled={connecting} style={primaryBtn}>
+              <QrCode size={15} /> {connecting ? 'Conectando…' : 'Conectar número del reto'}
+            </button>
+          </div>
+        )}
+      </div>
+
+      {err && <p style={{ fontSize: 12, color: '#DC2626', margin: 0 }}>{err}</p>}
+    </div>
   )
 }
 
@@ -169,7 +301,7 @@ export default function RetoConfiguracionPage() {
     setSaved(false)
     try {
       const body = {
-        botId: form.botId || null,
+        // botId lo gestiona la conexión del reto (no se toca al guardar ajustes)
         adminPhone: form.adminPhone.trim() || null,
         groupId: form.groupId.trim() || null,
         isActive: form.isActive,
@@ -236,9 +368,8 @@ export default function RetoConfiguracionPage() {
             >
               <Info size={16} className="text-[#B735B8]" style={{ flexShrink: 0, marginTop: 1 }} />
               <p style={{ fontSize: 12.5, color: '#6B7280', lineHeight: 1.6, margin: 0 }}>
-                El número del reto se vincula por QR en{' '}
-                <strong style={{ color: '#111827' }}>Dashboard → Bots (Baileys)</strong>; aquí solo eliges cuál
-                bot usa el reto.
+                El número del reto se conecta <strong style={{ color: '#111827' }}>aquí mismo</strong> por QR
+                (más abajo). Es un número dedicado, aparte de tus bots de venta.
               </p>
             </div>
 
@@ -273,29 +404,8 @@ export default function RetoConfiguracionPage() {
               </div>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                {/* Bot select */}
-                <div>
-                  <label style={labelStyle}>Bot de Baileys del reto</label>
-                  <select
-                    value={form.botId}
-                    onChange={e => set('botId', e.target.value)}
-                    style={{ ...inputStyle, cursor: 'pointer' }}
-                  >
-                    <option value="">— Selecciona un bot —</option>
-                    {bots.map(b => (
-                      <option key={b.id} value={b.id}>
-                        {b.name}
-                        {b.baileysPhone ? ` · ${b.baileysPhone}` : ''}
-                        {b.status ? ` (${b.status})` : ''}
-                      </option>
-                    ))}
-                  </select>
-                  {bots.length === 0 && (
-                    <p style={{ fontSize: 11, color: '#9CA3AF', marginTop: 6 }}>
-                      No hay bots Baileys disponibles. Crea y vincula uno en Dashboard → Bots.
-                    </p>
-                  )}
-                </div>
+                {/* Conexión dedicada del número del reto (QR aparte) */}
+                <RetoConnection />
 
                 {/* Admin phone */}
                 <div>

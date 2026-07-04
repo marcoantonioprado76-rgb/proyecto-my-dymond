@@ -25,7 +25,7 @@ export async function GET(
       plan === Infinity ? Infinity : plan + extra
 
     const [botsUsed, storesUsed, productsUsed, landingsUsed] = await Promise.all([
-      prisma.bot.count({ where: { userId: user.id } }),
+      prisma.bot.count({ where: { userId: user.id, isReto: false } }),
       prisma.store.count({ where: { userId: user.id } }),
       prisma.product.count({ where: { userId: user.id } }),
       prisma.landingPage.count({ where: { userId: user.id } }),
