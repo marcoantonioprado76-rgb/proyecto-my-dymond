@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import {
@@ -15,6 +15,7 @@ import {
   Star,
   AlertTriangle,
   Power,
+  ImagePlus,
 } from 'lucide-react'
 
 // ── Paleta MY DIAMOND ──────────────────────────────────────────────
@@ -59,7 +60,7 @@ interface TaskForm {
   deadlineTime: string       // "HH:mm"
   autoApproveMin: string     // "0"–"1"
   requiresReview: boolean
-  validExamples: string      // una URL por línea
+  validExamples: string[]    // URLs públicas de imágenes de referencia
   isActive: boolean
 }
 
@@ -72,13 +73,14 @@ const EMPTY_FORM: TaskForm = {
   deadlineTime: '21:00',
   autoApproveMin: '0.85',
   requiresReview: false,
-  validExamples: '',
+  validExamples: [],
   isActive: true,
 }
 
 // ── Sub-navegación del módulo ──────────────────────────────────────
 const SUBNAV = [
   { href: '/admin/reto-90d', label: 'Resumen', exact: true },
+  { href: '/admin/reto-90d/tablero', label: 'Tablero' },
   { href: '/admin/reto-90d/tareas', label: 'Tareas' },
   { href: '/admin/reto-90d/usuarios', label: 'Usuarios' },
   { href: '/admin/reto-90d/evidencias', label: 'Evidencias' },
@@ -153,6 +155,38 @@ export default function AdminReto90dTasksPage() {
   const [deleting, setDeleting] = useState(false)
   const [togglingId, setTogglingId] = useState<string | null>(null)
 
+  // Subida de imágenes de referencia
+  const fileInputRef = useRef<HTMLInputElement | null>(null)
+  const [uploadingCount, setUploadingCount] = useState(0)
+  const [uploadError, setUploadError] = useState<string | null>(null)
+
+  async function handleUploadFiles(files: FileList | null) {
+    if (!files || files.length === 0) return
+    setUploadError(null)
+    const list = Array.from(files)
+    setUploadingCount(c => c + list.length)
+    for (const file of list) {
+      try {
+        if (!file.type.startsWith('image/')) throw new Error('Solo se permiten imágenes')
+        const fd = new FormData()
+        fd.append('file', file)
+        const r = await fetch('/api/admin/reto-90d/upload', { method: 'POST', body: fd })
+        const j = await r.json().catch(() => ({}))
+        if (!r.ok || !j.url) throw new Error(j.error ?? `Error ${r.status} al subir la imagen`)
+        setModal(prev => (prev ? { ...prev, data: { ...prev.data, validExamples: [...prev.data.validExamples, j.url as string] } } : prev))
+      } catch (e) {
+        setUploadError(e instanceof Error ? e.message : 'No se pudo subir la imagen.')
+      } finally {
+        setUploadingCount(c => Math.max(0, c - 1))
+      }
+    }
+    if (fileInputRef.current) fileInputRef.current.value = ''
+  }
+
+  function removeExample(url: string) {
+    setModal(prev => (prev ? { ...prev, data: { ...prev.data, validExamples: prev.data.validExamples.filter(u => u !== url) } } : prev))
+  }
+
   // 1) Obtener el reto activo
   async function resolveActiveChallenge(): Promise<string | null> {
     const r = await fetch('/api/admin/reto-90d/challenges')
@@ -198,10 +232,12 @@ export default function AdminReto90dTasksPage() {
 
   function openCreate() {
     setSaveError(null)
-    setModal({ mode: 'create', data: { ...EMPTY_FORM } })
+    setUploadError(null)
+    setModal({ mode: 'create', data: { ...EMPTY_FORM, validExamples: [] } })
   }
   function openEdit(t: Task) {
     setSaveError(null)
+    setUploadError(null)
     setModal({
       mode: 'edit',
       data: {
@@ -214,7 +250,7 @@ export default function AdminReto90dTasksPage() {
         deadlineTime: t.deadlineTime ?? '21:00',
         autoApproveMin: String(t.autoApproveMin ?? 0.85),
         requiresReview: !!t.requiresReview,
-        validExamples: (t.validExamples ?? []).join('\n'),
+        validExamples: t.validExamples ?? [],
         isActive: !!t.isActive,
       },
     })
@@ -241,7 +277,7 @@ export default function AdminReto90dTasksPage() {
       deadlineTime: data.deadlineTime || '21:00',
       autoApproveMin: autoApprove,
       requiresReview: data.requiresReview,
-      validExamples: splitList(data.validExamples),
+      validExamples: data.validExamples,
       isActive: data.isActive,
     }
 
@@ -500,11 +536,87 @@ export default function AdminReto90dTasksPage() {
                 )}
               </div>
 
-              {/* Ejemplos válidos */}
+              {/* Imágenes de referencia (para la IA) */}
               <div>
-                <label style={labelStyle}>Ejemplos de evidencia válida (una URL por línea)</label>
-                <textarea value={modal.data.validExamples} onChange={e => setModal({ ...modal, data: { ...modal.data, validExamples: e.target.value } })}
-                  rows={2} placeholder={'https://…\nhttps://…'} style={{ ...inputStyle, resize: 'vertical' }} />
+                <label style={labelStyle}>Imágenes de referencia (para que la IA compare y sea precisa)</label>
+
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  style={{ display: 'none' }}
+                  onChange={e => handleUploadFiles(e.target.files)}
+                />
+
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={uploadingCount > 0}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 7,
+                    padding: '9px 14px',
+                    borderRadius: 10,
+                    fontSize: 13,
+                    fontWeight: 700,
+                    background: uploadingCount > 0 ? '#F0F3F7' : BRAND_GRADIENT,
+                    color: uploadingCount > 0 ? MUTED : '#fff',
+                    border: uploadingCount > 0 ? `1px solid ${BORDER}` : 'none',
+                    cursor: uploadingCount > 0 ? 'not-allowed' : 'pointer',
+                    boxShadow: uploadingCount > 0 ? 'none' : '0 8px 20px rgba(255,45,149,0.20)',
+                  }}
+                >
+                  {uploadingCount > 0
+                    ? <><Loader2 size={14} className="animate-spin" /> Subiendo…</>
+                    : <><ImagePlus size={15} /> Subir imagen</>}
+                </button>
+
+                {uploadError && (
+                  <p style={{ fontSize: 12.5, color: '#DC2626', margin: '10px 0 0', display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <AlertTriangle size={14} /> {uploadError}
+                  </p>
+                )}
+
+                {modal.data.validExamples.length > 0 && (
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 12 }}>
+                    {modal.data.validExamples.map((url, i) => (
+                      <div key={`${url}-${i}`} style={{ position: 'relative', width: 72, height: 72 }}>
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={url}
+                          alt={`Referencia ${i + 1}`}
+                          style={{ width: 72, height: 72, objectFit: 'cover', borderRadius: 10, border: `1px solid ${BORDER}`, display: 'block' }}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => removeExample(url)}
+                          title="Quitar imagen"
+                          style={{
+                            position: 'absolute',
+                            top: -6,
+                            right: -6,
+                            width: 20,
+                            height: 20,
+                            borderRadius: 999,
+                            background: '#DC2626',
+                            border: '2px solid #fff',
+                            color: '#fff',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            padding: 0,
+                            boxShadow: '0 2px 6px rgba(17,24,39,0.25)',
+                          }}
+                        >
+                          <X size={12} />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
 
               {/* Switches */}

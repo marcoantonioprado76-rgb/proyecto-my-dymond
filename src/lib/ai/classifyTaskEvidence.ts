@@ -26,11 +26,20 @@ export type ClassifyInput = {
     evidenceType: string
     expectedKeywords: string[]
     points: number
+    /** URLs públicas de imágenes de referencia (ejemplos de evidencia válida). */
+    referenceImages?: string[]
   }>
   phone: string
   dailyHistory: string
   now: Date
+  /** System prompt del admin: tono, trato y contexto del plan. */
+  instructions?: string
 }
+
+// Máximo de imágenes de referencia a enviar en total (control de costo/latencia).
+const MAX_REFERENCE_IMAGES = 6
+// Máximo de referencias por tarea.
+const MAX_REF_PER_TASK = 2
 
 export type ClassifyResult = {
   detectedTaskId: string | null
@@ -66,18 +75,25 @@ type OpenAIMessageContent =
       | { type: 'image_url'; image_url: { url: string } }
     >
 
-async function callOpenAI(prompt: string, imageUrl?: string): Promise<string> {
+export type LabeledImage = { url: string; label: string }
+
+async function callOpenAI(prompt: string, images: LabeledImage[] = []): Promise<string> {
   const apiKey = process.env.OPENAI_API_KEY
   if (!apiKey) {
     throw new Error('Falta la variable de entorno OPENAI_API_KEY para el clasificador de evidencias.')
   }
 
-  const content: OpenAIMessageContent = imageUrl
-    ? [
-        { type: 'text', text: prompt },
-        { type: 'image_url', image_url: { url: imageUrl } },
-      ]
-    : prompt
+  let content: OpenAIMessageContent
+  if (images.length > 0) {
+    const parts: Exclude<OpenAIMessageContent, string> = [{ type: 'text', text: prompt }]
+    for (const img of images) {
+      if (img.label) parts.push({ type: 'text', text: img.label })
+      parts.push({ type: 'image_url', image_url: { url: img.url } })
+    }
+    content = parts
+  } else {
+    content = prompt
+  }
 
   const controller = new AbortController()
   const timeout = setTimeout(() => controller.abort(), 30000)
@@ -113,6 +129,29 @@ async function callOpenAI(prompt: string, imageUrl?: string): Promise<string> {
 // ─── Clasificación ───────────────────────────────────────────────────────────
 
 export async function classifyEvidenceWithAI(input: ClassifyInput): Promise<ClassifyResult> {
+  // Imágenes de referencia: la evidencia del usuario va primero; luego, si hay
+  // imagen de evidencia, adjuntamos referencias por tarea (con tope de costo).
+  const images: LabeledImage[] = []
+  if (input.imageUrl) {
+    images.push({ url: input.imageUrl, label: 'EVIDENCIA DEL USUARIO (evalúa esta imagen):' })
+  }
+  const refCountByTask = new Map<string, number>()
+  if (input.imageUrl) {
+    let total = 0
+    for (const t of input.tasks) {
+      const refs = (t.referenceImages ?? []).filter(Boolean).slice(0, MAX_REF_PER_TASK)
+      let added = 0
+      for (const url of refs) {
+        if (total >= MAX_REFERENCE_IMAGES) break
+        images.push({ url, label: `IMAGEN DE REFERENCIA de la tarea «${t.title}» (id ${t.id}):` })
+        total++
+        added++
+      }
+      if (added > 0) refCountByTask.set(t.id, added)
+      if (total >= MAX_REFERENCE_IMAGES) break
+    }
+  }
+
   const promptTasks: EvidencePromptTask[] = input.tasks.map((t) => ({
     id: t.id,
     title: t.title,
@@ -120,6 +159,7 @@ export async function classifyEvidenceWithAI(input: ClassifyInput): Promise<Clas
     evidenceType: t.evidenceType,
     expectedKeywords: t.expectedKeywords,
     points: t.points,
+    referenceImageCount: refCountByTask.get(t.id) ?? 0,
   }))
 
   const evidence: { type: 'image' | 'text' | 'number' | 'link'; text?: string } = input.imageUrl
@@ -130,10 +170,11 @@ export async function classifyEvidenceWithAI(input: ClassifyInput): Promise<Clas
     tasks: promptTasks,
     evidence,
     dailyHistory: input.dailyHistory,
+    instructions: input.instructions,
   })
 
   try {
-    const raw = await callOpenAI(prompt, input.imageUrl)
+    const raw = await callOpenAI(prompt, images)
 
     let parsed: Record<string, unknown>
     try {

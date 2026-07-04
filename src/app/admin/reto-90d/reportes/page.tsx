@@ -13,6 +13,7 @@ const BRAND_GRADIENT = 'linear-gradient(135deg,#FF2D95,#B735B8,#233B8F)'
 // ── Sub-navegación del módulo Reto 90D ────────────────────────────────────────
 const NAV = [
   { href: '/admin/reto-90d', label: 'Resumen' },
+  { href: '/admin/reto-90d/tablero', label: 'Tablero' },
   { href: '/admin/reto-90d/tareas', label: 'Tareas' },
   { href: '/admin/reto-90d/usuarios', label: 'Usuarios' },
   { href: '/admin/reto-90d/evidencias', label: 'Evidencias' },

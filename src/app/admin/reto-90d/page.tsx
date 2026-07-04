@@ -77,6 +77,7 @@ interface DashboardData {
 // ── Sub-navegación del módulo ──────────────────────────────────────
 const SUBNAV = [
   { href: '/admin/reto-90d', label: 'Resumen', exact: true },
+  { href: '/admin/reto-90d/tablero', label: 'Tablero' },
   { href: '/admin/reto-90d/tareas', label: 'Tareas' },
   { href: '/admin/reto-90d/usuarios', label: 'Usuarios' },
   { href: '/admin/reto-90d/evidencias', label: 'Evidencias' },

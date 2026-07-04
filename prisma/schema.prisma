@@ -1812,6 +1812,7 @@ model WhatsAppConfig {
   nightReminderTime     String   @default("21:30") @map("night_reminder_time")
   finalReportTime       String   @default("23:50") @map("final_report_time")
   timezone              String   @default("America/La_Paz")
+  botInstructions       String?  @db.Text @map("bot_instructions")   // system prompt: tono, trato y contexto del plan
   createdAt             DateTime @default(now()) @map("created_at")
   updatedAt             DateTime @updatedAt @map("updated_at")
 

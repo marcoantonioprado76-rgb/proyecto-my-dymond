@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import {
-  Settings, Save, Loader2, Check, AlertCircle, Info, Bot, Clock, Globe,
+  Settings, Save, Loader2, Check, AlertCircle, Info, Bot, Clock, Globe, Sparkles,
 } from 'lucide-react'
 
 // ── Paleta de marca ───────────────────────────────────────────────────────────
@@ -13,6 +13,7 @@ const BRAND_GRADIENT = 'linear-gradient(135deg,#FF2D95,#B735B8,#233B8F)'
 // ── Sub-navegación del módulo Reto 90D ────────────────────────────────────────
 const NAV = [
   { href: '/admin/reto-90d', label: 'Resumen' },
+  { href: '/admin/reto-90d/tablero', label: 'Tablero' },
   { href: '/admin/reto-90d/tareas', label: 'Tareas' },
   { href: '/admin/reto-90d/usuarios', label: 'Usuarios' },
   { href: '/admin/reto-90d/evidencias', label: 'Evidencias' },
@@ -89,6 +90,7 @@ interface RetoConfig {
   nightReminderTime: string
   finalReportTime: string
   timezone: string
+  botInstructions: string
 }
 
 const DEFAULTS: RetoConfig = {
@@ -103,6 +105,7 @@ const DEFAULTS: RetoConfig = {
   nightReminderTime: '21:30',
   finalReportTime: '23:50',
   timezone: 'America/La_Paz',
+  botInstructions: '',
 }
 
 const labelStyle: React.CSSProperties = { fontSize: 12, color: '#6B7280', display: 'block', marginBottom: 6, fontWeight: 600 }
@@ -142,6 +145,7 @@ export default function RetoConfiguracionPage() {
           nightReminderTime: c.nightReminderTime ?? DEFAULTS.nightReminderTime,
           finalReportTime: c.finalReportTime ?? DEFAULTS.finalReportTime,
           timezone: c.timezone ?? DEFAULTS.timezone,
+          botInstructions: c.botInstructions ?? '',
         })
         setBots(Array.isArray(d.bots) ? (d.bots as BotOption[]) : [])
       } catch {
@@ -176,6 +180,7 @@ export default function RetoConfiguracionPage() {
         nightReminderTime: form.nightReminderTime,
         finalReportTime: form.finalReportTime,
         timezone: form.timezone.trim() || DEFAULTS.timezone,
+        botInstructions: form.botInstructions.trim() || null,
       }
       const r = await fetch('/api/admin/reto-90d/settings', {
         method: 'PATCH',
@@ -235,6 +240,27 @@ export default function RetoConfiguracionPage() {
                 <strong style={{ color: '#111827' }}>Dashboard → Bots (Baileys)</strong>; aquí solo eliges cuál
                 bot usa el reto.
               </p>
+            </div>
+
+            {/* Card: Instrucciones del bot (system prompt) ───────── */}
+            <div style={{ background: '#fff', border: '1px solid #E4E9F0', borderRadius: 16, padding: 20 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                <Sparkles size={15} className="text-[#B735B8]" />
+                <p style={{ fontSize: 13, fontWeight: 800, color: '#111827', margin: 0, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                  Instrucciones del bot (personalidad)
+                </p>
+              </div>
+              <p style={{ fontSize: 12, color: '#6B7280', lineHeight: 1.6, margin: '0 0 12px' }}>
+                Escribe el contexto del plan de 90 días y cómo debe tratar el bot a los participantes
+                (tono, motivación, reglas). La IA seguirá estas instrucciones al responderles.
+              </p>
+              <textarea
+                value={form.botInstructions}
+                onChange={e => set('botInstructions', e.target.value)}
+                rows={7}
+                placeholder={"Ej: Eres el coach del Reto 90 Días de My Diamond. Trata a cada participante por su nombre, con energía y cercanía (tutéalos). Recuérdales el porqué del reto y felicítalos cuando cumplen. Sé claro y breve. Si una evidencia no corresponde, explícales con amabilidad qué falta."}
+                style={{ ...inputStyle, resize: 'vertical', minHeight: 120, lineHeight: 1.6, fontFamily: 'inherit' }}
+              />
             </div>
 
             {/* Card: Bot y contactos ─────────────────────────────── */}

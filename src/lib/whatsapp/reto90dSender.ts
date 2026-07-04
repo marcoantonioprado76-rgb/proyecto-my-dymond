@@ -6,7 +6,13 @@
 import { prisma } from '@/lib/prisma'
 import { BaileysManager } from '@/lib/baileys-manager'
 
-type ConfigCache = { botId: string | null; groupId: string | null; adminPhone: string | null; at: number }
+type ConfigCache = {
+  botId: string | null
+  groupId: string | null
+  adminPhone: string | null
+  botInstructions: string | null
+  at: number
+}
 let cache: ConfigCache | null = null
 const CACHE_MS = 30_000
 
@@ -17,21 +23,27 @@ async function getConfig(): Promise<ConfigCache> {
   try {
     const cfg = await prisma.whatsAppConfig.findFirst({
       where: { isActive: true },
-      select: { botId: true, groupId: true, adminPhone: true },
+      select: { botId: true, groupId: true, adminPhone: true, botInstructions: true },
       orderBy: { updatedAt: 'desc' },
     })
     cache = {
       botId: cfg?.botId ?? null,
       groupId: cfg?.groupId ?? null,
       adminPhone: cfg?.adminPhone ?? null,
+      botInstructions: cfg?.botInstructions ?? null,
       at: now,
     }
   } catch (err) {
     console.error('[reto90d/sender] getConfig failed:', err)
     // No dejamos que un fallo de BD tumbe el flujo del bot: devolvemos cache viejo o vacío.
-    cache = cache ?? { botId: null, groupId: null, adminPhone: null, at: now }
+    cache = cache ?? { botId: null, groupId: null, adminPhone: null, botInstructions: null, at: now }
   }
   return cache
+}
+
+/** Instrucciones/system-prompt del bot (tono, trato y contexto del plan) o null. */
+export async function getRetoInstructions(): Promise<string | null> {
+  return (await getConfig()).botInstructions
 }
 
 /** Invalida el cache (útil tras guardar la configuración en el panel). */

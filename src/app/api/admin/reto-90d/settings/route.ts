@@ -33,6 +33,7 @@ const patchSchema = z.object({
   nightReminderTime: z.string().optional(),
   finalReportTime: z.string().optional(),
   timezone: z.string().optional(),
+  botInstructions: z.string().nullable().optional(),
 })
 
 // PATCH /api/admin/reto-90d/settings
