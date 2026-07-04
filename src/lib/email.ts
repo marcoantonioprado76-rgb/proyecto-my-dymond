@@ -148,6 +148,72 @@ export async function sendWelcomeEmail(
   }
 }
 
+/**
+ * Correo de bienvenida del Reto 90D (al correo que el participante registró).
+ * Incluye un botón a WhatsApp (wa.me) para que el participante ESCRIBA PRIMERO al
+ * número del reto — así el bot no inicia la conversación y se evita el baneo.
+ * `bodyText` es el mensaje ya personalizado ({nombre}/{reto} reemplazados).
+ */
+export async function sendRetoWelcomeEmail(
+  email: string,
+  fullName: string,
+  retoName: string,
+  bodyText: string,
+  waNumber?: string | null,
+): Promise<boolean> {
+  const esc = (s: string) => (s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+  const body = esc(bodyText)
+    .replace(/\*([^*\n]+)\*/g, '<strong style="color:rgba(255,255,255,0.9);">$1</strong>')
+    .replace(/\n/g, '<br>')
+
+  const waDigits = (waNumber || '').replace(/\D/g, '')
+  const waText = encodeURIComponent(`Hola, soy ${fullName}. Me registré al ${retoName} y estoy listo para empezar 💪`)
+  const waLink = waDigits ? `https://wa.me/${waDigits}?text=${waText}` : ''
+
+  const ctaBlock = waLink
+    ? `
+    <table cellpadding="0" cellspacing="0" style="margin-top:8px;">
+      <tr>
+        <td style="border-radius:12px;background:linear-gradient(135deg,#25D366 0%,#128C7E 100%);">
+          <a href="${waLink}" target="_blank"
+             style="display:inline-block;color:#ffffff;text-decoration:none;font-weight:800;font-size:14px;padding:14px 30px;border-radius:12px;letter-spacing:0.4px;">
+            📲 Escríbenos por WhatsApp para empezar
+          </a>
+        </td>
+      </tr>
+    </table>
+    <p style="color:rgba(255,255,255,0.30);font-size:11px;margin:12px 0 0;line-height:1.6;">
+      Toca el botón y envía el mensaje: así activas tu cupo y el asistente te guía cada día.
+    </p>`
+    : `
+    <p style="color:rgba(255,255,255,0.35);font-size:12px;margin:8px 0 0;">Pronto te contactaremos por WhatsApp para empezar.</p>`
+
+  const content = `
+    <p style="color:#B735B8;font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;margin:0 0 16px;">Reto 90 Días</p>
+    <h1 style="color:#ffffff;font-size:22px;font-weight:800;margin:0 0 14px;letter-spacing:-0.3px;line-height:1.3;">
+      ¡Felicidades, ${esc(fullName)}! 🎉
+    </h1>
+    <p style="color:rgba(255,255,255,0.55);font-size:14px;margin:0 0 26px;line-height:1.9;">
+      ${body}
+    </p>
+    ${ctaBlock}
+  `
+
+  try {
+    await transporter.sendMail({
+      from: `"MY DIAMOND" <${process.env.GMAIL_USER}>`,
+      to: email,
+      subject: `¡Bienvenido al ${retoName}! 🎉`,
+      html: emailWrapper(content, '#B735B8'),
+    })
+    console.log(`[EMAIL] Reto welcome sent to ${email}`)
+    return true
+  } catch (err) {
+    console.error('[EMAIL] Reto welcome error:', err)
+    return false
+  }
+}
+
 export interface OrderEmailItem {
   title: string
   quantity: number

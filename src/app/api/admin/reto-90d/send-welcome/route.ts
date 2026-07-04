@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
   let sent = 0
   const results: Array<{ phone: string; fullName: string; ok: boolean }> = []
   for (const m of targets) {
-    const ok = await sendWelcome(challenge.id, challenge.name, m.phone, m.fullName)
+    const ok = await sendWelcome(challenge.id, challenge.name, m.phone, m.fullName, (m as any).email ?? null)
     if (ok) sent++
     results.push({ phone: m.phone, fullName: m.fullName, ok })
   }

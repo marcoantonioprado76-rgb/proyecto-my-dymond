@@ -81,6 +81,18 @@ export async function getRetoBotId(): Promise<string | null> {
   return (await getConfig()).botId
 }
 
+/** Número de WhatsApp del reto (baileysPhone del bot) para armar enlaces wa.me. */
+export async function getRetoWaNumber(): Promise<string | null> {
+  const botId = await getRetoBotId()
+  if (!botId) return null
+  try {
+    const bot = await prisma.bot.findUnique({ where: { id: botId }, select: { baileysPhone: true } })
+    return bot?.baileysPhone ?? null
+  } catch {
+    return null
+  }
+}
+
 /** true si `botId` es el bot dedicado del reto. Nunca lanza. */
 export async function isReto90dBot(botId: string): Promise<boolean> {
   try {

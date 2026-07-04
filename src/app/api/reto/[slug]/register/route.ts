@@ -49,7 +49,7 @@ export async function POST(req: NextRequest, { params }: { params: { slug: strin
 
     // Bienvenida automática (best-effort, no bloquea la respuesta) solo si es nuevo.
     if (!existing) {
-      void sendWelcome(ch.id, ch.name, phone, fullName).catch(() => {})
+      void sendWelcome(ch.id, ch.name, phone, fullName, d.email?.trim() || null).catch(() => {})
     }
 
     return NextResponse.json({ ok: true })
