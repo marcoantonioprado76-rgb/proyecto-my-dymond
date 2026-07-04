@@ -12,6 +12,9 @@ export interface EnrollMemberInput {
   fullName: string
   phone: string
   userId?: string | null
+  email?: string | null
+  country?: string | null
+  city?: string | null
 }
 
 /** Normaliza un teléfono a solo dígitos (quita +, espacios, guiones, etc.). */
@@ -31,6 +34,9 @@ export async function enrollMember(challengeId: string, data: EnrollMemberInput)
       update: {
         fullName: data.fullName,
         userId: data.userId ?? undefined,
+        email: data.email ?? undefined,
+        country: data.country ?? undefined,
+        city: data.city ?? undefined,
         status: 'ACTIVE',
       },
       create: {
@@ -38,6 +44,9 @@ export async function enrollMember(challengeId: string, data: EnrollMemberInput)
         phone,
         fullName: data.fullName,
         userId: data.userId ?? null,
+        email: data.email ?? null,
+        country: data.country ?? null,
+        city: data.city ?? null,
         status: 'ACTIVE',
       },
     })

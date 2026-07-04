@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Users, Plus, Loader2, X, Pause, Play, UserMinus, Phone, Calendar } from 'lucide-react'
+import { Users, Plus, Loader2, X, Pause, Play, UserMinus, Phone, Calendar, Link2, Copy, ExternalLink, Check } from 'lucide-react'
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Reto 90D — Panel admin · Miembros (ADMIN-ONLY)
@@ -70,6 +70,84 @@ function extractActiveId(d: unknown, list: Challenge[]): string | null {
 function errMsg(e: unknown): string {
   if (e instanceof Error) return e.message
   return 'Ocurrió un error inesperado'
+}
+
+// ── Link de registro público (pertenece al reto activo) ─────────────────────
+function RegistrationLink() {
+  const [slug, setSlug] = useState<string | null>(null)
+  const [open, setOpen] = useState(false)
+  const [loading, setLoading] = useState(true)
+  const [busy, setBusy] = useState(false)
+  const [copied, setCopied] = useState(false)
+  const [noChallenge, setNoChallenge] = useState(false)
+
+  async function load() {
+    setLoading(true)
+    try {
+      const r = await fetch('/api/admin/reto-90d/registration')
+      const d = await r.json().catch(() => ({}))
+      if (!d.challenge) { setNoChallenge(true); return }
+      setNoChallenge(false); setSlug(d.slug ?? null); setOpen(!!d.open)
+    } catch { /* silencioso */ } finally { setLoading(false) }
+  }
+  useEffect(() => { load() }, [])
+
+  const url = slug && typeof window !== 'undefined' ? `${window.location.origin}/reto/${slug}` : ''
+
+  async function toggle() {
+    setBusy(true)
+    try {
+      const r = await fetch('/api/admin/reto-90d/registration', {
+        method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ open: !open }),
+      })
+      const d = await r.json().catch(() => ({}))
+      if (r.ok) { setOpen(!!d.open); if (d.slug) setSlug(d.slug) }
+    } finally { setBusy(false) }
+  }
+  async function copy() {
+    if (!url) return
+    try { await navigator.clipboard.writeText(url); setCopied(true); setTimeout(() => setCopied(false), 1800) } catch { /* noop */ }
+  }
+
+  if (loading || noChallenge) return null
+
+  const inputStyle: React.CSSProperties = { flex: 1, minWidth: 160, padding: '9px 12px', borderRadius: 10, border: '1px solid #E4E9F0', fontSize: 12.5, color: '#111827', background: '#F5F7FA' }
+  const ghost: React.CSSProperties = { display: 'inline-flex', alignItems: 'center', gap: 6, padding: '9px 12px', borderRadius: 10, fontSize: 12.5, fontWeight: 700, background: '#fff', border: '1px solid #E4E9F0', cursor: 'pointer', flexShrink: 0, textDecoration: 'none', color: '#111827' }
+
+  return (
+    <div style={{ background: '#fff', border: '1px solid #E4E9F0', borderRadius: 16, padding: 18, marginBottom: 16 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+        <Link2 size={15} style={{ color: '#B735B8' }} />
+        <p style={{ fontSize: 13, fontWeight: 800, color: '#111827', margin: 0 }}>Link de registro público</p>
+        <span style={{ fontSize: 10.5, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em', color: open ? '#16A34A' : '#6B7280', background: open ? 'rgba(22,163,74,0.1)' : 'rgba(107,114,128,0.12)', padding: '2px 8px', borderRadius: 999 }}>
+          {open ? 'Abierto' : 'Cerrado'}
+        </span>
+      </div>
+      <p style={{ fontSize: 12, color: '#6B7280', margin: '0 0 12px' }}>
+        Comparte este enlace para que los participantes se inscriban solos en este reto (nombre, celular, correo, país y ciudad).
+      </p>
+      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center', marginBottom: 12 }}>
+        <input readOnly value={url} onFocus={(e) => e.currentTarget.select()} style={inputStyle} />
+        <button onClick={copy} style={ghost}>{copied ? <Check size={13} style={{ color: '#16A34A' }} /> : <Copy size={13} />} {copied ? 'Copiado' : 'Copiar'}</button>
+        <a href={url || '#'} target="_blank" rel="noopener noreferrer" style={ghost}><ExternalLink size={13} /> Abrir</a>
+      </div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+        <button
+          onClick={toggle}
+          disabled={busy}
+          style={{
+            width: 46, height: 26, borderRadius: 99, border: 'none', cursor: busy ? 'wait' : 'pointer',
+            background: open ? BRAND_GRADIENT : '#D9E0EA', position: 'relative', transition: 'background 0.2s', flexShrink: 0,
+          }}
+        >
+          <span style={{ position: 'absolute', top: 3, left: open ? 23 : 3, width: 20, height: 20, borderRadius: '50%', background: '#fff', transition: 'left 0.2s', boxShadow: '0 1px 3px rgba(0,0,0,0.2)' }} />
+        </button>
+        <span style={{ fontSize: 12.5, color: '#6B7280' }}>
+          {open ? 'El link acepta registros. Desactívalo para cerrar las inscripciones.' : 'El link está cerrado: nadie puede registrarse. Actívalo para abrir.'}
+        </span>
+      </div>
+    </div>
+  )
 }
 
 function formatDate(iso: string): string {
@@ -217,6 +295,8 @@ export default function AdminReto90dUsuariosPage() {
       </div>
 
       <SubNav />
+
+      <RegistrationLink />
 
       {/* Top bar */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, marginBottom: 16, flexWrap: 'wrap' }}>
