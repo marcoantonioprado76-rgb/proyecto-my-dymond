@@ -1,8 +1,11 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // Reto 90D — Handler de mensajes ENTRANTES por WhatsApp (Baileys)
-// Flujo: chat individual → ¿miembro ACTIVE? → descarga media → anti-duplicado →
-//        crea submission (idempotente) → clasifica con IA → responde al usuario.
-// Sólo se invoca cuando el bot receptor es el bot dedicado del reto.
+//
+// SOLO responde a los inscritos (miembros ACTIVE) — a nadie más.
+// - IMAGEN  → clasifica la evidencia contra las tareas (con fotos de referencia).
+// - TEXTO   → asistente conversacional que RECUERDA el hilo y responde
+//             "¿qué tarea me falta?", "¿cómo voy?", saludos, etc.
+// Marca SIEMPRE el mensaje como leído. Sólo se invoca para el bot dedicado del reto.
 // ─────────────────────────────────────────────────────────────────────────────
 import crypto from 'crypto'
 import { proto, downloadMediaMessage } from '@whiskeysockets/baileys'
@@ -18,18 +21,22 @@ import {
   getPendingTasksForUser,
   type AiResult,
 } from './submissionService'
+import { saveRetoMessage, getRecentMessages } from './conversationService'
 import { classifyEvidenceWithAI } from '@/lib/ai/classifyTaskEvidence'
+import { assistParticipant, type TaskStatusLite } from '@/lib/ai/retoAssistant'
 import { sendToPhone, getRetoInstructions } from '@/lib/whatsapp/reto90dSender'
 
 // Conexión Baileys mínima que necesitamos (estructuralmente compatible con BaileysConnection)
 type RetoConn = { botId: string; sock?: any }
+type RetoMember = { userId?: string | null; fullName: string }
+type RetoChallenge = { id: string; name: string }
 
-const NOT_MEMBER_MSG =
-  'Hola 👋 No estás inscrito en el reto activo. Pídele al administrador que te agregue para registrar tus evidencias.'
-const DUPLICATE_MSG =
-  '⚠️ Esta evidencia ya la enviaste hoy; no puede sumar puntos otra vez.'
-const NO_TASKS_MSG =
-  'Por ahora no hay tareas configuradas para hoy. Intenta más tarde 🙌'
+const DUPLICATE_MSG = '⚠️ Esta evidencia ya la enviaste hoy; no puede sumar puntos otra vez.'
+const NO_TASKS_MSG = 'Por ahora no hay tareas configuradas para hoy. Intenta más tarde 🙌'
+
+function firstName(full: string): string {
+  return (full || '').trim().split(/\s+/)[0] || 'campeón/a'
+}
 
 /** Sube la imagen a Supabase Storage (bucket uploads). Best-effort: devuelve null si falla. */
 async function uploadEvidence(buffer: Buffer, phone: string, msgId: string): Promise<string | null> {
@@ -70,6 +77,32 @@ async function buildDailyHistory(phone: string, challengeId: string): Promise<st
   }
 }
 
+/** Estado de hoy del participante: tareas con hecho/pendiente + puntos aprobados. */
+async function computeStatus(
+  challenge: RetoChallenge,
+  phone: string,
+): Promise<{ tasksStatus: TaskStatusLite[]; points: number }> {
+  try {
+    const tasks = await getActiveTasksForToday(challenge.id)
+    const pending = await getPendingTasksForUser(phone, challenge.id, new Date())
+    const pendingIds = new Set(pending.map((t) => t.id))
+    const subs = await getDaySubmissions(phone, challenge.id, new Date())
+    const points = subs
+      .filter((s) => s.status === 'APPROVED')
+      .reduce((a, s) => a + (s.pointsEarned || 0), 0)
+    const tasksStatus: TaskStatusLite[] = tasks.map((t) => ({
+      title: t.title,
+      done: !pendingIds.has(t.id),
+      points: t.points,
+      evidenceType: t.evidenceType,
+    }))
+    return { tasksStatus, points }
+  } catch (err) {
+    console.error('[reto90d/inbound] computeStatus failed:', err)
+    return { tasksStatus: [], points: 0 }
+  }
+}
+
 /** Extrae texto plano del mensaje (conversación / caption / texto extendido). */
 function extractText(content: proto.IMessage): string {
   return (
@@ -81,52 +114,68 @@ function extractText(content: proto.IMessage): string {
   ).trim()
 }
 
-// ── Bot conversacional: saludos / comandos → orientar en vez de clasificar ──
-const GREETING_RE =
-  /^(hola+|buenas|buenos? d[ií]as?|buenas tardes|buenas noches|hey|ola|q(ue)? tal|menu|men[uú]|info|informacion|información|ayuda|help|start|empezar|comenzar|inicio|mis tareas|tareas|pendientes|puntos|estado|reto|listo)\b/i
+/** Crea la submission, clasifica la evidencia y responde (imagen o texto-evidencia). */
+async function classifyAndReply(
+  member: RetoMember,
+  challenge: RetoChallenge,
+  phone: string,
+  opts: { msgId: string; text?: string; dataUrl?: string; mediaUrl?: string; mediaHash?: string },
+): Promise<void> {
+  const submission = await createSubmission({
+    challengeId: challenge.id,
+    userId: member.userId ?? undefined,
+    fullName: member.fullName,
+    phone,
+    whatsappMsgId: opts.msgId,
+    mediaUrl: opts.mediaUrl,
+    mediaHash: opts.mediaHash,
+    textContent: opts.text || undefined,
+  })
+  // Ya clasificada antes (reintento de Baileys) → no reprocesar ni re-responder
+  if (submission.status !== 'PENDING') return
 
-function firstName(full: string): string {
-  return (full || '').trim().split(/\s+/)[0] || 'campeón/a'
-}
-
-/** true si el texto (sin imagen) es un saludo/comando corto y no una evidencia. */
-function isCommandMessage(text: string): boolean {
-  const t = text.trim().toLowerCase()
-  if (!t) return true // mensaje casi vacío → mejor orientar
-  if (t.length > 60) return false // texto largo → probablemente evidencia
-  return GREETING_RE.test(t)
-}
-
-/** Menú/orientación personalizada: nombre, tareas de hoy con ✅/⬜, avance y puntos. */
-async function buildOrientation(
-  member: { fullName: string; phone: string },
-  challenge: { id: string; name: string },
-): Promise<string> {
-  const header = `¡Hola ${firstName(member.fullName)}! 👋 Estás en *${challenge.name}*.`
-  try {
-    const tasks = await getActiveTasksForToday(challenge.id)
-    if (tasks.length === 0) {
-      return `${header}\nHoy todavía no hay tareas cargadas. Te aviso apenas estén 💪`
+  const tasks = await getActiveTasksForToday(challenge.id)
+  if (tasks.length === 0) {
+    const noTasks: AiResult = {
+      detectedTaskId: null,
+      detectedTaskTitle: null,
+      confidence: 0,
+      status: 'NEEDS_CLARIFICATION',
+      points: 0,
+      explanation: 'No hay tareas activas configuradas para hoy.',
+      needsManualReview: true,
+      userMessage: NO_TASKS_MSG,
     }
-    const pending = await getPendingTasksForUser(member.phone, challenge.id, new Date())
-    const pendingIds = new Set(pending.map((t) => t.id))
-    const subs = await getDaySubmissions(member.phone, challenge.id, new Date())
-    const points = subs
-      .filter((s) => s.status === 'APPROVED')
-      .reduce((a, s) => a + (s.pointsEarned || 0), 0)
-    const done = Math.max(0, tasks.length - pending.length)
-    const lines = tasks.map((t) => `${pendingIds.has(t.id) ? '⬜' : '✅'} ${t.title} · ${t.points} pts`)
-    return [
-      header,
-      `📅 Hoy: ${done}/${tasks.length} completadas · ⭐ ${points} pts`,
-      '',
-      ...lines,
-      '',
-      '📸 Envíame una *foto* (o un texto) como evidencia y la reviso al instante.',
-    ].join('\n')
-  } catch (err) {
-    console.error('[reto90d/inbound] buildOrientation failed:', err)
-    return `${header}\n📸 Envíame la evidencia de tus tareas (foto o texto) y la reviso al instante.`
+    await applyClassification(submission.id, noTasks)
+    await sendToPhone(phone, NO_TASKS_MSG)
+    await saveRetoMessage(challenge.id, phone, 'bot', NO_TASKS_MSG)
+    return
+  }
+
+  const dailyHistory = await buildDailyHistory(phone, challenge.id)
+  const instructions = (await getRetoInstructions()) ?? undefined
+  const ai = await classifyEvidenceWithAI({
+    imageUrl: opts.dataUrl,
+    text: opts.text || undefined,
+    tasks: tasks.map((t) => ({
+      id: t.id,
+      title: t.title,
+      description: t.description,
+      evidenceType: t.evidenceType,
+      expectedKeywords: t.expectedKeywords,
+      points: t.points,
+      referenceImages: t.validExamples, // fotos modelo subidas por el admin
+    })),
+    phone,
+    dailyHistory,
+    now: new Date(),
+    instructions,
+  })
+
+  await applyClassification(submission.id, ai)
+  if (ai.userMessage) {
+    await sendToPhone(phone, ai.userMessage)
+    await saveRetoMessage(challenge.id, phone, 'bot', ai.userMessage)
   }
 }
 
@@ -145,32 +194,21 @@ export async function handleReto90dInbound(conn: RetoConn, msg: proto.IWebMessag
   if (!content) return
   const text = extractText(content)
   const hasImage = !!content.imageMessage
+  if (!hasImage && !text) return // stickers/audio/reacciones/vacíos → ignorar
 
-  // Sin evidencia útil (stickers, audio, reacciones, mensajes vacíos) → no gastamos IA
-  if (!hasImage && !text) return
-
-  // 1) ¿Hay un reto activo? Si no, el bot del reto guarda silencio.
+  // 1) ¿Hay un reto activo?
   const challenge = await getActiveChallenge()
   if (!challenge) return
 
-  // 2) ¿Es miembro ACTIVE del reto?
+  // 2) SOLO responde a inscritos: si no es miembro ACTIVE, silencio total.
   const member = await getMemberByPhone(phone, challenge.id)
-  if (!member) {
-    await sendToPhone(phone, NOT_MEMBER_MSG)
-    return
-  }
+  if (!member) return
 
-  // 2.5) Mensaje conversacional (saludo / "tareas" / "puntos") → orientar, no clasificar
-  if (!hasImage && isCommandMessage(text)) {
-    await sendToPhone(phone, await buildOrientation(member, challenge))
-    return
-  }
-
-  // 3) Descargar media (si hay imagen): hash anti-dup + dataURL para la IA + subida best-effort
-  let mediaHash: string | undefined
-  let dataUrl: string | undefined
-  let mediaUrl: string | undefined
+  // ── IMAGEN → clasificar evidencia ──────────────────────────────────────────
   if (hasImage) {
+    let mediaHash: string | undefined
+    let dataUrl: string | undefined
+    let mediaUrl: string | undefined
     try {
       const buffer = (await downloadMediaMessage(msg as any, 'buffer', {})) as Buffer
       mediaHash = crypto.createHash('md5').update(buffer).digest('hex')
@@ -180,7 +218,7 @@ export async function handleReto90dInbound(conn: RetoConn, msg: proto.IWebMessag
       console.error('[reto90d/inbound] downloadMediaMessage failed:', err)
     }
 
-    // 4) Anti-duplicado por hash dentro del día (antes de crear, para no auto-coincidir)
+    // Anti-duplicado por hash dentro del día (antes de crear, para no auto-coincidir)
     if (mediaHash && (await detectDuplicateSubmission(phone, { mediaHash, day: new Date() }))) {
       const dupSub = await createSubmission({
         challengeId: challenge.id,
@@ -192,7 +230,6 @@ export async function handleReto90dInbound(conn: RetoConn, msg: proto.IWebMessag
         mediaHash,
         textContent: text || undefined,
       })
-      // Sólo procesar/responder si es nueva (evita reprocesar reintentos de Baileys)
       if (dupSub.status === 'PENDING') {
         const dupResult: AiResult = {
           detectedTaskId: null,
@@ -206,65 +243,38 @@ export async function handleReto90dInbound(conn: RetoConn, msg: proto.IWebMessag
         }
         await applyClassification(dupSub.id, dupResult)
         await sendToPhone(phone, DUPLICATE_MSG)
+        await saveRetoMessage(challenge.id, phone, 'bot', DUPLICATE_MSG)
       }
       return
     }
-  }
 
-  // 5) Crear submission PENDING (idempotente por whatsappMsgId)
-  const submission = await createSubmission({
-    challengeId: challenge.id,
-    userId: member.userId ?? undefined,
-    fullName: member.fullName,
-    phone,
-    whatsappMsgId: msgId,
-    mediaUrl,
-    mediaHash,
-    textContent: text || undefined,
-  })
-  // Ya clasificada antes (reintento de webhook) → no reprocesar ni re-responder
-  if (submission.status !== 'PENDING') return
-
-  // 6) Tareas activas de hoy
-  const tasks = await getActiveTasksForToday(challenge.id)
-  if (tasks.length === 0) {
-    const noTasks: AiResult = {
-      detectedTaskId: null,
-      detectedTaskTitle: null,
-      confidence: 0,
-      status: 'NEEDS_CLARIFICATION',
-      points: 0,
-      explanation: 'No hay tareas activas configuradas para hoy.',
-      needsManualReview: true,
-      userMessage: NO_TASKS_MSG,
-    }
-    await applyClassification(submission.id, noTasks)
-    await sendToPhone(phone, NO_TASKS_MSG)
+    await saveRetoMessage(challenge.id, phone, 'user', text ? `[foto] ${text}` : '[foto de evidencia]')
+    await classifyAndReply(member, challenge, phone, { msgId, text, dataUrl, mediaUrl, mediaHash })
     return
   }
 
-  // 7) Clasificar con IA (imagen en base64 + texto + historial del día + referencias + instrucciones)
-  const dailyHistory = await buildDailyHistory(phone, challenge.id)
+  // ── TEXTO → asistente conversacional (recuerda el hilo + responde pendientes) ─
+  const history = await getRecentMessages(challenge.id, phone) // contexto previo
+  await saveRetoMessage(challenge.id, phone, 'user', text)
+
+  const { tasksStatus, points } = await computeStatus(challenge, phone)
   const instructions = (await getRetoInstructions()) ?? undefined
-  const ai = await classifyEvidenceWithAI({
-    imageUrl: dataUrl,
-    text: text || undefined,
-    tasks: tasks.map((t) => ({
-      id: t.id,
-      title: t.title,
-      description: t.description,
-      evidenceType: t.evidenceType,
-      expectedKeywords: t.expectedKeywords,
-      points: t.points,
-      referenceImages: t.validExamples, // fotos modelo subidas por el admin
-    })),
-    phone,
-    dailyHistory,
-    now: new Date(),
+  const result = await assistParticipant({
     instructions,
+    participantName: firstName(member.fullName),
+    challengeName: challenge.name,
+    tasksStatus,
+    points,
+    history,
+    userText: text,
   })
 
-  // 8) Persistir clasificación (transacción con log de revisión) + responder al usuario
-  await applyClassification(submission.id, ai)
-  if (ai.userMessage) await sendToPhone(phone, ai.userMessage)
+  if (result.intent === 'evidence') {
+    // El participante entregó una tarea por texto/número/enlace → clasificar
+    await classifyAndReply(member, challenge, phone, { msgId, text })
+    return
+  }
+
+  await sendToPhone(phone, result.reply)
+  await saveRetoMessage(challenge.id, phone, 'bot', result.reply)
 }

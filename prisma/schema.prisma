@@ -1820,3 +1820,17 @@ model WhatsAppConfig {
 
   @@map("reto90d_whatsapp_config")
 }
+
+// Memoria de conversación del bot con cada participante (para recordar el hilo
+// y responder "¿qué tarea me falta?" con contexto).
+model RetoMessage {
+  id          String   @id @default(uuid()) @db.Uuid
+  challengeId String   @map("challenge_id") @db.Uuid
+  phone       String
+  role        String   // 'user' | 'bot'
+  content     String   @db.Text
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@index([challengeId, phone, createdAt])
+  @@map("reto90d_messages")
+}
