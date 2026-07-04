@@ -74,14 +74,17 @@ export async function updateChallenge(id: string, data: UpdateChallengeInput) {
  * Reto activo: `isActive = true` cuya fecha actual (en la zona horaria por
  * defecto) esté entre startDate y endDate. Devuelve el más reciente o null.
  */
-export async function getActiveChallenge(timeZone: string = DEFAULT_TIMEZONE) {
+export async function getActiveChallenge(_timeZone: string = DEFAULT_TIMEZONE) {
   try {
-    const today = currentDateInTimeZone(timeZone)
+    // Usamos el instante actual (now) — no la medianoche de la zona — para evitar
+    // el desfase horario: un reto que empieza "hoy" queda activo apenas se crea,
+    // sin importar si en La Paz aún es el día anterior respecto a UTC.
+    const now = new Date()
     return await prisma.challenge.findFirst({
       where: {
         isActive: true,
-        startDate: { lte: today },
-        endDate: { gte: today },
+        startDate: { lte: now },
+        endDate: { gte: now },
       },
       orderBy: [{ startDate: 'desc' }, { createdAt: 'desc' }],
     })
