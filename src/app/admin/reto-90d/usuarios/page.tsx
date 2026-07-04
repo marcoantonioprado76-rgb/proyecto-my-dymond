@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Users, Plus, Loader2, X, Pause, Play, UserMinus, Phone, Calendar, Link2, Copy, ExternalLink, Check } from 'lucide-react'
+import { Users, Plus, Loader2, X, Pause, Play, UserMinus, Phone, Calendar, Link2, Copy, ExternalLink, Check, Pencil, Trash2, Mail, MapPin, Send } from 'lucide-react'
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Reto 90D — Panel admin · Miembros (ADMIN-ONLY)
@@ -39,6 +39,9 @@ interface Member {
   id: string
   fullName: string
   phone: string
+  email?: string | null
+  country?: string | null
+  city?: string | null
   status: MemberStatus
   joinedAt: string
 }
@@ -202,6 +205,20 @@ export default function AdminReto90dUsuariosPage() {
   const [saving, setSaving] = useState(false)
   const [saveError, setSaveError] = useState<string | null>(null)
 
+  // Edit member modal
+  const [editM, setEditM] = useState<Member | null>(null)
+  const [eName, setEName] = useState('')
+  const [ePhone, setEPhone] = useState('')
+  const [eEmail, setEEmail] = useState('')
+  const [eCountry, setECountry] = useState('')
+  const [eCity, setECity] = useState('')
+  const [editSaving, setEditSaving] = useState(false)
+  const [editErr, setEditErr] = useState<string | null>(null)
+
+  // Enviar bienvenida
+  const [welcoming, setWelcoming] = useState(false)
+  const [welcomeMsg, setWelcomeMsg] = useState<string | null>(null)
+
   async function loadMembers(cid: string) {
     const r = await fetch(`/api/admin/reto-90d/members?challengeId=${encodeURIComponent(cid)}`)
     if (!r.ok) throw new Error('No se pudieron cargar los miembros')
@@ -281,6 +298,47 @@ export default function AdminReto90dUsuariosPage() {
     }
   }
 
+  function openEdit(m: Member) {
+    setEditM(m)
+    setEName(m.fullName || ''); setEPhone(m.phone || ''); setEEmail(m.email || '')
+    setECountry(m.country || ''); setECity(m.city || ''); setEditErr(null)
+  }
+
+  async function saveEdit() {
+    if (!editM || !challengeId) return
+    if (!eName.trim() || !ePhone.trim()) { setEditErr('Nombre y celular son obligatorios'); return }
+    setEditSaving(true); setEditErr(null)
+    try {
+      const r = await fetch(`/api/admin/reto-90d/members/${editM.id}`, {
+        method: 'PATCH', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ fullName: eName.trim(), phone: ePhone.trim(), email: eEmail.trim() || null, country: eCountry.trim() || null, city: eCity.trim() || null }),
+      })
+      if (!r.ok) throw new Error((await r.json().catch(() => ({}))).error || 'No se pudo guardar')
+      setEditM(null); await loadMembers(challengeId)
+    } catch (e) { setEditErr(errMsg(e)) } finally { setEditSaving(false) }
+  }
+
+  async function hardDelete(m: Member) {
+    if (!challengeId) return
+    if (!window.confirm(`¿Eliminar definitivamente a ${m.fullName || 'este inscrito'}? No se puede deshacer.`)) return
+    setActioningId(m.id)
+    try {
+      const r = await fetch(`/api/admin/reto-90d/members/${m.id}`, { method: 'DELETE' })
+      if (!r.ok) throw new Error('No se pudo eliminar')
+      await loadMembers(challengeId)
+    } catch (e) { setError(errMsg(e)) } finally { setActioningId(null) }
+  }
+
+  async function sendWelcomeBulk() {
+    setWelcoming(true); setWelcomeMsg(null)
+    try {
+      const r = await fetch('/api/admin/reto-90d/send-welcome?scope=withEmail', { method: 'POST' })
+      const d = await r.json().catch(() => ({}))
+      if (!r.ok) throw new Error(d.error || 'No se pudo enviar')
+      setWelcomeMsg(`Bienvenida enviada a ${d.sent}/${d.total} inscritos con correo.`)
+    } catch (e) { setWelcomeMsg(errMsg(e)) } finally { setWelcoming(false) }
+  }
+
   return (
     <div className="font-ui">
       {/* Header */}
@@ -303,18 +361,37 @@ export default function AdminReto90dUsuariosPage() {
         <p style={{ fontSize: 13, color: '#6B7280', margin: 0 }}>
           {loading ? 'Cargando…' : `${members.length} miembro${members.length !== 1 ? 's' : ''}`}
         </p>
-        <button
-          onClick={() => { setSaveError(null); setFullName(''); setPhone(''); setShowAdd(true) }}
-          disabled={!challengeId}
-          style={{
-            display: 'flex', alignItems: 'center', gap: 6, padding: '9px 16px', borderRadius: 10, fontSize: 13, fontWeight: 700,
-            background: challengeId ? BRAND_GRADIENT : '#E4E9F0', color: challengeId ? '#fff' : '#9CA3AF',
-            border: 'none', cursor: challengeId ? 'pointer' : 'not-allowed',
-          }}
-        >
-          <Plus size={15} /> Agregar usuario
-        </button>
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+          <button
+            onClick={sendWelcomeBulk}
+            disabled={welcoming || !challengeId}
+            title="Enviar la bienvenida por WhatsApp a los inscritos que tienen correo"
+            style={{
+              display: 'flex', alignItems: 'center', gap: 6, padding: '9px 14px', borderRadius: 10, fontSize: 13, fontWeight: 700,
+              background: '#fff', color: '#233B8F', border: '1px solid #E4E9F0', cursor: welcoming ? 'wait' : 'pointer',
+            }}
+          >
+            {welcoming ? <Loader2 size={15} className="animate-spin" /> : <Send size={15} />} Enviar bienvenida
+          </button>
+          <button
+            onClick={() => { setSaveError(null); setFullName(''); setPhone(''); setShowAdd(true) }}
+            disabled={!challengeId}
+            style={{
+              display: 'flex', alignItems: 'center', gap: 6, padding: '9px 16px', borderRadius: 10, fontSize: 13, fontWeight: 700,
+              background: challengeId ? BRAND_GRADIENT : '#E4E9F0', color: challengeId ? '#fff' : '#9CA3AF',
+              border: 'none', cursor: challengeId ? 'pointer' : 'not-allowed',
+            }}
+          >
+            <Plus size={15} /> Agregar usuario
+          </button>
+        </div>
       </div>
+
+      {welcomeMsg && (
+        <div style={{ padding: '10px 14px', borderRadius: 12, background: 'rgba(35,59,143,0.06)', border: '1px solid rgba(35,59,143,0.2)', color: '#233B8F', fontSize: 13, marginBottom: 16 }}>
+          {welcomeMsg}
+        </div>
+      )}
 
       {error && (
         <div style={{ padding: '12px 14px', borderRadius: 12, background: 'rgba(220,38,38,0.06)', border: '1px solid rgba(220,38,38,0.2)', color: '#DC2626', fontSize: 13, marginBottom: 16 }}>
@@ -350,6 +427,12 @@ export default function AdminReto90dUsuariosPage() {
                       <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}><Phone size={12} /> {m.phone || '—'}</span>
                       <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}><Calendar size={12} /> {formatDate(m.joinedAt)}</span>
                     </div>
+                    {(m.email || m.city || m.country) && (
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap', fontSize: 12, color: '#6B7280', marginTop: 4 }}>
+                        {m.email && <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}><Mail size={12} /> {m.email}</span>}
+                        {(m.city || m.country) && <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}><MapPin size={12} /> {[m.city, m.country].filter(Boolean).join(', ')}</span>}
+                      </div>
+                    )}
                   </div>
 
                   {/* Status chip */}
@@ -358,7 +441,11 @@ export default function AdminReto90dUsuariosPage() {
                   </span>
 
                   {/* Actions */}
-                  <div style={{ display: 'flex', gap: 6 }}>
+                  <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                    <button onClick={() => openEdit(m)} disabled={busy} title="Editar datos"
+                      style={actionBtn('#233B8F', 'rgba(35,59,143,0.08)', 'rgba(35,59,143,0.2)', busy)}>
+                      <Pencil size={13} /> Editar
+                    </button>
                     {m.status === 'ACTIVE' && (
                       <button onClick={() => changeStatus(m.id, 'PAUSED')} disabled={busy} title="Pausar"
                         style={actionBtn('#D97706', 'rgba(217,119,6,0.08)', 'rgba(217,119,6,0.2)', busy)}>
@@ -372,11 +459,15 @@ export default function AdminReto90dUsuariosPage() {
                       </button>
                     )}
                     {m.status !== 'REMOVED' && (
-                      <button onClick={() => changeStatus(m.id, 'REMOVED')} disabled={busy} title="Quitar"
-                        style={actionBtn('#DC2626', 'rgba(220,38,38,0.08)', 'rgba(220,38,38,0.2)', busy)}>
+                      <button onClick={() => changeStatus(m.id, 'REMOVED')} disabled={busy} title="Quitar (pausa sin borrar)"
+                        style={actionBtn('#D97706', 'rgba(217,119,6,0.08)', 'rgba(217,119,6,0.2)', busy)}>
                         {busy ? <Loader2 size={13} className="animate-spin" /> : <UserMinus size={13} />} Quitar
                       </button>
                     )}
+                    <button onClick={() => hardDelete(m)} disabled={busy} title="Eliminar definitivamente"
+                      style={actionBtn('#DC2626', 'rgba(220,38,38,0.08)', 'rgba(220,38,38,0.2)', busy)}>
+                      {busy ? <Loader2 size={13} className="animate-spin" /> : <Trash2 size={13} />} Eliminar
+                    </button>
                   </div>
                 </div>
               </div>
@@ -417,6 +508,54 @@ export default function AdminReto90dUsuariosPage() {
                 <button onClick={handleAdd} disabled={saving}
                   style={{ flex: 2, padding: '10px 0', borderRadius: 10, fontSize: 13, fontWeight: 700, background: BRAND_GRADIENT, border: 'none', color: '#fff', cursor: saving ? 'not-allowed' : 'pointer', opacity: saving ? 0.7 : 1 }}>
                   {saving ? <Loader2 size={14} className="animate-spin mx-auto" /> : 'Agregar'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit member modal */}
+      {editM && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(17,24,39,0.45)', backdropFilter: 'blur(4px)' }}
+          onClick={(e) => { if (e.target === e.currentTarget && !editSaving) setEditM(null) }}>
+          <div style={{ background: '#fff', border: '1px solid #E4E9F0', borderRadius: 20, padding: 24, width: '100%', maxWidth: 440 }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 18 }}>
+              <h3 style={{ fontSize: 16, fontWeight: 800, color: '#111827', margin: 0 }}>Editar inscrito</h3>
+              <button onClick={() => { if (!editSaving) setEditM(null) }} style={{ background: 'none', border: 'none', color: '#6B7280', cursor: 'pointer' }}><X size={18} /></button>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              <div>
+                <label style={{ fontSize: 12, color: '#6B7280', display: 'block', marginBottom: 6 }}>Nombre completo *</label>
+                <input type="text" value={eName} onChange={(e) => setEName(e.target.value)} style={inputStyle} />
+              </div>
+              <div>
+                <label style={{ fontSize: 12, color: '#6B7280', display: 'block', marginBottom: 6 }}>WhatsApp *</label>
+                <input type="tel" value={ePhone} onChange={(e) => setEPhone(e.target.value)} placeholder="591700..." style={inputStyle} />
+              </div>
+              <div>
+                <label style={{ fontSize: 12, color: '#6B7280', display: 'block', marginBottom: 6 }}>Correo</label>
+                <input type="email" value={eEmail} onChange={(e) => setEEmail(e.target.value)} style={inputStyle} />
+              </div>
+              <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+                <div style={{ flex: '1 1 140px' }}>
+                  <label style={{ fontSize: 12, color: '#6B7280', display: 'block', marginBottom: 6 }}>País</label>
+                  <input type="text" value={eCountry} onChange={(e) => setECountry(e.target.value)} style={inputStyle} />
+                </div>
+                <div style={{ flex: '1 1 140px' }}>
+                  <label style={{ fontSize: 12, color: '#6B7280', display: 'block', marginBottom: 6 }}>Ciudad</label>
+                  <input type="text" value={eCity} onChange={(e) => setECity(e.target.value)} style={inputStyle} />
+                </div>
+              </div>
+              {editErr && <p style={{ fontSize: 12, color: '#DC2626', margin: 0 }}>{editErr}</p>}
+              <div style={{ display: 'flex', gap: 10, marginTop: 2 }}>
+                <button onClick={() => { if (!editSaving) setEditM(null) }} disabled={editSaving}
+                  style={{ flex: 1, padding: '10px 0', borderRadius: 10, fontSize: 13, fontWeight: 600, background: '#F0F3F7', border: '1px solid #E4E9F0', color: '#6B7280', cursor: editSaving ? 'not-allowed' : 'pointer' }}>
+                  Cancelar
+                </button>
+                <button onClick={saveEdit} disabled={editSaving}
+                  style={{ flex: 2, padding: '10px 0', borderRadius: 10, fontSize: 13, fontWeight: 700, background: BRAND_GRADIENT, border: 'none', color: '#fff', cursor: editSaving ? 'not-allowed' : 'pointer', opacity: editSaving ? 0.7 : 1 }}>
+                  {editSaving ? <Loader2 size={14} className="animate-spin mx-auto" /> : 'Guardar cambios'}
                 </button>
               </div>
             </div>

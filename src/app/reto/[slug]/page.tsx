@@ -1,575 +1,194 @@
-'use client';
+'use client'
 
-import { useEffect, useState, type CSSProperties } from 'react';
-import {
-  Gem,
-  User,
-  Smartphone,
-  Mail,
-  Globe,
-  Building2,
-  Loader2,
-  CheckCircle2,
-} from 'lucide-react';
+import { useEffect, useState } from 'react'
+import { Calendar, Gem, CheckCircle2, Loader2 } from 'lucide-react'
 
-type RetoInfo = { name: string; open: boolean };
-
-type LoadState =
-  | { status: 'loading' }
-  | { status: 'not-found' }
-  | { status: 'closed'; name: string }
-  | { status: 'ready'; name: string };
-
-const BRAND_GRADIENT = 'linear-gradient(135deg,#FF2D95,#B735B8,#233B8F)';
+const BRAND = 'linear-gradient(135deg,#FF2D95 0%,#B735B8 48%,#233B8F 100%)'
+const NAVY = '#1E2A4A'
+const MUTED = '#8B93A7'
 
 const COUNTRIES = [
-  'Bolivia',
-  'Argentina',
-  'Chile',
-  'Perú',
-  'Colombia',
-  'Ecuador',
-  'México',
-  'España',
-  'Estados Unidos',
-  'Paraguay',
-  'Uruguay',
-  'Venezuela',
-  'Brasil',
-  'Otro',
-];
+  'Bolivia', 'Argentina', 'Chile', 'Perú', 'Colombia', 'Ecuador', 'México',
+  'España', 'Estados Unidos', 'Paraguay', 'Uruguay', 'Venezuela', 'Brasil', 'Otro',
+]
 
-export default function Page({ params }: { params: { slug: string } }) {
-  const { slug } = params;
+type State = 'loading' | 'notfound' | 'closed' | 'form' | 'success'
 
-  const [load, setLoad] = useState<LoadState>({ status: 'loading' });
+const label: React.CSSProperties = {
+  display: 'block', fontSize: 12, fontWeight: 800, letterSpacing: '0.06em',
+  textTransform: 'uppercase', color: NAVY, marginBottom: 7,
+}
+const input: React.CSSProperties = {
+  width: '100%', padding: '14px 16px', borderRadius: 12, border: '1px solid #E3E6F0',
+  background: '#EEF0F7', fontSize: 14.5, color: NAVY, outline: 'none', boxSizing: 'border-box',
+}
 
-  const [fullName, setFullName] = useState('');
-  const [phone, setPhone] = useState('');
-  const [email, setEmail] = useState('');
-  const [country, setCountry] = useState('');
-  const [city, setCity] = useState('');
+export default function RetoRegisterPage({ params }: { params: { slug: string } }) {
+  const [state, setState] = useState<State>('loading')
+  const [retoName, setRetoName] = useState('Reto 90 Días')
+  const [sending, setSending] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
-  const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [fieldErrors, setFieldErrors] = useState<{ fullName?: boolean; phone?: boolean }>({});
-  const [success, setSuccess] = useState(false);
+  const [fullName, setFullName] = useState('')
+  const [phone, setPhone] = useState('')
+  const [email, setEmail] = useState('')
+  const [country, setCountry] = useState('')
+  const [city, setCity] = useState('')
+  const [savedName, setSavedName] = useState('')
 
   useEffect(() => {
-    let active = true;
-    setLoad({ status: 'loading' });
-
-    (async () => {
-      try {
-        const res = await fetch(`/api/reto/${slug}`);
-        if (!active) return;
-
-        if (res.status === 404) {
-          setLoad({ status: 'not-found' });
-          return;
-        }
-
-        if (!res.ok) {
-          setLoad({ status: 'not-found' });
-          return;
-        }
-
-        const data = (await res.json()) as RetoInfo;
-        if (!active) return;
-
-        if (!data || data.open === false) {
-          setLoad({ status: 'closed', name: data?.name ?? '' });
-          return;
-        }
-
-        setLoad({ status: 'ready', name: data.name });
-      } catch {
-        if (active) setLoad({ status: 'not-found' });
-      }
-    })();
-
-    return () => {
-      active = false;
-    };
-  }, [slug]);
-
-  const retoName =
-    load.status === 'ready' || load.status === 'closed'
-      ? load.name || 'Reto 90 Días'
-      : 'Reto 90 Días';
+    let alive = true
+    fetch(`/api/reto/${params.slug}`)
+      .then(async (r) => {
+        if (!r.ok) throw new Error('notfound')
+        return r.json()
+      })
+      .then((d) => {
+        if (!alive) return
+        if (d?.name) setRetoName(d.name)
+        setState(d?.open ? 'form' : 'closed')
+      })
+      .catch(() => { if (alive) setState('notfound') })
+    return () => { alive = false }
+  }, [params.slug])
 
   function resetForm() {
-    setFullName('');
-    setPhone('');
-    setEmail('');
-    setCountry('');
-    setCity('');
-    setError(null);
-    setFieldErrors({});
-    setSuccess(false);
+    setFullName(''); setPhone(''); setEmail(''); setCountry(''); setCity('')
+    setError(null); setState('form')
   }
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setError(null);
-
-    const nextFieldErrors: { fullName?: boolean; phone?: boolean } = {};
-    if (!fullName.trim()) nextFieldErrors.fullName = true;
-    if (!phone.trim()) nextFieldErrors.phone = true;
-
-    if (nextFieldErrors.fullName || nextFieldErrors.phone) {
-      setFieldErrors(nextFieldErrors);
-      setError('Por favor completa tu nombre y tu número de celular.');
-      return;
-    }
-
-    setFieldErrors({});
-    setSubmitting(true);
-
+  async function submit(e: React.FormEvent) {
+    e.preventDefault()
+    if (!fullName.trim()) { setError('Escribe tu nombre.'); return }
+    if (!phone.trim()) { setError('Escribe tu número de celular.'); return }
+    setSending(true); setError(null)
     try {
-      const res = await fetch(`/api/reto/${slug}/register`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          fullName: fullName.trim(),
-          phone: phone.trim(),
-          email: email.trim(),
-          country,
-          city: city.trim(),
-        }),
-      });
-
-      let payload: { ok?: boolean; error?: string } = {};
-      try {
-        payload = await res.json();
-      } catch {
-        payload = {};
-      }
-
-      if (!res.ok || !payload.ok) {
-        setError(payload.error || 'No se pudo completar el registro. Intenta de nuevo.');
-        return;
-      }
-
-      setSuccess(true);
-    } catch {
-      setError('Error de conexión. Verifica tu internet e intenta de nuevo.');
+      const r = await fetch(`/api/reto/${params.slug}/register`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ fullName: fullName.trim(), phone: phone.trim(), email: email.trim(), country, city: city.trim() }),
+      })
+      const d = await r.json().catch(() => ({}))
+      if (!r.ok || !d?.ok) throw new Error(d?.error || 'No se pudo completar el registro.')
+      setSavedName(fullName.trim().split(/\s+/)[0] || fullName.trim())
+      setState('success')
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'No se pudo completar el registro.')
     } finally {
-      setSubmitting(false);
+      setSending(false)
     }
   }
 
   return (
-    <main style={styles.page}>
-      <div style={styles.borderGlow}>
-        <div style={styles.card}>
-          {load.status === 'loading' && (
-            <div style={styles.centerState}>
-              <Loader2 size={36} color="#FF2D95" style={{ animation: 'reto-spin 1s linear infinite' }} />
-              <p style={styles.stateText}>Cargando…</p>
-            </div>
-          )}
-
-          {load.status === 'not-found' && (
-            <div style={styles.centerState}>
-              <Gem size={40} color="#B735B8" style={styles.diamondGlow} />
-              <h1 style={styles.stateTitle}>Reto no encontrado</h1>
-              <p style={styles.stateText}>
-                El enlace no corresponde a ningún reto activo. Verifica que sea correcto.
-              </p>
-            </div>
-          )}
-
-          {load.status === 'closed' && (
-            <div style={styles.centerState}>
-              <Gem size={40} color="#B735B8" style={styles.diamondGlow} />
-              <h1 style={styles.stateTitle}>{retoName}</h1>
-              <p style={styles.stateText}>El registro está cerrado por ahora.</p>
-            </div>
-          )}
-
-          {load.status === 'ready' && success && (
-            <div style={styles.centerState}>
-              <CheckCircle2 size={56} color="#22C55E" style={styles.successGlow} />
-              <h1 style={styles.stateTitle}>¡Registro completado! 🎉</h1>
-              <p style={styles.retoNameSuccess}>{retoName}</p>
-              <p style={styles.stateText}>Pronto recibirás información por WhatsApp.</p>
-              <button type="button" style={styles.secondaryBtn} onClick={resetForm}>
-                Registrar a otra persona
-              </button>
-            </div>
-          )}
-
-          {load.status === 'ready' && !success && (
-            <>
-              <div style={styles.header}>
-                <div style={styles.iconWrap}>
-                  <Gem size={40} color="#FF2D95" style={styles.diamondGlow} />
-                </div>
-                <h1 style={styles.title}>
-                  <span style={styles.gradientText}>{retoName}</span>
-                </h1>
-                <p style={styles.subtitle}>Completa tus datos para comenzar</p>
-              </div>
-
-              {error && <div style={styles.errorBanner}>{error}</div>}
-
-              <form onSubmit={handleSubmit} noValidate style={styles.form}>
-                <Field label="Nombre">
-                  <InputWithIcon
-                    icon={<User size={18} color="#6B7280" />}
-                    invalid={fieldErrors.fullName}
-                  >
-                    <input
-                      type="text"
-                      value={fullName}
-                      onChange={(e) => setFullName(e.target.value)}
-                      placeholder="Ingresa tu nombre"
-                      style={styles.input}
-                      autoComplete="name"
-                    />
-                  </InputWithIcon>
-                </Field>
-
-                <Field label="Celular">
-                  <InputWithIcon
-                    icon={<Smartphone size={18} color="#6B7280" />}
-                    invalid={fieldErrors.phone}
-                  >
-                    <input
-                      type="tel"
-                      value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
-                      placeholder="Ingresa tu número de celular"
-                      style={styles.input}
-                      autoComplete="tel"
-                      inputMode="tel"
-                    />
-                  </InputWithIcon>
-                </Field>
-
-                <Field label="Correo">
-                  <InputWithIcon icon={<Mail size={18} color="#6B7280" />}>
-                    <input
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      placeholder="Ingresa tu correo electrónico"
-                      style={styles.input}
-                      autoComplete="email"
-                      inputMode="email"
-                    />
-                  </InputWithIcon>
-                </Field>
-
-                <div style={styles.row}>
-                  <div style={styles.rowCol}>
-                    <Field label="País">
-                      <InputWithIcon icon={<Globe size={18} color="#6B7280" />}>
-                        <select
-                          value={country}
-                          onChange={(e) => setCountry(e.target.value)}
-                          style={{
-                            ...styles.input,
-                            ...styles.select,
-                            color: country ? '#FFFFFF' : '#6B7280',
-                          }}
-                        >
-                          <option value="" disabled style={styles.option}>
-                            Selecciona tu país
-                          </option>
-                          {COUNTRIES.map((c) => (
-                            <option key={c} value={c} style={styles.option}>
-                              {c}
-                            </option>
-                          ))}
-                        </select>
-                      </InputWithIcon>
-                    </Field>
-                  </div>
-
-                  <div style={styles.rowCol}>
-                    <Field label="Ciudad">
-                      <InputWithIcon icon={<Building2 size={18} color="#6B7280" />}>
-                        <input
-                          type="text"
-                          value={city}
-                          onChange={(e) => setCity(e.target.value)}
-                          placeholder="Ingresa tu ciudad"
-                          style={styles.input}
-                          autoComplete="address-level2"
-                        />
-                      </InputWithIcon>
-                    </Field>
-                  </div>
-                </div>
-
-                <button type="submit" style={styles.submitBtn} disabled={submitting}>
-                  {submitting ? (
-                    <span style={styles.btnInner}>
-                      <Loader2
-                        size={20}
-                        color="#FFFFFF"
-                        style={{ animation: 'reto-spin 1s linear infinite' }}
-                      />
-                      Registrando…
-                    </span>
-                  ) : (
-                    'REGISTRARSE'
-                  )}
-                </button>
-              </form>
-            </>
-          )}
-        </div>
+    <div style={{
+      minHeight: '100vh', width: '100%', display: 'flex', flexDirection: 'column',
+      alignItems: 'center', justifyContent: 'center', padding: '32px 16px', boxSizing: 'border-box',
+      background: 'radial-gradient(1200px 600px at 20% -10%, rgba(255,45,149,0.18), transparent 55%), radial-gradient(1200px 700px at 90% 110%, rgba(35,59,143,0.35), transparent 55%), linear-gradient(160deg,#0C1428 0%,#141033 55%,#0B1020 100%)',
+    }}>
+      {/* Marca MY DIAMOND */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 22 }}>
+        <Gem size={26} style={{ color: '#fff', filter: 'drop-shadow(0 0 10px rgba(255,45,149,0.6))' }} />
+        <span style={{ color: '#fff', fontWeight: 800, letterSpacing: '0.16em', fontSize: 17 }}>MY DIAMOND</span>
       </div>
 
-      <style>{`
-        @keyframes reto-spin { to { transform: rotate(360deg); } }
-        input::placeholder { color: #6B7280; }
-        select:focus, input:focus { outline: none; }
-      `}</style>
-    </main>
-  );
-}
+      <div style={{
+        width: '100%', maxWidth: 470, background: '#fff', borderRadius: 26,
+        boxShadow: '0 30px 80px rgba(0,0,0,0.45)', padding: '34px 30px', boxSizing: 'border-box',
+      }}>
+        {state === 'loading' ? (
+          <div style={{ display: 'flex', justifyContent: 'center', padding: '40px 0' }}>
+            <Loader2 size={26} className="animate-spin" style={{ color: '#B735B8' }} />
+          </div>
+        ) : state === 'notfound' ? (
+          <div style={{ textAlign: 'center', padding: '30px 0' }}>
+            <p style={{ fontSize: 18, fontWeight: 800, color: NAVY, margin: 0 }}>Enlace no válido</p>
+            <p style={{ fontSize: 14, color: MUTED, marginTop: 8 }}>Este enlace de registro no existe o fue cambiado.</p>
+          </div>
+        ) : state === 'closed' ? (
+          <div style={{ textAlign: 'center', padding: '30px 0' }}>
+            <div style={{ position: 'relative', width: 48, height: 48, margin: '0 auto 14px' }}>
+              <Calendar size={48} strokeWidth={1.6} style={{ color: '#B735B8' }} />
+              <span style={{ position: 'absolute', bottom: 6, left: 0, right: 0, textAlign: 'center', fontSize: 15, fontWeight: 800, color: '#B735B8' }}>90</span>
+            </div>
+            <p style={{ fontSize: 18, fontWeight: 800, color: NAVY, margin: 0 }}>Registro cerrado</p>
+            <p style={{ fontSize: 14, color: MUTED, marginTop: 8 }}>Por ahora no se aceptan nuevas inscripciones. Vuelve más tarde 🙌</p>
+          </div>
+        ) : state === 'success' ? (
+          <div style={{ textAlign: 'center', padding: '20px 0' }}>
+            <CheckCircle2 size={64} style={{ color: '#16A34A', margin: '0 auto 16px', display: 'block' }} />
+            <h1 style={{ fontSize: 24, fontWeight: 800, color: NAVY, margin: 0 }}>¡Felicidades, {savedName}! 🎉</h1>
+            <p style={{ fontSize: 15, color: MUTED, margin: '10px 0 24px' }}>Tu registro al reto quedó completo.</p>
+            <button
+              onClick={resetForm}
+              style={{ width: '100%', padding: '15px', borderRadius: 14, border: 'none', color: '#fff', fontSize: 14, fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', background: BRAND, cursor: 'pointer', boxShadow: '0 12px 26px rgba(183,53,184,0.3)' }}
+            >
+              Registrar a otra persona
+            </button>
+          </div>
+        ) : (
+          <form onSubmit={submit}>
+            {/* Encabezado */}
+            <div style={{ textAlign: 'center', marginBottom: 24 }}>
+              <div style={{ position: 'relative', width: 48, height: 48, margin: '0 auto 12px' }}>
+                <Calendar size={48} strokeWidth={1.6} style={{ color: '#B735B8' }} />
+                <span style={{ position: 'absolute', bottom: 6, left: 0, right: 0, textAlign: 'center', fontSize: 15, fontWeight: 800, color: '#B735B8' }}>90</span>
+              </div>
+              <h1 style={{ fontSize: 24, fontWeight: 800, color: NAVY, margin: 0, textTransform: 'uppercase', letterSpacing: '-0.01em', lineHeight: 1.15 }}>
+                Regístrate al {retoName}
+              </h1>
+              <p style={{ fontSize: 14.5, color: MUTED, margin: '8px 0 0' }}>Da el primer paso hacia tu transformación.</p>
+            </div>
 
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <label style={styles.field}>
-      <span style={styles.label}>{label}</span>
-      {children}
-    </label>
-  );
-}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+              <div>
+                <label style={label}>Nombre</label>
+                <input style={input} value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="Escribe tu nombre completo" />
+              </div>
+              <div>
+                <label style={label}>Celular</label>
+                <input style={input} type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="Escribe tu número de celular" />
+              </div>
+              <div>
+                <label style={label}>Correo</label>
+                <input style={input} type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Escribe tu correo electrónico" />
+              </div>
+              <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap' }}>
+                <div style={{ flex: '1 1 150px' }}>
+                  <label style={label}>País</label>
+                  <select style={{ ...input, cursor: 'pointer' }} value={country} onChange={(e) => setCountry(e.target.value)}>
+                    <option value="">Selecciona tu país</option>
+                    {COUNTRIES.map((c) => <option key={c} value={c}>{c}</option>)}
+                  </select>
+                </div>
+                <div style={{ flex: '1 1 150px' }}>
+                  <label style={label}>Ciudad</label>
+                  <input style={input} value={city} onChange={(e) => setCity(e.target.value)} placeholder="Escribe tu ciudad" />
+                </div>
+              </div>
 
-function InputWithIcon({
-  icon,
-  invalid,
-  children,
-}: {
-  icon: React.ReactNode;
-  invalid?: boolean;
-  children: React.ReactNode;
-}) {
-  const [focused, setFocused] = useState(false);
-  return (
-    <div
-      onFocusCapture={() => setFocused(true)}
-      onBlurCapture={() => setFocused(false)}
-      style={{
-        ...styles.inputWrap,
-        borderColor: invalid ? '#EF4444' : focused ? '#FF2D95' : '#2A2E45',
-        boxShadow: focused ? '0 0 0 3px rgba(255,45,149,0.18)' : 'none',
-      }}
-    >
-      <span style={styles.inputIcon}>{icon}</span>
-      {children}
+              {error && (
+                <div style={{ padding: '11px 14px', borderRadius: 10, background: 'rgba(220,38,38,0.07)', border: '1px solid rgba(220,38,38,0.25)', color: '#DC2626', fontSize: 13, fontWeight: 600 }}>
+                  {error}
+                </div>
+              )}
+
+              <button
+                type="submit"
+                disabled={sending}
+                style={{
+                  width: '100%', padding: '16px', borderRadius: 14, border: 'none', color: '#fff',
+                  fontSize: 15, fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase',
+                  background: BRAND, cursor: sending ? 'wait' : 'pointer', opacity: sending ? 0.8 : 1,
+                  boxShadow: '0 14px 30px rgba(183,53,184,0.32)', marginTop: 4,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                }}
+              >
+                {sending && <Loader2 size={17} className="animate-spin" />}
+                {sending ? 'Registrando…' : 'Registrarse'}
+              </button>
+            </div>
+          </form>
+        )}
+      </div>
     </div>
-  );
+  )
 }
-
-const styles: Record<string, CSSProperties> = {
-  page: {
-    minHeight: '100vh',
-    width: '100%',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: '24px 16px',
-    boxSizing: 'border-box',
-    background:
-      'radial-gradient(1200px 600px at 50% -10%, rgba(255,45,149,0.10), transparent 60%),' +
-      'radial-gradient(900px 600px at 50% 110%, rgba(35,59,143,0.18), transparent 60%),' +
-      '#0A0A12',
-    color: '#FFFFFF',
-    fontFamily:
-      '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
-  },
-  borderGlow: {
-    width: '100%',
-    maxWidth: 520,
-    borderRadius: 24,
-    padding: 1.5,
-    background: BRAND_GRADIENT,
-    boxShadow: '0 0 40px rgba(255,45,149,0.25), 0 0 80px rgba(35,59,143,0.25)',
-  },
-  card: {
-    background: 'rgba(14,17,32,0.96)',
-    borderRadius: 22.5,
-    padding: '32px 24px',
-    boxSizing: 'border-box',
-  },
-  header: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    textAlign: 'center',
-    marginBottom: 24,
-  },
-  iconWrap: {
-    marginBottom: 14,
-    display: 'flex',
-  },
-  diamondGlow: {
-    filter: 'drop-shadow(0 0 12px rgba(255,45,149,0.7))',
-  },
-  successGlow: {
-    filter: 'drop-shadow(0 0 14px rgba(34,197,94,0.6))',
-    marginBottom: 6,
-  },
-  title: {
-    fontSize: 30,
-    lineHeight: 1.15,
-    fontWeight: 800,
-    margin: 0,
-  },
-  gradientText: {
-    background: BRAND_GRADIENT,
-    WebkitBackgroundClip: 'text',
-    backgroundClip: 'text',
-    WebkitTextFillColor: 'transparent',
-    color: 'transparent',
-  },
-  subtitle: {
-    marginTop: 10,
-    marginBottom: 0,
-    color: '#9AA0B4',
-    fontSize: 15,
-  },
-  form: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: 16,
-  },
-  field: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: 7,
-  },
-  label: {
-    fontSize: 13.5,
-    fontWeight: 600,
-    color: '#FFFFFF',
-  },
-  inputWrap: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: 10,
-    background: '#0B0E1A',
-    border: '1px solid #2A2E45',
-    borderRadius: 12,
-    padding: '0 12px',
-    height: 50,
-    transition: 'border-color 0.15s ease, box-shadow 0.15s ease',
-  },
-  inputIcon: {
-    display: 'flex',
-    alignItems: 'center',
-    flexShrink: 0,
-  },
-  input: {
-    flex: 1,
-    width: '100%',
-    minWidth: 0,
-    background: 'transparent',
-    border: 'none',
-    outline: 'none',
-    color: '#FFFFFF',
-    fontSize: 15,
-    height: '100%',
-    padding: 0,
-    fontFamily: 'inherit',
-  },
-  select: {
-    appearance: 'none',
-    WebkitAppearance: 'none',
-    MozAppearance: 'none',
-    cursor: 'pointer',
-  },
-  option: {
-    background: '#0E1120',
-    color: '#FFFFFF',
-  },
-  row: {
-    display: 'flex',
-    gap: 12,
-    flexWrap: 'wrap',
-  },
-  rowCol: {
-    flex: '1 1 180px',
-    minWidth: 0,
-  },
-  submitBtn: {
-    marginTop: 6,
-    width: '100%',
-    border: 'none',
-    borderRadius: 14,
-    padding: '15px 16px',
-    background: BRAND_GRADIENT,
-    color: '#FFFFFF',
-    fontSize: 15,
-    fontWeight: 800,
-    letterSpacing: 0.6,
-    textTransform: 'uppercase',
-    cursor: 'pointer',
-    boxShadow: '0 8px 24px rgba(255,45,149,0.30)',
-    fontFamily: 'inherit',
-  },
-  btnInner: {
-    display: 'inline-flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 10,
-  },
-  secondaryBtn: {
-    marginTop: 18,
-    borderRadius: 12,
-    padding: '12px 20px',
-    background: 'transparent',
-    border: '1px solid #2A2E45',
-    color: '#FFFFFF',
-    fontSize: 14,
-    fontWeight: 600,
-    cursor: 'pointer',
-    fontFamily: 'inherit',
-  },
-  errorBanner: {
-    background: 'rgba(239,68,68,0.12)',
-    border: '1px solid rgba(239,68,68,0.45)',
-    color: '#FCA5A5',
-    borderRadius: 12,
-    padding: '12px 14px',
-    fontSize: 13.5,
-    marginBottom: 16,
-  },
-  centerState: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-    textAlign: 'center',
-    gap: 10,
-    padding: '20px 4px',
-  },
-  stateTitle: {
-    fontSize: 22,
-    fontWeight: 800,
-    margin: 0,
-  },
-  retoNameSuccess: {
-    margin: 0,
-    fontSize: 16,
-    fontWeight: 700,
-    background: BRAND_GRADIENT,
-    WebkitBackgroundClip: 'text',
-    backgroundClip: 'text',
-    WebkitTextFillColor: 'transparent',
-    color: 'transparent',
-  },
-  stateText: {
-    margin: 0,
-    color: '#9AA0B4',
-    fontSize: 15,
-    lineHeight: 1.5,
-  },
-};

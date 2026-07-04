@@ -61,6 +61,39 @@ export async function removeMember(id: string) {
   return setMemberStatus(id, 'REMOVED')
 }
 
+/** Actualiza los datos de un miembro (nombre, celular, correo, país, ciudad). */
+export async function updateMember(
+  id: string,
+  data: { fullName?: string; phone?: string; email?: string | null; country?: string | null; city?: string | null },
+) {
+  try {
+    return await prisma.challengeMember.update({
+      where: { id },
+      data: {
+        ...(data.fullName !== undefined ? { fullName: data.fullName } : {}),
+        ...(data.phone !== undefined ? { phone: normalizePhone(data.phone) } : {}),
+        ...(data.email !== undefined ? { email: data.email } : {}),
+        ...(data.country !== undefined ? { country: data.country } : {}),
+        ...(data.city !== undefined ? { city: data.city } : {}),
+      },
+    })
+  } catch (err) {
+    console.error(`[reto90d/memberService] updateMember failed (id=${id}):`, err)
+    throw new Error('No se pudo actualizar al miembro')
+  }
+}
+
+/** Elimina definitivamente a un miembro del reto. */
+export async function deleteMember(id: string) {
+  try {
+    await prisma.challengeMember.delete({ where: { id } })
+    return true
+  } catch (err) {
+    console.error(`[reto90d/memberService] deleteMember failed (id=${id}):`, err)
+    throw new Error('No se pudo eliminar al miembro')
+  }
+}
+
 /** Cambia el estado de un miembro. */
 export async function setMemberStatus(id: string, status: MemberStatus) {
   try {
