@@ -44,6 +44,158 @@ function fallbackReply(input: AssistInput): string {
   ].join('\n')
 }
 
+// ── Recordatorio motivacional personalizado ─────────────────────────────────
+export type ReminderKindES = 'morning' | 'midday' | 'afternoon' | 'night'
+export type ReminderGenInput = {
+  instructions?: string
+  participantName: string
+  challengeName: string
+  kind: ReminderKindES
+  tasksStatus: TaskStatusLite[]
+  points: number
+  dayNumber?: number // día del reto (1..90) si se conoce
+  openaiKey?: string
+}
+
+const KIND_CONTEXT: Record<ReminderKindES, string> = {
+  morning: 'Es la MAÑANA: dale energía para arrancar el día.',
+  midday: 'Es el MEDIODÍA: chequeo de avance, ánimo para seguir.',
+  afternoon: 'Es la TARDE: recuérdale aprovechar lo que queda del día.',
+  night: 'Es la NOCHE: última llamada para cerrar el día con sus tareas.',
+}
+
+function reminderFallback(input: ReminderGenInput): string {
+  const done = input.tasksStatus.filter((t) => t.done)
+  const pend = input.tasksStatus.filter((t) => !t.done)
+  const hi: Record<ReminderKindES, string> = {
+    morning: `¡Buenos días, ${input.participantName}! ☀️`,
+    midday: `¡${input.participantName}, mediodía! ⏳`,
+    afternoon: `¡${input.participantName}, buenas tardes! 💪`,
+    night: `¡${input.participantName}, cerremos el día! 🌙`,
+  }
+  if (!input.tasksStatus.length) return `${hi[input.kind]}\nHoy aún no hay tareas cargadas. ¡Prepárate para mañana! 🔥`
+  if (!pend.length) return `${hi[input.kind]}\n🎉 ¡Completaste TODAS tus tareas de hoy (${done.length}/${input.tasksStatus.length}) y sumaste ${input.points} pts! Sigue así, vas increíble. 🏆`
+  const lista = pend.map((t) => `⬜ ${t.title}`).join('\n')
+  const logro = done.length ? `Ya llevas ${done.length}/${input.tasksStatus.length} ✅ (${input.points} pts). ` : ''
+  return `${hi[input.kind]}\n${logro}Te falta${pend.length > 1 ? 'n' : ''}:\n${lista}\n\n📸 Mándame la evidencia y sumas puntos. ¡Tú puedes! 🚀`
+}
+
+/** Mensaje de recordatorio motivacional, consciente de lo YA entregado. */
+export async function generateReminder(input: ReminderGenInput): Promise<string> {
+  const apiKey = input.openaiKey || process.env.OPENAI_API_KEY
+  if (!apiKey || !input.tasksStatus.length) return reminderFallback(input)
+
+  const done = input.tasksStatus.filter((t) => t.done).map((t) => t.title)
+  const pend = input.tasksStatus.filter((t) => !t.done).map((t) => t.title)
+
+  const system = [
+    input.instructions?.trim() || 'Eres el coach del Reto 90 Días de My Diamond. Motivas con cercanía y energía.',
+    '',
+    `Reto "${input.challengeName}". Participante: ${input.participantName}. Puntos hoy: ${input.points}.`,
+    KIND_CONTEXT[input.kind],
+    `Tareas YA entregadas hoy: ${done.length ? done.join('; ') : 'ninguna'}.`,
+    `Tareas PENDIENTES hoy: ${pend.length ? pend.join('; ') : 'ninguna'}.`,
+    '',
+    'Escribe UN mensaje corto de recordatorio MOTIVACIONAL (máx 4 líneas), en español, con su nombre.',
+    '- Reconoce y felicita lo que YA entregó (si entregó algo).',
+    '- Motívalo a entregar SOLO las tareas pendientes; NO le recuerdes las que ya hizo.',
+    '- Si ya completó todo, felicítalo fuerte y anímalo a mantener la racha (sin pedir más).',
+    '- Cierra invitando a mandar la evidencia (foto o texto). Usa 1-2 emojis, sin exagerar.',
+    'Devuelve SOLO el texto del mensaje (sin comillas ni JSON).',
+  ].join('\n')
+
+  const controller = new AbortController()
+  const timeout = setTimeout(() => controller.abort(), 20000)
+  try {
+    const res = await fetch(OPENAI_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}` },
+      signal: controller.signal,
+      body: JSON.stringify({
+        model: 'gpt-4o-mini',
+        messages: [{ role: 'system', content: system }, { role: 'user', content: 'Genera el recordatorio.' }],
+        temperature: 0.7,
+        max_tokens: 220,
+      }),
+    })
+    if (!res.ok) throw new Error(`OpenAI ${res.status}`)
+    const data = await res.json()
+    const txt = (data.choices?.[0]?.message?.content as string)?.trim()
+    return txt || reminderFallback(input)
+  } catch (err) {
+    console.error('[reto90d/reminder] failed:', err)
+    return reminderFallback(input)
+  } finally {
+    clearTimeout(timeout)
+  }
+}
+
+// ── Acompañamiento semanal / mensual (diagnóstico motivacional) ──────────────
+export type ProgressPeriod = 'semana' | 'mes'
+export type ProgressInput = {
+  instructions?: string
+  participantName: string
+  challengeName: string
+  period: ProgressPeriod
+  approved: number     // tareas aprobadas en el periodo
+  points: number       // puntos del periodo
+  activeDays: number   // días que entregó algo
+  periodDays: number   // días que tuvo el periodo (7 o ~30)
+  openaiKey?: string
+}
+
+function progressFallback(i: ProgressInput): string {
+  const p = i.period
+  if (i.approved === 0) {
+    return `¡Hola ${i.participantName}! 💪 Esta ${p} no registré entregas tuyas. Es un nuevo comienzo: hoy es el mejor día para retomar. Mándame tu primera evidencia y arrancamos con todo 🚀`
+  }
+  return `¡${i.participantName}, resumen de tu ${p}! 🏅\n✅ ${i.approved} tareas · ⭐ ${i.points} pts · 📅 ${i.activeDays}/${i.periodDays} días activo.\n¡Vas muy bien! Sigamos sumando la próxima ${p}. 🔥`
+}
+
+/** Mensaje de acompañamiento con diagnóstico del periodo (semana/mes). */
+export async function generateProgressMessage(input: ProgressInput): Promise<string> {
+  const apiKey = input.openaiKey || process.env.OPENAI_API_KEY
+  if (!apiKey) return progressFallback(input)
+
+  const system = [
+    input.instructions?.trim() || 'Eres el coach del Reto 90 Días de My Diamond. Acompañas con cercanía y motivación.',
+    '',
+    `Reto "${input.challengeName}". Participante: ${input.participantName}.`,
+    `Resumen de la ${input.period}: ${input.approved} tareas aprobadas, ${input.points} puntos, activo ${input.activeDays} de ${input.periodDays} días.`,
+    '',
+    `Escribe UN mensaje de acompañamiento de la ${input.period} (máx 5 líneas), en español, con su nombre.`,
+    '- Dale un diagnóstico breve y motivador de cómo le fue.',
+    '- Si le fue bien, felicítalo y rétalo a más; si le fue flojo, anímalo sin regañar, con foco en retomar.',
+    '- Termina con una meta concreta y positiva para la próxima ' + input.period + '.',
+    'Devuelve SOLO el texto (sin comillas ni JSON).',
+  ].join('\n')
+
+  const controller = new AbortController()
+  const timeout = setTimeout(() => controller.abort(), 20000)
+  try {
+    const res = await fetch(OPENAI_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}` },
+      signal: controller.signal,
+      body: JSON.stringify({
+        model: 'gpt-4o-mini',
+        messages: [{ role: 'system', content: system }, { role: 'user', content: 'Genera el mensaje.' }],
+        temperature: 0.7,
+        max_tokens: 260,
+      }),
+    })
+    if (!res.ok) throw new Error(`OpenAI ${res.status}`)
+    const data = await res.json()
+    const txt = (data.choices?.[0]?.message?.content as string)?.trim()
+    return txt || progressFallback(input)
+  } catch (err) {
+    console.error('[reto90d/progress] failed:', err)
+    return progressFallback(input)
+  } finally {
+    clearTimeout(timeout)
+  }
+}
+
 export async function assistParticipant(input: AssistInput): Promise<AssistResult> {
   const apiKey = input.openaiKey || process.env.OPENAI_API_KEY
   if (!apiKey) return { intent: 'chat', reply: fallbackReply(input) }

@@ -8,21 +8,25 @@ import { prisma } from '@/lib/prisma'
 import { getActiveChallenge } from './challengeService'
 import { listMembers } from './memberService'
 import { getActiveTasksForToday } from './taskService'
-import { getPendingTasksForUser } from './submissionService'
-import { buildReminderMessage, type ReminderKind } from './reminderService'
+import { getPendingTasksForUser, getDaySubmissions, getRangeStats } from './submissionService'
+import { type ReminderKind } from './reminderService'
 import {
   generateDailyUserReport,
   generateAdminDailyReport,
   generateGroupReport,
 } from './reportService'
 import { getOptedInPhones } from './conversationService'
-import { sendToPhone, sendToAdmin, sendToGroup } from '@/lib/whatsapp/reto90dSender'
+import { generateReminder, generateProgressMessage, type TaskStatusLite } from '@/lib/ai/retoAssistant'
+import {
+  sendToPhone, sendToAdmin, sendToGroup, getRetoInstructions, getEffectiveOpenAIKey,
+} from '@/lib/whatsapp/reto90dSender'
 
 const WINDOW_MIN = 7
 const SENTINEL = '__system__'
 
 // Guard en memoria del proceso: evita reenviar el mismo recordatorio en la ventana.
 const reminderGuard = new Set<string>()
+const periodGuard = new Set<string>()
 
 export function laPazParts(tz: string): { date: string; hhmm: string } {
   const fmt = new Intl.DateTimeFormat('en-CA', {
@@ -74,21 +78,38 @@ export async function runReminders(opts?: { kind?: ReminderKind }): Promise<Sche
     const guardKey = `${challenge.id}:${kind}:${date}`
     if (reminderGuard.has(guardKey)) return { skipped: 'ya enviado', kind }
 
-    const [allMembers, optedIn] = await Promise.all([
+    const [allMembers, optedIn, tasks, instructions, openaiKey] = await Promise.all([
       listMembers(challenge.id, { status: 'ACTIVE' }),
       getOptedInPhones(challenge.id),
+      getActiveTasksForToday(challenge.id),
+      getRetoInstructions(),
+      getEffectiveOpenAIKey(),
     ])
     // BAN-SAFE: solo a quienes ya le escribieron al bot.
     const members = allMembers.filter((m) => optedIn.has(m.phone))
-    const totalTasks = (await getActiveTasksForToday(challenge.id)).length
 
     let sent = 0
     for (const m of members) {
       try {
-        const pendientes = (await getPendingTasksForUser(m.phone, challenge.id, new Date())).length
-        const completadas = Math.max(0, totalTasks - pendientes)
-        const text = buildReminderMessage(kind, {
-          nombre: m.fullName, totalTareas: totalTasks, completadas, pendientes,
+        // Estado por tarea de ESTE miembro: qué entregó y qué le falta.
+        const [pending, subs] = await Promise.all([
+          getPendingTasksForUser(m.phone, challenge.id, new Date()),
+          getDaySubmissions(m.phone, challenge.id, new Date()),
+        ])
+        const pendingIds = new Set(pending.map((t) => t.id))
+        const points = subs.filter((s) => s.status === 'APPROVED').reduce((a, s) => a + (s.pointsEarned || 0), 0)
+        const tasksStatus: TaskStatusLite[] = tasks.map((t) => ({
+          title: t.title, done: !pendingIds.has(t.id), points: t.points, evidenceType: t.evidenceType,
+        }))
+
+        const text = await generateReminder({
+          instructions: instructions ?? undefined,
+          participantName: (m.fullName || '').trim().split(/\s+/)[0] || m.fullName,
+          challengeName: challenge.name,
+          kind,
+          tasksStatus,
+          points,
+          openaiKey: openaiKey ?? undefined,
         })
         if (await sendToPhone(m.phone, text)) sent++
       } catch (e) {
@@ -102,6 +123,72 @@ export async function runReminders(opts?: { kind?: ReminderKind }): Promise<Sche
     return { ok: true, kind, date, members: members.length, sent }
   } catch (err) {
     console.error('[reto90d/scheduler] runReminders error:', err)
+    return { error: err instanceof Error ? err.message : 'error' }
+  }
+}
+
+/** Acompañamiento SEMANAL (domingos) y MENSUAL (día 1) — resumen motivacional. */
+export async function runPeriodicSummaries(): Promise<SchedulerResult> {
+  try {
+    const config = await prisma.whatsAppConfig.findFirst({ where: { isActive: true }, orderBy: { updatedAt: 'desc' } })
+    if (!config) return { skipped: 'sin config activa' }
+    const tz = config.timezone || 'America/La_Paz'
+    const { date, hhmm } = laPazParts(tz)
+
+    const diff = minutesOf(hhmm) - minutesOf(config.finalReportTime)
+    if (!(diff >= 0 && diff <= WINDOW_MIN)) return { skipped: 'fuera de ventana' }
+
+    const dow = new Date(`${date}T12:00:00Z`).getUTCDay() // 0 = domingo
+    const dayOfMonth = parseInt(date.slice(8, 10), 10)
+
+    let period: 'semana' | 'mes' | null = null
+    let from: Date | null = null
+    let periodDays = 7
+    if (dayOfMonth === 1) { period = 'mes'; from = new Date(Date.now() - 30 * 86400000); periodDays = 30 }
+    else if (dow === 0) { period = 'semana'; from = new Date(Date.now() - 7 * 86400000); periodDays = 7 }
+    if (!period || !from) return { skipped: 'hoy no toca semana/mes' }
+
+    const challenge = await getActiveChallenge(tz)
+    if (!challenge) return { skipped: 'sin reto activo' }
+
+    const guardKey = `${period}:${date}`
+    if (periodGuard.has(guardKey)) return { skipped: 'ya enviado', period }
+
+    const [allMembers, optedIn, instructions, openaiKey] = await Promise.all([
+      listMembers(challenge.id, { status: 'ACTIVE' }),
+      getOptedInPhones(challenge.id),
+      getRetoInstructions(),
+      getEffectiveOpenAIKey(),
+    ])
+    const members = allMembers.filter((m) => optedIn.has(m.phone)) // ban-safe
+    const now = new Date()
+
+    let sent = 0
+    for (const m of members) {
+      try {
+        const stats = await getRangeStats(m.phone, challenge.id, from, now)
+        const text = await generateProgressMessage({
+          instructions: instructions ?? undefined,
+          participantName: (m.fullName || '').trim().split(/\s+/)[0] || m.fullName,
+          challengeName: challenge.name,
+          period,
+          approved: stats.approved,
+          points: stats.points,
+          activeDays: stats.activeDays,
+          periodDays,
+          openaiKey: openaiKey ?? undefined,
+        })
+        if (await sendToPhone(m.phone, text)) sent++
+      } catch (e) {
+        console.error('[reto90d/scheduler] resumen periódico falló', m.phone, e)
+      }
+    }
+
+    periodGuard.add(guardKey)
+    if (periodGuard.size > 200) periodGuard.clear()
+    return { ok: true, period, date, members: members.length, sent }
+  } catch (err) {
+    console.error('[reto90d/scheduler] runPeriodicSummaries error:', err)
     return { error: err instanceof Error ? err.message : 'error' }
   }
 }

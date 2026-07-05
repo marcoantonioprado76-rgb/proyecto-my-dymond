@@ -199,8 +199,9 @@ export async function register() {
         // externo; el endpoint /api/cron/reto-90d/* queda como respaldo manual.
         const retoScheduler = async () => {
             try {
-                const { runReminders, runFinalReport } = await import('@/lib/reto90d/scheduler')
+                const { runReminders, runFinalReport, runPeriodicSummaries } = await import('@/lib/reto90d/scheduler')
                 await runReminders()
+                await runPeriodicSummaries() // acompañamiento semanal (domingos) y mensual (día 1)
                 await runFinalReport()
             } catch (err) {
                 console.error('[RETO90D] scheduler tick error:', err)

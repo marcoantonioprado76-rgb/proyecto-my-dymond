@@ -392,3 +392,24 @@ export async function getDaySubmissions(
         orderBy: { submittedAt: 'asc' },
     })
 }
+
+/** Progreso de un miembro en un rango [from, to): tareas aprobadas, puntos y días activos. */
+export async function getRangeStats(
+    phone: string,
+    challengeId: string,
+    from: Date,
+    to: Date,
+): Promise<{ approved: number; points: number; activeDays: number }> {
+    try {
+        const subs = await prisma.taskSubmission.findMany({
+            where: { phone, challengeId, status: 'APPROVED', submittedAt: { gte: from, lt: to } },
+            select: { pointsEarned: true, submittedAt: true },
+        })
+        const points = subs.reduce((a, s) => a + (s.pointsEarned || 0), 0)
+        const days = new Set(subs.map((s) => s.submittedAt.toISOString().slice(0, 10))).size
+        return { approved: subs.length, points, activeDays: days }
+    } catch (err) {
+        console.error('[reto90d/submissionService] getRangeStats failed:', err)
+        return { approved: 0, points: 0, activeDays: 0 }
+    }
+}
