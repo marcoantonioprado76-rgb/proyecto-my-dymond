@@ -15,6 +15,7 @@ import {
   generateAdminDailyReport,
   generateGroupReport,
 } from './reportService'
+import { getOptedInPhones } from './conversationService'
 import { sendToPhone, sendToAdmin, sendToGroup } from '@/lib/whatsapp/reto90dSender'
 
 const WINDOW_MIN = 7
@@ -73,7 +74,12 @@ export async function runReminders(opts?: { kind?: ReminderKind }): Promise<Sche
     const guardKey = `${challenge.id}:${kind}:${date}`
     if (reminderGuard.has(guardKey)) return { skipped: 'ya enviado', kind }
 
-    const members = await listMembers(challenge.id, { status: 'ACTIVE' })
+    const [allMembers, optedIn] = await Promise.all([
+      listMembers(challenge.id, { status: 'ACTIVE' }),
+      getOptedInPhones(challenge.id),
+    ])
+    // BAN-SAFE: solo a quienes ya le escribieron al bot.
+    const members = allMembers.filter((m) => optedIn.has(m.phone))
     const totalTasks = (await getActiveTasksForToday(challenge.id)).length
 
     let sent = 0
@@ -123,7 +129,12 @@ export async function runFinalReport(opts?: { force?: boolean }): Promise<Schedu
     const day = new Date()
 
     // ── 1) Reporte individual por miembro (idempotente por sentToUser) ──
-    const members = await listMembers(challenge.id, { status: 'ACTIVE' })
+    // BAN-SAFE: solo a quienes ya le escribieron al bot.
+    const [allMembers, optedIn] = await Promise.all([
+      listMembers(challenge.id, { status: 'ACTIVE' }),
+      getOptedInPhones(challenge.id),
+    ])
+    const members = allMembers.filter((m) => optedIn.has(m.phone))
     let usersSent = 0
     for (const m of members) {
       try {

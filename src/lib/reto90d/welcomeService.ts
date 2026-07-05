@@ -4,9 +4,8 @@
 // reto, usando una plantilla editable ({nombre}, {reto}). Best-effort: nunca
 // lanza (no debe romper el registro si el bot no está conectado).
 // ─────────────────────────────────────────────────────────────────────────────
-import { sendToPhone, getWelcomeTemplate, getRetoWaNumber } from '@/lib/whatsapp/reto90dSender'
+import { getWelcomeTemplate, getRetoWaNumber } from '@/lib/whatsapp/reto90dSender'
 import { sendRetoWelcomeEmail } from '@/lib/email'
-import { saveRetoMessage } from './conversationService'
 
 const DEFAULT_WELCOME =
   '¡Felicidades {nombre}! 🎉 Te uniste al reto *{reto}*.\n' +
@@ -38,29 +37,20 @@ export async function sendWelcome(
   fullName: string,
   email?: string | null,
 ): Promise<boolean> {
-  const template = await getWelcomeTemplate()
-  const msg = buildWelcome(template, fullName, challengeName)
-  let anyOk = false
-
-  // 1) Correo con botón de WhatsApp (canal principal y confiable)
-  if (email && email.trim()) {
-    try {
-      const waNumber = await getRetoWaNumber()
-      const ok = await sendRetoWelcomeEmail(email.trim(), fullName, challengeName, msg, waNumber)
-      anyOk = anyOk || ok
-    } catch (err) {
-      console.error('[reto90d/welcome] email failed:', err)
-    }
+  // BAN-SAFE: el bot NUNCA escribe primero por WhatsApp (eso banea el número).
+  // La bienvenida va SOLO por CORREO, con un botón wa.me para que el participante
+  // ESCRIBA PRIMERO al número del reto. A partir de ahí el bot solo responde.
+  if (!email || !email.trim()) {
+    console.warn('[reto90d/welcome] sin correo, no se envía bienvenida (no mandamos WhatsApp primero)')
+    return false
   }
-
-  // 2) WhatsApp (best-effort; puede fallar si el bot aún no habló con ese número)
   try {
-    const ok = await sendToPhone(phone, msg)
-    if (ok) await saveRetoMessage(challengeId, phone, 'bot', msg)
-    anyOk = anyOk || ok
+    const template = await getWelcomeTemplate()
+    const msg = buildWelcome(template, fullName, challengeName)
+    const waNumber = await getRetoWaNumber()
+    return await sendRetoWelcomeEmail(email.trim(), fullName, challengeName, msg, waNumber)
   } catch (err) {
-    console.error('[reto90d/welcome] whatsapp failed:', err)
+    console.error('[reto90d/welcome] email failed:', err)
+    return false
   }
-
-  return anyOk
 }

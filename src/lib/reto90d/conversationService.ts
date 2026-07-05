@@ -26,6 +26,25 @@ export async function saveRetoMessage(
   }
 }
 
+/**
+ * Teléfonos que YA le escribieron al bot (tienen al menos un mensaje entrante).
+ * BAN-SAFE: solo a estos se les puede enviar WhatsApp proactivo (recordatorios,
+ * reportes), porque iniciaron la conversación. A los demás, nunca escribimos primero.
+ */
+export async function getOptedInPhones(challengeId: string): Promise<Set<string>> {
+  try {
+    const rows = await prisma.retoMessage.findMany({
+      where: { challengeId, role: 'user' },
+      select: { phone: true },
+      distinct: ['phone'],
+    })
+    return new Set(rows.map((r) => r.phone))
+  } catch (err) {
+    console.error('[reto90d/conversation] getOptedInPhones failed:', err)
+    return new Set()
+  }
+}
+
 /** Últimos N mensajes (orden cronológico ascendente) del participante. */
 export async function getRecentMessages(
   challengeId: string,
