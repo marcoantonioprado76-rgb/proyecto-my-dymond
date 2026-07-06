@@ -45,9 +45,9 @@ export async function POST(
 
         console.log(`[Upload] file: ${file.name}, type: ${file.type}, size: ${(file.size / 1024 / 1024).toFixed(2)}MB`)
 
-        // Validate env vars
-        if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
-            return NextResponse.json({ error: 'Supabase no configurado en .env' }, { status: 500 })
+        // Validate env vars (storage en S3 vía shim: requiere región + prefijo de buckets)
+        if (!process.env.AWS_REGION || !process.env.S3_BUCKET_PREFIX) {
+            return NextResponse.json({ error: 'Almacenamiento (S3) no configurado en .env' }, { status: 500 })
         }
 
         // Ensure bucket exists — create silently if missing
