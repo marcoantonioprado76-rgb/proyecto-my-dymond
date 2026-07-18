@@ -4,8 +4,8 @@
 //
 // Uso (desde la raíz del repo, con node_modules instalado):
 //   source deploy/.secrets/source.env
-//   export S3_BUCKET_PREFIX="mydymond-<ACCOUNT>-"  AWS_REGION="us-east-2"
-//   AWS_PROFILE=mydymond node deploy/migrate-storage.mjs
+//   export S3_BUCKET_PREFIX="agentenuro-<ACCOUNT>-"  AWS_REGION="us-east-1"
+//   AWS_PROFILE=agentenuro node deploy/migrate-storage.mjs
 // ============================================================================
 import { createClient } from '@supabase/supabase-js'
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3'
@@ -13,7 +13,7 @@ import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3'
 const SUPA_URL = process.env.SRC_SUPABASE_URL
 const SUPA_KEY = process.env.SRC_SUPABASE_SERVICE_ROLE_KEY
 const PREFIX   = process.env.S3_BUCKET_PREFIX
-const REGION   = process.env.AWS_REGION || 'us-east-2'
+const REGION   = process.env.AWS_REGION || 'us-east-1'
 const BUCKETS  = (process.env.SRC_BUCKETS || 'uploads ad-creatives broadcast-images social-media course-videos').split(/\s+/).filter(Boolean)
 
 if (!SUPA_URL || !SUPA_KEY || !PREFIX) {

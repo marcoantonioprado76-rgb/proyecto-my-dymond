@@ -16,7 +16,7 @@ source "$SECRETS_DIR/source.env"
 DEST_URL="$(cat "$SECRETS_DIR/database-url")"
 command -v psql >/dev/null || { echo "Falta psql (postgresql-client). Corré en el EC2."; exit 1; }
 
-# ref del proyecto Supabase (bdhatmdhalsrwjmfcduj) desde la URL
+# ref del proyecto Supabase (zxwdmqbbkoyoybxwqvun) desde la URL
 SUPA_REF="$(echo "$SRC_SUPABASE_URL" | sed -E 's#https?://([^.]+)\..*#\1#')"
 
 for bucket in uploads ad-creatives broadcast-images social-media; do

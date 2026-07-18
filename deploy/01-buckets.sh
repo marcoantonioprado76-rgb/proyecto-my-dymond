@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ============================================================================
-# 01 · Crea los buckets S3 de my-dymond (4 públicos + 1 privado).
+# 01 · Crea los buckets S3 de agentenuro (4 públicos + 1 privado).
 # Idempotente: si el bucket ya existe, solo reaplica policy/cors.
 # ============================================================================
 source "$(dirname "$0")/config.sh"
@@ -46,5 +46,5 @@ for name in "${PRIVATE_BUCKETS[@]}"; do
   echo "    privado + CORS (con PUT para subida directa) aplicados"
 done
 
-echo "== Buckets de my-dymond =="
+echo "== Buckets de agentenuro =="
 aws s3 ls | grep "${S3_PREFIX}" || true

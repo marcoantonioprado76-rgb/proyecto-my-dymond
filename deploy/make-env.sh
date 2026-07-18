@@ -22,3 +22,13 @@ sed -e "s#__DATABASE_URL__#${DBURL}#g" \
 echo "[make-env] generado $SECRETS_DIR/prod.env"
 echo "[make-env] DATABASE_URL -> ${DBURL%%@*}@... (RDS)"
 echo "[make-env] S3_BUCKET_PREFIX -> ${S3_PREFIX}"
+
+# Aviso si quedaron variables sin completar (las que van copiadas de Render).
+LEFT="$(grep -c '__FILL_FROM_RENDER__' "$SECRETS_DIR/prod.env" || true)"
+if [ "${LEFT:-0}" != "0" ]; then
+  echo ""
+  echo "[make-env] ⚠️  Quedan $LEFT variable(s) sin completar en prod.env:"
+  grep -n '__FILL_FROM_RENDER__' "$SECRETS_DIR/prod.env" | sed 's/^/    /'
+  echo "[make-env] Completá esos valores en $BASE (panel de Render) y re-corré make-env.sh."
+  echo "[make-env] Si alguna integración no la usás, poné la variable vacía (VAR=)."
+fi

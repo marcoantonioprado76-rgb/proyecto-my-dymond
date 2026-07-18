@@ -1,6 +1,6 @@
-# Migración de my-dymond a AWS — Runbook
+# Migración de agentenuro a AWS — Runbook
 
-Kit completo para migrar my-dymond (Next.js + bot WhatsApp Baileys) de Render/Supabase a **AWS**, en una **cuenta propia y aislada** (nada compartido con otros proyectos).
+Kit completo para migrar agentenuro (Next.js + bot WhatsApp Baileys) de Render/Supabase a **AWS**, en una **cuenta propia y aislada** (nada compartido con otros proyectos).
 
 Destino:
 - **Cómputo:** EC2 dedicada (Ubuntu 24.04) + Elastic IP + Caddy (HTTPS automático) + systemd.
@@ -15,13 +15,13 @@ Todo el estado sensible (llaves, passwords, `.env`) vive en `deploy/.secrets/` (
 ## 0. Requisito único de tu parte: activar la cuenta AWS y darme acceso
 
 1. Activá la cuenta AWS nueva (facturación OK).
-2. Creá un usuario IAM `claude-mydymond` con `AdministratorAccess` y una **access key** (CLI).
+2. Creá un usuario IAM `claude-agentenuro` con `AdministratorAccess` y una **access key** (CLI).
 3. En esta máquina configurá el perfil aislado:
    ```bash
-   aws configure --profile mydymond      # pegás Access Key ID + Secret, región us-east-2
+   aws configure --profile agentenuro      # pegás Access Key ID + Secret, región us-east-1
    ```
 
-Todo lo demás lo corro yo. Los scripts usan **siempre** `--profile mydymond`.
+Todo lo demás lo corro yo. Los scripts usan **siempre** `--profile agentenuro`.
 
 ---
 
@@ -37,8 +37,8 @@ bash 03-ec2.sh          # EC2 + Elastic IP + SG + IAM role S3 -> imprime la IP f
 Al final, **03-ec2.sh imprime la IP fija**. 👉 **Apuntá el DNS del dominio a esa IP** en tu registrador:
 
 ```
-mydiamondapp.com      A   <IP>
-www.mydiamondapp.com  A   <IP>
+agentenuro.com      A   <IP>
+www.agentenuro.com  A   <IP>
 ```
 
 ## 2. Migrar datos y archivos
@@ -50,7 +50,7 @@ node ../deploy/migrate-storage.mjs   # (ver env abajo) copia archivos Supabase -
 
 La **base de datos** y la **reescritura de URLs** conviene correrlas **desde el EC2** (trae `psql 16` y está al lado de la RDS). Tras el deploy (paso 3), por SSH:
 ```bash
-cd /opt/mydymond/deploy
+cd /opt/agentenuro/deploy
 bash 05-migrate-db.sh   # pg_dump Supabase -> RDS
 bash 06-rewrite-urls.sh # URLs viejas de Supabase -> URLs de S3
 ```
@@ -58,7 +58,7 @@ bash 06-rewrite-urls.sh # URLs viejas de Supabase -> URLs de S3
 > `migrate-storage.mjs` (local) necesita:
 > ```bash
 > source deploy/.secrets/source.env
-> export S3_BUCKET_PREFIX="mydymond-<ACCOUNT>-" AWS_REGION="us-east-2" AWS_PROFILE=mydymond
+> export S3_BUCKET_PREFIX="agentenuro-<ACCOUNT>-" AWS_REGION="us-east-1" AWS_PROFILE=agentenuro
 > node deploy/migrate-storage.mjs
 > ```
 
@@ -68,13 +68,13 @@ bash 06-rewrite-urls.sh # URLs viejas de Supabase -> URLs de S3
 bash 04-deploy-app.sh   # clona repo, copia .env, npm ci + build, systemd + Caddy
 ```
 
-Cuando el DNS ya propagó, Caddy saca el certificado solo → `https://mydiamondapp.com`.
+Cuando el DNS ya propagó, Caddy saca el certificado solo → `https://agentenuro.com`.
 
 ---
 
 ## 4. Pasos finales (tu parte, fuera de AWS)
 
-1. **Actualizar redirect URIs** (ya apuntan a `https://mydiamondapp.com`, así que si el dominio no cambia, **no hay que tocar nada**). Si algo cambió, revisá en:
+1. **Actualizar redirect URIs** (ya apuntan a `https://agentenuro.com`, así que si el dominio no cambia, **no hay que tocar nada**). Si algo cambió, revisá en:
    - Meta (Facebook/IG), Google Ads/YouTube, TikTok — sus consolas de desarrollador.
 2. **Re-vincular los bots de WhatsApp por QR** (las sesiones de Render no se transfieren): entrá al panel de cada bot y escaneá el QR.
 3. **Verificar**: login, subida de imagen (uploads/ads), video de curso (subida + reproducción firmada), y que un bot responda.
@@ -83,7 +83,7 @@ Cuando el DNS ya propagó, Caddy saca el certificado solo → `https://mydiamond
 
 - Rotá la contraseña de la DB de Supabase vieja (ya no se usa).
 - Rotá el token de GitHub que está en la URL del remoto.
-- Borrá o desactivá la access key `claude-mydymond` si ya no la necesitás.
+- Borrá o desactivá la access key `claude-agentenuro` si ya no la necesitás.
 
 ---
 
@@ -106,5 +106,5 @@ Si algo falla en AWS, volvés el DNS a Render y listo. La RDS/S3/EC2 quedan para
 | `05-migrate-db.sh` | `pg_dump` Supabase → RDS. |
 | `06-rewrite-urls.sh` | Reescribe URLs de storage en la BD. |
 | `migrate-storage.mjs` | Copia archivos Supabase Storage → S3. |
-| `Caddyfile`, `mydymond.service` | Reverse-proxy TLS y servicio systemd. |
+| `Caddyfile`, `agentenuro.service` | Reverse-proxy TLS y servicio systemd. |
 | `.secrets/` | Llaves, passwords, `.env` (git-ignored). |

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ============================================================================
-# 02 · Crea la RDS PostgreSQL DEDICADA de my-dymond.
+# 02 · Crea la RDS PostgreSQL DEDICADA de agentenuro.
 # - Instancia propia (no compartida con nada).
 # - SG que permite 5432 desde tu IP pública (para el pg_dump/restore) y luego
 #   desde el SG del EC2 (lo agrega 03-ec2.sh).
@@ -20,7 +20,7 @@ if ! SG_RDS_ID="$(aws ec2 describe-security-groups \
       --filters Name=group-name,Values="$SG_RDS" Name=vpc-id,Values="$VPC_ID" \
       --query 'SecurityGroups[0].GroupId' --output text 2>/dev/null)" || [ "$SG_RDS_ID" = "None" ]; then
   SG_RDS_ID="$(aws ec2 create-security-group --group-name "$SG_RDS" \
-    --description "my-dymond RDS" --vpc-id "$VPC_ID" --query GroupId --output text)"
+    --description "agentenuro RDS" --vpc-id "$VPC_ID" --query GroupId --output text)"
   echo "[rds] + SG $SG_RDS ($SG_RDS_ID)"
 fi
 echo "$SG_RDS_ID" > "$SECRETS_DIR/sg-rds-id"
@@ -35,7 +35,7 @@ aws ec2 authorize-security-group-ingress --group-id "$SG_RDS_ID" \
 SUBNETS=$(aws ec2 describe-subnets --filters Name=vpc-id,Values="$VPC_ID" \
   --query 'Subnets[].SubnetId' --output text)
 aws rds create-db-subnet-group --db-subnet-group-name "${PROJECT}-subnets" \
-  --db-subnet-group-description "my-dymond" --subnet-ids $SUBNETS 2>/dev/null \
+  --db-subnet-group-description "agentenuro" --subnet-ids $SUBNETS 2>/dev/null \
   && echo "[rds] + subnet group" || echo "[rds] subnet group ya existía"
 
 # --- Password (generado una vez, persistido) --------------------------------

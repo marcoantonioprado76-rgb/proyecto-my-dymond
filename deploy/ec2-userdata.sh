@@ -9,8 +9,18 @@ set -euxo pipefail
 export DEBIAN_FRONTEND=noninteractive
 
 apt-get update -y
-apt-get install -y curl git build-essential ca-certificates gnupg postgresql-client-16 || \
-apt-get install -y curl git build-essential ca-certificates gnupg postgresql-client
+apt-get install -y curl git build-essential ca-certificates gnupg lsb-release
+
+# --- Cliente PostgreSQL 17 (repo oficial PGDG) ------------------------------
+# Necesario: Supabase corre PG 17.x y pg_dump se niega a dumpear de un server
+# más nuevo que el cliente. El client-16 de Ubuntu 24.04 NO sirve para migrar.
+install -d /usr/share/postgresql-common/pgdg
+curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc \
+  -o /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc
+echo "deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] https://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" \
+  > /etc/apt/sources.list.d/pgdg.list
+apt-get update -y
+apt-get install -y postgresql-client-17 || apt-get install -y postgresql-client
 
 # --- Node 20 LTS (NodeSource) ----------------------------------------------
 curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
@@ -26,7 +36,7 @@ apt-get install -y caddy
 # --- Directorios de la app y del disco persistente -------------------------
 # /var/data/baileys-sessions = sesiones de WhatsApp (BAILEYS_SESSIONS_DIR).
 # Vive en el volumen root (gp3) que sobrevive reinicios stop/start.
-mkdir -p /opt/mydymond /var/data/baileys-sessions
-chown -R ubuntu:ubuntu /opt/mydymond /var/data
+mkdir -p /opt/agentenuro /var/data/baileys-sessions
+chown -R ubuntu:ubuntu /opt/agentenuro /var/data
 
-echo "user-data OK" > /var/log/mydymond-bootstrap.done
+echo "user-data OK" > /var/log/agentenuro-bootstrap.done

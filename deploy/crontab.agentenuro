@@ -1,0 +1,5 @@
+# agentenuro — crons externos (los demás corren in-process vía instrumentation.ts)
+* * * * *   /opt/agentenuro/cron/hit.sh GET  /api/cron/follow-ups       >> /opt/agentenuro/cron/cron.log 2>&1
+*/2 * * * * /opt/agentenuro/cron/hit.sh GET  /api/cron/social-scheduler >> /opt/agentenuro/cron/cron.log 2>&1
+*/2 * * * * /opt/agentenuro/cron/hit.sh GET  /api/purchases/verify      >> /opt/agentenuro/cron/cron.log 2>&1
+0 13 * * *  /opt/agentenuro/cron/hit.sh POST /api/cron/plan-reminders   >> /opt/agentenuro/cron/cron.log 2>&1

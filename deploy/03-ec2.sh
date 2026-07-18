@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ============================================================================
-# 03 · Provisiona el EC2 de my-dymond: IAM role (acceso S3), security group,
+# 03 · Provisiona el EC2 de agentenuro: IAM role (acceso S3), security group,
 #      key pair, instancia Ubuntu 24.04 + Elastic IP, y abre RDS al EC2.
 # El bootstrap base (Node/Caddy/git) va como user-data; el deploy de la app
 # (env + build + arranque) lo hace 04-deploy-app.sh por SSH.
@@ -16,7 +16,7 @@ if ! aws iam get-role --role-name "$IAM_ROLE" >/dev/null 2>&1; then
     '{"Version":"2012-10-17","Statement":[{"Effect":"Allow","Principal":{"Service":"ec2.amazonaws.com"},"Action":"sts:AssumeRole"}]}' >/dev/null
   echo "[ec2] + IAM role $IAM_ROLE"
 fi
-aws iam put-role-policy --role-name "$IAM_ROLE" --policy-name s3-mydymond --policy-document \
+aws iam put-role-policy --role-name "$IAM_ROLE" --policy-name s3-agentenuro --policy-document \
   "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Action\":[\"s3:GetObject\",\"s3:PutObject\",\"s3:DeleteObject\",\"s3:ListBucket\"],\"Resource\":[\"arn:aws:s3:::${S3_PREFIX}*\",\"arn:aws:s3:::${S3_PREFIX}*/*\"]}]}"
 if ! aws iam get-instance-profile --instance-profile-name "$IAM_PROFILE" >/dev/null 2>&1; then
   aws iam create-instance-profile --instance-profile-name "$IAM_PROFILE" >/dev/null
@@ -30,7 +30,7 @@ if ! SG_APP_ID="$(aws ec2 describe-security-groups \
       --filters Name=group-name,Values="$SG_APP" Name=vpc-id,Values="$VPC_ID" \
       --query 'SecurityGroups[0].GroupId' --output text 2>/dev/null)" || [ "$SG_APP_ID" = "None" ]; then
   SG_APP_ID="$(aws ec2 create-security-group --group-name "$SG_APP" \
-    --description "my-dymond app" --vpc-id "$VPC_ID" --query GroupId --output text)"
+    --description "agentenuro app" --vpc-id "$VPC_ID" --query GroupId --output text)"
   echo "[ec2] + SG $SG_APP ($SG_APP_ID)"
 fi
 echo "$SG_APP_ID" > "$SECRETS_DIR/sg-app-id"
